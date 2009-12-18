@@ -32,6 +32,7 @@ public:
 				}
 
 		word	 lvlPtrCalculate( byte pCount );
+		void	 BlackScreen();
 		void	 ClearScreen();
 		void	 changeLevel( size_t pNumber );
 		void	 drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfxPosX, word pGfxPosY );
