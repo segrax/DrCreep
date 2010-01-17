@@ -711,10 +711,35 @@ noCarry2:;
 		if( gfxCurrentPosY < 0x19 ) {
 			gfxCurPos = gfxDestX2;
 			
-			
+			Y = 0;
+
+			for(;;) {
+				if( gfxCurPos < 0x28 ) 
+					mDump[ word_30 + Y ] = mDump[ word_32 + Y ];
+				
+				++Y;
+				if( gfxCurPos == gfxPosRightX )
+					break;
+
+				++gfxCurPos;
+			}
 		}
 		//5C7F
+		if( gfxCurrentPosY != mDump[ 0x5CE2 ] ) {
+			++gfxCurrentPosY;
+			gfx += gfxWidth;
+		} else {
+		// 5C99
+			if( mDump[ 0x5CE5 ] != 1 )
+				return;
 
+			mDump[ 0x5CE5 ] = 0;
+			if( gfxCurrentPosY != 0xFF )
+				if( gfxCurrentPosY >= 0x18 )
+					return;
+		}
+		// 5CB0
+		word_30 += 0x28;
 	}
 
 }
