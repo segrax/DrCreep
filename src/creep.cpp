@@ -545,7 +545,7 @@ void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfx
 	byte_34 |= mDump[ 0xBB00 + gfxCurrentPosY ] << 8;
 
 	byte drawingFirst;
-	byte count;
+	static byte count = 0xD5;	// FIXME: is this correct?
 
 	// 5A77
 	for(;;) {
@@ -658,7 +658,7 @@ noCarry2:;
 		if( gfxCurrentPosY < 0x19 ) {
 			gfxCurPos = gfxDestX2;
 		
-			Y = 0;
+			byte Y = 0;
 
 			for( ;; ) {
 			
@@ -696,7 +696,7 @@ noCarry2:;
 	
 	// 5C24
 	gfx += gfxWidth;
-	if( gfxPosY & 0x7 )
+	if( pGfxPosY & 0x7 )
 		mDump[ 0x5CE5 ] = 1;
 	else
 		mDump[ 0x5CE5 ] = 0;
@@ -711,11 +711,11 @@ noCarry2:;
 		if( gfxCurrentPosY < 0x19 ) {
 			gfxCurPos = gfxDestX2;
 			
-			Y = 0;
+			byte Y = 0;
 
 			for(;;) {
 				if( gfxCurPos < 0x28 ) 
-					mDump[ word_30 + Y ] = mDump[ word_32 + Y ];
+					mDump[ word_30 + Y ] = mDump[ gfx + Y ];
 				
 				++Y;
 				if( gfxCurPos == gfxPosRightX )
@@ -741,7 +741,6 @@ noCarry2:;
 		// 5CB0
 		word_30 += 0x28;
 	}
-
 }
 
 void cCreep::sub_410C( word &pData ) {
