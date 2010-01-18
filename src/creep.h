@@ -17,10 +17,13 @@ private:
 
 	bool		 mQuit;
 
-	byte		 byte_11C9;
+	byte		 byte_83E, byte_83F, byte_11C9, byte_5CE2;
 
 	byte		 mTxtY_0, mTxtPosLowerY, mTxtDestXLeft, mTxtDestX, mTxtEdgeScreenX;
 	byte		 mTxtDestXRight, mTxtWidth;
+	byte		 mCount;
+	 
+	word		 word_30, word_32;
 
 public:
 
@@ -41,7 +44,9 @@ public:
 		void	 mainLoop();
 		void	 Menu();
 		void	 start();											// 
+		void	 sub_166A( word &pData );
 		void	 sub_410C( word &pData );
+		bool	 sub_5750();
 		void	 TextGraphicsDraw( word pData );
 		void	 run();
 };
