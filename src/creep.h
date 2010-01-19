@@ -1,12 +1,14 @@
 class cVideoWindow;
+class cBitmapMulticolor;
 
 class cCreep {
 
 private:
 
 	cVideoWindow		 *mWindow;
+	cBitmapMulticolor	 *mBitmap;
 
-	byte		*mDump,			*mLevel;
+	byte		*mDump,			*mLevel,		*m64CharRom;
 	size_t		 mDumpSize;
 
 	byte		 mFileListingNamePtr;
@@ -19,13 +21,15 @@ private:
 
 	byte		 byte_83E, byte_83F, byte_11C9, byte_5CE2;
 	char		 byte_5FD5, byte_5FD6;
+	byte		 byte_73B5, byte_73E8;
 
+	byte		 mTextXPos, mTextYPos, mTextColor, mTextFont, mTextFontt;
 	byte		 mTxtX_0, mTxtY_0, mTxtPosLowerY, mTxtDestXLeft, mTxtDestX, mTxtEdgeScreenX;
 	byte		 mTxtDestXRight, mTxtWidth, mTxtHeight;
 	byte		 mGfxWidth, mGfxHeight;
 	byte		 mCount;
 	 
-	word		 word_30, word_32, word_3C;
+	word		 word_30, word_32, word_34, word_3C;
 
 public:
 
@@ -34,6 +38,10 @@ public:
 
 				inline byte	*level( word pAddress ) {
 					return &mLevel[(pAddress - 0x9800) + 2];
+				}
+				
+				inline word charRom( word pAddress ) {
+					return m64CharRom[ pAddress - 0xD000 ];
 				}
 
 		word	 lvlPtrCalculate( byte pCount );
@@ -54,6 +62,7 @@ public:
 		void	 sub_410C( word &pData );
 		bool	 sub_5750();
 		void	 sub_5FA3();
+		void	 textDecode( word &pData );
 		void	 TextGraphicsDraw( word &pData );
 		void	 run();
 };

@@ -2,15 +2,19 @@
 #include "graphics/window.h"
 #include "graphics/surface.h"
 #include "creep.h"
+#include "bitmapMulticolor.h"
 
 cCreep::cCreep() {
-	
+	size_t RomSize;
+
+	m64CharRom = fileRead( "char.rom", RomSize );
 	mDumpSize = 0;
 	mDump = fileRead( "object", mDumpSize );
 	mLevel = 0;
 	mQuit = false;
 
 	mWindow = new cVideoWindow( 640, 400, 4 );
+	mBitmap = new cBitmapMulticolor();
 
 	byte_83F = 0x80;
 	byte_11C9 = 0xA0;
@@ -19,6 +23,7 @@ cCreep::cCreep() {
 
 cCreep::~cCreep() {
 
+	delete m64CharRom;
 	delete mDump;
 	delete mLevel;
 }
@@ -333,7 +338,7 @@ void cCreep::Menu() {
 			++mMenuScreenCount;
 			word word_42 = lvlPtrCalculate( mMenuScreenCount );
 
-			if( !((*level( word_42 )) && 0x40) )
+			if( !((*level( word_42 )) & 0x40) )
 				mMenuScreenCount = 0;
 
 			ClearScreen();
@@ -345,6 +350,10 @@ void cCreep::Menu() {
 		}
 		
 		// 0BE1
+		mBitmap->load( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
+		
+		mWindow->blit( mBitmap->mSurface->surfaceGet(), 0, 0 );
+		mWindow->clear(0);
 	}
 	
 }
@@ -367,8 +376,109 @@ void cCreep::Game() {
 	
 }
 
-void cCreep::DisplayText( word &pData ) {
+void cCreep::textDecode( word &pData ) {
+	byte gfxPosX, gfxPosY;
+
+	gfxPosX = mTxtX_0 = mTextXPos;
+	gfxPosY = mTxtY_0 = mTextYPos;
 	
+	if( mTextFont == 0 )
+		mTextFontt = 1;
+	else
+		mTextFontt = mTextFont & 0x03;
+
+	byte_73B5 = mTextFontt << 3;
+	byte_73E8 = byte_73B5;
+
+	word_30 = (byte_73E8 << 1) + 0xEA;
+	word_30 += 0x7300;
+
+	byte Y = 5;
+
+	for( ; Y; --Y)
+		mDump[ word_30 + Y] = mTextColor << 4;
+	
+	//2AFE
+	for(;;) {
+		byte X = mTextFont & 0x30;
+		X >>= 3;
+
+		word_30 = (mDump[ pData ] & 0x7F) << 3;
+		word_30 += mDump[ 0x2BE8 + X ];
+		word_30 += (mDump[ 0x2BE9 + X ] << 8);
+
+		// Copy from Char ROM
+		for( char count = 7; count >= 0; --count )
+			mDump[ 0x2BF0 + count ] = charRom( word_30 + count);
+
+		word_30 = 0x73EA;
+		X = 0;
+
+		// 2B50
+		for(;;) {
+			byte Y = mDump[ 0x2BF0 + X ];
+			Y >>= 4;
+			Y &= 0x0F;
+
+			word tmp =  mDump[ 0x2BF8 + Y ];
+			Y = mDump[ 0x2BF0 + X ] & 0xF;
+			tmp += (mDump[ 0x2BF8 + Y] << 8);
+			
+			mDump[ word_30 ] = tmp;
+			byte A;
+
+			if( mTextFontt < 2 ) {
+				A = 2;
+
+			} else {
+				if( mTextFontt == 2 ) {
+					word_32 = word_30;
+					word_34 = word_30;
+					A = 4;
+
+				} else {
+
+					word_32 = word_30;
+					word_34 = word_30;
+					A = 6;
+				}
+			}
+			
+			//2BAb
+			word_30 += A;
+			++X;
+			if( X >= 8 )
+				break;
+		}
+
+		drawGraphics( pData, 2, 0x95, gfxPosX, gfxPosY, 0x94 );
+
+		if( ((char) mDump[ pData ]) < 0 )
+			break;
+
+		++pData;
+		gfxPosX += 8;
+		mTxtX_0 = gfxPosX;
+	}
+
+	// 2BD7
+	++pData;
+}
+
+void cCreep::DisplayText( word &pData ) {
+	//2A6D
+
+	while( (mTextXPos = mDump[ pData ]) ) {
+		mTextYPos = mDump[ pData + 1 ];
+		mTextColor = mDump[ pData + 2 ];
+		mTextFont = mDump[ pData + 3 ];
+
+		pData += 0x04;
+
+		textDecode( pData );
+	}
+
+	++pData;
 }
 
 void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfxPosX, word pGfxPosY, byte pTxtCurrentID = 0 ) {
