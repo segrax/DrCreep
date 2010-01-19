@@ -18,19 +18,21 @@ private:
 	bool		 mQuit;
 
 	byte		 byte_83E, byte_83F, byte_11C9, byte_5CE2;
+	char		 byte_5FD5, byte_5FD6;
 
-	byte		 mTxtY_0, mTxtPosLowerY, mTxtDestXLeft, mTxtDestX, mTxtEdgeScreenX;
-	byte		 mTxtDestXRight, mTxtWidth;
+	byte		 mTxtX_0, mTxtY_0, mTxtPosLowerY, mTxtDestXLeft, mTxtDestX, mTxtEdgeScreenX;
+	byte		 mTxtDestXRight, mTxtWidth, mTxtHeight;
+	byte		 mGfxWidth, mGfxHeight;
 	byte		 mCount;
 	 
-	word		 word_30, word_32;
+	word		 word_30, word_32, word_3C;
 
 public:
 
 				 cCreep();
 				~cCreep();
 
-				inline byte	*level( word pAddress) {
+				inline byte	*level( word pAddress ) {
 					return &mLevel[(pAddress - 0x9800) + 2];
 				}
 
@@ -38,15 +40,20 @@ public:
 		void	 BlackScreen();
 		void	 ClearScreen();
 		void	 changeLevel( size_t pNumber );
-		void	 drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfxPosX, word pGfxPosY );
+		void	 DisplayText( word &pData );
+		void	 drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfxPosX, word pGfxPosY, byte pTxtCurrentID );
 		void	 Game();
 		void	 gameMenuDisplaySetup();
 		void	 mainLoop();
 		void	 Menu();
-		void	 start();											// 
+		void	 start();	
+		void	 sub_160A( word &pData ); 
 		void	 sub_166A( word &pData );
+		void	 sub_1747( word &pData );
+		void	 sub_17EE( word &pData );
 		void	 sub_410C( word &pData );
 		bool	 sub_5750();
-		void	 TextGraphicsDraw( word pData );
+		void	 sub_5FA3();
+		void	 TextGraphicsDraw( word &pData );
 		void	 run();
 };
