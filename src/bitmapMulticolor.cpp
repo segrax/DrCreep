@@ -4,11 +4,11 @@
 
 
 cBitmapMulticolor::cBitmapMulticolor() {
-	_surface = new cVideoSurface<dword>( 160, 200 );
+	mSurface = new cVideoSurface<dword>( 320, 200 );
 }
 
 cBitmapMulticolor::~cBitmapMulticolor() {
-	delete _surface;
+	delete mSurface;
 }
 
 void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 ) {
@@ -16,36 +16,51 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 	byte	data;
 	byte	pixel;
 
-	_surface->surfaceWipe(0xFF);
+	mSurface->surfaceWipe(0xFF);
+	
+	word count = 0;
 
-	// Draw 8 Rows
-	for( size_t Y = 0; Y < 8; ++Y ) {
-		// Read char row
-		data = *pBuffer++;
-		
-		// Lets draw 8 bits
-		for( size_t X = 0; X < 8; ++X ) {
-			pixel = (data & 0xC0) >> 6;
+	// Draw 160 Rows
+	for( size_t Y = 0; Y < 200; Y += 8) {
+		size_t drawY = Y;
 
-			if(pixel == 0)
-				color = pBackgroundColor0;
+		for( size_t X = 0; X < 320; ) {
+			// Read char row
+			data = *pBuffer++;
+			count++;
 
-			else if(pixel == 1)
-				color = *pColorData & 0xF;
+			// Lets draw 8 bits
+			for( size_t drawX = X; drawX < (X + 8); ++drawX ) {
 
-			else if(pixel == 2)
-				color = *pColorData & 0xF0;
+				pixel = (data & 0xC0) >> 6;
 
-			else if(pixel == 3)
-				color = *pColorRam & 0xF;
+				if(pixel == 0)
+					color = pBackgroundColor0;
 
-			_surface->pixelDraw(X++, Y, color);
-			_surface->pixelDraw(X, Y, color);
-			data <<= 2;
-		} // X
+				else if(pixel == 1)
+					color = (*pColorData & 0xF0) >> 4;
 
-		++pColorData;
-		++pColorRam;
+				else if(pixel == 2)
+					color = *pColorData & 0xF;
+
+				else if(pixel == 3)
+					color = *pColorRam & 0x0F;
+
+				mSurface->pixelDraw(drawX++, drawY, color);
+				mSurface->pixelDraw(drawX, drawY, color);
+				data <<= 2;
+			} // X
+
+			if(++drawY == (Y + 8)) {
+				drawY = Y;
+				X += 0x8;
+
+				++pColorData;
+				++pColorRam;
+			}
+
+		}
+
 	}	// Y
 
 }
