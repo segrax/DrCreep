@@ -4,7 +4,7 @@
 
 
 cBitmapMulticolor::cBitmapMulticolor() {
-	mSurface = new cVideoSurface<dword>( 640, 400 );
+	mSurface = new cVideoSurface<dword>( 321, 201 );
 }
 
 cBitmapMulticolor::~cBitmapMulticolor() {
@@ -17,8 +17,6 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 	byte	pixel;
 
 	mSurface->surfaceWipe(0xFF);
-	
-	word count = 0;
 
 	// Draw 160 Rows
 	for( size_t Y = 0; Y < 200; Y += 8) {
@@ -27,7 +25,6 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 		for( size_t X = 0; X < 320; ) {
 			// Read char row
 			data = *pBuffer++;
-			count++;
 
 			// Lets draw 8 bits
 			for( size_t drawX = X; drawX < (X + 8); ++drawX ) {

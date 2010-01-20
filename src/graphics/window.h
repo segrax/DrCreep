@@ -20,9 +20,14 @@
 			srcRect.x = pSourceX;
 			srcRect.y = pSourceY;
 
+			srcRect.h = source->h;
+			srcRect.w = source->w;
+
 			destRect.x = x;
 			destRect.y = y;
-	
+			destRect.h = source->h;
+			destRect.w = source->w;
+
 			SDL_SetColorKey( source, SDL_SRCCOLORKEY, 0xFF);
 			SDL_BlitSurface( source, &srcRect, _surface, &destRect);
 

@@ -54,6 +54,7 @@ public:
 		void	 gameMenuDisplaySetup();
 		void	 mainLoop();
 		void	 Menu();
+		void	 SpriteMovement( word &pData, byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
 		void	 start();	
 		void	 sub_160A( word &pData ); 
 		void	 sub_166A( word &pData );
