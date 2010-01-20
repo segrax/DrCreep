@@ -19,6 +19,7 @@ private:
 
 	bool		 mQuit;
 
+	byte		 byte_474F;
 	byte		 byte_83E, byte_83F, byte_11C9, byte_5CE2;
 	char		 byte_5FD5, byte_5FD6;
 
@@ -60,8 +61,12 @@ public:
 		void	 sub_166A( word &pData );
 		void	 sub_1747( word &pData );
 		void	 sub_17EE( word &pData );
+		void	 sub_3757( word &pData );
+		void	 sub_3F14( byte &pX );
 		void	 sub_410C( word &pData );
-		bool	 sub_5750();
+		void	 sub_422A( word &pData );
+		void	 sub_46AE( word &pData );
+		bool	 sub_5750( byte &pX );
 		void	 sub_5FA3();
 		void	 textDecode( word &pData );
 		void	 TextGraphicsDraw( word &pData );

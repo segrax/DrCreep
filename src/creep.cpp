@@ -314,7 +314,12 @@ void cCreep::TextGraphicsDraw( word &pData ) {
 			case 0x080C:	// Ladder
 				sub_17EE( pData );
 				break;
-
+			case 0x080F:	// Doorbell
+				sub_422A( pData );
+				break;
+			case 0x0815:	//Forcefield
+				sub_46AE( pData );
+				break;
 			case 0x0821:
 			case 0x160A:
 				sub_160A( pData );
@@ -554,10 +559,7 @@ void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfx
 		word_30 += 0x03;
 	} 
 
-	if( pDecodeMode == 1 ) {
-		
-		
-	} else {
+	if( pDecodeMode != 1 ) {
 		word byte_38;
 
 		//58B7
@@ -686,9 +688,8 @@ void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfx
 	// 59F0
 	if( pDecodeMode == 1 ) {
 
-		// TODO
-		//gfxPosTopY = txtY_0;
-		//gfxBottomY = txtPosLowerY;
+		gfxPosTopY = mTxtY_0;
+		gfxBottomY = mTxtPosLowerY;
 
 	} else if( pDecodeMode == 2 ) {
 		byte A = 0;
@@ -1140,7 +1141,7 @@ void cCreep::sub_17EE( word &pData ) {
 		A -= 0x04;
 
 		byte_5FD5 = A;
-		A = gfxPosY >>= 3;
+		A = (gfxPosY >> 3);
 		byte_5FD6 = A;
 
 		sub_5FA3();
@@ -1170,6 +1171,7 @@ void cCreep::sub_17EE( word &pData ) {
 					mTxtX_0 = gfxPosX;
 					mTxtY_0 = gfxPosY;
 					drawGraphics( pData, 2, 0x2C, gfxPosX, gfxPosY, 0x2D );
+					gfxPosX += 4;
 				}
 			}
 			// 189C
@@ -1208,28 +1210,28 @@ void cCreep::sub_410C( word &pData ) {
 		drawGraphics( pData, 0, gfxCurrentID, gfxPosX, gfxPosY );
 		// 4159
 
-		sub_5750();
+		sub_5750( X );
 		
 		gfxPosX += 0x04;
 		gfxPosY += 0x10;
 
-		mDump[ 0xBE00 + 0 ] = count;
-		mDump[ 0xBF00 + 0 ] = 0;
+		mDump[ 0xBE00 + X ] = count;
+		mDump[ 0xBF00 + X ] = 0;
 
 		word word_42 = lvlPtrCalculate( *level( pData + 3 ) );
 		
 		byte A =  (*level( word_42 ) & 0xF);
 
-		mDump[ 0xBE03 + 0 ] = A;
+		mDump[ 0xBE03 + X ] = A;
 		A <<= 4;
 
-		A |= mDump[ 0xBE03 + 0 ];
-		mDump[ 0xBE03 + 0 ] = A;
+		A |= mDump[ 0xBE03 + X ];
+		mDump[ 0xBE03 + X ] = A;
 		
 		A = *level( pData + 2 );
 		if(A & 0x80) {
-			mDump[ 0xBE01 + 0 ] = 1;
-			A = mDump[ 0xBE03 + 0 ];
+			mDump[ 0xBE01 + X ] = 1;
+			A = mDump[ 0xBE03 + X ];
 
 			byte Y = 5;
 			while(Y) {
@@ -1248,6 +1250,130 @@ void cCreep::sub_410C( word &pData ) {
 		pData += 0x08;
 	}
 
+}
+
+void cCreep::sub_422A( word &pData ) {
+	byte gfxCurrentID, gfxPosX, gfxPosY;
+	byte byte_42AB;
+
+	byte_42AB = mDump[ pData ];
+	++pData;
+	byte X = 0;
+
+	for( ;; ) {
+
+		if( byte_42AB == 0 )
+			return;
+
+		sub_5750(X);
+		mDump[ 0xBF00 + X ] = 1;
+
+		gfxPosX = mDump[pData];
+		gfxPosY = mDump[pData+1];
+		gfxCurrentID = 0x09;
+		mDump[ 0xBE00 + X ] = mDump[ pData+2 ];
+		
+		byte A = 0;
+		char Y = 0;
+
+		for(;;) {
+			if( mDump[ 0xBF00 + Y ] == 0 ) {
+
+				if( mDump[ 0xBE00 + Y ] == mDump[ 0xBE00 + X ] ) {
+					A = mDump[ 0xBE03 + Y ];
+					break;
+				}
+			}	
+
+			Y += 8;
+		}
+
+		Y = 8;
+		while( Y >= 0 ) {
+			mDump[ 0x63D2 + Y ] = A;
+			--Y;
+		}
+
+		A >>= 4;
+		A |= 0x10;
+
+		mDump[ 0x63D6 ] = A;
+		SpriteMovement( pData, gfxCurrentID, gfxPosX, gfxPosY, 0, X);
+		pData += 0x03;
+
+		--byte_42AB;
+	}
+
+}
+
+void cCreep::sub_46AE( word &pData ) {
+	// 46AE
+	byte X = 0;
+	byte gfxPosX, gfxPosY;
+
+	byte_474F = 0;
+	
+	for(;;) {
+		
+		if( mDump[ pData ] == 0 ) {
+			++pData;
+			return;
+		}
+
+		sub_5750( X );
+
+		mDump[ 0xBF00 + X ] = 4;
+
+		gfxPosX = mDump[ pData ];
+		gfxPosY = mDump[ pData + 1 ];
+
+		drawGraphics( pData, 0, 0x3F, gfxPosX, gfxPosY, 0 );
+
+		// 46EA
+		gfxPosX += 4;
+		gfxPosY += 8;
+
+		for( char Y = 7; Y >= 0; --Y ) 
+			mDump[ 0x6889 + Y ] = 0x55;
+
+		SpriteMovement( pData, 0x40, gfxPosX, gfxPosY, 0, X );
+
+		mDump[ 0xBE00 + X ] = byte_474F;
+		mDump[ 0x4750 + byte_474F ] = 1;
+
+		sub_3757( pData );
+
+		gfxPosX = mDump[ pData + 2 ];
+		gfxPosY = mDump[ pData + 3 ];
+
+		drawGraphics( pData, 0, 0x3E, gfxPosX, gfxPosY, 0 );
+		
+		++byte_474F;
+		pData += 0x04;
+	}
+
+}
+
+void cCreep::sub_3757( word &pData ) {
+	byte X = 0;
+
+	sub_3F14( X );
+
+	mDump[ 0xBD00 + X ] = 2;
+	mDump[ 0xBD01 + X ] = mDump[ pData + 2 ];
+	mDump[ 0xBD02 + X ] = mDump[ pData + 3 ] + 2;
+	mDump[ 0xBD03 + X ] = 0x35;
+
+	mDump[ 0xBD1F + X ] = byte_474F;
+	mDump[ 0xBD1E + X ] = 0;
+	mDump[ 0xBD06 + X ] = 4;
+	mDump[ 0xBD0C + X ] = 2;
+	mDump[ 0xBD0D + X ] = 0x19;
+
+}
+
+void cCreep::sub_3F14( byte &pX ) {
+	
 }
 
 void cCreep::SpriteMovement( word &pData, byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX ) {
@@ -1277,27 +1403,25 @@ void cCreep::SpriteMovement( word &pData, byte pGfxID, byte pGfxPosX, byte pGfxP
 	mDump[ 0xBF05 + pX ] <<= 2;
 }
 
-bool cCreep::sub_5750() {
-	char X = byte_83E;
+bool cCreep::sub_5750( byte &pX ) {
 
-	if( X == 0x20 )
+	if( byte_83E == 0x20 )
 		return true;
-	
-	++byte_83E;
-	
-	X <<= 3;
+
+	pX = byte_83E++;
+	pX <<= 3;
 	
 	char Y = 8;
 
 	while( Y ) {
-		mDump[ 0xBF00 + X ] = 0;
-		mDump[ 0xBE00 + X ] = 0;
-		++X;
+		mDump[ 0xBF00 + pX ] = 0;
+		mDump[ 0xBE00 + pX ] = 0;
+		++pX;
 		--Y;
 	}
 
-	X -= 8;
-	mDump[ 0xBF04 + X ] = byte_83F;
+	pX -= 8;
+	mDump[ 0xBF04 + pX ] = byte_83F;
 
 	return false;
 }
