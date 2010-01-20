@@ -4,7 +4,7 @@
 
 
 cBitmapMulticolor::cBitmapMulticolor() {
-	mSurface = new cVideoSurface<dword>( 320, 200 );
+	mSurface = new cVideoSurface<dword>( 640, 400 );
 }
 
 cBitmapMulticolor::~cBitmapMulticolor() {

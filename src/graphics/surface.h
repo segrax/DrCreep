@@ -59,6 +59,7 @@ struct SDL_Surface;
 								for(int color=0; color < 16; color++) {
 									paletteColorSet(color, C64pal[color][0], C64pal[color][1], C64pal[color][2] );
 								}
+								
 							}
 
 							~cVideoSurface() {
@@ -104,7 +105,6 @@ struct SDL_Surface;
 
 			// set pixel data
 			*pixelPosition =  colorGet(pPaletteIndex);
-
 		}
 
 		SDL_Surface *scaleTo( size_t scaleLevel ) {

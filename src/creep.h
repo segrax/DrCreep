@@ -21,8 +21,8 @@ private:
 
 	byte		 byte_83E, byte_83F, byte_11C9, byte_5CE2;
 	char		 byte_5FD5, byte_5FD6;
-	byte		 byte_73B5, byte_73E8;
 
+	byte		 mGfxEdgeOfScreenX;
 	byte		 mTextXPos, mTextYPos, mTextColor, mTextFont, mTextFontt;
 	byte		 mTxtX_0, mTxtY_0, mTxtPosLowerY, mTxtDestXLeft, mTxtDestX, mTxtEdgeScreenX;
 	byte		 mTxtDestXRight, mTxtWidth, mTxtHeight;

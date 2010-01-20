@@ -250,6 +250,12 @@ void cCreep::ClearScreen() {
 	
 	BlackScreen();
 
+	word_30 = 0xC000;
+
+	while( word_30 <= 0xC800) {
+		mDump[word_30++] = 0;
+	}
+
 	byte X, A;
 
 	// 1411
@@ -338,7 +344,7 @@ void cCreep::Menu() {
 			++mMenuScreenCount;
 			word word_42 = lvlPtrCalculate( mMenuScreenCount );
 
-			if( !((*level( word_42 )) & 0x40) )
+			if( ((*level( word_42 )) & 0x40) )
 				mMenuScreenCount = 0;
 
 			ClearScreen();
@@ -387,15 +393,13 @@ void cCreep::textDecode( word &pData ) {
 	else
 		mTextFontt = mTextFont & 0x03;
 
-	byte_73B5 = mTextFontt << 3;
-	byte_73E8 = byte_73B5;
+	mDump[0x73B5] = mTextFontt << 3;
+	mDump[0x73E8] = mDump[0x73B5];
 
-	word_30 = (byte_73E8 << 1) + 0xEA;
+	word_30 = ((mDump[0x73E8] << 1) + 0xEA);
 	word_30 += 0x7300;
 
-	byte Y = 5;
-
-	for( ; Y; --Y)
+	for( char Y = 5; Y >= 0; --Y)
 		mDump[ word_30 + Y] = mTextColor << 4;
 	
 	//2AFE
@@ -424,7 +428,8 @@ void cCreep::textDecode( word &pData ) {
 			Y = mDump[ 0x2BF0 + X ] & 0xF;
 			tmp += (mDump[ 0x2BF8 + Y] << 8);
 			
-			mDump[ word_30 ] = tmp;
+			*(word*)(&mDump[ word_30 ]) = tmp;
+
 			byte A;
 
 			if( mTextFontt < 2 ) {
@@ -432,14 +437,17 @@ void cCreep::textDecode( word &pData ) {
 
 			} else {
 				if( mTextFontt == 2 ) {
-					word_32 = word_30;
-					word_34 = word_30;
+					mDump[ word_30 + 2 ] = mDump[ word_30 ];
+					mDump[ word_30 + 3 ] = mDump[ word_30 + 1 ];
+
 					A = 4;
 
 				} else {
+					mDump[ word_30 + 2 ] = mDump[ word_30 ];
+					mDump[ word_30 + 4 ] = mDump[ word_30 ];
+					mDump[ word_30 + 3 ] = mDump[ word_30 + 1 ];
+					mDump[ word_30 + 5 ] = mDump[ word_30 + 1 ];
 
-					word_32 = word_30;
-					word_34 = word_30;
 					A = 6;
 				}
 			}
@@ -449,6 +457,7 @@ void cCreep::textDecode( word &pData ) {
 			++X;
 			if( X >= 8 )
 				break;
+
 		}
 
 		drawGraphics( pData, 2, 0x95, gfxPosX, gfxPosY, 0x94 );
@@ -487,7 +496,6 @@ void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfx
 
 	byte gfxPosBottomY, gfxBottomY;
 	byte gfxDestX;
-	byte gfxEdgeOfScreenX;
 	byte gfxDestX2;
 	byte gfxPosRightX;
 	byte gfxDestY;
@@ -502,8 +510,7 @@ void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfx
 		word word_38 = pTxtCurrentID;
 		
 		word_38 <<= 1;
-		word_38 += 0x3B;
-		word_38 += 0x60 << 8;
+		word_38 += 0x603B;
 
 		word_30 = mDump[ word_38 ];
 		word_30 += mDump[ word_38 + 1 ] << 8;
@@ -513,6 +520,8 @@ void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfx
 		mCount = mDump[ word_30 + 1 ];
 
 		mTxtPosLowerY = mTxtY_0 + mTxtHeight;
+		--mTxtPosLowerY;
+
 		if( mTxtX_0 < 0x10 ) {
 			mTxtDestX = 0xFF;
 			mTxtEdgeScreenX = 0xFF;
@@ -560,18 +569,16 @@ void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfx
 		gfxDestX = (pGfxPosX - 0x10);
 
 		if( pGfxPosX < 0x10 )
-			gfxEdgeOfScreenX = 0xFF;
+			mGfxEdgeOfScreenX = 0xFF;
 		else
-			gfxEdgeOfScreenX = 0;
+			mGfxEdgeOfScreenX = 0;
 
 		gfxDestX2 = gfxDestX >> 2;
-
-		gfxDestX2 |= (gfxEdgeOfScreenX & 0xC0);
+		gfxDestX2 |= (mGfxEdgeOfScreenX & 0xC0);
 		
-		if(gfxDestX & 0x80) {
-			gfxEdgeOfScreenX <<= 1;
-			gfxEdgeOfScreenX |= 0x1;
-		}
+		mGfxEdgeOfScreenX <<= 1;
+		if(gfxDestX & 0x80)
+			mGfxEdgeOfScreenX |= 0x1;
 
 		gfxDestX <<= 1;
 		
@@ -590,20 +597,18 @@ void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfx
 			byte_38 = 0xFF;
 
 		// 595B
+		gfxDestY >>= 1;
 		if(byte_38 & 0x1) {
-			gfxDestY >>= 1;
 			gfxDestY |= 0x80;
 		}
 		byte_38 >>= 1;
-
+		gfxDestY >>= 1;
 		if(byte_38 & 0x1) {
-			gfxDestY >>= 1;
 			gfxDestY |= 0x80;
 		}
 		byte_38 >>= 1;
-		
+		gfxDestY >>= 1;
 		if(byte_38 & 0x1) {
-			gfxDestY >>= 1;
 			gfxDestY |= 0x80;
 		}
 		byte_38 >>= 1;
@@ -635,7 +640,7 @@ void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfx
 		// 59A8
 
 		byte_38 = pGfxPosX - 0x10;
-		if( !(byte_38 & 0x80) )
+		if( pGfxPosX < 0x10 )
 			A = 0xFF;
 		else
 			A = 0;
@@ -643,18 +648,22 @@ void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfx
 		byte byte38 = byte_38 & 0xFF, byte39 = ((byte_38 & 0xFF00) >> 8);
 
 		byte39 = A;
-		byte38 >>= 1;
+		
 		if( byte39 & 0x01 ) {
 			byte38 |= 0x80;
 		}
 		byte38 >>= 1;
-		byte39 >>= 1;
+		
 		if( byte39 & 0x01 ) {
 			byte38 |= 0x80;
 		}
-		byte39 >>= 1;
+		byte38 >>= 1;
+		byte39 = A;
 
 		// 59C6
+		if((videoPtr0 + byte38) > 0xFF)
+			++videoPtr1;
+
 		videoPtr0 += byte38;
 		videoPtr1 += byte39;
 
@@ -742,10 +751,10 @@ void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfx
 			if( gfxCurrentPosY < 0xC8 ) {
 				
 				gfxCurPos = mTxtDestXLeft;
-				byte byte_36 = ((byte_34 & 0xFF00) >> 8) + mTxtDestX;
-				byte byte_37 = (byte_34 & 0xFF) + mTxtEdgeScreenX;
+				byte byte_36 = ((byte_34 & 0xFF)) + mTxtDestX;
+				byte byte_37 = (byte_34 & 0xFF00) >> 8 + mTxtEdgeScreenX;
 
-				word word_36 = (byte_36 << 8) + byte_37;
+				word word_36 = byte_36 + (byte_37 << 8);
 
 				// 5AB8
 				for( byte Y = 0;; ++Y ) {
@@ -753,8 +762,8 @@ void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfx
 						
 						byte A = mDump[ word_30 + Y ];
 						A ^= 0xFF;
-						A &= mDump[ word_36 ];
-						mDump[ word_36 ] = A;
+						A &= mDump[ word_36 + Y];
+						mDump[ word_36 + Y] = A;
 					} 
 					// 5AC7
 					if( gfxCurPos == mTxtDestXRight )
@@ -783,15 +792,15 @@ void cCreep::drawGraphics( word &pData, word pDecodeMode, word pGfxID, word pGfx
 			if( gfxCurrentPosY < 0xC8 ) {
 				// 5b17
 				gfxCurPos = gfxDestX2;
-				word byte_36 = byte_34 +  (gfxEdgeOfScreenX << 8);
+				word byte_36 = byte_34 +  (mGfxEdgeOfScreenX << 8);
 				byte_36 += gfxDestX;
 
 				for( byte Y = 0; ; ++Y ) {
 					// 5B2E
 					if( gfxCurPos < 0x28 ) {
 						byte A = mDump[ word_32 + Y ];
-						A |= mDump[ byte_36 ];
-						mDump[ byte_36 ] = A;
+						A |= mDump[ byte_36 + Y];
+						mDump[ byte_36 + Y] = A;
 					}
 
 					if( gfxCurPos == gfxPosRightX )
@@ -925,7 +934,8 @@ noCarry2:;
 }
 
 void cCreep::sub_160A( word &pData ) {
-	byte gfxRepeat, gfxCurrentID, gfxPosX, gfxPosY;
+	byte gfxCurrentID, gfxPosX, gfxPosY;
+	char gfxRepeat;
 
 	while( (gfxRepeat = mDump[ pData ]) != 0 ) {
 
@@ -935,7 +945,7 @@ void cCreep::sub_160A( word &pData ) {
 
 		--gfxRepeat;
 
-		for( ; gfxRepeat; --gfxRepeat ) {
+		for( ; gfxRepeat >= 0; --gfxRepeat ) {
 		
 			drawGraphics( pData, 0, gfxCurrentID, gfxPosX, gfxPosY );
 		
