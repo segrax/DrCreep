@@ -16,8 +16,16 @@ cCreep::cCreep() {
 	mWindow = new cVideoWindow( 640, 400, 4 );
 	mBitmap = new cBitmapMulticolor();
 
+	byte_840 = 0x40;
+	byte_882 = 0x80;
+	byte_889 = 0x01;
+
 	byte_83F = 0x80;
 	byte_11C9 = 0xA0;
+
+	byte_45DD = 0x80;
+	byte_45DE = 0x40;
+	byte_45DF = 0x20;
 
 }
 
@@ -244,6 +252,13 @@ void cCreep::BlackScreen() {
 		}
 	}
 
+	for( Y = 0;; ) {
+		mDump[ 0xBD04 + Y ] = byte_889;
+		Y += 0x20;
+		if(!Y)
+			break;
+	}
+
 	byte_83E = 0;
 	
 }
@@ -302,6 +317,9 @@ void cCreep::TextGraphicsDraw( word &pData ) {
 		pData  += 2;
 
 		switch( func ) {
+			case 0:
+				return;
+
 			case 0x0803:	// Doors
 				sub_410C( pData );
 				break;
@@ -317,9 +335,16 @@ void cCreep::TextGraphicsDraw( word &pData ) {
 			case 0x080F:	// Doorbell
 				sub_422A( pData );
 				break;
+			case 0x0812:	// Lightning Machine
+				sub_43E4( pData );
+				break;
 			case 0x0815:	//Forcefield
 				sub_46AE( pData );
 				break;
+			case 0x081E:	//Lock
+				sub_4AB6( pData );
+				break;
+
 			case 0x0821:
 			case 0x160A:
 				sub_160A( pData );
@@ -1194,6 +1219,37 @@ void cCreep::sub_17EE( word &pData ) {
 
 }
 
+void cCreep::sub_4AB6( word &pData ) {
+	
+	byte X, gfxPosX, gfxPosY;
+
+	for(;;) {
+		
+		if( mDump[ pData ] == 0 )
+			break;
+
+		sub_5750( X );
+		
+		mDump[ 0xBF00 + X ] = 7;
+		gfxPosX = mDump[ pData + 3 ];
+		gfxPosY = mDump[ pData + 4 ];
+		
+		byte A = (mDump[ pData ] << 4);
+		mDump[ pData ] |= A;
+
+		for( char Y = 8; Y >= 0; --Y )
+			mDump[ 0x6C53 + Y ] = A;
+
+		mDump[ 0xBE00 + X ] = mDump[ pData ];
+		mDump[ 0xBE01 + X ] = mDump[ pData + 2 ];
+		SpriteMovement( pData, 0x58, gfxPosX, gfxPosY, 0, X );
+
+		pData += 0x05;
+	}
+
+	++pData;
+}
+
 void cCreep::sub_410C( word &pData ) {
 	byte byte_41D0 = *level(pData++);
 	word byte_41D3 = pData;
@@ -1306,6 +1362,72 @@ void cCreep::sub_422A( word &pData ) {
 
 }
 
+void cCreep::sub_43E4( word &pData ) {
+	byte	byte_44E5, byte_44E6, gfxPosX, gfxPosY;
+
+	word_45DB = pData;
+	byte_44E5 = 0;
+
+	byte X = 0, A;
+
+	for(;;) {
+		
+		if( mDump[ pData ] & byte_45DF ) {
+			++pData;
+			break;
+		}
+
+		sub_5750( X );
+
+		mDump[ 0xBE00 + X ] = byte_44E5;
+		if( mDump[ pData ] & byte_45DD ) {
+			// 441C
+			gfxPosX = mDump[ pData + 1 ];
+			gfxPosY = mDump[ pData + 2 ];
+			drawGraphics( pData, 0, 0x36, gfxPosX, gfxPosY, 0 );
+			
+			gfxPosX += 0x04;
+			gfxPosY += 0x08;
+
+			mDump[ 0xBF00 + X ] = 3;
+			if( mDump[ pData ] & byte_45DE )
+				A = 0x37;
+			else
+				A = 0x38;
+
+			SpriteMovement( pData, A, gfxPosX, gfxPosY, 0, X );
+
+		} else {
+			// 4467
+			mDump[ 0xBF00 + X ] = 2;
+			gfxPosX = mDump[ pData + 1 ];
+			gfxPosY = mDump[ pData + 2 ];
+
+			byte_44E6 = mDump[ pData + 3 ];
+			mDump[ 0xBE03 + X ] = mDump[ pData + 3 ];
+
+			for(;; ) {
+				if( !byte_44E6 ) 
+					break;
+
+				drawGraphics( pData, 0, 0x32, gfxPosX, gfxPosY, 0 );
+				gfxPosY += 0x08;
+				--byte_44E6;
+			}
+
+			gfxPosX -= 0x04;
+
+			SpriteMovement( pData, 0x33, gfxPosX, gfxPosY, 0, X );
+			if( mDump[ pData ] & byte_45DE )
+				mDump[ 0xBF04 + X ] = mDump[ 0xBF04 + X ] | byte_840;
+		}
+
+		// 44C8
+		byte_44E5 += 0x08;
+		pData += 0x08;
+	}
+}
+
 void cCreep::sub_46AE( word &pData ) {
 	// 46AE
 	byte X = 0;
@@ -1369,11 +1491,32 @@ void cCreep::sub_3757( word &pData ) {
 	mDump[ 0xBD06 + X ] = 4;
 	mDump[ 0xBD0C + X ] = 2;
 	mDump[ 0xBD0D + X ] = 0x19;
-
 }
 
 void cCreep::sub_3F14( byte &pX ) {
 	
+	pX = 0;
+	byte A;
+
+	for( ;; ) {
+		A = mDump[ 0xBD04 + pX ];
+		if( A & byte_889 )
+			break;
+
+		pX += 0x20;
+		if( pX == 0 )
+			return;
+	}
+
+	for( byte Y = 0x20; Y > 0; --Y ) {
+		mDump[ 0xBD00 + pX ] = 0;
+		++pX;
+	}
+	
+	pX -= 0x20;
+	mDump[ 0xBD04 + pX ] = byte_882;
+	mDump[ 0xBD05 + pX ] = 1;
+	mDump[ 0xBD06 + pX ] = 1;
 }
 
 void cCreep::SpriteMovement( word &pData, byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX ) {
@@ -1381,7 +1524,7 @@ void cCreep::SpriteMovement( word &pData, byte pGfxID, byte pGfxPosX, byte pGfxP
 	byte gfxDecodeMode;
 
 	byte A = mDump[ 0xBF04 + pX ];
-	if( A & byte_83F ) {
+	if( !(A & byte_83F) ) {
 		gfxDecodeMode = 2;
 		mTxtX_0 = mDump[ 0xBF01 + pX ];
 		mTxtY_0 = mDump[ 0xBF02 + pX ];

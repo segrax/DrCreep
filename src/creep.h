@@ -19,7 +19,10 @@ private:
 
 	bool		 mQuit;
 
+	word		 word_45DB;					// Lightning
+	byte		 byte_44E5, byte_45DD, byte_45DE, byte_45DF;		// Lightning
 	byte		 byte_474F;
+	byte		 byte_840, byte_889, byte_882;
 	byte		 byte_83E, byte_83F, byte_11C9, byte_5CE2;
 	char		 byte_5FD5, byte_5FD6;
 
@@ -63,8 +66,10 @@ public:
 		void	 sub_17EE( word &pData );
 		void	 sub_3757( word &pData );
 		void	 sub_3F14( byte &pX );
+		void	 sub_4AB6( word &pData );
 		void	 sub_410C( word &pData );
 		void	 sub_422A( word &pData );
+		void	 sub_43E4( word &pData );
 		void	 sub_46AE( word &pData );
 		bool	 sub_5750( byte &pX );
 		void	 sub_5FA3();
