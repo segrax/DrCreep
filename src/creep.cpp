@@ -785,6 +785,8 @@ void cCreep::sub_36B3( byte pX ) {
 			word_3C -= 2;
 			mDump[ word_3C + 0 ] = mDump[ word_3C + 0 ] & 0xFB;
 			mDump[ word_3C + 4 ] = mDump[ word_3C + 4 ] & 0xBF;
+
+			A = 0x35;
 		} else {
 			// 3709
 			if( mDump[ 0xBD03 + pX ] == 0x35 )
