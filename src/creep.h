@@ -73,12 +73,15 @@ public:
 		void	 objectFunction( byte pX );
 		void	 optionsMenu();
 		bool	 Menu();
+		void	 SpriteDraw();
 		void	 SpriteMovement( word &pData, byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
 		void	 start();	
+		void	 sub_95F();
 		void	 sub_160A( word &pData ); 
 		void	 sub_166A( word &pData );
 		void	 sub_1747( word &pData );
 		void	 sub_17EE( word &pData );
+		void	 sub_2973();
 		void	 sub_2E79( );
 		void	 sub_3026( byte pX );
 		void	 sub_31F6( byte pX );
