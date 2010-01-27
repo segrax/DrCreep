@@ -471,7 +471,6 @@ bool cCreep::Menu() {
 			mWindow->clear(0);
 			mWindow->blit( mBitmap->mSurface->surfaceGet(), 0, 0 );
 			
-
 			if( mMenuScreenTimer )
 				handleEvents();
 			else {
@@ -633,7 +632,7 @@ s2ED5:
 				word_30 = mDump[ 0xBD01 + X ];
 				word_30 <<= 1;
 
-				mDump[ 0x10 + Y ] = (word_30 - 33);
+				mDump[ 0x10 + Y ] = (word_30 - 32);
 
 				byte w30 = (word_30 & 0xFF00) >> 8;
 
@@ -1612,8 +1611,10 @@ void cCreep::sub_5D26( byte &pX ) {
 
 	if( !(mDump[ 0xBD09 + pX ] & byte_88A ))
 		A = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0xD01D ];
-	else
-		A = (mDump[ 0xD01D ] << mDump[ 0xBD0A + pX ]) | mDump[ 0x2F82 + Y ];
+	else {
+		A = (mDump[ 0xD01D ] | mDump[ 0x2F82 + Y ]);
+		mDump[ 0xBD0A + pX ] <<= 1;
+	}
 
 	// Sprite X Expansion
 	mDump[ 0xD01D ] = A;
@@ -1633,8 +1634,8 @@ void cCreep::sub_5D26( byte &pX ) {
 	if( !(mDump[ 0xBD09 + pX ] & byte_88C ))
 		A = mDump[ 0xD01B ] | mDump[ 0x2F82 + Y ];
 	else
-		A = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0xD01B ];
-
+		A = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0xD01B ]; 
+	
 	// Sprite data priority
 	mDump[ 0xD01B ] = A;
 
@@ -1643,7 +1644,7 @@ void cCreep::sub_5D26( byte &pX ) {
 		A = mDump[ 0xD01C ] | mDump[ 0x2F82 + Y ];
 	else
 		A = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0xD01C ];
-
+		
 	// MultiColor Enable
 	mDump[ 0xD01C ] = A;
 }
@@ -1654,18 +1655,18 @@ void cCreep::SpriteDraw() {
 	byte Y2 = 1;
 
 	for( byte Y = 0; Y < 8; ++Y, Y2 <<= 1 ) {
-		if( !(mDump[ 0x21 ] && Y2) )
+		if( !(mDump[ 0x21 ] & Y2) )
 			continue;
 
 		sprite = new cSprite( 0x0A, 0x0D );
 
-		if( !(mDump[ 0xBD09 + Y ] & byte_88D ))
+		if( mDump[ 0xD01C ] & Y2)
 			sprite->_rMultiColored = true;
 
-		if( !(mDump[ 0xBD09 + Y ] & byte_88B ))
+		if( mDump[ 0xD017 ] & Y2)
  			sprite->_rDoubleHeight = true;
 
-		if( !(mDump[ 0xBD09 + Y ] & byte_88A ))
+		if( mDump[ 0xD01D ] & Y2)
 			sprite->_rDoubleWidth = true;
 
 		sprite->_color = mDump[ 0xD027 + Y ];

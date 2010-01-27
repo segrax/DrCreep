@@ -10,7 +10,7 @@ cSprite::cSprite( word pColor0, word pColor1) {
 	_multiColor1 = pColor1;
 
 	_rEnabled = _rMultiColored = _rDoubleWidth = _rDoubleHeight = false;
-	_surface = new cVideoSurface<dword>(25, 22);
+	_surface = new cVideoSurface<dword>(25, 28);
 }
 
 cSprite::~cSprite() {
@@ -23,7 +23,7 @@ void cSprite::streamLoad( byte *pBuffer ) {
 
 	_surface->surfaceWipe(0xFF);
 
-	for( word Y = 0; Y < 21; ++Y ) {
+	for( word Y = 0; Y < 27; ++Y ) {
 	
 		for( word X = 0; X < 24; ++X ) {
 		
@@ -53,7 +53,6 @@ void cSprite::streamLoad( byte *pBuffer ) {
 				} 
 				
 				++X;
-
 				currentByte <<= 1;
 				currentByte <<= 1;
 				if(++count == 4) {
