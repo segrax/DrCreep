@@ -346,20 +346,46 @@ void cCreep::ClearScreen() {
 	else
 		X = 0;
 
-	if( mMenuIntro == true )
+	if( mMenuIntro )
 		A = mMenuScreenCount;
 	else
 		A = mDump[ 0x7809 + X ];
 
 	word word_42 = lvlPtrCalculate( A );
 	
+	// Room Color
 	A = mDump[word_42] & 0xF;
-	
+
+	// Set floor colours
 	// 1438
 	mDump[ 0x6481 ] = A;
 	A <<= 4;
-	mDump[ 0x6481 ] |= A;
+	A |= mDump[ 0x6481 ];
 
+	mDump[ 0x6481 ] = A;
+	mDump[ 0x648E ] = A;
+	mDump[ 0x649B ] = A;
+	mDump[ 0x65CC ] = A;
+	mDump[ 0x65CE ] = A;
+	mDump[ 0x6EAE ] = A;
+	mDump[ 0x6EAF ] = A;
+	mDump[ 0x6EB0 ] = A;
+	mDump[ 0x6EC6 ] = A;
+	mDump[ 0x6EC7 ] = A;
+	mDump[ 0x6EC8 ] = A;
+	mDump[ 0x6EDB ] = A;
+	mDump[ 0x6EDC ] = A;
+	mDump[ 0x6EED ] = A;
+	mDump[ 0x6EEE ] = A;
+	mDump[ 0x6EEF ] = A;
+	mDump[ 0x6EFC ] = A;
+	mDump[ 0x6EFD ] = A;
+	mDump[ 0x6EFE ] = A;
+	mDump[ 0x6F08 ] = A;
+	mDump[ 0x6F09 ] = A;
+	mDump[ 0x6F0A ] = A;
+
+	// Ptr to start of room data
 	word_3E = *( (word*) &mDump[word_42 + 6] );
 
 	if(mMenuIntro)
@@ -406,7 +432,9 @@ void cCreep::TextGraphicsDraw( ) {
 			case 0x081E:	// Lock
 				sub_4AB6( );
 				break;
-			
+			case 0x082A:	// Trap Door
+				//sub_517F( );
+				break;
 			case 0x082D:	// Conveyor
 				sub_5501( );
 				break;
@@ -475,7 +503,7 @@ bool cCreep::Menu() {
 
 		for(;;) {
 
-			_sleep(17);
+			_sleep(10);
 
 			if( mMenuScreenTimer )
 				handleEvents();

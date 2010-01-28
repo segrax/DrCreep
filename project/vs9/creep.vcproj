@@ -134,6 +134,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="opengl32.lib glu32.lib sdl.lib sdlmain.lib"
 				OutputFile="..\..\run\creep.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
