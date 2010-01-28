@@ -88,6 +88,7 @@ public:
 		void	 sub_3026( byte pX );
 		void	 sub_31F6( byte pX );
 		void	 sub_3F4F( );
+		void	 sub_3639( byte pX );
 		void	 sub_368A( byte &pY );
 		void	 sub_36B3( byte pX );
 		void	 sub_3757( );
@@ -103,6 +104,7 @@ public:
 		bool	 sub_5750( byte &pX );
 		void	 sub_57DF( byte pX );
 		void	 sub_5D26( byte &pX );
+		byte	 sub_5ED5( );
 		void	 sub_5F6B( byte &pX );
 		void	 sub_5FA3();
 		void	 textDecode( );

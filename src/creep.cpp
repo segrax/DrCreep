@@ -475,7 +475,7 @@ bool cCreep::Menu() {
 
 		for(;;) {
 
-			_sleep(20);
+			_sleep(17);
 
 			if( mMenuScreenTimer )
 				handleEvents();
@@ -571,6 +571,7 @@ void cCreep::handleEvents() {
 	++byte_2E36;
 
 	mBitmap->load( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
+
 	mSurface->surfaceWipe(0xFF);
 	mSurface->surfacePut( mBitmap->mSurface, 0, 0 );
 
@@ -645,28 +646,37 @@ s2ED5:
 				word_30 = mDump[ 0xBD01 + X ];
 				word_30 <<= 1;
 
+				// Sprite X
 				mDump[ 0x10 + Y ] = (word_30 - 32);
 
 				byte w30 = (word_30 & 0xFF00) >> 8;
+				
+				if( (w30 & 0x80) ) {
+					// 2f51
+					A = (mDump[ 0x2F82 + Y ] ^ 0xFF);
 
-				if( w30 )
-					A = (mDump[ 0x20 ] | mDump[ 0x2F82 + Y ]);
-				else
-					A = (mDump[ 0x20 ] ^ 0xFF);
+				} else {
+					if( w30 )
+						A = (mDump[ 0x20 ] | mDump[ 0x2F82 + Y ]);
+					else
+						A = (mDump[ 0x2F82 ] ^ 0xFF) & mDump[ 0x20 ];
 
-				// Sprites X Bit 8
-				mDump[ 0x20 ] = A;
-				if((A & mDump[ 0x2F82 + Y ]) && (mDump[ 0x10 + Y ] < 0x58) )
-					A = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0x21 ];
-				else {
-					// 2F5B
-					mDump[ 0x18 + Y ] = mDump[ 0xBD02 + X ];// + 0x32;
-					A = mDump[ 0x21 ] | mDump[ 0x2F82 + Y ];
+					// Sprites X Bit 8
+					mDump[ 0x20 ] = A;
+
+					// 2F45
+					if((A & mDump[ 0x2F82 + Y ]) && (mDump[ 0x10 + Y ] >= 0x58) )
+						A = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0x21 ];
+					else {
+						// 2F5B
+						mDump[ 0x18 + Y ] = mDump[ 0xBD02 + X ];// + 0x32;
+						A = mDump[ 0x21 ] | mDump[ 0x2F82 + Y ];
+					}
 				}
 
+				// 2F69
 				// Enabled Sprites
 				mDump[ 0x21 ] = A;
-				
 				mDump[ 0xBD05 + X ] = mDump[ 0xBD06 + X ];
 			}
 				
@@ -784,6 +794,7 @@ void cCreep::objectFunction( byte pX ) {
 			break;
 
 		case 0x3639:
+			sub_3639( pX );
 			break;
 
 		case 0x3682:
@@ -917,7 +928,38 @@ void cCreep::sub_3F4F() {
 	}
 
 	//
+	
+}
 
+void cCreep::sub_3639( byte pX ) {
+	byte A = mDump[ 0xBD04 + pX ];
+	if( A & byte_885 ) {
+		mDump[ 0xBD04 + pX ] = (A ^ byte_885) | byte_886;
+		return;
+	}
+
+	if( A & byte_882 ) {
+		A ^= byte_882;
+		mDump[ 0xBD04 + pX ] = A;
+	}
+
+	A = sub_5ED5();
+	A &= 0x03;
+	mDump[ 0xBD06 + pX ] = A;
+	++mDump[ 0xBD06 + pX ];
+
+	A = sub_5ED5();
+	A &= 3;
+
+	A += 0x39;
+	if( A == mDump[ 0xBD03 + pX ] ) {
+		A += 0x01;
+		if( A >= 0x3D )
+			A = 0x39;
+	}
+	// 3679
+	mDump[ 0xBD03 + pX ] = A;
+	sub_5D26( pX );
 }
 
 void cCreep::sub_368A( byte &pY  ) {
@@ -1681,6 +1723,46 @@ void cCreep::sub_57DF( byte pX ) {
 	}
 
 
+}
+
+byte cCreep::sub_5ED5() {
+	static byte byte_5EFB = 0x57, byte_5EFA = 0xC6, byte_5EF9 = 0xA0;
+	
+	byte A = byte_5EFB;
+	bool ocf = false, cf = false;
+
+	if( A & 0x01 )
+		cf = true;
+	
+	A >>= 1;
+	if(ocf)
+		A |= 0x80;
+	
+	ocf = cf;
+	cf = false;
+	A = byte_5EFA;
+	if( A & 0x01 )
+		cf = true;
+	A >>= 1;
+	if(ocf)
+		A |= 0x80;
+
+	byte_5EF9 = A;
+	A = 0;
+	if(cf)
+		A = 0x01;
+
+	A ^= byte_5EFA;
+	byte_5EFA = A;
+
+	A = byte_5EF9;
+	A ^= byte_5EFB;
+	byte_5EFB = A;
+	
+	A ^= byte_5EFA;
+	byte_5EFA = A;
+
+	return A;
 }
 
 void cCreep::sub_5D26( byte &pX ) {
