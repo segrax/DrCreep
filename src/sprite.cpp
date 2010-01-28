@@ -32,11 +32,13 @@ void cSprite::streamLoad( byte *pBuffer ) {
 				// 3 Bytes per row
 				
 				if(pixel) {
-					
-					if(pixel == 1)
+					if( pixel == 0 )
+						pixel = 0xFF;
+
+					else if(pixel == 1)
 						pixel = _multiColor0;
 
-					if(pixel == 2)
+					else if(pixel == 2)
 						pixel = _color;
 
 					else if(pixel == 3)

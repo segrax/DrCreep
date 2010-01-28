@@ -385,6 +385,21 @@ void cCreep::ClearScreen() {
 	mDump[ 0x6F09 ] = A;
 	mDump[ 0x6F0A ] = A;
 
+	//1487
+
+	for( char Y = 7; Y >= 0; --Y ) {
+		mDump[ 0x6FB2 + Y ] = A;
+		mDump[ 0x6FF5 + Y ] = A;
+		mDump[ 0x7038 + Y ] = A;
+		mDump[ 0x707B + Y ] = A;
+	}
+	
+	A &= 0x0F;
+	A |= 0x10;
+	mDump[ 0x6584 ] = A;
+	mDump[ 0x659B ] = mDump[ 0x65CD ] = (mDump[ 0x649B ] & 0xF0) | 0x01;
+
+	//14AC
 	// Ptr to start of room data
 	word_3E = *( (word*) &mDump[word_42 + 6] );
 
@@ -1399,7 +1414,7 @@ void cCreep::drawGraphics( word pDecodeMode, word pGfxID, word pGfxPosX, word pG
 
 			if( gfxPosBottomY >= mTxtPosLowerY ) {
 
-				if( gfxPosBottomY >= 0xDC || mTxtPosLowerY >= 0xDC ) {
+				if( gfxPosBottomY >= 0xDC && mTxtPosLowerY < 0xDC ) {
 					gfxBottomY = mTxtPosLowerY;
 				}  else
 					gfxBottomY = gfxPosBottomY;
@@ -1407,7 +1422,7 @@ void cCreep::drawGraphics( word pDecodeMode, word pGfxID, word pGfxPosX, word pG
 			} else {
 
 				// 5A49
-				if( mTxtPosLowerY >= 0xDC || gfxPosBottomY < 0xDC ) {
+				if( mTxtPosLowerY >= 0xDC && gfxPosBottomY < 0xDC ) {
 					gfxBottomY = gfxPosBottomY;
 				} else
 					gfxBottomY = mTxtPosLowerY;
@@ -1440,10 +1455,9 @@ void cCreep::drawGraphics( word pDecodeMode, word pGfxID, word pGfxPosX, word pG
 			if( gfxCurrentPosY < 0xC8 ) {
 				
 				gfxCurPos = mTxtDestXLeft;
-				byte byte_36 = ((byte_34 & 0xFF)) + mTxtDestX;
-				byte byte_37 = (byte_34 & 0xFF00) >> 8 + mTxtEdgeScreenX;
 
-				word word_36 = byte_36 + (byte_37 << 8);
+				word word_36 = (byte_34 + mTxtDestX) + (mTxtEdgeScreenX << 8);
+
 
 				// 5AB8
 				for( byte Y = 0;; ++Y ) {
@@ -1985,9 +1999,7 @@ void cCreep::sub_1747() {
 
 		//1781
 		for(;;) {
-			A = mDump[ word_3C ];
-			A &= 0x44;
-			if(A) {
+			if (mDump[ word_3C ]  & 0x44) {
 				mTxtX_0 = gfxPosX - 4;
 				mTxtY_0 = gfxPosY;
 				
@@ -2000,6 +2012,7 @@ void cCreep::sub_1747() {
 			A = mDump[ word_3C ];
 			A |= 0x10;
 			mDump[ word_3C ] = A;
+
 			--byte_17ED;
 			if( !byte_17ED ) {
 				word_3E += 0x03;
