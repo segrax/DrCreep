@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <direct.h>
 #include "stdafx.h"
+#include "graphics/surface.h"
 #include "creep.h"
 
 
