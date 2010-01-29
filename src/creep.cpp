@@ -407,11 +407,11 @@ void cCreep::ClearScreen() {
 		word_3E += 0x2000;
 
 	// Function ptr
-	TextGraphicsDraw( );
+	roomPrepare( );
 }
 
 // 15E0
-void cCreep::TextGraphicsDraw( ) {
+void cCreep::roomPrepare( ) {
 	word func = 0x01;
 
 	while(func) {
@@ -424,34 +424,34 @@ void cCreep::TextGraphicsDraw( ) {
 				return;
 
 			case 0x0803:	// Doors
-				sub_410C( );
+				obj_PrepDoors( );
 				break;
 			case 0x0806:	// Walkway
-				sub_166A( );
+				obj_PrepWalkway( );
 				break;
 			case 0x0809:	// Sliding Pole
-				sub_1747( );
+				obj_PrepSlidingPole( );
 				break;
 			case 0x080C:	// Ladder
-				sub_17EE( );
+				obj_PrepLadder( );
 				break;
 			case 0x080F:	// Doorbell
-				sub_422A( );
+				obj_PrepDoorbell( );
 				break;
 			case 0x0812:	// Lightning Machine
-				sub_43E4( );
+				obj_PrepLightning( );
 				break;
 			case 0x0815:	// Forcefield
-				sub_46AE( );
+				obj_PrepForcefield( );
 				break;
 			case 0x081E:	// Lock
-				sub_4AB6( );
+				obj_PrepLock( );
 				break;
 			case 0x082A:	// Trap Door
-				//sub_517F( );
+				obj_PrepTrapDoor( );
 				break;
 			case 0x082D:	// Conveyor
-				sub_5501( );
+				obj_PrepConveyor( );
 				break;
 
 			case 0x0821:
@@ -498,7 +498,7 @@ bool cCreep::Menu() {
 			word_3E = 0x0D1A;
 
 			BlackScreen();
-			TextGraphicsDraw( );
+			roomPrepare( );
 			
 			mBitmap->load( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
 			mSurface->surfaceWipe(0xFF);
@@ -608,7 +608,7 @@ void cCreep::handleEvents() {
 	
 	byte_2E35 = 2;
 
-	//sub_2E37();
+	sub_2E37();
 	sub_2E79();
 	sub_3F4F();
 	++byte_2E36;
@@ -619,6 +619,12 @@ void cCreep::handleEvents() {
 	mSurface->surfacePut( mBitmap->mSurface, 0, 0 );
 
 	SpriteDraw();
+}
+
+void cCreep::sub_2E37() {
+	byte gfxSpriteCollision, gfxBackgroundCollision;
+
+	//gfxSpriteCollision = mSprite
 }
 
 void cCreep::sub_2E79( ) {
@@ -635,14 +641,14 @@ void cCreep::sub_2E79( ) {
 					--mDump[ 0xBD05 + X ];
 
 					if( mDump[ 0xBD05 + X ] != 0 ) {
-						if(! (A & byte_888 )) {
+						if((A & byte_888)) {
 							sub_3026(X);
 							A = mDump[ 0xBD04 + X];
-							if(!(A & byte_883))
-								goto s2F72;
-							else
+							if((A & byte_883))
 								goto s2EF3;
 						}
+						
+						goto s2F72;
 					} else {
 					// 2EAD
 						if(A & byte_884) 
@@ -825,7 +831,7 @@ void cCreep::objectFunction( byte pX ) {
 	word func = *((word*) &mDump[ 0x88F + Y ]);
 	
 	switch(func) {
-
+/*
 		case 0x31F6:
 			//sub_31F6( pX );
 			break;
@@ -835,19 +841,19 @@ void cCreep::objectFunction( byte pX ) {
 
 		case 0x34EF:
 			break;
-
+*/
 		case 0x3639:
-			sub_3639( pX );
+			obj_ExecLightning( pX );
 			break;
 
-		case 0x3682:
+		//case 0x3682:
+		//	break;
+
+		case 0x36B3:		// Forcefield
+			obj_ExecForcefield( pX );
 			break;
 
-		case 0x36B3:
-			sub_36B3( pX );
-			break;
-
-		case 0x374F:
+		/*case 0x374F:
 			break;
 		case 0x379A:
 			break;
@@ -864,6 +870,9 @@ void cCreep::objectFunction( byte pX ) {
 		case 0x3DDE:
 			break;
 		case 0x3D6E:
+			break;*/
+		default:
+			printf("acc");
 			break;
 	}
 
@@ -904,7 +913,7 @@ void cCreep::sub_3F4F() {
 					//sub_41D8( X );
 					break;
 				case 0x42AD:	// Lightning
-					sub_42AD( X );
+					obj_ExecLightningMachine( X );
 					break;
 				case 0x44E7:
 					//sub_44E7( X );
@@ -974,7 +983,7 @@ void cCreep::sub_3F4F() {
 	
 }
 
-void cCreep::sub_3639( byte pX ) {
+void cCreep::obj_ExecLightning( byte pX ) {
 	byte A = mDump[ 0xBD04 + pX ];
 	if( A & byte_885 ) {
 		mDump[ 0xBD04 + pX ] = (A ^ byte_885) | byte_886;
@@ -1002,7 +1011,7 @@ void cCreep::sub_3639( byte pX ) {
 	}
 	// 3679
 	mDump[ 0xBD03 + pX ] = A;
-	sub_5D26( pX );
+	hw_SpritePrepare( pX );
 }
 
 void cCreep::sub_368A( byte &pY  ) {
@@ -1017,12 +1026,14 @@ void cCreep::sub_368A( byte &pY  ) {
 
 }
 
-void cCreep::sub_36B3( byte pX ) {
+// sub_36B3: Forcefield
+void cCreep::obj_ExecForcefield( byte pX ) {
 	byte A = mDump[ 0xBD04 + pX ];
 	byte Y;
 
 	if(A & byte_885 ) {
 		A ^= byte_885;
+
 		A |= byte_886;
 		mDump[ 0xBD04 + pX ] = A;
 		return;
@@ -1032,10 +1043,10 @@ void cCreep::sub_36B3( byte pX ) {
 		mDump[ 0xBD04 + pX ] = (A ^ byte_882);
 
 	Y = mDump[ 0xBD1F + pX ];
-	A = mDump[ 0x4750 + Y ];
-	if( A == 1 ) {
-		A = mDump[ 0xBD1E + pX ];
-		if( A != 1 ) {
+
+	if( mDump[ 0x4750 + Y ] == 1 ) {
+
+		if( mDump[ 0xBD1E + pX ] != 1 ) {
 			mDump[ 0xBD1E + pX ] = 1;
 			sub_5F6B( pX );
 			
@@ -1054,8 +1065,7 @@ void cCreep::sub_36B3( byte pX ) {
 
 	} else {
 	// 371A
-		A = mDump[ 0xBD1E + pX ];
-		if( A != 1 )
+		if( mDump[ 0xBD1E + pX ] != 1 )
 			return;
 
 		mDump[ 0xBD1E + pX ] = 0;
@@ -1069,7 +1079,9 @@ void cCreep::sub_36B3( byte pX ) {
 
 	// 3746
 	mDump[ 0xBD03 + pX ] = A;
-	sub_5D26( pX );
+
+	// Draw sprite
+	hw_SpritePrepare( pX );
 }
 
 // 5FD9
@@ -1662,7 +1674,7 @@ void cCreep::sub_160A() {
 	++word_3E;
 }
 
-void cCreep::sub_166A() {
+void cCreep::obj_PrepWalkway() {
 	byte byte_1744, byte_1745, byte_1746;
 	byte gfxCurrentID, gfxPosX, gfxPosY;
 
@@ -1807,15 +1819,15 @@ byte cCreep::sub_5ED5() {
 	return A;
 }
 
-void cCreep::sub_5D26( byte &pX ) {
+// 5D26: Prepare sprites
+void cCreep::hw_SpritePrepare( byte &pX ) {
 	byte byte_5E8C, byte_5E8D, byte_5E88;
 	byte A;
 
 	word word_38 = *((word*) &mDump[ 0xBD03 + pX ]);
 	word_38 <<= 1;
 
-	word_38 += 0x3B;
-	word_38 += 0x6000;
+	word_38 += 0x603B;
 	
 	word_30 = *((word*) &mDump[ word_38 ]);
 	
@@ -1916,9 +1928,10 @@ void cCreep::sub_5D26( byte &pX ) {
 void cCreep::SpriteDraw() {
 	cSprite *sprite;
 
-	byte Y2 = 1;
+	byte Y2 = 0x80;
 
-	for( byte Y = 0; Y < 8; ++Y, Y2 <<= 1 ) {
+	// Draw from sprite 7
+	for( char Y = 7; Y >= 0; --Y, Y2 >>= 1 ) {
 		if( !(mDump[ 0x21 ] & Y2) )
 			continue;
 
@@ -1976,7 +1989,7 @@ void cCreep::sub_5FA3() {
 	word_3C += A;
 }
 
-void cCreep::sub_1747() {
+void cCreep::obj_PrepSlidingPole() {
 	byte byte_17ED;
 	byte A, gfxPosX, gfxPosY;
 
@@ -2025,7 +2038,7 @@ void cCreep::sub_1747() {
 	}
 }
 
-void cCreep::sub_17EE() {
+void cCreep::obj_PrepLadder() {
 	byte byte_18E3, gfxPosX, gfxPosY;
 	
 	for(;;) {
@@ -2097,7 +2110,7 @@ void cCreep::sub_17EE() {
 
 }
 
-void cCreep::sub_4AB6() {
+void cCreep::obj_PrepLock() {
 	
 	byte X, gfxPosX, gfxPosY;
 
@@ -2128,7 +2141,7 @@ void cCreep::sub_4AB6() {
 	++word_3E;
 }
 
-void cCreep::sub_410C() {
+void cCreep::obj_PrepDoors() {
 	byte byte_41D0 = *level(word_3E++);
 	word byte_41D3 = word_3E;
 	
@@ -2186,8 +2199,8 @@ void cCreep::sub_410C() {
 
 }
 
-// Lightning
-void cCreep::sub_42AD( byte pX ) {
+// 42AD: Lightning Machine pole movement
+void cCreep::obj_ExecLightningMachine( byte pX ) {
 	byte gfxPosX, gfxPosY;
 
 	byte byte_43E2, byte_43E3;
@@ -2290,7 +2303,7 @@ void cCreep::sub_42AD( byte pX ) {
 
 }
 
-void cCreep::sub_422A() {
+void cCreep::obj_PrepDoorbell() {
 	byte gfxCurrentID, gfxPosX, gfxPosY;
 	byte byte_42AB;
 
@@ -2345,7 +2358,7 @@ void cCreep::sub_422A() {
 }
 
 // Lightning Machine Setup
-void cCreep::sub_43E4() {
+void cCreep::obj_PrepLightning() {
 	byte	byte_44E5, byte_44E6, gfxPosX, gfxPosY;
 
 	word_45DB = word_3E;
@@ -2411,7 +2424,8 @@ void cCreep::sub_43E4() {
 	}
 }
 
-void cCreep::sub_46AE() {
+// Forcefield
+void cCreep::obj_PrepForcefield() {
 	// 46AE
 	byte X = 0;
 	byte gfxPosX, gfxPosY;
@@ -2432,6 +2446,7 @@ void cCreep::sub_46AE() {
 		gfxPosX = mDump[ word_3E ];
 		gfxPosY = mDump[ word_3E + 1 ];
 
+		// Draw outside of timer
 		drawGraphics( 0, 0x3F, gfxPosX, gfxPosY, 0 );
 
 		// 46EA
@@ -2441,6 +2456,7 @@ void cCreep::sub_46AE() {
 		for( char Y = 7; Y >= 0; --Y ) 
 			mDump[ 0x6889 + Y ] = 0x55;
 
+		// Draw inside of timer
 		SpriteMovement( 0x40, gfxPosX, gfxPosY, 0, X );
 
 		mDump[ 0xBE00 + X ] = byte_474F;
@@ -2451,6 +2467,7 @@ void cCreep::sub_46AE() {
 		gfxPosX = mDump[ word_3E + 2 ];
 		gfxPosY = mDump[ word_3E + 3 ];
 
+		// Draw top of forcefield
 		drawGraphics( 0, 0x3E, gfxPosX, gfxPosY, 0 );
 		
 		++byte_474F;
@@ -2459,12 +2476,17 @@ void cCreep::sub_46AE() {
 
 }
 
+// 517F : Load the rooms Trapdoors
+void cCreep::obj_PrepTrapDoor( ) {
+
+}
+
 // Moving Sidewalk
 void cCreep::sub_538B( byte pX ) {
 	
 }
 
-void cCreep::sub_5501() {
+void cCreep::obj_PrepConveyor() {
 	word_564B = word_3E;
 
 	byte byte_5649 = 0, gfxPosX = 0, gfxPosY = 0;
