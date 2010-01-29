@@ -49,6 +49,12 @@ cCreep::cCreep() {
 	byte_45DE = 0x40;
 	byte_45DF = 0x20;
 
+	byte_4D60 = 0x80;
+	byte_4D61 = 0x40;
+	byte_4D63 = 0x10;
+	byte_4D67 = 0x01;
+	
+
 	byte_5389 = 0x80;
 	byte_538A = 0x01;
 
@@ -455,13 +461,18 @@ void cCreep::roomPrepare( ) {
 			case 0x081E:	// Lock
 				obj_PrepLock( );
 				break;
+			case 0x0824:	// Ray Gun
+				obj_PrepRayGun( );
+				break;
 			case 0x082A:	// Trap Door
 				obj_PrepTrapDoor( );
 				break;
 			case 0x082D:	// Conveyor
 				obj_PrepConveyor( );
 				break;
-
+			case 0x0830:	// Frankenstein
+				obj_PrepFrankenstein( );
+				break;
 			case 0x0821:
 			case 0x160A:
 				sub_160A( );
@@ -2139,6 +2150,82 @@ void cCreep::obj_PrepLadder() {
 
 }
 
+// 4C58: Load the rooms' Ray Guns
+void cCreep::obj_PrepRayGun() {
+	byte	byte_4D5D;
+
+	word_4D5B = word_3E;
+	byte_4D5D = 0;
+
+	for(;;) {
+		if( mDump[ word_3E ] & byte_4D60 ) {
+			++word_3E;
+			break;
+		}
+		// 4C7E
+
+		mDump[ word_3E ] &= 0xFF ^ byte_4D61;
+		byte gfxPosX = mDump[ word_3E + 1 ];
+		byte gfxPosY = mDump[ word_3E + 2 ];
+		byte gfxCurrentID;
+
+		if( mDump[ word_3E ] & byte_4D67 )
+			gfxCurrentID = 0x5F;
+		else
+			gfxCurrentID = 0x60;
+
+		byte_4D5E = mDump[ word_3E + 3 ];
+		for(;;) {
+			if(!byte_4D5E)
+				break;
+			
+			drawGraphics( 0, gfxCurrentID, gfxPosX, gfxPosY, 0 );
+			gfxPosY += 0x08;
+			--byte_4D5E;
+		}
+		// 4CCB
+		if(!( mDump[ word_3E ] & byte_4D63 )) {
+			byte X;
+
+			sub_5750( X );
+			
+			mDump[ 0xBF00 + X ] = 8;
+			mDump[ 0xBE00 + X ] = byte_4D5D;
+			mDump[ 0xBF04 + X ] |= byte_840;
+			
+			byte A = mDump[ word_3E + 3 ];
+			A <<= 3;
+			A += mDump[ word_3E + 2 ];
+			A -= 0x0B;
+			mDump[ 0xBE01 + X ] = A;
+			// 4D01
+			if( !(mDump[ word_3E ] & byte_4D67) ) {
+				A = mDump[ word_3E + 1 ];
+				A += 4;
+			} else {
+				A = mDump[ word_3E + 1 ];
+				A -= 8;
+			}
+			mDump[ 0xBF01 + X ] = A;
+		} 
+		
+		// 4D1A
+		byte X;
+
+		sub_5750( X );
+		mDump[ 0xBF00 + X ] = 9;
+		gfxPosX = mDump[ word_3E + 5 ];
+		gfxPosY = mDump[ word_3E + 6 ];
+
+		SpriteMovement( 0x6D, gfxPosX, gfxPosY, 0, X );
+
+		mDump[ 0xBE00 + X ] = byte_4D5D;
+
+		word_3E += 0x07;
+		byte_4D5D += 0x07;
+	}
+}
+
 // 49F8: Load the rooms' Keys
 void cCreep::obj_PrepKey() {
 	word_4A65 = word_3E;
@@ -2760,6 +2847,11 @@ void cCreep::obj_ExecConveyor( byte pX ) {
 		
 		SpriteMovement( gfxCurrentID, gfxPosX, gfxPosY, 0, pX );
 	}
+}
+
+// 564E: Load the rooms' frankensteins
+void cCreep::obj_PrepFrankenstein() {
+	
 }
 
 // 5501: Load the rooms' Conveyors

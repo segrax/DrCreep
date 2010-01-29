@@ -30,6 +30,11 @@ private:
 
 	word		 word_498B;											// Mummys
 
+	word		 word_4D5B;											// RayGuns
+	byte		 byte_4D5E, byte_4D61, byte_4D67, byte_4D60;		// RayGuns
+	byte		 byte_4D63;
+
+
 	word		 word_5387;											// Trap Door
 	byte		 byte_5389, byte_538A;
 
@@ -106,6 +111,7 @@ public:
 		void	 sub_3757( );
 		void	 sub_396A( byte pA, byte pX );
 		void	 sub_3F14( byte &pX );
+		void	 obj_PrepRayGun( );
 		void	 obj_PrepKey( );
 		void	 obj_PrepLock( );
 		void	 obj_PrepDoors( );
@@ -117,6 +123,7 @@ public:
 		void	 obj_PrepTrapDoor();
 		void	 obj_ExecConveyor( byte pX );
 		void	 obj_PrepConveyor( );
+		void	 obj_PrepFrankenstein();
 		bool	 sub_5750( byte &pX );
 		void	 sub_57DF( byte pX );
 		void	 hw_SpritePrepare( byte &pX );
