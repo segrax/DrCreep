@@ -20,6 +20,7 @@ cCreep::cCreep() {
 
 	mMenuMusicScore = 0xFF;
 
+	byte_839 = 0;
 	byte_840 = 0x40;
 	byte_841 = 0x20;
 	byte_882 = 0x80;
@@ -52,7 +53,6 @@ cCreep::cCreep() {
 	byte_538A = 0x01;
 
 	byte_5642 = 0x80;
-
 	byte_5643 = 0x20;
 	byte_5644 = 0x10;
 	byte_5645 = 0x08;
@@ -60,6 +60,8 @@ cCreep::cCreep() {
 	byte_5647 = 0x02;
 	byte_5648 = 0x01;
 	
+	
+
 	byte_5F57 = 0xA0;
 }
 
@@ -909,7 +911,7 @@ void cCreep::sub_3F4F() {
 				case 0:
 					mDump[ 0xBF04 + X ] ^= byte_840;
 					break;
-				case 0x3FD5:
+				/*case 0x3FD5:
 					//sub_3FD5( X );
 					break;
 				case 0x4075:
@@ -917,11 +919,11 @@ void cCreep::sub_3F4F() {
 					break;
 				case 0x41D8:
 					//sub_41D8( X );
-					break;
+					break;*/
 				case 0x42AD:	// Lightning
 					obj_ExecLightningMachine( X );
 					break;
-				case 0x44E7:
+				/*case 0x44E7:
 					//sub_44E7( X );
 					break;
 				case 0x45E0:
@@ -945,13 +947,16 @@ void cCreep::sub_3F4F() {
 				case 0x4EA8:
 					break;
 				case 0x50D2:
+					break;*/
+				case 0x538B:		// Conveyor
+					obj_ExecConveyor( X );
 					break;
-				case 0x538B:		// Moving Sidewalk
-					sub_538B( X );
-					break;
-				case 0x548B:
+				/*case 0x548B:
 					break;
 				case 0x5611:
+					break;*/
+				default:
+					printf("aaa");
 					break;
 			}
 
@@ -1239,7 +1244,7 @@ void cCreep::drawGraphics( word pDecodeMode, word pGfxID, word pGfxPosX, word pG
 		word_38 += 0x603B;
 
 		word_30 = mDump[ word_38 ];
-		word_30 += mDump[ word_38 + 1 ] << 8;
+		word_30 += (mDump[ word_38 + 1 ] << 8);
 		
 		mTxtWidth = mDump[ word_30 ];
 		mTxtHeight = mDump[ word_30 + 1];
@@ -1678,6 +1683,24 @@ void cCreep::sub_160A() {
 	}
 	
 	++word_3E;
+}
+
+void cCreep::sub_21C8( char pA ) {
+	char byte_2231 = pA;
+
+	if( mMenuIntro == 1 )
+		return;
+
+	if( byte_839 == 1 )
+		return;
+
+	if( byte_2232 < 0 )
+		return;
+
+	byte_2232 = byte_2231;
+
+	byte Y = byte_2232 << 1;
+	// TODO: 21E9
 }
 
 void cCreep::obj_PrepWalkway() {
@@ -2649,9 +2672,94 @@ void cCreep::obj_PrepTrapDoor( ) {
 
 }
 
-// Moving Sidewalk
-void cCreep::sub_538B( byte pX ) {
+// 538B: Conveyor
+void cCreep::obj_ExecConveyor( byte pX ) {
 	
+	word_40 = word_564B + mDump[ 0xBE00 + pX ];
+	byte A = mDump[ word_40 ];
+
+	// FIXME: this is not quite right...
+	// 539F
+	if( ((!(A & byte_5646)) || !(A & byte_5644)) &&  
+		(A & byte_5645) && !(A & byte_5643 )) {
+		
+		// 53B3
+			if( A & byte_5648 ) {
+				
+				A ^= byte_5648;
+				A ^= byte_5647;
+
+				mDump[ word_40 ] = A;
+				mDump[ 0x70A8 ] = mDump[ 0x70A6 ] = 0xC0;
+				//RAM:53E6 8D 24 76                    STA     loc_7623+1
+
+			} else {
+				// 53D0
+				A |= byte_5648;
+				mDump[ word_40 ] = A;
+				if( A & byte_5647 ) {
+					mDump[ 0x70A6 ] = 0x50;
+					mDump[ 0x70A8 ] = 0xC0;
+					//RAM:53E6 8D 24 76                    STA     loc_7623+1
+				} else {
+					// 53EC
+					mDump[ 0x70A6 ] = 0xC0;
+					mDump[ 0x70A8 ] = 0x20;
+					//RAM:53F8 8D 24 76                    STA     loc_7623+1
+				}
+			}
+
+			// 53FB
+			byte gfxPosX = mDump[ word_40 + 3 ];
+			byte gfxPosY = mDump[ word_40 + 4 ];
+			drawGraphics( 0, 0x82, gfxPosX, gfxPosY, 0 );
+
+			sub_21C8(0xA);
+	}
+
+	// 541B
+	A = 0xFF;
+
+	A ^= byte_5644;
+	A ^= byte_5643;
+	A &= mDump[ word_40 ];
+	// 5427
+	if( A & byte_5646 ) {
+		A |= byte_5644;
+		A ^= byte_5646;
+	}
+	if( A & byte_5645 ) {
+		A |= byte_5643;
+		A ^= byte_5645;
+	}
+
+	mDump[ word_40 ] = A;
+	// 543F
+	if( A & byte_5648 ) {
+		A = byte_2E36 & 1;
+		if( A )
+			return;
+
+		byte gfxCurrentID = mDump[ 0xBF03 + pX ];
+
+		if( !(mDump[ word_40 ] & byte_5647) ) {
+			// 5458
+			++gfxCurrentID;
+			if( gfxCurrentID >= 0x82 )
+				gfxCurrentID = 0x7E;
+
+		} else {
+			//546a
+			--gfxCurrentID;
+			if( gfxCurrentID < 0x7E )
+				gfxCurrentID = 0x81;
+		}
+		// 5479
+		byte gfxPosX = mDump[ 0xBF01 + pX ];
+		byte gfxPosY = mDump[ 0xBF02 + pX ];
+		
+		SpriteMovement( gfxCurrentID, gfxPosX, gfxPosY, 0, pX );
+	}
 }
 
 // 5501: Load the rooms' Conveyors

@@ -20,8 +20,10 @@ private:
 
 	bool		 mQuit;
 
-	byte		 byte_20DE, byte_24FD, byte_2E36, RunRestorePressed;
-	byte		 byte_2E35;
+	byte		 byte_20DE, byte_24FD, RunRestorePressed;
+	
+	byte		 byte_2E35, byte_2E36, byte_2232;					// Conveyor
+
 
 	word		 word_4A65;											// Keys
 	byte		 byte_4A64;
@@ -41,7 +43,7 @@ private:
 	byte		 byte_3FD4;
 
 	byte		 byte_840, byte_841, byte_883, byte_884, byte_885, byte_886, byte_887, byte_888, byte_889, byte_88A, byte_88B, byte_88C, byte_88D, byte_88E, byte_882, byte_D10, byte_D12;
-	byte		 byte_83E, byte_83F, byte_11C9, byte_5CE2;
+	byte		 byte_839, byte_83E, byte_83F, byte_11C9, byte_5CE2;
 	char		 byte_5FD5, byte_5FD6, byte_5FD7, byte_5FD8;
 	
 	byte		 mGfxEdgeOfScreenX;
@@ -88,6 +90,7 @@ public:
 		void	 start();	
 		void	 sub_95F();
 		void	 sub_160A(); 
+		void	 sub_21C8( char pA );
 		void	 obj_PrepWalkway( );
 		void	 obj_PrepSlidingPole( );
 		void	 obj_PrepLadder();
@@ -112,7 +115,7 @@ public:
 		void	 obj_PrepForcefield( );
 		void	 obj_PrepMummy( );
 		void	 obj_PrepTrapDoor();
-		void	 sub_538B( byte pX );
+		void	 obj_ExecConveyor( byte pX );
 		void	 obj_PrepConveyor( );
 		bool	 sub_5750( byte &pX );
 		void	 sub_57DF( byte pX );
