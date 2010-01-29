@@ -23,6 +23,11 @@ private:
 	byte		 byte_20DE, byte_24FD, byte_2E36, RunRestorePressed;
 	byte		 byte_2E35;
 
+	word		 word_4A65;											// Keys
+	byte		 byte_4A64;
+
+	word		 word_498B;											// Mummys
+
 	word		 word_5387;											// Trap Door
 	byte		 byte_5389, byte_538A;
 
@@ -62,8 +67,8 @@ public:
 				}
 
 		word	 lvlPtrCalculate( byte pCount );
-		void	 BlackScreen();
-		void	 ClearScreen();
+		void	 ScreenClear();
+		void	 roomLoad();
 		void	 changeLevel( size_t pNumber );
 		void	 DisplayText(  );
 		void	 drawGraphics(  word pDecodeMode, word pGfxID, word pGfxPosX, word pGfxPosY, byte pTxtCurrentID );
@@ -96,7 +101,9 @@ public:
 		void	 sub_368A( byte &pY );
 		void	 obj_ExecForcefield( byte pX );
 		void	 sub_3757( );
+		void	 sub_396A( byte pA, byte pX );
 		void	 sub_3F14( byte &pX );
+		void	 obj_PrepKey( );
 		void	 obj_PrepLock( );
 		void	 obj_PrepDoors( );
 		void	 obj_PrepDoorbell( );

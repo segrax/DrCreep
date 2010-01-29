@@ -297,10 +297,12 @@ void cCreep::mainLoop() {
 }
 
 // 18E4
-void cCreep::BlackScreen() {
+void cCreep::ScreenClear() {
 	word word_30 = 0xFF00;
 
 	byte Y = 0xF9;
+	
+	mWindow->clear(0);
 
 	// Disable all sprites
 	mDump[ 0x21 ] = 0; 
@@ -322,18 +324,13 @@ void cCreep::BlackScreen() {
 			break;
 	}
 
-
-
 	byte_83E = 0;
-	
 }
 
 // 13F0
-void cCreep::ClearScreen() {
+void cCreep::roomLoad() {
 	
-	mWindow->clear(0);
-	
-	BlackScreen();
+	ScreenClear();
 
 	word_30 = 0xC000;
 
@@ -450,6 +447,9 @@ void cCreep::roomPrepare( ) {
 			case 0x0818:	// Mummy
 				obj_PrepMummy( );
 				break;
+			case 0x081B:	// Key
+				obj_PrepKey( );
+				break;
 			case 0x081E:	// Lock
 				obj_PrepLock( );
 				break;
@@ -499,11 +499,11 @@ bool cCreep::Menu() {
 			if( ((*level( word_42 )) & 0x40) )
 				mMenuScreenCount = 0;
 
-			ClearScreen();
+			roomLoad();
 		} else {
 			word_3E = 0x0D1A;
 
-			BlackScreen();
+			ScreenClear();
 			roomPrepare( );
 			
 			mBitmap->load( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
@@ -2116,6 +2116,40 @@ void cCreep::obj_PrepLadder() {
 
 }
 
+// 49F8: Load the rooms' Keys
+void cCreep::obj_PrepKey() {
+	word_4A65 = word_3E;
+
+	byte_4A64 = 0;
+	
+	for(;;) {
+		if( mDump[ word_3E ] == 0 ) {
+			++word_3E;
+			break;
+		}
+
+		if( mDump[ word_3E + 1 ] != 0 ) {
+			byte X;
+			
+			sub_5750(X);
+			mDump[ 0xBF00 + X ] = 6;
+
+			byte gfxPosX = mDump[ word_3E + 2 ];
+			byte gfxPosY = mDump[ word_3E + 3 ];
+			byte gfxCID = mDump[ word_3E + 1 ];
+
+			mDump[ 0xBE00 + X ] = byte_4A64;
+
+			SpriteMovement( gfxCID, gfxPosX, gfxPosY, 0, X );
+		}
+
+		// 4A47
+		byte_4A64 += 0x04;
+		word_3E += 0x04;
+	}
+
+}
+
 void cCreep::obj_PrepLock() {
 	
 	byte X, gfxPosX, gfxPosY;
@@ -2484,7 +2518,74 @@ void cCreep::obj_PrepForcefield() {
 
 // 4872 : Load the rooms' Mummys
 void cCreep::obj_PrepMummy( ) {
-	
+	byte	byte_498D = 0, byte_498E, byte_498F;
+	byte	X;
+	byte	gfxCurrentID;
+
+	word_498B = word_3E;
+
+	for(;;) {
+		
+		if( mDump[ word_3E ] == 0 ) {
+			++word_3E;
+			return;
+		}
+
+		sub_5750( X );
+		
+		mDump[ 0xBF00 + X ] = 5;
+
+		byte gfxPosX = mDump[ word_3E + 1 ];
+		byte gfxPosY = mDump[ word_3E + 2 ];
+		gfxCurrentID = 0x44;
+
+		mDump[ 0xBE00 + X ] = byte_498D;
+		mDump[ 0xBE02 + X ] = 0x66;
+		for( char Y = 5; Y >= 0; --Y )
+			mDump[ 0x68F0 + Y ] = 0x66;
+
+		SpriteMovement( gfxCurrentID, gfxPosX, gfxPosY, 0, X );
+		byte_498E = 3;
+		gfxPosY = mDump[ word_3E + 4 ];
+		gfxCurrentID = 0x42;
+
+		while(byte_498E) {
+			byte_498F = 5;
+			gfxPosX = mDump[ word_3E + 3 ];
+
+			while(byte_498F) {
+				drawGraphics( 0, gfxCurrentID, gfxPosX, gfxPosY, 0 );
+				gfxPosX += 4;
+				--byte_498F;
+			}
+
+			gfxPosY += 8;
+			--byte_498E;
+		}
+
+		if( mDump[ word_3E ] != 1 ) {
+			// 4911
+			mTxtX_0 = mDump[ word_3E + 3 ] + 4;
+			mTxtY_0 = mDump[ word_3E + 4 ] + 8;
+			byte_498E = 3;
+
+			while( byte_498E ) {
+				drawGraphics( 1, gfxCurrentID, gfxPosX, gfxPosY, 0x42 );
+				mTxtX_0 += 4;
+			}
+			
+			gfxPosX = mTxtX_0 - 0x0C;
+			gfxPosY = mTxtY_0;
+			drawGraphics( 0, 0x43, gfxPosX, gfxPosY, 0x42 );
+			
+			if( mDump[ word_3E ] == 2 ) {
+				sub_396A(0xFF, X);
+			}
+		}
+		// 496E
+		word_3E += 0x07;
+		byte_498D += 0x07;
+	}
 }
 
 // 517F : Load the rooms' Trapdoors
@@ -2643,6 +2744,42 @@ void cCreep::sub_3757() {
 	mDump[ 0xBD06 + X ] = 4;
 	mDump[ 0xBD0C + X ] = 2;
 	mDump[ 0xBD0D + X ] = 0x19;
+}
+
+void cCreep::sub_396A( byte pA, byte pX ) {
+	byte byte_39EE = pA;
+	byte X;
+	byte Y = pX;
+
+	sub_3F14( X );
+	
+	mDump[ 0xBD00 + X ] = 3;
+	mDump[ 0xBD1B + X ] = 0xFF;
+	mDump[ 0xBD1C + X ] = 0xFF;
+	mDump[ 0xBD1D + X ] = mDump[ 0xBE00 + Y ];
+	
+	word_40 = word_498B + mDump[ 0xBD1D + X ];
+	//3998
+
+	mDump[ 0xBD0C + X ] = 5;
+	mDump[ 0xBD0D + X ] = 0x11;
+	mDump[ 0xBD03 + X ] = 0xFF;
+	if( byte_39EE == 0 ) {
+		mDump[ 0xBD1E + X ] = 0;
+		mDump[ 0xBD1F + X ] = 0xFF;
+		mDump[ 0xBD06 + X ] = 4;
+		
+		mDump[ 0xBD01 + X ] = mDump[ word_40 + 3 ] + 0x0D;
+		mDump[ 0xBD02 + X ] = mDump[ word_40 + 4 ] + 0x08;
+	} else {
+		// 39D0
+		mDump[ 0xBD1E + X ] = 1;
+		mDump[ 0xBD01 + X ] = mDump[ word_40 + 5 ];
+		mDump[ 0xBD02 + X ] = mDump[ word_40 + 6 ];
+		mDump[ 0xBD06 + X ] = 2;
+	}
+
+	// 39E8
 }
 
 void cCreep::sub_3F14( byte &pX ) {
