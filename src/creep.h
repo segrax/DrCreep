@@ -23,6 +23,9 @@ private:
 	byte		 byte_20DE, byte_24FD, byte_2E36, RunRestorePressed;
 	byte		 byte_2E35;
 
+	word		 word_5387;											// Trap Door
+	byte		 byte_5389, byte_538A;
+
 	word		 word_45DB;											// Lightning
 	byte		 byte_44E5, byte_45DD, byte_45DE, byte_45DF;		// Lightning
 	byte		 byte_474F;
@@ -35,7 +38,7 @@ private:
 	byte		 byte_840, byte_841, byte_883, byte_884, byte_885, byte_886, byte_887, byte_888, byte_889, byte_88A, byte_88B, byte_88C, byte_88D, byte_88E, byte_882, byte_D10, byte_D12;
 	byte		 byte_83E, byte_83F, byte_11C9, byte_5CE2;
 	char		 byte_5FD5, byte_5FD6, byte_5FD7, byte_5FD8;
-
+	
 	byte		 mGfxEdgeOfScreenX;
 	byte		 mTextXPos, mTextYPos, mTextColor, mTextFont, mTextFontt;
 	byte		 mTxtX_0, mTxtY_0, mTxtPosLowerY, mTxtDestXLeft, mTxtDestX, mTxtEdgeScreenX;
@@ -100,6 +103,7 @@ public:
 		void	 obj_ExecLightningMachine( byte pX );
 		void	 obj_PrepLightning( );
 		void	 obj_PrepForcefield( );
+		void	 obj_PrepMummy( );
 		void	 obj_PrepTrapDoor();
 		void	 sub_538B( byte pX );
 		void	 obj_PrepConveyor( );

@@ -48,6 +48,9 @@ cCreep::cCreep() {
 	byte_45DE = 0x40;
 	byte_45DF = 0x20;
 
+	byte_5389 = 0x80;
+	byte_538A = 0x01;
+
 	byte_5642 = 0x80;
 
 	byte_5643 = 0x20;
@@ -443,6 +446,9 @@ void cCreep::roomPrepare( ) {
 				break;
 			case 0x0815:	// Forcefield
 				obj_PrepForcefield( );
+				break;
+			case 0x0818:	// Mummy
+				obj_PrepMummy( );
 				break;
 			case 0x081E:	// Lock
 				obj_PrepLock( );
@@ -2476,8 +2482,69 @@ void cCreep::obj_PrepForcefield() {
 
 }
 
-// 517F : Load the rooms Trapdoors
+// 4872 : Load the rooms' Mummys
+void cCreep::obj_PrepMummy( ) {
+	
+}
+
+// 517F : Load the rooms' Trapdoors
 void cCreep::obj_PrepTrapDoor( ) {
+	byte	byte_5381;
+	word_5387 = word_3E;
+
+	byte X;
+
+	byte_5381 = 0;
+	for(;;) {
+	
+		if( (mDump[ word_3E ] & byte_5389) ) {
+			++word_3E;
+			return;
+		}
+		
+		sub_5750( X );
+		mDump[ 0xBF00 + X ] = 0x0B;
+		mDump[ 0xBE00 + X ] = byte_5381;
+		if( !(mDump[ word_3E ] & byte_538A) ) {
+			// 51BC
+			mDump[ 0x6F2E ] = 0xC0;
+			mDump[ 0x6F30 ] = 0x55;
+		} else {
+			// 51c9
+			mTxtX_0 = mDump[ word_3E + 1 ];
+			mTxtY_0 = mDump[ word_3E + 2 ];
+			drawGraphics( 1, 0, 0, 0, 0x7B );
+			
+			byte gfxPosX, gfxPosY;
+
+			gfxPosX = mTxtX_0 + 4;
+			gfxPosY = mTxtY_0;
+			SpriteMovement( 0x79, gfxPosX, gfxPosY, 0x7B, X );
+			mDump[ 0x6F2E ] = 0x20;
+			mDump[ 0x6F30 ] = 0xCC;
+			byte_5FD5 = mDump[ word_3E + 1 ] >> 2;
+			byte_5FD5 -= 4;
+			
+			byte_5FD6 = mDump[ word_3E + 2 ] >> 3;
+			sub_5FA3();
+
+			mDump[ word_3C ] = mDump[ word_3C ] & 0xFB;
+			mDump[ word_3C + 4 ] = mDump[ word_3C + 4 ] & 0xBF;
+		}
+
+		// 522E
+		sub_5750( X );
+		mDump[ 0xBF00 + X ] = 0x0C;
+		
+		byte gfxPosX = mDump[ word_3E + 3 ];
+		byte gfxPosY = mDump[ word_3E + 4 ];
+		
+		mDump[ 0xBE00 + X ] = byte_5381;
+		SpriteMovement( 0x7A, gfxPosX, gfxPosY, 0, X );
+		
+		byte_5381 += 0x05;
+		word_3E += 0x05;
+	}
 
 }
 
@@ -2486,6 +2553,7 @@ void cCreep::sub_538B( byte pX ) {
 	
 }
 
+// 5501: Load the rooms' Conveyors
 void cCreep::obj_PrepConveyor() {
 	word_564B = word_3E;
 
