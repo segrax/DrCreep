@@ -2278,6 +2278,9 @@ void cCreep::SpriteDraw() {
 
 		sprite = &mSprites[Y];
 
+		sprite->_multiColor0 = 0x0A;
+		sprite->_multiColor1 = 0x0D;
+
 		word posX = mDump[ 0x10 + Y ];
 		word posY = mDump[ 0x18 + Y ];
 		if( (mDump [0x20] & Y2) )
