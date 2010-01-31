@@ -9,6 +9,8 @@ private:
 	cBitmapMulticolor	 *mBitmap;
 	cVideoSurface<dword> *mSurface;
 
+	cSprite				  mSprites[8];
+
 	byte		*mDump,			*mLevel,		*m64CharRom;
 	size_t		 mDumpSize;
 
@@ -32,11 +34,15 @@ private:
 
 	word		 word_4D5B;											// RayGuns
 	byte		 byte_4D5E, byte_4D61, byte_4D67, byte_4D60;		// RayGuns
-	byte		 byte_4D63;
+	byte		 byte_4D63, byte_574C;
 
 
 	word		 word_5387;											// Trap Door
 	byte		 byte_5389, byte_538A;
+
+	word		 word_5748;											// Frankenstein
+	byte		 byte_574A, byte_574D, byte_574E, byte_574F;
+
 
 	word		 word_45DB;											// Lightning
 	byte		 byte_44E5, byte_45DD, byte_45DE, byte_45DF;		// Lightning
@@ -104,6 +110,8 @@ public:
 		void	 sub_2E79( );
 		void	 sub_3026( byte pX );
 		void	 sub_31F6( byte pX );
+		void	 sub_3AEB( byte pX );
+		void	 sub_3E87( );
 		void	 sub_3F4F( );
 		void	 obj_ExecLightning( byte pX );
 		void	 sub_368A( byte &pY );
@@ -124,6 +132,7 @@ public:
 		void	 obj_ExecConveyor( byte pX );
 		void	 obj_PrepConveyor( );
 		void	 obj_PrepFrankenstein();
+		void	 sub_526F( char &pA );
 		bool	 sub_5750( byte &pX );
 		void	 sub_57DF( byte pX );
 		void	 hw_SpritePrepare( byte &pX );

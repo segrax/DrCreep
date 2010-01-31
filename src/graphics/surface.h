@@ -9,8 +9,10 @@ struct SDL_Surface;
 	template <class sizeData> class cVideoSurface {
 	private:
 		bool				 _scaled;
+		SDL_Surface			*_surface, *_surfaceScaled;
 
 	protected:
+		bool				 _changed;
 		byte				*_buffer;					// Raw image data
 		size_t				 _bufferSize;				// Raw image data size
 		
@@ -24,6 +26,8 @@ struct SDL_Surface;
 	public:
 		
 							 cVideoSurface<sizeData>( size_t pWidth, size_t pHeight ) {
+								_changed = true;
+								
 								_width = pWidth; 
 								_height = pHeight;
 	
@@ -32,6 +36,9 @@ struct SDL_Surface;
 
 								_bufferSize = (_width * _height) * _pixelBytes;
 								_buffer = new byte[_bufferSize];
+								
+								_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, pWidth, pHeight, 32, 0, 0, 0, 0);
+								_surfaceScaled = 0;
 
 								_scaled = false;
 
@@ -65,6 +72,8 @@ struct SDL_Surface;
 							~cVideoSurface() {
 		
 								delete _buffer;
+								delete _surface;
+								delete _surfaceScaled;
 							}
 
 		inline	byte		*bufferGet()						{ return _buffer; }
@@ -107,44 +116,33 @@ struct SDL_Surface;
 			*pixelPosition =  colorGet(pPaletteIndex);
 		}
 
-		SDL_Surface *scaleTo( size_t scaleLevel ) {
-			bool			 scaled = _scaled;
-			SDL_Surface		*surface = surfaceGet();
+	SDL_Surface *scaleTo( size_t scaleLevel ) {
+		SDL_Surface *surface = _surface;
 
-			SDL_Surface		*tmpScaled = 0;
-
-			// Invalid Scale?
-			if(scaleLevel < 2 || scaleLevel > 4)
-				return 0;
-
-			if(_scaled == false) {
-				// Set our new dimensions
-				_maxWidth	= surface->w * scaleLevel;
-				_maxHeight	= surface->h * scaleLevel;
-				_scaled = true;	
-			}
-
-			// Create a new surface
-			tmpScaled = SDL_CreateRGBSurface(SDL_SWSURFACE, _maxWidth, _maxHeight, 32, 0, 0, 0, 0);
-
-			SDL_SetColorKey(	tmpScaled, SDL_SRCCOLORKEY, SDL_MapRGB(tmpScaled->format, 0, 0, 0)	);
-
-			// Do the scale
-			if(scaled)
-				scale(scaleLevel, tmpScaled->pixels, tmpScaled->pitch, surface->pixels, surface->pitch, surface->format->BytesPerPixel, surface->w, surface->h);
-			else
-				scale(scaleLevel, tmpScaled->pixels, tmpScaled->pitch, surface->pixels, surface->pitch, surface->format->BytesPerPixel, surface->w, surface->h);
-
-			// Free the old surface
-			SDL_FreeSurface( surface );
-
-			return tmpScaled;
+		// Invalid Scale?
+		if(scaleLevel < 2 || scaleLevel > 4) {
+			return surface;
+		}
+		if(!_surfaceScaled) {
+			// Set our new dimensions
+			_surfaceScaled = SDL_CreateRGBSurface(SDL_SWSURFACE, surface->w * scaleLevel, surface->h * scaleLevel, 32, 0, 0, 0, 0);
 		}
 
-		SDL_Surface *surfaceGet(){
-			SDL_Surface *surface = SDL_CreateRGBSurface(	SDL_SWSURFACE,	_width,	_height,	 32, 0, 0, 0, 0);
-			
-			sizeData		*pixel  = (sizeData*) surface->pixels;
+		if(!_changed && _surfaceScaled)
+			return _surfaceScaled;
+
+		_changed = false;
+
+		SDL_SetColorKey(	_surfaceScaled, SDL_SRCCOLORKEY, SDL_MapRGB(_surfaceScaled->format, 0, 0, 0)	);
+
+		// Do the scale
+		scale(scaleLevel, _surfaceScaled->pixels, _surfaceScaled->pitch, surface->pixels, surface->pitch, surface->format->BytesPerPixel, surface->w, surface->h);
+
+		return _surfaceScaled;
+	}
+
+		void surfaceSet(){
+			sizeData		*pixel  = (sizeData*) _surface->pixels;
 			sizeData		*buf	= (sizeData*) _buffer;
 
 			for( unsigned int y = 0; y < _height; y++ ) {
@@ -155,13 +153,13 @@ struct SDL_Surface;
 
 				}
 			}
-			
-			return surface;
+		
 		}
 
 		void surfacePut( cVideoSurface<sizeData> *pSource, word pX, word pY, word pSourceX = 0, word pSourceY = 0 ) {
 			sizeData *pixel;
 			sizeData *source = (sizeData*) pSource->pointGet(pSourceX, pSourceY);
+			_changed = true;
 
 			for( word y = 0; y < pSource->_height; ++y ) {
 				pixel = pointGet(pX, pY + y);
@@ -177,6 +175,7 @@ struct SDL_Surface;
 
 			}
 
+			surfaceSet();
 		}
 
 	};

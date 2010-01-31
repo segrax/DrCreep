@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "graphics/window.h"
 #include "graphics/surface.h"
+#include "sprite.h"
 #include "creep.h"
 #include "bitmapMulticolor.h"
-#include "sprite.h"
 
 cCreep::cCreep() {
 	size_t RomSize;
@@ -65,8 +65,10 @@ cCreep::cCreep() {
 	byte_5646 = 0x04;
 	byte_5647 = 0x02;
 	byte_5648 = 0x01;
-	
-	
+	byte_574D = 0x04;
+	byte_574E = 0x02;
+	byte_574F = 0x01;	
+	byte_574C = 0x80;
 
 	byte_5F57 = 0xA0;
 }
@@ -288,7 +290,7 @@ void cCreep::sub_95F() {
 
 	mDump[ 0xD025 ] = 0x0A;
 	mDump[ 0xD026 ] = 0x0D;
-
+	mDump[ 0x21 ] = 0;
 }
 
 // 0B84
@@ -313,6 +315,7 @@ void cCreep::ScreenClear() {
 	mWindow->clear(0);
 
 	// Disable all sprites
+	mDump[ 0x20 ] = 0;
 	mDump[ 0x21 ] = 0; 
 
 	for( ; word_30 >= 0xE000; word_30 -= 0x0100) {
@@ -537,7 +540,7 @@ bool cCreep::Menu() {
 
 		for(;;) {
 
-			_sleep(10);
+			_sleep(5);
 
 			if( mMenuScreenTimer )
 				handleEvents();
@@ -551,8 +554,9 @@ bool cCreep::Menu() {
 			}
 
 			mWindow->clear(0);
-			mWindow->blit( mSurface->surfaceGet(), 0, 0 );
-			
+			SDL_Surface *surface = mSurface->scaleTo(2);
+			mWindow->blit( surface, 0, 0 );
+
 			// C17
 			KeyboardJoystickMonitor( byte_D10 );
 			if( byte_5F57 )
@@ -714,11 +718,14 @@ s2ED5:
 				word_30 = mDump[ 0xBD01 + X ];
 				word_30 <<= 1;
 
+				byte w30 = (word_30 & 0xFF00) >> 8;
+
 				// Sprite X
 				mDump[ 0x10 + Y ] = (word_30 - 32);
 
-				byte w30 = (word_30 & 0xFF00) >> 8;
-				
+				if((word_30 >= 0x100) && ((word_30 - 32) < 0x100))
+					--w30;
+
 				if( (w30 & 0x80) ) {
 					// 2f51
 					A = (mDump[ 0x2F82 + Y ] ^ 0xFF);
@@ -883,10 +890,11 @@ void cCreep::objectFunction( byte pX ) {
 		case 0x3A08:
 			break;
 		case 0x3A60:
-			break;
+			break;*/
 		case 0x3AEB:
+			sub_3AEB( pX );
 			break;
-		case 0x3DDE:
+		/*case 0x3DDE:
 			break;
 		case 0x3D6E:
 			break;*/
@@ -899,6 +907,282 @@ void cCreep::objectFunction( byte pX ) {
 
 void cCreep::sub_31F6( byte pX ) {
 	
+}
+
+void cCreep::sub_3AEB( byte pX ) {
+	char A = mDump[ 0xBD04 + pX ];
+	char byte_3F0A, byte_3F0B, byte_3F10, byte_3F11, byte_3F12;
+
+	if( A & byte_885 ) {
+		mDump[ 0xBD04 + pX ] = (A ^ byte_885) | byte_886;
+		return;
+	}
+
+	if( A & byte_882 ) 
+		mDump[ 0xBD04 + pX ] ^= byte_882;
+
+	word_40 = word_5748 + mDump[ 0xBD1F + pX ] + (mDump[ 0xBD1E + pX ] << 8);
+	
+	if( !(mDump[ 0xBD1E + pX ] & byte_574E) ) {
+		if( mMenuIntro == 1 )
+			return;
+
+		
+		for(byte_3F0A = 1; byte_3F0A >= 0; --byte_3F0A) {
+			byte Y = byte_3F0A;
+
+			if( mDump[ 0x780D + Y ] != 0 )
+				continue;
+
+			Y = mDump[ 0x34D1 + Y ];
+			A = mDump[ 0xBD02 + pX ];
+			A -= mDump[ 0xBD02 + Y ];
+			if( A >= 4 )
+				continue;
+
+			// 3B4A
+			A = mDump[ 0xBD01 + pX ];
+			A -= mDump[ 0xBD01 + Y ];
+			if(A >= 0) {
+				A = mDump[ 0xBD1E + pX ];
+				if( !(A & byte_574F) )
+					continue;
+				else
+					goto s3B6E;
+			}
+			A = mDump[ 0xBD1E + pX ];
+			if( !(A & byte_574F)) {
+s3B6E:
+				A |= byte_574E;
+				mDump[ 0xBD1E + pX ] = A;
+				mDump[ word_40 ] = A;
+				mDump[ 0xBD1D + pX ] = 0x80;
+
+				sub_21C8(7);
+			}
+		}
+	// 3B82
+	A = mDump[ 0xBD1B + pX ];
+	if( A != 0xFF )
+		if( A != mDump[ 0xBD1A + pX ] )
+			sub_526F(A);
+
+	mDump[ 0xBD1A + pX ] = A;
+	mDump[ 0xBD1B + pX ] = 0xFF;
+	sub_5F6B( pX );
+	
+	}
+
+	//3B9C
+	A = mDump[ word_3C ] + mDump[ 0xBD1C + pX ];
+	byte byte_3F13 = A;
+
+	mDump[ 0xBD1C + pX ] = 0xFF;
+	A = byte_3F13;
+	if(!A) {
+		mDump[ 0xBD1D + pX ] = 0x80;
+		goto s3CB4;
+	} else {
+		byte_3F0A = 0;
+		
+		// 3BBF
+		for(char Y = 6; Y >= 0;) {
+			if( !(mDump[ 0x2F82 + Y ] & byte_3F13 )) {
+				++byte_3F0A;
+				byte_3F0B = Y;
+			}
+
+			Y -= 2;
+		}
+	
+		// 3BD1
+		if( byte_3F0A == 1 ) {
+			mDump[ 0xBD1D + pX ] = byte_3F0B;
+			goto s3CB4;
+		}
+		if( byte_3F0A == 2 ) {
+			byte Y = (byte_3F0B - 4) & 7;
+			if( mDump[ 0x2F82 + Y ] & byte_3F13 ) {
+				Y = mDump[ 0xBD1D + pX ];
+				if( !(Y & 0x80 ))
+					if( mDump[ 0x2F82 + Y ] & byte_3F13 )
+						goto s3CB4;
+			}
+		}
+		// 3C06
+		byte Y = 3;
+		while(Y >= 0) {
+			mDump[ 0x3F0C + Y ] = 0xFF;
+			--Y;
+		}
+
+		byte_3F0A = 1;
+
+		// 3C15
+		for(;;) {
+			byte Y = byte_3F0A;
+			if( mDump[ 0x780D + Y ] == 0 ) {
+				
+				Y = mDump[ 0x34D1 + Y ];
+				A = mDump[ 0xBD01 + Y ];
+				A -= mDump[ 0xBD01 + pX ];
+				//3C2A
+				if( A < 0 ) {
+					A ^= 0xFF;
+					++A;
+					Y = 3;
+				} else {
+					Y = 1;
+				}
+				if( A < mDump[ 0x3F0C + Y ] )
+					mDump[ 0x3F0C + Y ] = A;
+
+				Y = byte_3F0A;
+				Y = mDump[ 0x34D1 + Y ];
+				A = mDump[ 0xBD02 + Y ];
+				A -= mDump[ 0xBD02 + pX ];
+				if( A < 0 ) {
+					A ^= 0xFF;
+					++A;
+					Y = 0;
+				} else {
+					Y = 2;
+				}
+				if( A < mDump[ 0x3F0C + Y ] )
+					mDump[ 0x3F0C + Y ] = A;
+			}
+			// 3C62
+			--byte_3F0A;
+			if( byte_3F0A < 0 )
+				break;
+		}
+
+		// 3C67
+		byte_3F10 = 0xFF;
+		for(;;) {
+			byte_3F11 = 0x00;
+			byte_3F12 = 0xFF;
+			
+			for( char Y = 3; Y >= 0; --Y ) {
+				A = mDump[ 0x3F0C + Y ];
+				if( A >= byte_3F10 )
+					continue;
+				if( A < byte_3F11 )
+					continue;
+
+				byte_3F11 = A;
+				byte_3F12 = Y;
+			}
+		
+			//3C8E
+			if( byte_3F12 == 0xFF ) {
+				mDump[ 0xBD1D + pX ] = 0x80;
+				goto s3CB4;
+			}
+			
+			Y = A << 1;
+			mDump[ 0x2F82 + Y ] = A;
+			if( A & byte_3F13 )
+				break;
+
+			byte_3F10 = byte_3F11;
+		}
+
+		// 3CB0
+		mDump[ 0xBD1D + pX ] = Y;
+	}
+
+	// 3CB4
+s3CB4:;
+	if( mDump[ 0xBD1D + pX ] & 2 ) {
+		mDump[ 0xBD02 + pX ] -= mDump[ 0xBD02 + pX ];
+
+		++mDump[ 0xBD03 + pX ];
+		if( mDump[ 0xBD1D + pX ] != 2 ) {
+			// 3ccf
+			--mDump[ 0xBD01 + pX ];
+			if( mDump[ 0xBD03 + pX ] >= 0x87 )
+				if( mDump[ 0xBD03 + pX ] >= 0x8A )
+					goto s3D4C;
+			
+			mDump[ 0xBD03 + pX ] = 0x87;
+			
+		} else {
+			// 3ce5
+			++mDump[ 0xBD01 + pX ];
+			if( mDump[ 0xBD03 + pX ] >= 0x84 )
+				if( mDump[ 0xBD03 + pX ] >= 0x87 )
+					goto s3D4C;
+
+			mDump[ 0xBD03 + pX ] = 0x84;
+
+			goto s3D4C;
+		}
+	} else {
+		// 3CFB
+		A = mDump[ 0xBD1D + pX ];
+		if(A < 0)
+			goto s3D4F;
+
+		mDump[ 0xBD01 + pX ] -= byte_5FD7;
+		++mDump[ 0xBD01 + pX ];
+		if( !(mDump[ word_3C ] & 1) ) {
+			// 3d15
+			mDump[ 0xBD03 + pX ] = 0x8A;
+			mDump[ 0xBD02 + pX ] += 2;
+			goto s3D4C;
+		} else {
+			// 3d26
+			if( !(mDump[ 0xBD1D + pX ]) )
+				mDump[ 0xBD02 + pX ] -= 2;
+			else
+				mDump[ 0xBD02 + pX ] += 2;
+
+			// 3d40
+			mDump[ 0xBD03 + pX ] = ((mDump[ 0xBD02 + pX ] & 0x06) >> 1) + 0x8B;
+		}
+	}
+s3D4C:;
+	// 3D4C
+	hw_SpritePrepare( pX );
+
+s3D4F:;
+	mDump[ word_40 + 6 ] = mDump[ 0xBD1D + pX ];
+	mDump[ word_40 + 3 ] = mDump[ 0xBD01 + pX ];
+	mDump[ word_40 + 4 ] = mDump[ 0xBD02 + pX ];
+	mDump[ word_40 + 5 ] = mDump[ 0xBD03 + pX ];
+}
+
+void cCreep::sub_3E87() {
+	if( mDump[ word_3E ] & byte_574D )
+		return;
+
+	byte X;
+	
+	sub_3F14(X);
+	mDump[ 0xBD00 + X ] = 5;
+	mDump[ 0xBD1F + X ] = byte_574A;
+	mDump[ 0xBD1E + X ] = mDump[ word_3E ];
+	if( !(mDump[ word_3E ] & byte_574E) ) {
+		mDump[ 0xBD01 + X ] = mDump[ word_3E + 1 ];
+		mDump[ 0xBD02 + X ] = mDump[ word_3E + 2 ] + 7;
+		mDump[ 0xBD03 + X ] = 0x8F;
+	} else {
+		// 3EC8
+		mDump[ 0xBD01 + X ] = mDump[ word_3E + 3 ];
+		mDump[ 0xBD02 + X ] = mDump[ word_3E + 4 ];
+		mDump[ 0xBD03 + X ] = mDump[ word_3E + 5 ];
+		mDump[ 0xBD1D + X ] = mDump[ word_3E + 6 ];
+	}
+	// 3ee4
+	mDump[ 0xBD0C + X ] = 3;
+	mDump[ 0xBD0D + X ] = 0x11;
+	hw_SpritePrepare(X);
+	mDump[ 0xBD1C + X ] = 0xFF;
+	mDump[ 0xBD1A + X ] = 0xFF;
+	mDump[ 0xBD1B + X ] = 0xFF;
+	mDump[ 0xBD06 + X ] = 2;
+	mDump[ 0xBD05 + X ] = 2;
 }
 
 void cCreep::sub_3F4F() {
@@ -948,10 +1232,10 @@ void cCreep::sub_3F4F() {
 				case 0x4990:
 					break;
 				case 0x4A68:
-					break;
-				case 0x4B1A:
-					break;
-				case 0x4D70:
+					break;*/
+				//case 0x4B1A:		// RayGun Control
+				//	break;
+				/*case 0x4D70:
 					break;
 				case 0x4E32:
 					break;
@@ -1048,7 +1332,7 @@ void cCreep::sub_368A( byte &pY  ) {
 
 }
 
-// sub_36B3: Forcefield
+// 36B3: Forcefield
 void cCreep::obj_ExecForcefield( byte pX ) {
 	byte A = mDump[ 0xBD04 + pX ];
 	byte Y;
@@ -1102,7 +1386,7 @@ void cCreep::obj_ExecForcefield( byte pX ) {
 	// 3746
 	mDump[ 0xBD03 + pX ] = A;
 
-	// Draw sprite
+	// Draw the forcefield
 	hw_SpritePrepare( pX );
 }
 
@@ -1920,27 +2204,39 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 
 	// 5DFB
 	Y = byte_5E88;
-	mDump[ 0x26 + Y ] = mDump[ 0x26 + Y ] ^ 8;
 	
+	cSprite *sprite = &mSprites[Y];
+
+	word dataSrc = mDump[ 0x26 + Y ] ^ 8;
+	dataSrc <<= 6;
+	dataSrc += 0xC000;;
+
+	mDump[ 0x26 + Y ] = mDump[ 0x26 + Y ] ^ 8;
+
 	// Sprite Color
 	mDump[ 0xD027 + Y ]  = mDump[ 0xBD09 + pX ] & 0x0F;
+	sprite->_color = mDump[ 0xD027 + Y ];
 
-	if( !(mDump[ 0xBD09 + pX ] & byte_88A ))
+	if( !(mDump[ 0xBD09 + pX ] & byte_88A )) {
 		A = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0xD01D ];
-	else {
+		sprite->_rDoubleWidth = false;
+	} else {
 		A = (mDump[ 0xD01D ] | mDump[ 0x2F82 + Y ]);
 		mDump[ 0xBD0A + pX ] <<= 1;
+		sprite->_rDoubleWidth = true;
 	}
 
 	// Sprite X Expansion
 	mDump[ 0xD01D ] = A;
 	
 	// 5E2D
-	if( !(mDump[ 0xBD09 + pX ] & byte_88B ))
+	if( !(mDump[ 0xBD09 + pX ] & byte_88B )) {
 		A = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0xD017 ];
-	else {
+		sprite->_rDoubleHeight = false;
+	} else {
 		A = (mDump[ 0xD017 ] | mDump[ 0x2F82 + Y ]);
 		mDump[ 0xBD0B + pX ] <<= 1;
+		sprite->_rDoubleHeight = true;
 	}
 
 	// Sprite Y Expansion
@@ -1956,13 +2252,18 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	mDump[ 0xD01B ] = A;
 
 	// 5E68
-	if(! (mDump[ 0xBD09 + pX ] & byte_88D ))
+	if(! (mDump[ 0xBD09 + pX ] & byte_88D )) {
 		A = mDump[ 0xD01C ] | mDump[ 0x2F82 + Y ];
-	else
+		sprite->_rMultiColored = true;
+	} else {
 		A = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0xD01C ];
+		sprite->_rMultiColored = false;
+	}
 		
 	// MultiColor Enable
 	mDump[ 0xD01C ] = A;
+
+	sprite->streamLoad( &mDump[ dataSrc ] );
 }
 
 void cCreep::SpriteDraw() {
@@ -1975,32 +2276,15 @@ void cCreep::SpriteDraw() {
 		if( !(mDump[ 0x21 ] & Y2) )
 			continue;
 
-		sprite = new cSprite( 0x0A, 0x0D );
+		sprite = &mSprites[Y];
 
-		if( mDump[ 0xD01C ] & Y2)
-			sprite->_rMultiColored = true;
-
-		if( mDump[ 0xD017 ] & Y2)
- 			sprite->_rDoubleHeight = true;
-
-		if( mDump[ 0xD01D ] & Y2)
-			sprite->_rDoubleWidth = true;
-
-		sprite->_color = mDump[ 0xD027 + Y ];
-		
-		word_32 = (mDump[ 0x26 + Y ] ^ 8);
-		word_32 <<= 6;
-		word_32 += 0xC000;
-		
-		sprite->streamLoad( &mDump[ word_32 ] );
-		
 		word posX = mDump[ 0x10 + Y ];
 		word posY = mDump[ 0x18 + Y ];
 		if( (mDump [0x20] & Y2) )
 			posX += 0x100;
 
 		mSurface->surfacePut( sprite->_surface, posX, posY );
-		delete sprite;
+		//delete sprite;
 	}
 
 }
@@ -2574,9 +2858,8 @@ void cCreep::obj_PrepLightning() {
 	}
 }
 
-// Forcefield
+// 46AE: Forcefield
 void cCreep::obj_PrepForcefield() {
-	// 46AE
 	byte X = 0;
 	byte gfxPosX, gfxPosY;
 
@@ -2851,7 +3134,64 @@ void cCreep::obj_ExecConveyor( byte pX ) {
 
 // 564E: Load the rooms' frankensteins
 void cCreep::obj_PrepFrankenstein() {
-	
+	word_5748 = word_3E;
+	byte byte_574B;
+
+	byte_574A = 0;
+
+	for(;;) {
+
+		if( mDump[ word_3E ] & byte_574C ) {
+			++word_3E;
+			return;
+		}
+
+		mTxtX_0 = mDump[ word_3E + 1 ];
+		mTxtY_0 = mDump[ word_3E + 2 ] + 0x18;
+		drawGraphics( 1, 0, 0, 0, 0x92 );
+
+		byte_5FD5 = (mTxtX_0 >> 2) - 4;
+		byte_5FD6 = (mTxtY_0 >> 3);
+
+		sub_5FA3();
+		byte A;
+
+		if( ( mDump[ word_3E ] & byte_574F )) {
+			word_3C -= 2;
+			A = 0xFB;
+		} else
+			A = 0xBF;
+
+		// 56C4
+		byte_574B = A;
+		
+		for( char Y = 4; Y >= 0; Y -= 2 ) {
+			mDump[ word_3C + Y ] &= byte_574B;
+		}
+		byte X;
+		sub_5750(X);
+		mDump[ 0xBF00 + X ] = 0x0F;
+		byte gfxPosX = mDump[ word_3E + 1 ];
+		byte gfxPosY = mDump[ word_3E + 2 ];
+		if( !(mDump[ word_3E ] & byte_574F ))
+			A = 0x90;
+		else
+			A = 0x91;
+
+		SpriteMovement( A, gfxPosX, gfxPosY, 0, X );
+
+		//5700
+		if(!( mDump[ word_3E ]  & byte_574F )) {
+			gfxPosX += 4;
+			gfxPosY += 0x18;
+			drawGraphics( 0, 0x1C, gfxPosX, gfxPosY, 0 );
+		}
+		sub_3E87();
+
+		word_3E += 0x07;
+		byte_574A += 0x07;
+	}
+
 }
 
 // 5501: Load the rooms' Conveyors
@@ -3033,6 +3373,71 @@ void cCreep::SpriteMovement( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTx
 	mDump[ 0xBF06 + pX ] = mGfxHeight;
 
 	mDump[ 0xBF05 + pX ] <<= 2;
+}
+
+void cCreep::sub_526F( char &pA ) {
+	byte byte_5382;
+	word word_5383, word_5385;
+
+	byte_5382 = pA;
+
+	word_5383 = word_40;
+	word_5385 = word_3C;
+
+	word_40 = word_5387 + byte_5382;
+	// 529B
+	mDump[ word_40 ] ^= byte_538A;
+	byte X;
+
+	for( X = 0 ;;X+=8) {
+		if( mDump[ 0xBF00 + X ] != 0x0B )
+			continue;
+		if( mDump[ 0xBE00 + X ] == byte_5382 )
+			break;
+	}
+
+	//52bd
+	mDump[ 0xBF04 + X ] |= byte_840;
+	
+	if( !(mDump[ word_40 ] & byte_538A) ) {
+		// 52cf
+		mDump[ 0xBE01 + X ] = 0;
+		mDump[ 0xBE02 + X ] = 0x78;
+		mDump[ 0x6F2E ] = 0xC0;
+		mDump[ 0x6F30 ] = 0x55;
+
+		byte_5FD5 = (mDump[ word_40 + 1 ] >> 2) - 4;
+		byte_5FD6 = mDump[ word_40 + 2 ] >> 3;
+
+		sub_5FA3();
+
+		mDump[ word_3C ] |= 0x04;
+		mDump[ word_3C + 4 ] |= 0x40;
+
+	} else {
+		// 530F
+		mDump[ 0xBE01 + X ] = 1;
+		mDump[ 0xBE02 + X ] = 0x73;
+		mDump[ 0x6F2E ] = 0x20;
+		mDump[ 0x6F30 ] = 0xCC;
+		
+		byte_5FD5 = (mDump[ word_40 + 1 ] >> 2) - 4;
+		byte_5FD6 = mDump[ word_40 + 2 ] >> 3;
+
+		sub_5FA3();
+
+		mDump[ word_3C ] &= 0xFB;
+		mDump[ word_3C + 4 ] &= 0xBF;
+	}
+
+	// 534c
+	byte gfxPosX = mDump[ word_40 + 3 ];
+	byte gfxPosY = mDump[ word_40 + 4 ];
+
+	drawGraphics( 0, 0x7A, gfxPosX, gfxPosY, 0 );
+
+	word_40 = word_5383;
+	word_3C = word_5385;
 }
 
 bool cCreep::sub_5750( byte &pX ) {

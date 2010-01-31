@@ -8,6 +8,7 @@ using namespace std;
 
 #include <sdl.h>
 #include "types.h"
+#include "graphics/scale/scalebit.h"
 
 // Endian functions
 // Read a word from the buffer

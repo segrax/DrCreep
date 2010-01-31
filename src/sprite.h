@@ -9,7 +9,7 @@ public:
 	byte					 _X,		_Y,		_color,		_multiColor0,	_multiColor1;
 public:
 
-							 cSprite( word pColor0, word pColor1 );
+							 cSprite();
 							~cSprite();
 
 	inline cVideoSurface<dword>	 *getSurface()			{ return _surface; }

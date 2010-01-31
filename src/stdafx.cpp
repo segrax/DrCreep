@@ -2,6 +2,7 @@
 #include <direct.h>
 #include "stdafx.h"
 #include "graphics/surface.h"
+#include "sprite.h"
 #include "creep.h"
 
 
