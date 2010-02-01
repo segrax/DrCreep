@@ -119,7 +119,9 @@ public:
 		void	 sub_3757( );
 		void	 sub_396A( byte pA, byte pX );
 		void	 sub_3F14( byte &pX );
+		void	 obj_PrepTeleport( );
 		void	 obj_PrepRayGun( );
+		void	 obj_ExecRayGun( byte pX );
 		void	 obj_PrepKey( );
 		void	 obj_PrepLock( );
 		void	 obj_PrepDoors( );
@@ -132,6 +134,7 @@ public:
 		void	 obj_ExecConveyor( byte pX );
 		void	 obj_PrepConveyor( );
 		void	 obj_PrepFrankenstein();
+		void	 sub_505C( byte pA, byte pX );
 		void	 sub_526F( char &pA );
 		bool	 sub_5750( byte &pX );
 		void	 sub_57DF( byte pX );

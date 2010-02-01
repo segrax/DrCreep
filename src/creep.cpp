@@ -467,6 +467,9 @@ void cCreep::roomPrepare( ) {
 			case 0x0824:	// Ray Gun
 				obj_PrepRayGun( );
 				break;
+			case 0x0827:	// Teleport
+				obj_PrepTeleport( );
+				break;
 			case 0x082A:	// Trap Door
 				obj_PrepTrapDoor( );
 				break;
@@ -1233,8 +1236,9 @@ void cCreep::sub_3F4F() {
 					break;
 				case 0x4A68:
 					break;*/
-				//case 0x4B1A:		// RayGun Control
-				//	break;
+				case 0x4B1A:		// RayGun Control
+					obj_ExecRayGun( X );
+					break;
 				/*case 0x4D70:
 					break;
 				case 0x4E32:
@@ -2436,6 +2440,68 @@ void cCreep::obj_PrepLadder() {
 	}
 
 }
+// 4F5C: Load the rooms' Teleports
+void cCreep::obj_PrepTeleport() {
+	mTxtX_0 = mDump[ word_3E ];
+	mTxtY_0 = mDump[ word_3E + 1 ];
+
+	byte byte_50D0 = 3;
+	for(;;) {
+		drawGraphics( 1, 0, 0, 0, 0x1C );
+		
+		mTxtX_0 += 0x04;
+		--byte_50D0;
+		if( byte_50D0 == 0 )
+			break;
+	}
+
+	byte gfxPosX = mDump[ word_3E ];
+	byte gfxPosY = mDump[ word_3E + 1 ];
+
+	// Draw the teleport unit
+	drawGraphics( 0, 0x6F, gfxPosX, gfxPosY, 0 );
+
+	//4fad
+	gfxPosX += 0x0C;
+	gfxPosY += 0x18;
+	drawGraphics( 0, 0x1C, gfxPosX, gfxPosY, 0 );
+
+	byte X;
+	sub_5750( X );
+	
+	mDump[ 0xBF00 + X ] = 0x0A;
+	gfxPosX = mDump[ word_3E ] + 4;
+	gfxPosY = mDump[ word_3E + 1 ] + 0x18;
+
+	mDump[ 0xBE00 + X ] = (word_3E & 0xFF);
+	mDump[ 0xBE01 + X ] = (word_3E & 0xFF00) >> 8;
+	
+	SpriteMovement( 0x70, gfxPosX, gfxPosY, 0, X );
+
+	sub_505C( (mDump[ word_3E + 2 ] + 2), X );
+	
+	byte_50D0 = 0x20;
+
+	while( mDump[ word_3E + 3 ] ) {
+		byte A = byte_50D0;
+		mDump[ 0x6E95 ] = mDump[ 0x6E96 ] = mDump[ 0x6E97 ] = mDump[ 0x6E98 ] = A;
+		gfxPosX = mDump[ word_3E + 3 ];
+		gfxPosY = mDump[ word_3E + 4 ];
+
+		drawGraphics( 0, 0x72, gfxPosX, gfxPosY, 0 );
+		
+		word_3E += 2;
+
+		byte_50D0 += 0x10;
+	}
+
+	word_3E += 0x04;
+}
+
+// 4B1A: 
+void cCreep::obj_ExecRayGun( byte pX ) {
+	
+}
 
 // 4C58: Load the rooms' Ray Guns
 void cCreep::obj_PrepRayGun() {
@@ -3376,6 +3442,28 @@ void cCreep::SpriteMovement( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTx
 	mDump[ 0xBF06 + pX ] = mGfxHeight;
 
 	mDump[ 0xBF05 + pX ] <<= 2;
+}
+
+void cCreep::sub_505C( byte pA, byte pX ) {
+	byte byte_50D1 = pA;
+
+	byte A =  (pA << 4) | 0x0A;
+
+	mDump[ 0x6E70 ] = mDump[ 0x6E71 ] = mDump[ 0x6E72 ] = A;
+	mDump[ 0x6E73 ] = mDump[ 0x6E74 ] = mDump[ 0x6E75 ] = 0x0F;
+
+	word_40 = *((word*) &mDump[ 0xBE00 + pX ]);
+
+	byte gfxPosX = mDump[ word_40 ] + 4;
+	byte gfxPosY = mDump[ word_40 + 1 ] ;
+	drawGraphics( 0, 0x71, gfxPosX, gfxPosY, 0 );
+
+	gfxPosY += 0x08;
+
+	mDump[ 0x6E73 ] = mDump[ 0x6E74 ] = mDump[ 0x6E75 ] = 1;
+	drawGraphics( 0, 0x71, gfxPosX, gfxPosY, 0 );
+	gfxPosY += 0x08;
+	drawGraphics( 0, 0x71, gfxPosX, gfxPosY, 0 );
 }
 
 void cCreep::sub_526F( char &pA ) {
