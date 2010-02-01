@@ -32,10 +32,11 @@ private:
 
 	word		 word_498B;											// Mummys
 
-	word		 word_4D5B;											// RayGuns
-	byte		 byte_4D5E, byte_4D61, byte_4D67, byte_4D60;		// RayGuns
-	byte		 byte_4D63, byte_574C;
-
+	word		 word_4D5B;											// RayGuns	
+	byte		 byte_4D5D, byte_4D5E, byte_4D5F;
+	byte		 byte_574C, byte_4D60, byte_4D61;
+	byte		 byte_4D62, byte_4D63, byte_4D64;
+	byte		 byte_4D65, byte_4D66, byte_4D67;
 
 	word		 word_5387;											// Trap Door
 	byte		 byte_5389, byte_538A;
@@ -110,6 +111,7 @@ public:
 		void	 sub_2E79( );
 		void	 sub_3026( byte pX );
 		void	 sub_31F6( byte pX );
+		void	 sub_3A7F( byte pX );
 		void	 sub_3AEB( byte pX );
 		void	 sub_3E87( );
 		void	 sub_3F4F( );

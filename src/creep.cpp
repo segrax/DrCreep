@@ -51,9 +51,12 @@ cCreep::cCreep() {
 
 	byte_4D60 = 0x80;
 	byte_4D61 = 0x40;
+	byte_4D62 = 0x20;
 	byte_4D63 = 0x10;
+	byte_4D64 = 0x08;
+	byte_4D65 = 0x04;
+	byte_4D66 = 0x02;
 	byte_4D67 = 0x01;
-	
 
 	byte_5389 = 0x80;
 	byte_538A = 0x01;
@@ -2500,12 +2503,119 @@ void cCreep::obj_PrepTeleport() {
 
 // 4B1A: 
 void cCreep::obj_ExecRayGun( byte pX ) {
-	
+	if( byte_2E36 & 3 )
+		return;
+
+	word_40 = word_4D5B + mDump[ 0xBE00 + pX ];
+
+	byte A = mDump[ 0xBF04 + pX ];
+	if(!( A & byte_83F )) {
+		if( mMenuIntro == 1 )
+			return;
+
+		// 4B46
+		if(!(mDump[ word_40 ] & byte_4D62) ) {
+			byte_4D5D = 0xFF;
+			byte_4D5E = 0x00;
+			byte_4D5F = 0x01;
+
+			for(;;) {
+
+				if( mDump[ 0x780D + byte_4D5F ] == 0 ) {
+					byte Y = mDump[ 0x34D1 + byte_4D5F ];
+					char A = mDump[ 0xBD02 + Y ];
+					A -= mDump[ 0xBF02 + pX ];
+					if( A < 0 )
+						A = (A ^ 0xFF) + 1;
+
+					if( A < byte_4D5D ) {
+						byte_4D5D = A;
+						if( mDump[ 0xBD02 + Y ] >= 0xC8  ) {
+							byte_4D5E = byte_4D65;
+						} else {
+							byte_4D5E = byte_4D66;
+						}
+					}
+				}
+				//4B9C
+				--byte_4D5F;
+				if( byte_4D5F < 0 )
+					break;
+			}
+			// 4BA1
+			A = 0xFF;
+			A ^= byte_4D65;
+			A ^= byte_4D66;
+
+			A &= mDump[ word_40 ];
+			A |= byte_4D5E;
+			mDump[ word_40 ] = A;
+		}
+		//4BB2
+		if( mDump[ word_40 ] & byte_4D65 ) {
+			A = mDump[ word_40 + 4 ];
+			if( A != mDump[ word_40 + 2 ] ) {
+				A -= 1;
+				mDump[ word_40 + 4 ] = A;
+				sub_4DE9( 0x5C );
+			} else
+				goto s4BD9;
+		} else {
+			// 4BD4
+			if( !(A & byte_4D66) ) {
+s4BD9:;
+				sub_4DE9( 0xCC );
+				goto s4C27;
+			}
+			// 4BE1
+			A = mDump[ word_40 + 4 ];
+			if( A >= mDump[ 0xBE01 + pX ] )
+				goto s4BD9;
+
+			mDump[ word_40 + 4 ] = A + 1;
+			sub_4DE9( 0xC2 );
+		}	
+	}
+	// 4BF4
+	byte gfxPosX = mDump[ 0xBF01 + pX ];
+	byte gfxPosY = mDump[ word_40 + 4 ];
+
+	A = mDump[ word_40 ];
+	if( A & byte_4D67 )
+		A = 4;
+	else
+		A = 0;
+
+	byte_4D5E = A;
+	byte Y = mDump[ word_40 + 4 ] & 3;
+
+	SpriteMovement( mDump[ 0x4D68 + Y ], gfxPosX, gfxPosY, 0, pX );
+
+s4C27:;
+	A = mDump[ word_40 ];
+
+	if( A & byte_4D62 ) {
+		A ^= byte_4D62;
+		mDump[ word_40 ] = A;
+		if( !(A & byte_4D64 ))
+			return;
+	} else {
+		// 4C3D
+		if( byte_4D5D >= 5 )
+			return;
+	}
+	// 4C44
+	A = mDump[ word_40 ];
+	if( (A & byte_4D61) )
+		return;
+
+	sub_3A7F( pX );
+	A |= byte_4D61;
+	mDump[ word_40 ] = A;
 }
 
 // 4C58: Load the rooms' Ray Guns
 void cCreep::obj_PrepRayGun() {
-	byte	byte_4D5D;
 
 	word_4D5B = word_3E;
 	byte_4D5D = 0;
@@ -3353,6 +3463,12 @@ void cCreep::sub_3757() {
 	mDump[ 0xBD06 + X ] = 4;
 	mDump[ 0xBD0C + X ] = 2;
 	mDump[ 0xBD0D + X ] = 0x19;
+}
+
+void cCreep::sub_3A7F( byte pX ) {
+	byte Y = pX;
+
+	
 }
 
 void cCreep::sub_396A( byte pA, byte pX ) {
