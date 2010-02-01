@@ -136,6 +136,7 @@ public:
 		void	 obj_ExecConveyor( byte pX );
 		void	 obj_PrepConveyor( );
 		void	 obj_PrepFrankenstein();
+		void	 sub_4DE9( byte pA );
 		void	 sub_505C( byte pA, byte pX );
 		void	 sub_526F( char &pA );
 		bool	 sub_5750( byte &pX );

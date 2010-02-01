@@ -2588,6 +2588,7 @@ s4BD9:;
 
 	byte_4D5E = A;
 	byte Y = mDump[ word_40 + 4 ] & 3;
+	Y |= byte_4D5E;
 
 	SpriteMovement( mDump[ 0x4D68 + Y ], gfxPosX, gfxPosY, 0, pX );
 
@@ -3468,7 +3469,33 @@ void cCreep::sub_3757() {
 void cCreep::sub_3A7F( byte pX ) {
 	byte Y = pX;
 
+	byte A = mDump[ 0xBE00 + Y ] + 0x07;
+	A |= 0xF8;
+	A >>= 1;
+	A += 0x2C;
 	
+	// TODO
+	//RAM:3A90 8D 93 75                    STA     loc_7591+2
+	sub_21C8( 0 );
+
+	byte X;
+	sub_3F14( X );
+	mDump[ 0xBD00 + X ] = 4;
+	mDump[ 0xBD01 + X ] = mDump[ 0xBF01 + Y ];
+	mDump[ 0xBD02 + X ] = mDump[ 0xBF02 + Y ] + 0x05;
+	mDump[ 0xBD03 + X ] = 0x6C;
+	mDump[ 0xBD1E + X ] = mDump[ 0xBE00 + Y ];
+
+	if( mDump[ word_40 ] & byte_4D67 ) {
+		mDump[ 0xBD01 + X ] -= 0x08;
+		mDump[ 0xBD1F + X ] = 0xFC;
+	} else {
+		// 3AD4	
+		mDump[ 0xBD01 + X ] += 0x08;
+		mDump[ 0xBD1F + X ] = 4;
+	}
+
+	hw_SpritePrepare( X );
 }
 
 void cCreep::sub_396A( byte pA, byte pX ) {
@@ -3560,6 +3587,25 @@ void cCreep::SpriteMovement( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTx
 	mDump[ 0xBF05 + pX ] <<= 2;
 }
 
+// 4DE9: 
+void cCreep::sub_4DE9( byte pA ) {
+	byte byte_4E31 = pA;
+	
+	mDump[ 0x6DBF ] = pA;
+	mDump[ 0x6DC0 ] = pA;
+
+	byte gfxPosX = mDump[ word_40 + 5 ];
+	byte gfxPosY = mDump[ word_40 + 6 ];
+
+	drawGraphics( 0, 0x6E, gfxPosX, gfxPosY, 0 );
+	mDump[ 0x6DBF ] = byte_4E31 << 4;
+	mDump[ 0x6DC0 ] = byte_4E31 << 4;
+
+	gfxPosY += 0x10;
+	drawGraphics( 0, 0x6E, gfxPosX, gfxPosY, 0 );
+}
+
+// 505C: 
 void cCreep::sub_505C( byte pA, byte pX ) {
 	byte byte_50D1 = pA;
 
