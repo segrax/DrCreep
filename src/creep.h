@@ -23,9 +23,12 @@ private:
 	bool		 mQuit;
 
 	byte		 byte_20DE, byte_24FD, RunRestorePressed;
-	
+	byte		 byte_2E02;
+
 	byte		 byte_2E35, byte_2E36, byte_2232;					// Conveyor
 
+	byte		 byte_3638;
+	word		 word_41D3;
 
 	word		 word_4A65;											// Keys
 	byte		 byte_4A64;
@@ -55,8 +58,9 @@ private:
 	byte		 byte_3FD4;
 
 	byte		 byte_840, byte_841, byte_883, byte_884, byte_885, byte_886, byte_887, byte_888, byte_889, byte_88A, byte_88B, byte_88C, byte_88D, byte_88E, byte_882, byte_D10, byte_D12;
-	byte		 byte_839, byte_83E, byte_83F, byte_11C9, byte_5CE2;
-	char		 byte_5FD5, byte_5FD6, byte_5FD7, byte_5FD8;
+	byte		 byte_839, byte_83E, byte_83F, byte_8C0, byte_8C1, byte_11C9, byte_5CE2;
+	byte		 byte_B83, byte_603A;
+	char		 byte_5FD5, byte_5FD6, byte_5FD7, byte_5FD8, byte_5F6A;
 	
 	byte		 mGfxEdgeOfScreenX;
 	byte		 mTextXPos, mTextYPos, mTextColor, mTextFont, mTextFontt;
@@ -65,7 +69,7 @@ private:
 	byte		 mGfxWidth, mGfxHeight;
 	byte		 mCount;
 	 
-	word		 word_30, word_32, word_34, word_3C, word_3E, word_40;
+	word		 word_30, word_32, word_34, word_3C, word_3E, word_40, word_42, word_44;
 
 public:
 
@@ -88,29 +92,36 @@ public:
 		void	 drawGraphics(  word pDecodeMode, word pGfxID, word pGfxPosX, word pGfxPosY, byte pTxtCurrentID );
 		void	 handleEvents();
 		void	 Game();
+		void	 GameMain();
 		void	 GameAction();
 		void	 gameMenuDisplaySetup();
 		void	 KeyboardJoystickMonitor( byte pA );
 		void	 mainLoop();
+		void	 MapDisplay();
 		void	 ObjectActions();
 		void	 ObjectHitsObject( byte pX );
 		void	 objectFunction( byte pX );
 		void	 optionsMenu();
 		bool	 Menu();
+		void	 SavePosition();
 		void	 SpriteDraw();
 		void	 SpriteMovement( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
 		void	 start();	
 		void	 sub_95F();
+		void	 sub_1203();
 		void	 sub_160A(); 
 		void	 sub_21C8( char pA );
 		void	 obj_PrepWalkway( );
 		void	 obj_PrepSlidingPole( );
 		void	 obj_PrepLadder();
 		void	 sub_2973();
+		void	 sub_29AE();
+		void	 sub_29D0( byte pA, byte pY );
 		void	 sub_2E37();
 		void	 sub_2E79( );
 		void	 sub_3026( byte pX );
 		void	 sub_31F6( byte pX );
+		void	 sub_359E( );
 		void	 sub_3A7F( byte pX );
 		void	 sub_3AEB( byte pX );
 		void	 sub_3E87( );
@@ -145,6 +156,7 @@ public:
 		byte	 sub_5ED5( );
 		void	 sub_5F6B( byte &pX );
 		void	 sub_5FA3();
+		void	 sub_6009( byte pA );
 		void	 textDecode( );
 		void	 roomPrepare( );
 		void	 run();
