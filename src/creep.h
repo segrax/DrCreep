@@ -77,7 +77,10 @@ public:
 				~cCreep();
 
 				inline byte	*level( word pAddress ) {
-					return &mLevel[(pAddress - 0x9800) + 2];
+					if(mMenuIntro)
+						return &mLevel[(pAddress - 0x9800) + 2];
+					else
+						return &mDump[pAddress];
 				}
 				
 				inline byte charRom( word pAddress ) {

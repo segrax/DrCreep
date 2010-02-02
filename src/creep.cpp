@@ -1619,7 +1619,7 @@ sF99:;
 			
 			bool cf = false;
 
-			if( (A - 4) < 0 )
+			if( (A - 16) < 0 )
 				cf = true;
 			A -= 16;
 			A <<= 1;
@@ -1849,6 +1849,10 @@ void cCreep::GameMain() {
 	byte_B83 = 0;
 
 	for(;;) {
+		mWindow->clear(0);
+		SDL_Surface *surface = mSurface->scaleTo(2);
+		mWindow->blit( surface, 0, 0 );
+
 		handleEvents();
 		if( byte_5F6A == 1 ) {
 			byte_2E02 = 0;
@@ -2520,8 +2524,9 @@ void cCreep::sub_1203() {
 			
 			byte_13EA = byte_13EE;
 
+			// Top edge of room
 			for(;;) {
-				//drawGraphics(1, 0, gfxPosX, gfxPosY, 0x0B );
+				drawGraphics(1, 0, gfxPosX, gfxPosY, 0x0B );
 				mTxtX_0 += 0x04;
 				--byte_13EA;
 				if(!byte_13EA)
@@ -2532,6 +2537,8 @@ void cCreep::sub_1203() {
 			mTxtX_0 = byte_13EC;
 			mTxtY_0 = ((byte_13EF << 3) + byte_13ED) - 3;
 			byte_13EA = byte_13EE;
+
+			// Bottom edge of room
 			for(;;) {
 				drawGraphics(1, 0, gfxPosX, gfxPosY, 0x0B );
 				mTxtX_0 += 0x04;
