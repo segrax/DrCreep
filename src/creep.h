@@ -111,7 +111,7 @@ public:
 		void	 SpriteMovement( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
 		void	 start();	
 		void	 sub_95F();
-		void	 sub_1203();
+		void	 mapRoomDraw();
 		void	 sub_160A(); 
 		void	 sub_21C8( char pA );
 		void	 obj_PrepWalkway( );

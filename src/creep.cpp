@@ -934,12 +934,12 @@ void cCreep::objectFunction( byte pX ) {
 	word func = *((word*) &mDump[ 0x88F + Y ]);
 	
 	switch(func) {
-/*
+
 		case 0x31F6:
-			//sub_31F6( pX );
+			sub_31F6( pX );
 			break;
 		
-		case 0x3534:
+/*		case 0x3534:
 			break;
 
 		case 0x34EF:
@@ -1496,30 +1496,9 @@ void cCreep::Game() {
 		word_34 = mDump[ 0x9800 ];
 		word_34 |= (mDump[ 0x9801 ] << 8);
 		
-		if( (word_34 & 0xFF00) ) {
+		// Hope this is correct
+		memcpy( &mDump[ word_32 ], &mDump[ word_30 ], word_34 );
 
-			for(byte Y = 0; ;) {
-				mDump[ word_32 + Y ] = mDump[ word_30 + Y ];
-
-				++Y;
-				if( Y != 0 )
-					continue;
-				
-				word_30 += 0x100;
-				word_32 += 0x100;
-				word_34 -= 0x100;
-
-				if( (word_34 & 0xFF00) == 0 )
-					break;
-			}
-		}
-		// DBA
-		for(byte Y = 0;;) {
-			if( (word_34 & 0xFF) == Y )
-				break;
-			mDump[ word_32 + Y ] = mDump[ word_30 + Y ];
-			++Y;
-		}
 		// DC6
 		mDump[ 0x7812 ] = byte_D10;
 
@@ -1592,6 +1571,7 @@ sF99:;
 	mDump[ 0xD028 ] = mDump[ 0xD027 ] = 0;
 	mDump[ 0x11D7 ] = 0;
 
+	// Draw both players Name/Time/Arrows
 	// FA9
 	for(;; ) {
 		byte X = mDump[ 0x11D7 ];
@@ -1636,20 +1616,22 @@ sF99:;
 
 			// Sprite X 8bit
 			mDump[ 0x20 ] = A;
+
 			// 100D
 			A = mDump[ word_42 + 2 ];
 			A += mDump[ word_40 + 6 ];
-
 			A += mDump[ 0x11DE + mDump[ 0x11D9 ] ];
 			//A += 0x32;
-			
+
 			// Sprite Y
 			mDump[ 0x18 + mDump[ 0x11D8 ] ] = A;
 			mDump[ 0xBD03 + X ] = mDump[ 0x11E2 + Y ];
 			
+			// Enable the Arrow sprite
 			hw_SpritePrepare( X );
 			
-			mDump[ 0x21 ] = mDump[ 0x2F82 + mDump[ 0x11D8 ] ] | mDump[ 0x21 ];
+			// Sprites Enabled
+			mDump[ 0x21 ] = (mDump[ 0x2F82 + mDump[ 0x11D8 ] ] | mDump[ 0x21 ]);
 			// 103C
 			X = mDump[ 0x7807 + mDump[ 0x11D7 ] ];
 			A = mDump[ 0x11E5 + X ];
@@ -1660,16 +1642,20 @@ sF99:;
 			word_3E = mDump[ 0x11E9 + X ];
 			word_3E += mDump[ 0x11EA + X ] << 8;
 
+			// Player (One Up / Two Up)
 			DisplayText();
+
 			// 1058
-			word_3E = Y << 1;
+			word_3E = (Y << 1);
 			word_3E += 0x7855;
+
 
 			sub_29AE();
 
 			gfxPosX = mDump[ 0x11D3 + Y ] + 8;
 			gfxPosY = 0x10;
 
+			// Draw Time ' : : '
 			drawGraphics(0, 0x93, gfxPosX, gfxPosY, 0);
 		} 
 		
@@ -1680,7 +1666,8 @@ sF99:;
 	}
 	
 	// 1094
-	sub_1203();
+	mapRoomDraw();
+
 	mDump[ 0x11CB ] = 0;
 	mDump[ 0x11CD ] = mDump[ 0x11CC ] = 1;
 	if( mDump[ 0x11C9 ] != 1 ) {
@@ -1710,10 +1697,14 @@ s10EB:;
 	mDump[ 0x11CF ] = mDump[ 0x11D2 ];
 	mDump[ 0x11D7 ] = 0;
 	
+
 	// 110E
 	for( ;; ) {
 		byte_2E35 = 1;
+
 		byte X = mDump[ 0x11D7 ];
+
+		// Player Arrow Flash
 		if( mDump[ 0x11CB ] != 1 ) {
 			--mDump[ 0x11CE + X ];
 			if(mDump[ 0x11CE + X ] == 0 ) {
@@ -1730,6 +1721,7 @@ s10EB:;
 				}
 			}
 		}
+
 		// 1146
 		if( byte_B83 == 1 ) {
 			byte_B83 = 0;
@@ -2473,7 +2465,7 @@ noCarry2:;
 }
 
 // 1203: 
-void cCreep::sub_1203() {
+void cCreep::mapRoomDraw() {
 	byte byte_13EA, byte_13EB, byte_13EC;
 	byte byte_13ED, byte_13EE, byte_13EF;
 
@@ -2501,6 +2493,7 @@ void cCreep::sub_1203() {
 
 			byte_13EB = byte_13EF;
 			
+			// Draw Room Floor Square
 			// 1260
 			for(;;) {
 				byte_13EA = byte_13EE;
@@ -2518,29 +2511,29 @@ void cCreep::sub_1203() {
 				if(!byte_13EB)
 					break;
 			}
+
 			// 128B
+			// Top edge of room
 			mTxtX_0 = byte_13EC;
 			mTxtY_0 = byte_13ED;
-			
 			byte_13EA = byte_13EE;
 
-			// Top edge of room
 			for(;;) {
-				drawGraphics(1, 0, gfxPosX, gfxPosY, 0x0B );
+				drawGraphics(1, 0, 0, 0, 0x0B );
 				mTxtX_0 += 0x04;
 				--byte_13EA;
 				if(!byte_13EA)
 					break;
 			}
-			// 12B8
 
+			// 12B8
+			// Bottom edge of room
 			mTxtX_0 = byte_13EC;
 			mTxtY_0 = ((byte_13EF << 3) + byte_13ED) - 3;
 			byte_13EA = byte_13EE;
 
-			// Bottom edge of room
 			for(;;) {
-				drawGraphics(1, 0, gfxPosX, gfxPosY, 0x0B );
+				drawGraphics(1, 0, 0, 0, 0x0B );
 				mTxtX_0 += 0x04;
 				--byte_13EA;
 				if(!byte_13EA)
@@ -2548,28 +2541,33 @@ void cCreep::sub_1203() {
 			}
 
 			//12E5
+			// Draw Left Edge
 			mTxtX_0 = byte_13EC;
 			mTxtY_0 = byte_13ED;
 			byte_13EA = byte_13EF;
 
 			for(;;) {
-				drawGraphics(1, 0, gfxPosX, gfxPosY, 0x0C );
+				drawGraphics(1, 0, 0, 0, 0x0C );
 				mTxtY_0 += 0x08;
 				--byte_13EA;
 				if(!byte_13EA)
 					break;
 			}
+
 			//130D
+			// Draw Right Edge
 			mTxtX_0 = ((byte_13EE << 2) + byte_13EC) - 4;
 			mTxtY_0 = byte_13ED;
+			byte_13EA = byte_13EF;
 
 			for(;;) {
-				drawGraphics(1, 0, gfxPosX, gfxPosY, 0x0D );
+				drawGraphics(1, 0, 0, 0, 0x0D );
 				mTxtY_0 += 0x08;
 				--byte_13EA;
 				if(!byte_13EA)
 					break;
 			}
+
 			// 133E
 			sub_6009( 0 );
 			byte_13EA = byte_603A;
@@ -2594,7 +2592,7 @@ s1349:;
 			mTxtY_0 -= 3;
 		} else {
 			// 13A0
-			mTxtY_0 =byte_13ED + mDump[ word_40 + 6 ];
+			mTxtY_0 = byte_13ED + mDump[ word_40 + 6 ];
 			
 			if( A != 3 ) {
 				mTxtX_0 = ((byte_13EE << 2) + byte_13EC) - 4;
@@ -2616,8 +2614,9 @@ s1349:;
 	} else 
 		A = 0x0E;
 		
+	// Draw Doors in sides
 s13CD:;
-	drawGraphics( 1, 0, gfxPosX, gfxPosY, A );
+	drawGraphics( 1, 0, 0, 0, A );
 
 	word_40 += 0x08;
 	--byte_13EA;
