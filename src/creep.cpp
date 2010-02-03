@@ -639,7 +639,7 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 
 	byte_5F58 = pA;
 	RunRestorePressed = false;
-	byte A = 0;
+	byte A = 0, X = 0xFF;
 
 	switch( keyevent.type ) {
 		case SDL_KEYDOWN:
@@ -650,9 +650,17 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 				case SDLK_RCTRL:
 					A = 1;
 					break;
+				case SDLK_LEFT:
+					X = 0xFB;
+					break;
+				case SDLK_RIGHT:
+					X = 0xF7;
+					break;
 			}
 	}
-	
+
+	X &= 0x0F;
+	byte_5F56 = mDump[ 0x5F59 + X ];
 	byte_5F57 = A;
 }
 
@@ -983,9 +991,246 @@ void cCreep::objectFunction( byte pX ) {
 }
 
 void cCreep::sub_31F6( byte pX ) {
+	char A =  mDump[ 0xBD04 + pX ];
+
+	if( A & byte_885 ) {
+		A ^= byte_885;
+		A |= byte_886;
+		mDump[ 0xBD04 + pX ] = A;
+		A = mDump[ 0xBD1C + pX ];
+		A <<= 1;
+
+		char Y = A;
+
+		word_30 = *((word*) &mDump[ 0x34E7 + Y ]);
+		word_32 = *((word*) &mDump[ 0x34EB + Y ]);
+		
+		for( Y = 3; Y >= 0; --Y ) 
+			mDump[ word_32 + Y ] = mDump[ word_30 + Y ];
+
+		return;
+	} 
+
+	//322C
+	if( A & byte_882 ) {
+		A ^= byte_882;
+		mDump[ 0xBD04 + pX ] = A;
+		char Y = mDump[ 0xBD1C + pX ] << 1;
+		
+		word_32 = *((word*) &mDump[ 0x34E7 + Y ]);
+		word_30 = *((word*) &mDump[ 0x34EB + Y ]);
+
+		for( Y = 3; Y >= 0; --Y ) 
+			mDump[ word_32 + Y ] = mDump[ word_30 + Y ];
+		
+		Y = mDump[ 0xBD1C + pX ];
+		A = mDump[ 0x780D + Y ];
+		if( A != 6 ) {
+			sub_3488( pX );
+			goto s32DB;
+		}
+
+	} else {
+		// 3269
+		byte Y = mDump[ 0xBD1C + pX ];
+		A = mDump[ 0x780D + Y ];
+
+		if( A == 5 ) {
+			//3280
+			byte_34D6 = Y;
+			Y = mDump[ 0xBD1B + pX ];
+			A = mDump[ 0x34A4 + Y ];
+
+			if( A != 0xFF ) {
+				mDump[ 0x780D + Y ] = A;
+				mDump[ 0xBD06 + pX ] = 1;
+				A = mDump[ 0x780D + Y ];
+				goto s32CB;
+
+			} else {
+				// 329E
+				mDump[ 0xBD1B + pX ] += 0x04;
+				Y = mDump[ 0xBD1B + pX ];
+
+				mDump[ 0xBD01 + pX ] += mDump[ 0x34A1 + Y ];
+				mDump[ 0xBD02 + pX ] += mDump[ 0x34A2 + Y ];
+			}
+
+		} else if( A == 6 ) {
+			mDump[ 0x780D + Y ] = 5;
+		} else
+			goto s32CB;
+	}
+	// 32BC
+	mDump[ 0xBD03 + pX ] = mDump[ 0x34A3 + mDump[ 0xBD1B + pX ] ];
+	sub_3488( pX );
+	return;
+s32CB:;
 	
+	if( A != 0 ) {
+		mDump[ 0xBD04 + pX ] |= byte_885;
+		return;
+	}
+
+s32DB:;
+	byte AA = mDump[ 0xBD1A + pX ];
+	A = AA;
+	if( AA != 0xFF )
+		if( AA != mDump[ 0xBD19 + pX ] )
+			sub_526F( A );
+
+	mDump[ 0xBD19 + pX ] = A;
+	mDump[ 0xBD1A + pX ] = 0xFF;
+	sub_5F6B( pX );
+	
+	byte byte_34D5 = mDump[ word_3C ] & mDump[ 0xBD18 + pX ];
+	//32FF
+	mDump[ 0xBD18 + pX ] = 0xFF;
+
+	if( byte_5FD8 != 0 ) {
+		// 3309
+		if( !(byte_34D5 & 0x11) ) {
+			byte_34D5 &= 0xBB;	
+			if( byte_5FD8 >> 1 != byte_5FD7 )
+				byte_34D5 &= 0x77;
+			else
+				byte_34D5 &= 0xDD;
+		}
+
+	} else {
+		// 3337
+		A = byte_5FD7;
+		if( A == 3 ) {
+			word_3C -= 0x4E;
+
+			byte_34D5 &= 0x75;
+			byte_34D5 |= mDump[ word_3C ] & 2;
+
+		} else {
+			// 3360
+			if( A == 0 ) {
+				word_3C -= 0x52;
+
+				byte_34D5 &= 0x5D;
+				byte_34D5 |= mDump[ word_3C ] & 0x80;
+
+			} else {
+				// 3386
+				byte_34D5 &= 0x55;
+			}
+		}
+	}
+	// 338E
+	KeyboardJoystickMonitor( mDump[ 0xBD1C + pX ] );
+	mDump[ 0xBD1D + pX ] = byte_5F57;
+	mDump[ 0xBD1E + pX ] = byte_5F56;
+	
+	byte Y = byte_5F56;
+	if( !(Y & 0x80 )) {
+
+		if( mDump[ 0x2F82 + Y ] & byte_34D5 ) {
+			mDump[ 0xBD1F + pX ] = Y;
+			goto s33DE;
+
+		} 
+
+		// 33B2
+		A = mDump[ 0xBD1F + pX ];
+
+		if(!( A & 0x80 )) {
+			A += 1;
+			A &= 7;
+			if( A != byte_5F56 ) {
+				A -= 2;
+				A &= 7;
+				if( A != byte_5F56 )
+					goto s33D6;
+			}
+			
+			if( mDump[ 0x2F82 + mDump[ 0xBD1F + pX ] ] & byte_34D5 )
+				goto s33DE;
+		}
+	}
+s33D6:;
+	// 33D6
+	mDump[ 0xBD1F + pX ] = 0x80;
+	return;
+
+	// 33DE
+s33DE:;
+	A = (mDump[ 0xBD1F + pX ] & 3);
+
+	if( A == 2 ) {
+		mDump[ 0xBD02 + pX ] -= byte_5FD8;
+
+	} else {
+		// 33F4
+		if( A == 0 ) {
+			mDump[ 0xBD01 + pX ] -= byte_5FD7;
+			++mDump[ 0xBD01 + pX ];
+		}
+	}
+	// 3405
+	Y = mDump[ 0xBD1F + pX ];
+	mDump[ 0xBD01 + pX ] += mDump[ 0x34D7 + Y ];
+	mDump[ 0xBD02 + pX ] += mDump[ 0x34DF + Y ];
+
+	if( !(Y & 3) ) {
+		// 3421
+		if( byte_34D5 & 1 ) {
+			A = mDump[ 0xBD1F + pX ];
+			if( !A )
+				++mDump[ 0xBD03 + pX ];
+			else 
+				--mDump[ 0xBD03 + pX ];
+			
+			// 3436
+			A = mDump[ 0xBD03 + pX ];
+			if( A >= 0x2E ) {
+				// 3445
+				if( A >= 0x32 )
+					mDump[ 0xBD03 + pX ] = 0x2E;
+			} else {
+				// 343D
+				mDump[ 0xBD03 + pX ] = 0x31;
+			}
+
+		} else {
+			//3451
+			mDump[ 0xBD03 + pX ] = 0x26;
+		}
+
+	} else {
+		// 3459
+		++mDump[ 0xBD03 + pX ];
+		if( mDump[ 0xBD1F + pX ] < 4 ) {
+			// 3463
+			A = mDump[ 0xBD03 + pX ];
+			if( A >= 6 || A < 3 )
+				mDump[ 0xBD03 + pX ] = 3;
+
+		} else {
+			// 3476
+			if( mDump[ 0xBD03 + pX ] >= 3 )
+				mDump[ 0xBD03 + pX ] = 0;
+		}
+	}
+
+	// 3482
+	sub_3488( pX );
+
 }
 
+// 3488: 
+void cCreep::sub_3488( byte pX ) {
+	hw_SpritePrepare( pX );
+
+	byte_34D6 = pX >> 5;
+
+	mDump[ 0xD027 + byte_34D6 ] = mDump[ 0x34D3 + mDump[ 0xBD1C + pX ] ];
+}
+
+// 3AEB: 
 void cCreep::sub_3AEB( byte pX ) {
 	char A = mDump[ 0xBD04 + pX ];
 	char byte_3F0A, byte_3F0B, byte_3F10, byte_3F11, byte_3F12;

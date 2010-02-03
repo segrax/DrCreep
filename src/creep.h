@@ -27,7 +27,7 @@ private:
 
 	byte		 byte_2E35, byte_2E36, byte_2232;					// Conveyor
 
-	byte		 byte_3638;
+	byte		 byte_34D6, byte_3638;
 	word		 word_41D3;
 
 	word		 word_4A65;											// Keys
@@ -54,7 +54,7 @@ private:
 	
 	word		 word_564B;													// Conveyor
 	byte		 byte_5642, byte_5643, byte_5644, byte_5645, byte_5646;		// Conveyor
-	byte		 byte_5647, byte_5648, byte_5F58, byte_5F57;
+	byte		 byte_5647, byte_5648, byte_5F58, byte_5F57, byte_5F56;
 	byte		 byte_3FD4;
 
 	byte		 byte_840, byte_841, byte_883, byte_884, byte_885, byte_886, byte_887, byte_888, byte_889, byte_88A, byte_88B, byte_88C, byte_88D, byte_88E, byte_882, byte_D10, byte_D12;
@@ -124,6 +124,7 @@ public:
 		void	 sub_2E79( );
 		void	 sub_3026( byte pX );
 		void	 sub_31F6( byte pX );
+		void	 sub_3488( byte pX );
 		void	 sub_359E( );
 		void	 sub_3A7F( byte pX );
 		void	 sub_3AEB( byte pX );
