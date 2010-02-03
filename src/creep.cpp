@@ -1,22 +1,18 @@
 #include "stdafx.h"
-#include "graphics/window.h"
 #include "graphics/surface.h"
-#include "sprite.h"
+#include "screen.h"
 #include "creep.h"
-#include "bitmapMulticolor.h"
+#include "sprite.h"
 
 cCreep::cCreep() {
 	size_t RomSize;
 
+	mScreen = new cScreen();
 	m64CharRom = fileRead( "char.rom", RomSize );
 	mDumpSize = 0;
 	mDump = fileRead( "object", mDumpSize );
 	mLevel = 0;
 	mQuit = false;
-
-	mWindow = new cVideoWindow( 640, 400, 4 );
-	mBitmap = new cBitmapMulticolor();
-	mSurface = new cVideoSurface<dword>( 640, 400 );
 
 	mMenuMusicScore = 0xFF;
 
@@ -338,11 +334,10 @@ void cCreep::ScreenClear() {
 
 	byte Y = 0xF9;
 	
-	mWindow->clear(0);
+	mScreen->clear(0);
 
 	// Disable all sprites
-	mDump[ 0x20 ] = 0;
-	mDump[ 0x21 ] = 0; 
+	mScreen->spriteDisable();
 
 	for( ; word_30 >= 0xE000; word_30 -= 0x0100) {
 
@@ -551,9 +546,7 @@ bool cCreep::Menu() {
 			ScreenClear();
 			roomPrepare( );
 			
-			mBitmap->load( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
-			mSurface->surfaceWipe(0xFF);
-			mSurface->surfacePut( mBitmap->mSurface, 0, 0 );
+			mScreen->bitmapLoad( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
 		}
 		
 		// 0BE1
@@ -582,9 +575,7 @@ bool cCreep::Menu() {
 				byte_2E35 = 2;
 			}
 
-			mWindow->clear(0);
-			SDL_Surface *surface = mSurface->scaleTo(2);
-			mWindow->blit( surface, 0, 0 );
+			mScreen->refresh();
 
 			// C17
 			KeyboardJoystickMonitor( byte_D10 );
@@ -683,12 +674,8 @@ void cCreep::handleEvents() {
 	sub_3F4F();
 	++byte_2E36;
 
-	mBitmap->load( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
-
-	mSurface->surfaceWipe(0xFF);
-	mSurface->surfacePut( mBitmap->mSurface, 0, 0 );
-
-	SpriteDraw();
+	mScreen->bitmapLoad( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
+	mScreen->spriteDraw();
 }
 
 void cCreep::sub_29AE() {
@@ -811,8 +798,11 @@ s2ED5:
 
 				byte w30 = (word_30 & 0xFF00) >> 8;
 
+				cSprite *sprite = mScreen->spriteGet( Y );
+
 				// Sprite X
 				mDump[ 0x10 + Y ] = (word_30 - 32);
+				sprite->_X = (word_30 - 32);
 
 				if((word_30 >= 0x100) && ((word_30 - 32) < 0x100))
 					--w30;
@@ -822,21 +812,26 @@ s2ED5:
 					A = (mDump[ 0x2F82 + Y ] ^ 0xFF);
 
 				} else {
-					if( w30 )
+					if( w30 ) {
 						A = (mDump[ 0x20 ] | mDump[ 0x2F82 + Y ]);
-					else
+						//sprite->_X += 0x100;
+					} else
 						A = (mDump[ 0x2F82 ] ^ 0xFF) & mDump[ 0x20 ];
 
 					// Sprites X Bit 8
 					mDump[ 0x20 ] = A;
 
 					// 2F45
-					if((A & mDump[ 0x2F82 + Y ]) && (mDump[ 0x10 + Y ] >= 0x58) )
+					if((A & mDump[ 0x2F82 + Y ]) && (mDump[ 0x10 + Y ] >= 0x58) ) {
 						A = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0x21 ];
-					else {
+						sprite->_rEnabled = false;
+					} else {
 						// 2F5B
+						sprite->_Y = mDump[ 0xBD02 + X ];
 						mDump[ 0x18 + Y ] = mDump[ 0xBD02 + X ];// + 0x32;
 						A = mDump[ 0x21 ] | mDump[ 0x2F82 + Y ];
+
+						sprite->_rEnabled = true;
 					}
 				}
 
@@ -1919,12 +1914,15 @@ sF99:;
 			sub_3F14( X );
 			mDump[ 0x11D8 ] = X >> 5;
 			
+			word posX;
+			
 			A = mDump[ word_42 + 1 ];
 			A += mDump[ word_40 + 5 ];
-			
+
 			byte Y = mDump[ 0x11D9 ];
 			A += mDump[ 0x11DA + Y ];
-			
+			posX = A;
+
 			bool cf = false;
 
 			if( (A - 16) < 0 )
@@ -1932,14 +1930,19 @@ sF99:;
 			A -= 16;
 			A <<= 1;
 
+			posX -= 16;
+			posX <<= 1;
+			
 			Y = mDump[ 0x11D8 ];
+			cSprite *sprite = mScreen->spriteGet( Y );
 
 			// Sprite X
 			mDump[ 0x10 + Y ] = A;
+			sprite->_X = posX;
 
-			if( cf )
+			if( cf ) {
 				A = mDump[ 0x2F82 + Y ] | mDump[ 0x20 ];
-			else
+			} else
 				A = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0x20 ];
 
 			// Sprite X 8bit
@@ -1952,6 +1955,7 @@ sF99:;
 			//A += 0x32;
 
 			// Sprite Y
+			sprite->_Y = A;
 			mDump[ 0x18 + mDump[ 0x11D8 ] ] = A;
 			mDump[ 0xBD03 + X ] = mDump[ 0x11E2 + Y ];
 			
@@ -1960,6 +1964,8 @@ sF99:;
 			
 			// Sprites Enabled
 			mDump[ 0x21 ] = (mDump[ 0x2F82 + mDump[ 0x11D8 ] ] | mDump[ 0x21 ]);
+			sprite->_rEnabled = true;
+
 			// 103C
 			X = mDump[ 0x7807 + mDump[ 0x11D7 ] ];
 			A = mDump[ 0x11E5 + X ];
@@ -1976,7 +1982,6 @@ sF99:;
 			// 1058
 			word_3E = (Y << 1);
 			word_3E += 0x7855;
-
 
 			sub_29AE();
 
@@ -2041,11 +2046,11 @@ s10EB:;
 				if( X == 0 || byte_11C9 != 1 ) {
 					// 1133
 					mDump[ 0xD027 ] ^= 0x01;
-					mSprites[ 0 ]._color ^= 0x01;
+					mScreen->spriteGet( 0 )->_color ^= 0x01;
 				} else {
 					// 113E
 					mDump[ 0xD028 ] ^= 0x01;
-					mSprites[ 1 ]._color ^= 0x01;
+					mScreen->spriteGet( 1 )->_color ^= 0x01;
 				}
 			}
 		}
@@ -2083,16 +2088,11 @@ s10EB:;
 		mDump[ 0x11D7 ] ^= 0x01;
 		// TODO: Wait for vic interrupts
 
-		mBitmap->load( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
 
-		mSurface->surfaceWipe(0xFF);
-		mSurface->surfacePut( mBitmap->mSurface, 0, 0 );
-
-		SpriteDraw();
+		mScreen->bitmapLoad( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
+		mScreen->spriteDraw();
 		
-		mWindow->clear(0);
-		SDL_Surface *surface = mSurface->scaleTo(2);
-		mWindow->blit( surface, 0, 0 );
+		mScreen->refresh();
 	}
 	// 11A5
 
@@ -2197,9 +2197,7 @@ void cCreep::GameMain() {
 	byte_B83 = 0;
 
 	for(;;) {
-		mWindow->clear(0);
-		SDL_Surface *surface = mSurface->scaleTo(2);
-		mWindow->blit( surface, 0, 0 );
+		mScreen->refresh();
 
 		handleEvents();
 		if( byte_5F6A == 1 ) {
@@ -3242,11 +3240,11 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	// 5DFB
 	Y = byte_5E88;
 	
-	cSprite *sprite = &mSprites[Y];
+	cSprite *sprite = mScreen->spriteGet(Y);
 
 	word dataSrc = mDump[ 0x26 + Y ] ^ 8;
 	dataSrc <<= 6;
-	dataSrc += 0xC000;;
+	dataSrc += 0xC000;
 
 	mDump[ 0x26 + Y ] = mDump[ 0x26 + Y ] ^ 8;
 
@@ -3308,33 +3306,6 @@ void cCreep::SavePosition() {
 	// TODO
 }
 
-void cCreep::SpriteDraw() {
-	cSprite *sprite;
-
-	byte Y2 = 0x80;
-
-	// Draw from sprite 7
-	for( char Y = 7; Y >= 0; --Y, Y2 >>= 1 ) {
-		if( !(mDump[ 0x21 ] & Y2) )
-			continue;
-
-		sprite = &mSprites[Y];
-
-		sprite->_multiColor0 = 0x0A;
-		sprite->_multiColor1 = 0x0D;
-
-		word posX = mDump[ 0x10 + Y ];
-		word posY = mDump[ 0x18 + Y ];
-		if( (mDump [0x20] & Y2) )
-			posX += 0x100;
-
-		sprite->streamLoad( 0 );
-
-		mSurface->surfacePut( sprite->_surface, posX, posY );
-		//delete sprite;
-	}
-
-}
 void cCreep::sub_5F6B( byte &pX ) {
 	byte_5FD5 = mDump[ 0xBD01 + pX ] + mDump[ 0xBD0C + pX ];
 	

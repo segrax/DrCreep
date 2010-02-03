@@ -121,9 +121,10 @@ void cSprite::drawSingle( byte *pBuffer ) {
 void cSprite::streamLoad( byte *pBuffer ) {
 	if( !pBuffer )
 		pBuffer = _buffer;
-	else
+	else {
 		_buffer = pBuffer;
-
+		return;
+	}
 	_surface->surfaceWipe(0xFF);
 
 

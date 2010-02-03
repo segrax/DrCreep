@@ -7,7 +7,8 @@ public:
 	
 	cVideoSurface<dword>	*_surface;
 
-	byte					 _X,		_Y,		_color,		_multiColor0,	_multiColor1;
+	word					 _X,		_Y;
+	byte					 _color,		_multiColor0,	_multiColor1;
 
 	void					 drawMulti( byte *pBuffer );
 	void					 drawSingle( byte *pBuffer );

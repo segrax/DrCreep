@@ -15,10 +15,10 @@ struct SDL_Surface;
 		bool				 _changed;
 		byte				*_buffer;					// Raw image data
 		size_t				 _bufferSize;				// Raw image data size
-		
+	public:
 		size_t				 _width,	_height;		// Width / Height
 		size_t				 _maxWidth, _maxHeight;	
-
+	protected:
 		size_t				 _pixelBytes;
 		size_t				 _pitch;					// Bytes per row
 		paletteColor		 _palette[16];
@@ -114,6 +114,10 @@ struct SDL_Surface;
 
 			// set pixel data
 			*pixelPosition =  colorGet(pPaletteIndex);
+		}
+
+		SDL_Surface *surfaceGet() {
+			return _surface;
 		}
 
 	SDL_Surface *scaleTo( size_t scaleLevel ) {

@@ -1,18 +1,12 @@
-class cVideoWindow;
-class cBitmapMulticolor;
+class cScreen;
 
 class cCreep {
 
 private:
 
-	cVideoWindow		 *mWindow;
-	cBitmapMulticolor	 *mBitmap;
-	cVideoSurface<dword> *mSurface;
-
-	cSprite				  mSprites[8];
-
 	byte		*mDump,			*mLevel,		*m64CharRom;
 	size_t		 mDumpSize;
+	cScreen		*mScreen;
 
 	byte		 mFileListingNamePtr;
 	
