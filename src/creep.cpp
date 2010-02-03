@@ -656,6 +656,12 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 				case SDLK_RIGHT:
 					X = 0xF7;
 					break;
+				case SDLK_DOWN:
+					X = 0xFD;
+					break;
+				case SDLK_UP:
+					X = 0xFE;
+					break;
 			}
 	}
 
@@ -850,6 +856,7 @@ s2F72:
 
 }
 
+// 311E
 void cCreep::ObjectActions() {
 	
 }
