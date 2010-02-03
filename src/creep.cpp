@@ -767,8 +767,8 @@ void cCreep::sub_2E79( ) {
 					// 2EAD
 						if(A & byte_884) 
 							goto s2EF3;
-						if(!(A & byte_887)) {
-							ObjectActions();
+						if((A & byte_887)) {
+							ObjectActions( X );
 							if( mDump[ 0xBD04 + X ] & byte_883)
 								goto s2EF3;
 						}
@@ -857,8 +857,84 @@ s2F72:
 }
 
 // 311E
-void cCreep::ObjectActions() {
+void cCreep::ObjectActions( byte pX ) {
+
+	byte_31F1 = mDump[ 0xBD01 + pX ];
+	byte_31F2 = byte_31F1 + mDump[ 0xBD0A + pX ];
+	if( (mDump[ 0xBD01 + pX ] +  mDump[ 0xBD0A + pX ]) > 0xFF )
+		byte_31F1 = 0;
+
+	byte_31F3 = mDump[ 0xBD02 + pX ];
+	byte_31F4 = byte_31F3 + mDump[ 0xBD0B + pX ];
+	if( (mDump[ 0xBD02 + pX ] +  mDump[ 0xBD0B + pX ]) > 0xFF )
+		byte_31F3 = 0;
+
+	// 3149
+	if( !byte_83E )
+		return;
+
+	byte_31EF = byte_83E << 3;
+	for( byte Y = 0; Y != byte_31EF; Y = byte_31F0 + 8) {
+
+		byte_31F0 = Y;
+		if( mDump[ 0xBD04 + Y ] & byte_83F )
+			continue;
+		if( byte_31F2 < mDump[ 0xBF01 + Y ] )
+			continue;
+		if( mDump[ 0xBF01 + Y ] + mDump[ 0xBF05 + Y ] < byte_31F1 )
+			continue;
+		if( byte_31F4 < mDump[ 0xBF02 + Y ] )
+			continue;
+		if( mDump[ 0xBF02 + Y ] + mDump[ 0xBF06 + Y ] < byte_31F3 )
+			continue;
+		//318C
+		byte_31F5 = 1;
+		Y = mDump[ 0xBD00 + pX ]  << 3;
+
+		ObjectActionFunction( pX, Y );
+
+		Y = byte_31F0;
+		if( byte_31F5 == 1 ) 
+			mDump[ 0xBD04 + pX ] |= byte_883;
+
+		Y = mDump[ 0xBF00 + byte_31F0 ] << 2;
+		ObjectActionFunction2( pX, Y );
+	}
+}
+
+void cCreep::ObjectActionFunction( byte pX, byte pY ) {
+	word func = *((word*) &mDump[ 0x893 + pY ]);
 	
+	switch( func ) {
+		case 0:
+			break;
+		case 0x34EF:
+			sub_34EF( pX, pY );
+			break;
+
+		default:
+			printf("objectactionfunction");
+			break;
+
+	}
+}
+
+void cCreep::ObjectActionFunction2( byte pX, byte pY ) {
+	word func = *((word*) &mDump[ 0x844 + pY ]);
+	
+	switch( func ) {
+		case 0:
+			break;
+		
+		case 0x4075:
+			sub_4075( pX, pY );
+			break;
+
+		default:
+			printf("objectactionfunction2");
+			break;
+
+	}
 }
 
 void cCreep::ObjectHitsObject( byte pX ) {
@@ -2034,6 +2110,34 @@ s10EB:;
 
 	sub_21C8( 9 );
 	mDump[ 0x11D0 ] = 0;
+}
+
+void cCreep::sub_34EF( byte pX, byte pY ) {
+	byte A;
+	if( mDump[ 0xBF00 + pY ] == 0x0B ) {
+		
+		A = mDump[ 0xBD01 + pX ] + mDump[ 0xBD0C + pX ];
+		A -= mDump[ 0xBF01 + pY ];
+
+		if( A < 4 ) {
+			mDump[ 0x780D + mDump[ 0xBD1C + pX ] ] = 2;
+			return;
+		}
+
+	} 
+	//3505
+	byte_31F5 = 0;
+	if( mDump[ 0xBF00 + pY ] != 0x0C ) 
+		return;
+
+	A = mDump[ 0xBD01 + pX ] + mDump[ 0xBD0C + pX ];
+	A -= mDump[ 0xBF01 + pY ];
+
+	if( A >= 4 )
+		return;
+
+	mDump[ 0xBD1A + pX ] = mDump[ 0xBE00 + pY ];
+	return;
 }
 
 void cCreep::sub_359E( ) {
@@ -3376,6 +3480,53 @@ void cCreep::obj_PrepLadder() {
 	}
 
 }
+
+// 4075: Pole Sliding
+void cCreep::sub_4075( byte pX, byte pY ) {
+	byte byte_41D5 = pY;
+	if( mDump[ 0xBE01 + pY ] == 0 )
+		return;
+	if( mDump[ 0xBD00 + pX ] )
+		return;
+
+	// 4085
+	if( mDump[ 0xBD1E + pX ] != 1 )
+		return;
+	
+	pY = mDump[ 0xBD1C + pX ];
+
+	byte A = mDump[ 0x780D + pY ];
+	if( A != 0 )
+		return;
+
+	mDump[ 0x780D + pY ] = 6;
+	mDump[ 0xBD1B + pX ] = 0;
+	mDump[ 0xBD06 + pX ] = 3;
+	
+	A = mDump[ 0xBE00 + byte_41D5 ];
+	A <<= 3;
+
+	word_40 = word_41D3 + A;
+
+	// 40BB
+
+	mDump[ 0xBD02 + pX ] = mDump[ word_40 + 1 ] + 0xF;
+	mDump[ 0xBD01 + pX ] = mDump[ word_40 ] + 0x06;
+	if( mDump[ word_40 + 7 ] != 0 ) {
+		mDump[ 0x785D + mDump[ 0xBD1C + pX ] ] = 1;
+	}
+
+	//40DD
+	word word_41D6 = *((word*) &mDump[ word_40 + 3 ]);
+	lvlPtrCalculate( word_41D6 );
+	
+	mDump[ word_42 ] |= byte_8C0;
+
+	pY = mDump[ 0xBD1C + pX ];
+	mDump[ 0x7809 + pY ] = word_41D6 & 0xFF;
+	mDump[ 0x780B + pY ] = (word_41D6 & 0xFF00) >> 8;
+}
+
 // 4F5C: Load the rooms' Teleports
 void cCreep::obj_PrepTeleport() {
 	mTxtX_0 = mDump[ word_3E ];

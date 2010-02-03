@@ -46,7 +46,9 @@ private:
 
 	word		 word_5748;											// Frankenstein
 	byte		 byte_574A, byte_574D, byte_574E, byte_574F;
-
+	
+	byte		 byte_31EF, byte_31F0, byte_31F1, byte_31F2;
+	byte		 byte_31F3, byte_31F4, byte_31F5;
 
 	word		 word_45DB;											// Lightning
 	byte		 byte_44E5, byte_45DD, byte_45DE, byte_45DF;		// Lightning
@@ -101,7 +103,9 @@ public:
 		void	 KeyboardJoystickMonitor( byte pA );
 		void	 mainLoop();
 		void	 MapDisplay();
-		void	 ObjectActions();
+		void	 ObjectActions( byte pX );
+		void	 ObjectActionFunction( byte pX, byte pY );
+		void	 ObjectActionFunction2( byte pX, byte pY );
 		void	 ObjectHitsObject( byte pX );
 		void	 objectFunction( byte pX );
 		void	 optionsMenu();
@@ -125,6 +129,7 @@ public:
 		void	 sub_3026( byte pX );
 		void	 sub_31F6( byte pX );
 		void	 sub_3488( byte pX );
+		void	 sub_34EF( byte pX, byte pY );
 		void	 sub_359E( );
 		void	 sub_3A7F( byte pX );
 		void	 sub_3AEB( byte pX );
@@ -136,6 +141,7 @@ public:
 		void	 sub_3757( );
 		void	 sub_396A( byte pA, byte pX );
 		void	 sub_3F14( byte &pX );
+		void	 sub_4075( byte pX, byte pY );
 		void	 obj_PrepTeleport( );
 		void	 obj_PrepRayGun( );
 		void	 obj_ExecRayGun( byte pX );
