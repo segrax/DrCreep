@@ -313,6 +313,8 @@ void cCreep::sub_95F() {
 	mDump[ 0xD025 ] = 0x0A;
 	mDump[ 0xD026 ] = 0x0D;
 	mDump[ 0x21 ] = 0;
+
+	mScreen->spriteDisable();
 }
 
 // 0B84
@@ -676,6 +678,7 @@ void cCreep::handleEvents() {
 
 	mScreen->bitmapLoad( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
 	mScreen->spriteDraw();
+
 }
 
 void cCreep::sub_29AE() {
@@ -822,7 +825,7 @@ s2ED5:
 					mDump[ 0x20 ] = A;
 
 					// 2F45
-					if((A & mDump[ 0x2F82 + Y ]) && (mDump[ 0x10 + Y ] >= 0x58) ) {
+					if((A & mDump[ 0x2F82 + Y ]) && (mDump[ 0x10 + Y ] >= 0x58) && w30 ) {
 						A = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0x21 ];
 						sprite->_rEnabled = false;
 					} else {

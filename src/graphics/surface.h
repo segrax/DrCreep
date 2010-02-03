@@ -12,10 +12,11 @@ struct SDL_Surface;
 		SDL_Surface			*_surface, *_surfaceScaled;
 
 	protected:
-		bool				 _changed;
+		
 		byte				*_buffer;					// Raw image data
 		size_t				 _bufferSize;				// Raw image data size
 	public:
+		bool				 _changed;
 		size_t				 _width,	_height;		// Width / Height
 		size_t				 _maxWidth, _maxHeight;	
 	protected:
