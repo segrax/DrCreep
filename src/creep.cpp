@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "graphics/surface.h"
 #include "screen.h"
 #include "creep.h"
 #include "sprite.h"
@@ -678,7 +677,6 @@ void cCreep::handleEvents() {
 
 	mScreen->bitmapLoad( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
 	mScreen->spriteDraw();
-
 }
 
 void cCreep::sub_29AE() {
@@ -3281,11 +3279,14 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	mDump[ 0xD017 ] = A;
 
 	// 5E4C
-	if( !(mDump[ 0xBD09 + pX ] & byte_88C ))
+	if( !(mDump[ 0xBD09 + pX ] & byte_88C )) {
 		A = mDump[ 0xD01B ] | mDump[ 0x2F82 + Y ];
-	else
+		sprite->_rPriority = true;
+	} else {
 		A = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0xD01B ]; 
-	
+		sprite->_rPriority = false;
+	}
+
 	// Sprite data priority
 	mDump[ 0xD01B ] = A;
 

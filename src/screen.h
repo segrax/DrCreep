@@ -1,21 +1,18 @@
 class cVideoWindow;
 class cBitmapMulticolor;
 class cSprite;
-
-struct sScreenPiece {
-	byte mPriority;
-};
-
+class cScreenSurface;
 
 class cScreen {
 
 	cVideoWindow			*mWindow;
 	cBitmapMulticolor		*mBitmap;
-	cVideoSurface<dword>	*mSurface;
-	byte					*mSurfacePriority;
-
+	cScreenSurface			*mSurface;
+	SDL_Surface				*mSDLSurface;
+	SDL_Surface				*mSDLSurfaceScaled;
 	cSprite					*mSprites[8];
 
+	size_t					 mScale;
 public:
 
 	cScreen();
@@ -24,8 +21,12 @@ public:
 
 	void					 bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 );
 	void					 blit( cSprite *pSprite, byte pOwner );
-	void					 blit( cVideoSurface<dword> *pSurface, word pDestX, word pDestY, byte pOwner);
+	void					 blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority);
 	void					 clear( byte pColor );
+
+	SDL_Surface				*scaleTo( size_t pScale );
+	void					 SDLSurfaceSet();
+
 	void					 spriteDisable();
 	void					 spriteDraw();
 	cSprite					*spriteGet( byte pCount );

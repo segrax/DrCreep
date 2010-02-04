@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include "graphics/surface.h"
+#include "graphics/screenSurface.h"
 #include "bitmapMulticolor.h"
 
 
 cBitmapMulticolor::cBitmapMulticolor() {
-	mSurface = new cVideoSurface<dword>( 321, 201 );
+	mSurface = new cScreenSurface( 321, 201 );
 }
 
 cBitmapMulticolor::~cBitmapMulticolor() {
@@ -12,11 +12,12 @@ cBitmapMulticolor::~cBitmapMulticolor() {
 }
 
 void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 ) {
-	dword	color = 0;
-	byte	data;
-	byte	pixel;
+	dword		color = 0;
+	byte		data;
+	byte		pixel;
+	ePriority	priority;
 
-	mSurface->surfaceWipe(0xFF);
+	mSurface->Wipe(0xFF);
 
 	// Draw 160 Rows
 	for( size_t Y = 0; Y < 200; Y += 8) {
@@ -31,6 +32,11 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 
 				pixel = (data & 0xC0) >> 6;
 
+				if(pixel == 1)
+					priority = ePriority_Background;
+				else
+					priority = ePriority_Foreground;
+
 				if(pixel == 0)
 					color = pBackgroundColor0;
 
@@ -43,8 +49,8 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 				else if(pixel == 3)
 					color = *pColorRam & 0x0F;
 
-				mSurface->pixelDraw(drawX++, drawY, color);
-				mSurface->pixelDraw(drawX, drawY, color);
+				mSurface->pixelDraw(drawX++, drawY, color, priority);
+				mSurface->pixelDraw(drawX, drawY, color, priority);
 				data <<= 2;
 			} // X
 
@@ -59,6 +65,4 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 		}
 
 	}	// Y
-
-	mSurface->surfaceSet();
 }

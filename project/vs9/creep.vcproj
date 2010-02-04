@@ -210,11 +210,11 @@
 				Name="graphics"
 				>
 				<File
-					RelativePath="..\..\src\graphics\surface.cpp"
+					RelativePath="..\..\src\graphics\screenSurface.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\graphics\surface.h"
+					RelativePath="..\..\src\graphics\screenSurface.h"
 					>
 				</File>
 				<File

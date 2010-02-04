@@ -2,7 +2,7 @@
 class cBitmapMulticolor {
 public:
 
-	cVideoSurface<dword>	*mSurface;
+	cScreenSurface		*mSurface;
 
 	void	 load( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 );
 
