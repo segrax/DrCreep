@@ -98,8 +98,8 @@ public:
 		void	 mainLoop();
 		void	 MapDisplay();
 		void	 ObjectActions( byte pX );
-		void	 ObjectActionFunction( byte pX, byte pY );
-		void	 ObjectActionFunction2( byte pX, byte pY );
+		bool	 ObjectActionFunction( byte pX, byte pY );
+		bool	 ObjectActionFunction2( byte pX, byte pY );
 		void	 ObjectHitsObject( byte pX );
 		void	 objectFunction( byte pX );
 		void	 optionsMenu();
@@ -127,6 +127,7 @@ public:
 		void	 sub_359E( );
 		void	 sub_3A7F( byte pX );
 		void	 sub_3AEB( byte pX );
+		void	 sub_3D6E( byte pX, byte pY );
 		void	 sub_3E87( );
 		void	 sub_3F4F( );
 		void	 obj_ExecLightning( byte pX );

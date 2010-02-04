@@ -50,6 +50,7 @@ void cScreenSurface::Wipe( dword pColor ) {
 	for( size_t count = 0; count < mScreenSize; ++count ) {
 		mScreenPieces[ count ].mPixel = pColor;
 		mScreenPieces[ count ].mPriority = ePriority_Background;
+		mScreenPieces[ count ].mSprite = mScreenPieces[ count ].mSprite2 = 0;
 	}
 
 }
@@ -61,5 +62,6 @@ void cScreenSurface::pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePrio
 		piece->mPixel = 0xFF;
 	else
 		piece->mPixel = mPalette[ pPaletteIndex ];
+
 	piece->mPriority = pPriority;
 }

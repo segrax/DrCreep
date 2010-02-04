@@ -1,3 +1,4 @@
+
 enum ePriority {
 	ePriority_Background = 0,
 	ePriority_Foreground = 1
@@ -6,10 +7,12 @@ enum ePriority {
 struct sScreenPiece {
 	ePriority	mPriority;
 	dword		mPixel;
+	byte		mSprite, mSprite2;
 
 	sScreenPiece() {
 		mPriority = ePriority_Background;
 		mPixel = 0xFF;
+		mSprite = mSprite2 = 0;
 	}
 };
 

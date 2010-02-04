@@ -2,6 +2,7 @@
 #include "screen.h"
 #include "creep.h"
 #include "sprite.h"
+#include "graphics/screenSurface.h"
 
 cCreep::cCreep() {
 	size_t RomSize;
@@ -631,7 +632,8 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 
 	byte_5F58 = pA;
 	RunRestorePressed = false;
-	static byte A = 0, X = 0xFF;
+	static byte X = 0xFF;
+	byte A = 0;
 
 	switch( keyevent.type ) {
 		case SDL_KEYDOWN:
@@ -706,8 +708,7 @@ void cCreep::sub_29D0( byte pA, byte pY ) {
 	byte A = byte_2A6B >> 4;
 	
 	for(;;) {
-		A << 3;
-		byte X = A;
+		byte X = A << 3;
 		for(;;) {
 			
 			A = X;
@@ -730,9 +731,54 @@ void cCreep::sub_29D0( byte pA, byte pY ) {
 }
 
 void cCreep::sub_2E37() {
-	byte gfxSpriteCollision, gfxBackgroundCollision;
+	byte gfxSpriteCollision = 0, gfxBackgroundCollision = 0;
 
-	//gfxSpriteCollision = mSprite
+	vector< sScreenPiece *>				*collisions = mScreen->collisionsGet();
+	vector< sScreenPiece *>::iterator	 colIT;
+
+	for( colIT = collisions->begin(); colIT != collisions->end(); ++colIT ) {
+		sScreenPiece *piece = *colIT;
+
+		if( piece->mSprite2 == 0 ) {
+			// Background collision
+			gfxBackgroundCollision |= (1 << (piece->mSprite-1) );
+
+		} else {
+			// Sprite collision
+			gfxSpriteCollision |= (1 << (piece->mSprite-1) );
+			gfxSpriteCollision |= (1 << (piece->mSprite2-1) );
+		
+		}
+	}
+
+	// Original
+	//gfxSpriteCollision = mDump[ 0xD01E ];
+	//gfxBackgroundCollision = mDump[ 0xD01F ];
+
+	byte X = 0;
+	for(;;) {
+		byte A = mDump[ 0xBD04 + X ];
+		if( A & byte_889 ) {
+			gfxSpriteCollision >>= 1;
+			gfxBackgroundCollision >>= 1;
+		} else {
+
+			A &= 0xF9;
+			if( gfxSpriteCollision & 0x01 )
+				A |= 2;
+			gfxSpriteCollision >>= 1;
+			
+			if( gfxBackgroundCollision & 0x01 )
+				A |= 4;
+			gfxBackgroundCollision >>= 1;
+
+			mDump[ 0xBD04 + X ] = A;
+		}
+
+		X += 0x20;
+		if(!X)
+			break;
+	}
 }
 
 void cCreep::sub_2E79( ) {
@@ -879,7 +925,7 @@ void cCreep::ObjectActions( byte pX ) {
 	for( byte Y = 0; Y != byte_31EF; Y = byte_31F0 + 8) {
 
 		byte_31F0 = Y;
-		if( mDump[ 0xBD04 + Y ] & byte_83F )
+		if( mDump[ 0xBF04 + Y ] & byte_83F )
 			continue;
 		if( byte_31F2 < mDump[ 0xBF01 + Y ] )
 			continue;
@@ -893,39 +939,46 @@ void cCreep::ObjectActions( byte pX ) {
 		byte_31F5 = 1;
 		Y = mDump[ 0xBD00 + pX ]  << 3;
 
-		ObjectActionFunction( pX, Y );
+		if( ObjectActionFunction( pX, Y ) == true ) {
 
-		Y = byte_31F0;
-		if( byte_31F5 == 1 ) 
-			mDump[ 0xBD04 + pX ] |= byte_883;
+			Y = byte_31F0;
+			if( byte_31F5 == 1 ) 
+				mDump[ 0xBD04 + pX ] |= byte_883;
+		}
 
 		Y = mDump[ 0xBF00 + byte_31F0 ] << 2;
 		ObjectActionFunction2( pX, Y );
 	}
 }
 
-void cCreep::ObjectActionFunction( byte pX, byte pY ) {
+bool cCreep::ObjectActionFunction( byte pX, byte pY ) {
 	word func = *((word*) &mDump[ 0x893 + pY ]);
 	
 	switch( func ) {
 		case 0:
-			break;
-		case 0x34EF:
+			return false;
+		case 0x34EF:		// in front of door/button ?
 			sub_34EF( pX, pY );
 			break;
+
+		case 0x3D6E:		// Frankie
+			sub_3D6E( pX, pY );
 
 		default:
 			printf("objectactionfunction");
 			break;
 
 	}
+
+	return true;
 }
 
-void cCreep::ObjectActionFunction2( byte pX, byte pY ) {
+bool cCreep::ObjectActionFunction2( byte pX, byte pY ) {
 	word func = *((word*) &mDump[ 0x844 + pY ]);
 	
 	switch( func ) {
 		case 0:
+			return false;
 			break;
 		
 		case 0x4075:
@@ -937,6 +990,8 @@ void cCreep::ObjectActionFunction2( byte pX, byte pY ) {
 			break;
 
 	}
+
+	return true;
 }
 
 void cCreep::ObjectHitsObject( byte pX ) {
@@ -1085,12 +1140,10 @@ void cCreep::sub_31F6( byte pX ) {
 		A = mDump[ 0xBD1C + pX ];
 		A <<= 1;
 
-		char Y = A;
-
-		word_30 = *((word*) &mDump[ 0x34E7 + Y ]);
-		word_32 = *((word*) &mDump[ 0x34EB + Y ]);
+		word_30 = *((word*) &mDump[ 0x34E7 + A ]);
+		word_32 = *((word*) &mDump[ 0x34EB + A ]);
 		
-		for( Y = 3; Y >= 0; --Y ) 
+		for( char Y = 3; Y >= 0; --Y ) 
 			mDump[ word_32 + Y ] = mDump[ word_30 + Y ];
 
 		return;
@@ -1465,10 +1518,10 @@ s3B6E:
 		}
 
 		// 3C67
-		byte_3F10 = 0xFF;
+		byte_3F10 = -1;
 		for(;;) {
 			byte_3F11 = 0x00;
-			byte_3F12 = 0xFF;
+			byte_3F12 = -1;
 			
 			for( char Y = 3; Y >= 0; --Y ) {
 				A = mDump[ 0x3F0C + Y ];
@@ -1487,7 +1540,7 @@ s3B6E:
 				goto s3CB4;
 			}
 			
-			Y = A << 1;
+			byte Y = A << 1;
 			mDump[ 0x2F82 + Y ] = A;
 			if( A & byte_3F13 )
 				break;
@@ -1558,6 +1611,10 @@ s3D4F:;
 	mDump[ word_40 + 3 ] = mDump[ 0xBD01 + pX ];
 	mDump[ word_40 + 4 ] = mDump[ 0xBD02 + pX ];
 	mDump[ word_40 + 5 ] = mDump[ 0xBD03 + pX ];
+}
+
+void cCreep::sub_3D6E( byte pX, byte pY ) {
+	
 }
 
 void cCreep::sub_3E87() {
@@ -1697,6 +1754,7 @@ void cCreep::sub_3F4F() {
 	
 }
 
+// 3639: 
 void cCreep::obj_ExecLightning( byte pX ) {
 	byte A = mDump[ 0xBD04 + pX ];
 	if( A & byte_885 ) {
@@ -2204,6 +2262,7 @@ void cCreep::GameMain() {
 	byte_B83 = 0;
 
 	for(;;) {
+		_sleep(5);
 		mScreen->refresh();
 
 		handleEvents();
@@ -3190,7 +3249,7 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	byte byte_5E8C, byte_5E8D, byte_5E88;
 	byte A;
 
-	word word_38 = *((word*) &mDump[ 0xBD03 + pX ]);
+	word word_38 = mDump[ 0xBD03 + pX ];
 	word_38 <<= 1;
 
 	word_38 += 0x603B;
