@@ -941,7 +941,6 @@ void cCreep::ObjectActions( byte pX ) {
 
 		if( ObjectActionFunction( pX, Y ) == true ) {
 
-			Y = byte_31F0;
 			if( byte_31F5 == 1 ) 
 				mDump[ 0xBD04 + pX ] |= byte_883;
 		}
@@ -954,6 +953,8 @@ void cCreep::ObjectActions( byte pX ) {
 bool cCreep::ObjectActionFunction( byte pX, byte pY ) {
 	word func = *((word*) &mDump[ 0x893 + pY ]);
 	
+	pY = byte_31F0;
+
 	switch( func ) {
 		case 0:
 			return false;
@@ -963,6 +964,7 @@ bool cCreep::ObjectActionFunction( byte pX, byte pY ) {
 
 		case 0x3D6E:		// Frankie
 			sub_3D6E( pX, pY );
+			break;
 
 		default:
 			printf("objectactionfunction");
@@ -1613,10 +1615,42 @@ s3D4F:;
 	mDump[ word_40 + 5 ] = mDump[ 0xBD03 + pX ];
 }
 
+// 3D6E: Frankie?
 void cCreep::sub_3D6E( byte pX, byte pY ) {
+	char A = mDump[ 0xBD01 + pX ] + mDump[ 0xBD0C + pX ];
+	A -= mDump[ 0xBF01 + pY ];
+	if( A >= 4 ) {
+		byte_31F5 = 0;
+		return;
+	}
 	
+	// 3d85
+	if( mDump[ 0xBF00 + pY ] != 0x0B ) {
+		byte_31F5 = 0;
+		if( mDump[ 0xBF00 + pY ] != 0x0C )
+			return;
+		mDump[ 0xBD1B + pX ] = mDump[ 0xBE00 + pY ];
+		return;
+
+	} else {
+		// 3DA1
+		word_40 = word_5387 + mDump[ 0xBE00 + pY ];
+
+		if( !(mDump[ word_40 ] & byte_538A) ) {
+			byte_31F5 = 0;
+			return;
+		}
+		
+		word_40 = word_5748 + mDump[ 0xBD1F + pX ];
+
+		A = (byte_574E ^ 0xFF) & mDump[ word_40 ];
+		A |= byte_574D;
+		mDump[ word_40 ] = A;
+		mDump[ 0xBD1E + pX ] = A;
+	}
 }
 
+// 3E87: 
 void cCreep::sub_3E87() {
 	if( mDump[ word_3E ] & byte_574D )
 		return;
