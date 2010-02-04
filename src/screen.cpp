@@ -48,15 +48,15 @@ void cScreen::bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte
 	clear();
 
 	mBitmap->load( pBuffer, pColorData, pColorRam, pBackgroundColor0 );
-	blit( mBitmap->mSurface, 0, 0, true );
+	blit( mBitmap->mSurface, 0, 0, false, false );
 }
 
 void cScreen::blit( cSprite *pSprite, byte pOwner ) {
 	
-	blit( pSprite->_surface, pSprite->_X, pSprite->_Y, !(pSprite->_rPriority) );
+	blit( pSprite->_surface, pSprite->_X, pSprite->_Y, pSprite->_rPriority, true );
 }
 
-void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority) {
+void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority, bool pSprite) {
 	sScreenPiece *dest;
 	sScreenPiece *source = pSurface->screenPiecesGet();
 
@@ -66,10 +66,32 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 		for( word x = 0; x < pSurface->widthGet(); ++x ) {
 			
 			if( source->mPixel != 0xFF ) {
-				if( source->mPriority > dest->mPriority || pPriority ) {
-					dest->mPixel = source->mPixel;
-					dest->mPriority = source->mPriority;
+
+				if( !pPriority 
+
+					|| (dest->mPriority == ePriority_Background && pPriority)
+
+					) {
+						dest->mPixel = source->mPixel;
+						dest->mPriority = source->mPriority;
 				}
+				
+				/*
+
+				if( pPriority == true ) {
+					if( dest->mPriority != ePriority_Foreground &&
+						(source->mPriority == ePriority_Foreground && pSprite)) {
+
+						dest->mPixel = source->mPixel;
+						dest->mPriority = source->mPriority;
+					} else {
+						
+						/*if( dest->mPriority == ePriority_Foreground &&
+							(source->mPriority != ePriority_Background )) {
+
+							dest->mPixel = source->mPixel;
+							dest->mPriority = source->mPriority;
+						}*/
 			}
 
 			++dest;

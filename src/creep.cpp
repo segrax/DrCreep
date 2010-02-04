@@ -631,7 +631,7 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 
 	byte_5F58 = pA;
 	RunRestorePressed = false;
-	byte A = 0, X = 0xFF;
+	static byte A = 0, X = 0xFF;
 
 	switch( keyevent.type ) {
 		case SDL_KEYDOWN:
@@ -655,6 +655,12 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 					X = 0xFE;
 					break;
 			}
+			break;
+		case SDL_KEYUP:
+
+			A = 0;
+			X = 0xFF;
+			break;
 	}
 
 	X &= 0x0F;

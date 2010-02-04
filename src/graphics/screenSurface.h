@@ -6,6 +6,11 @@ enum ePriority {
 struct sScreenPiece {
 	ePriority	mPriority;
 	dword		mPixel;
+
+	sScreenPiece() {
+		mPriority = ePriority_Background;
+		mPixel = 0xFF;
+	}
 };
 
 class cScreenSurface {

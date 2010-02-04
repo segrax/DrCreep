@@ -32,10 +32,11 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 
 				pixel = (data & 0xC0) >> 6;
 
-				if(pixel == 1)
+				if(pixel == 0 || pixel == 1)
 					priority = ePriority_Background;
 				else
 					priority = ePriority_Foreground;
+
 
 				if(pixel == 0)
 					color = pBackgroundColor0;

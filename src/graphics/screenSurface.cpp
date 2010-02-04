@@ -57,6 +57,9 @@ void cScreenSurface::Wipe( dword pColor ) {
 void cScreenSurface::pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePriority pPriority ) {
 	sScreenPiece *piece = screenPieceGet(pX,pY);
 	
-	piece->mPixel = mPalette[ pPaletteIndex ];
+	if( pPaletteIndex > 15 )
+		piece->mPixel = 0xFF;
+	else
+		piece->mPixel = mPalette[ pPaletteIndex ];
 	piece->mPriority = pPriority;
 }

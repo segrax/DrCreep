@@ -21,7 +21,7 @@ public:
 
 	void					 bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 );
 	void					 blit( cSprite *pSprite, byte pOwner );
-	void					 blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority);
+	void					 blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority, bool pSprite);
 	void					 clear( byte pColor );
 
 	SDL_Surface				*scaleTo( size_t pScale );

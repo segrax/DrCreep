@@ -104,6 +104,10 @@ void cSprite::drawSingle( byte *pBuffer ) {
 				if( _rDoubleHeight )
 					_surface->pixelDraw(X, Y+1, _color, ePriority_Foreground);	
 
+			} else {
+				_surface->pixelDraw(X, Y, 0xFF, ePriority_Background);
+				if( _rDoubleHeight )
+					_surface->pixelDraw(X, Y+1, 0xFF, ePriority_Background);
 			}
 
 			currentByte <<= 1;
