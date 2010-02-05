@@ -41,8 +41,6 @@ cCreep::cCreep() {
 
 	byte_B83 = 0;
 
-	byte_11C9 = 0xA0;
-
 	byte_20DE = 0x00;
 	byte_24FD = 0x00;
 	byte_2E35 = 0x00;
@@ -1167,7 +1165,7 @@ void cCreep::objectFunction( byte pX ) {
 }
 
 void cCreep::sub_31F6( byte pX ) {
-	char A =  mDump[ 0xBD04 + pX ];
+	byte A =  mDump[ 0xBD04 + pX ];
 
 	if( A & byte_885 ) {
 		A ^= byte_885;
@@ -1215,7 +1213,7 @@ void cCreep::sub_31F6( byte pX ) {
 			Y = mDump[ 0xBD1B + pX ];
 			A = mDump[ 0x34A4 + Y ];
 
-			if( A != -1 ) {
+			if( A != 0xFF ) {
 				Y = byte_34D6;
 				mDump[ 0x780D + Y ] = A;
 				mDump[ 0xBD06 + pX ] = 1;
@@ -1248,13 +1246,15 @@ s32CB:;
 	}
 
 s32DB:;
-	byte AA = mDump[ 0xBD1A + pX ];
-	A = AA;
-	if( AA != 0xFF )
-		if( AA != mDump[ 0xBD19 + pX ] )
-			sub_526F( A );
+	A = mDump[ 0xBD1A + pX ];
+	char a = A;
+	if( A != 0xFF )
+		if( A != mDump[ 0xBD19 + pX ] ) {
+			sub_526F( a );
+			A = a;
+		}
 
-	mDump[ 0xBD19 + pX ] = A;
+	mDump[ 0xBD19 + pX ] = a;
 	mDump[ 0xBD1A + pX ] = 0xFF;
 	sub_5F6B( pX );
 	
@@ -1407,8 +1407,10 @@ void cCreep::sub_3488( byte pX ) {
 
 // 3AEB: 
 void cCreep::sub_3AEB( byte pX ) {
+	byte Y;
 	char A = mDump[ 0xBD04 + pX ];
-	char byte_3F0A, byte_3F0B, byte_3F10, byte_3F11, byte_3F12;
+	byte byte_3F0B, byte_3F10, byte_3F11, byte_3F12;
+	char byte_3F0A;
 
 	if( A & byte_885 ) {
 		mDump[ 0xBD04 + pX ] = (A ^ byte_885) | byte_886;
@@ -1426,7 +1428,7 @@ void cCreep::sub_3AEB( byte pX ) {
 
 		
 		for(byte_3F0A = 1; byte_3F0A >= 0; --byte_3F0A) {
-			byte Y = byte_3F0A;
+			Y = byte_3F0A;
 
 			if( mDump[ 0x780D + Y ] != 0 )
 				continue;
@@ -1447,6 +1449,8 @@ void cCreep::sub_3AEB( byte pX ) {
 				else
 					goto s3B6E;
 			}
+
+			// 3B5E
 			A = mDump[ 0xBD1E + pX ];
 			if( !(A & byte_574F)) {
 s3B6E:
@@ -1456,17 +1460,24 @@ s3B6E:
 				mDump[ 0xBD1D + pX ] = 0x80;
 
 				sub_21C8(7);
+				break;
 			}
-		}
-	// 3B82
-	A = mDump[ 0xBD1B + pX ];
-	if( A != 0xFF )
-		if( A != mDump[ 0xBD1A + pX ] )
-			sub_526F(A);
 
-	mDump[ 0xBD1A + pX ] = A;
-	mDump[ 0xBD1B + pX ] = 0xFF;
-	sub_5F6B( pX );
+		}
+	
+		if(byte_3F0A < 0 )
+			return;
+
+
+		// 3B82
+		A = mDump[ 0xBD1B + pX ];
+		if( A != 0xFF )
+			if( A != mDump[ 0xBD1A + pX ] )
+				sub_526F(A);
+
+		mDump[ 0xBD1A + pX ] = A;
+		mDump[ 0xBD1B + pX ] = 0xFF;
+		sub_5F6B( pX );
 	
 	}
 
@@ -1507,17 +1518,15 @@ s3B6E:
 			}
 		}
 		// 3C06
-		byte Y = 3;
-		while(Y >= 0) {
+		for(char Y = 3; Y >= 0; --Y) {
 			mDump[ 0x3F0C + Y ] = 0xFF;
-			--Y;
 		}
 
 		byte_3F0A = 1;
 
 		// 3C15
 		for(;;) {
-			byte Y = byte_3F0A;
+			Y = byte_3F0A;
 			if( mDump[ 0x780D + Y ] == 0 ) {
 				
 				Y = mDump[ 0x34D1 + Y ];
@@ -1577,7 +1586,7 @@ s3B6E:
 				goto s3CB4;
 			}
 			
-			byte Y = A << 1;
+			Y = A << 1;
 			mDump[ 0x2F82 + Y ] = A;
 			if( A & byte_3F13 )
 				break;
@@ -1592,7 +1601,7 @@ s3B6E:
 	// 3CB4
 s3CB4:;
 	if( mDump[ 0xBD1D + pX ] & 2 ) {
-		mDump[ 0xBD02 + pX ] -= mDump[ 0xBD02 + pX ];
+		mDump[ 0xBD02 + pX ] -= byte_5FD8;
 
 		++mDump[ 0xBD03 + pX ];
 		if( mDump[ 0xBD1D + pX ] != 2 ) {
@@ -2068,6 +2077,7 @@ sEFC:;
 
 			word_3E = 0x0F64;
 			DisplayText();
+
 			if( mDump[ 0x7812 ] != 0 ) {
 				if( mDump[ 0x780F ] != 1 ) {
 					word_3E = 0x0F72;
@@ -2245,7 +2255,7 @@ s10EB:;
 			if(mDump[ 0x11CE + X ] == 0 ) {
 				// 1122
 				mDump[ 0x11CE + X ] = mDump[ 0x11D1 + X ];
-				if( X == 0 || byte_11C9 != 1 ) {
+				if( X == 0 || mDump[ 0x11C9 ] != 1 ) {
 					// 1133
 					mDump[ 0xD027 ] ^= 0x01;
 					mScreen->spriteGet( 0 )->_color ^= 0x01;
@@ -3644,7 +3654,7 @@ void cCreep::sub_5F6B( byte &pX ) {
 }
 
 void cCreep::sub_5FA3() {
-	
+	// 5fa6
 	word_3C = mDump[ 0x5CE6 + byte_5FD6 ];
 	word_3C += mDump[ 0x5D06 + byte_5FD6 ] << 8;
 
@@ -3844,7 +3854,7 @@ void cCreep::sub_4075( byte pX, byte pY ) {
 
 	// 40BB
 
-	mDump[ 0xBD02 + pX ] = mDump[ word_40 + 1 ] + 0xF;
+	mDump[ 0xBD02 + pX ] = mDump[ word_40 + 1 ] + 0x0F;
 	mDump[ 0xBD01 + pX ] = mDump[ word_40 ] + 0x06;
 	if( mDump[ word_40 + 7 ] != 0 ) {
 		mDump[ 0x785D + mDump[ 0xBD1C + pX ] ] = 1;
@@ -5197,6 +5207,7 @@ void cCreep::sub_4EA8( byte pX, byte pY ) {
 		//4F44
 		mDump[ 0xBE05 + byte_50CF ] = mDump[ word_40 + pY ];
 
+		// Set player new X/Y
 		pY = byte_50CF;
 		mDump[ 0xBD02 + pX ] = mDump[ 0xBE05 + pY ] + 0x07;
 		mDump[ 0xBE04 + pY ] = mDump[ 0xBD01 + pX ] = A2;
@@ -5249,7 +5260,7 @@ void cCreep::sub_526F( char &pA ) {
 	byte byte_5382;
 	word word_5383, word_5385;
 
-	byte_5382 = pA;
+	byte_5382 = (byte) pA;
 
 	word_5383 = word_40;
 	word_5385 = word_3C;
