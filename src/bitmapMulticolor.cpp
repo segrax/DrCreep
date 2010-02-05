@@ -24,7 +24,7 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 		size_t drawY = Y;
 
 		for( size_t X = 0; X < 320; ) {
-			// Read char row
+			// Read byte row
 			data = *pBuffer++;
 
 			// Lets draw 8 bits

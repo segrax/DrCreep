@@ -12,7 +12,7 @@ private:
 	
 	bool		 mMenuIntro;
 	byte		 mMenuMusicScore, mMenuScreenCount, mMenuScreenTimer;
-	
+	byte		 mUnlimitedLives;
 
 	bool		 mQuit;
 
@@ -111,6 +111,7 @@ public:
 		void	 sub_95F();
 		void	 mapRoomDraw();
 		void	 sub_160A(); 
+		void	 sub_1950();
 		void	 sub_21C8( char pA );
 		void	 obj_PrepWalkway( );
 		void	 obj_PrepSlidingPole( );
@@ -136,10 +137,12 @@ public:
 		void	 sub_3757( );
 		void	 sub_396A( byte pA, byte pX );
 		void	 sub_3F14( byte &pX );
+		void	 sub_3FD5( byte pX );
 		void	 sub_4075( byte pX, byte pY );
 		void	 obj_PrepTeleport( );
 		void	 obj_PrepRayGun( );
 		void	 obj_ExecRayGun( byte pX );
+		void	 obj_ExecTeleport( byte pX );
 		void	 obj_PrepKey( );
 		void	 obj_PrepLock( );
 		void	 obj_PrepDoors( );
@@ -152,11 +155,15 @@ public:
 		void	 obj_ExecConveyor( byte pX );
 		void	 obj_PrepConveyor( );
 		void	 obj_PrepFrankenstein();
+		void	 sub_41D8( byte pX, byte pY );
+		void	 sub_4A68( byte pX, byte pY );
+		void	 sub_4EA8( byte pX, byte pY );
 		void	 sub_4DE9( byte pA );
 		void	 sub_505C( byte pA, byte pX );
 		void	 sub_526F( char &pA );
 		bool	 sub_5750( byte &pX );
 		void	 sub_57DF( byte pX );
+		bool	 sub_5E8E( byte pA, byte pX, byte pY );
 		void	 hw_SpritePrepare( byte &pX );
 		byte	 sub_5ED5( );
 		void	 sub_5F6B( byte &pX );

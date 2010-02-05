@@ -7,7 +7,7 @@
 
 cScreen::cScreen() {
 	
-	for(char Y = 0; Y < 8; ++Y ) {
+	for(byte Y = 0; Y < 8; ++Y ) {
 		mSprites[Y] = new cSprite();
 		mSprites[Y]->_multiColor0 = 0x0A;
 		mSprites[Y]->_multiColor1 = 0x0D;
@@ -28,7 +28,7 @@ cScreen::cScreen() {
 
 cScreen::~cScreen() {
 
-	for(char Y = 0; Y < 8; ++Y ) 
+	for(byte Y = 0; Y < 8; ++Y ) 
 		delete mSprites[Y];
 
 	delete mSurface;
