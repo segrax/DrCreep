@@ -376,7 +376,7 @@ void cCreep::roomLoad() {
 	byte X, A;
 
 	// 1411
-	if( byte_11C9 != 1 )
+	if( mDump[0x11C9] != 1 )
 		X = 1;
 	else
 		X = 0;
@@ -1146,9 +1146,11 @@ void cCreep::objectFunction( byte pX ) {
 			break;
 		case 0x38CE:
 			break;
-		case 0x3A08:
-			break;
-		case 0x3A60:
+		*/
+		//case 0x3A08:
+		//	break;
+
+		/*case 0x3A60:
 			break;*/
 		case 0x3AEB:
 			sub_3AEB( pX );
@@ -2016,7 +2018,7 @@ void cCreep::Game() {
 		mDump[ 0xF62 ] = 0;
 
 		// E8D
-		for( byte X = 0;; ++X ) {
+		for( byte X = 0; X < 2; ++X ) {
 
 			if( mDump[ 0x11C9 + X ] == 1 ) {
 				if( mDump[ 0x780D + X ] != 2 ) {
@@ -2037,7 +2039,7 @@ void cCreep::Game() {
 								mDump[ 0x1CF9 + Y ] = mDump[ word_30 + Y ];
 							
 							mDump[ 0x1CFD ] = X;
-							sub_1B9F();
+							//sub_1B9F();
 						}
 					}
 					// EFC
@@ -2057,6 +2059,7 @@ sEFC:;
 				}
 			}
 			// F06
+
 		}
 
 		// F0B
@@ -2076,7 +2079,7 @@ sEFC:;
 					DisplayText();
 				}
 				// F4B
-				sub_1935();
+				sub_1935( 0x23 );
 			}
 		}
 	}
@@ -2101,7 +2104,7 @@ sF99:;
 		if( mDump[ 0x11C9 + X ] == 1 ) {
 			// FB6
 
-			char A = mDump[ 0x7809 + X ];
+			byte A = mDump[ 0x7809 + X ];
 			lvlPtrCalculate( A );
 			
 			mDump[ word_42 ] |= byte_8C0;
@@ -3204,6 +3207,17 @@ void cCreep::sub_160A() {
 	++word_3E;
 }
 
+// 1935: 
+void cCreep::sub_1935( byte pA ) {
+	byte byte_194F = pA;
+
+	/*for( byte X = 6;; --X ) {
+		byte_2E35 = byte_194F;
+
+	}*/
+	// TODO: Some type of sleep function
+}
+
 // 1950: 
 void cCreep::sub_1950() {
 	
@@ -3228,6 +3242,87 @@ void cCreep::sub_1950() {
 	drawGraphics(0, 0x93, 0x68, 0x18, 0 );
 	// 19AF
 	
+	byte Y = mDump[ 0x1AB2 ];
+	byte X = mDump[ 0x34D1 + Y ];
+	mDump[ 0xBD02 + X ] = 0x87;
+	mDump[ 0xBD01 + X ] = 0x08;
+
+	A =	sub_5ED5() & 0x0E;
+	if( A != 0 )
+		A = 0;
+	else
+		A = 8;
+
+	mDump[ 0x1AE5 ] = A;
+	mDump[ 0x1AE4 ] = 0;
+	
+	// 19DF
+	for(;;) {
+		A = mDump[ 0x1AE4 ];
+
+		if( A == 0 )  {
+			byte Y = mDump[ 0x1AE5 ];
+			A = mDump[ 0x1AD1 + Y ];
+			if( A == 0 )
+				break;
+
+			// 19EF
+			mDump[ 0x1AE4 ] = A;
+			mDump[ 0x1AE3 ] = mDump[ 0x1AD2 + Y ];
+			mDump[ 0x1AE5 ] += 0x02;
+		}
+		// 1A01
+		if( mDump[ 0x1AE3 ] >= 1 ) {
+			if( mDump[ 0x1AE3 ] != 1 ) {
+				// 1A0A
+				++mDump[ 0xBD03 + X];
+				if( mDump[ 0xBD03 + X] >= 0x9B || mDump[ 0xBD03 + X] < 0x97 ) {
+					A = 0x97;
+				}
+			} else {
+				// 1A33
+				--mDump[ 0xBD01 + X];
+				++mDump[ 0xBD03 + X];
+				if( mDump[ 0xBD03 + X ] >= 3 )
+					A = 0;
+			}
+
+		} else {
+			// 1A1D
+			++mDump[ 0xBD01 + X];
+			++mDump[ 0xBD03 + X];
+			if( mDump[ 0xBD03 + X ] >= 6 || mDump[ 0xBD03 + X ] < 3 )
+				A = 0x03;
+		}
+
+		// 1A42
+		mDump[ 0xBD03 + X ] = A;
+		Y = X >> 5;
+
+		cSprite *sprite = mScreen->spriteGet( Y );
+
+		// 1A4B
+		mDump[ 0x10 + Y ] = ((mDump[ 0xBD01 + X ] - 0x10) << 1) + 0x18;
+		sprite->_X = ((mDump[ 0xBD01 + X ] - 0x10) << 1) + 0x18;
+		
+		// 1A72
+		sprite->_Y = mDump[ 0xBD02 + X ] + 0x32;
+
+		hw_SpritePrepare( X );
+		sprite->_rEnabled = true;
+		if( mDump[ 0x1AB2 ] )
+			A = mDump[ 0x34D4 ];
+		else
+			A = mDump[ 0x34D3 ];
+
+		mDump[ 0xD027 + Y ] = A;
+		sprite->_color = A;
+		--mDump[ 0x1AE4 ];
+		byte_2E35 = 2;
+	}
+
+	// 1AA7
+	sub_1935(0xA);
 }
 
 void cCreep::sub_21C8( char pA ) {
@@ -3714,7 +3809,7 @@ void cCreep::sub_3FD5( byte pX ) {
 		return;
 	}
 	mDump[ 0xBF04 + pX ] ^= byte_840;
-	for(char Y = 5; Y >= 0; ++Y ) 
+	for(char Y = 5; Y >= 0; --Y ) 
 		mDump[ 0x6390 + Y ] = mDump[ 0xBE03 + pX ];
 
 	SpriteMovement( 0x08, mDump[ 0xBF01 + pX ], mDump[ 0xBF02 + pX ], 0, pX );
@@ -4834,8 +4929,8 @@ void cCreep::sub_3A7F( byte pX ) {
 	A >>= 1;
 	A += 0x2C;
 	
-	// TODO
-	//RAM:3A90 8D 93 75                    STA     loc_7591+2
+	mDump[ 0x7591 + 2 ] = A;
+
 	sub_21C8( 0 );
 
 	byte X;

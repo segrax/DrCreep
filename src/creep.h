@@ -30,7 +30,8 @@ private:
 	word		 word_498B;											// Mummys
 
 	word		 word_4D5B;											// RayGuns	
-	byte		 byte_4D5D, byte_4D5E, byte_4D5F;
+	byte		 byte_4D5D;
+	char		 byte_4D5E, byte_4D5F;
 	byte		 byte_574C, byte_4D60, byte_4D61;
 	byte		 byte_4D62, byte_4D63, byte_4D64;
 	byte		 byte_4D65, byte_4D66, byte_4D67;
@@ -111,6 +112,7 @@ public:
 		void	 sub_95F();
 		void	 mapRoomDraw();
 		void	 sub_160A(); 
+		void	 sub_1935( byte pA );
 		void	 sub_1950();
 		void	 sub_21C8( char pA );
 		void	 obj_PrepWalkway( );
