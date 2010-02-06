@@ -861,17 +861,17 @@ s2ED5:
 				goto s2ED5;
 
 			byte Y = (X >> 5);
+			cSprite *sprite = mScreen->spriteGet( Y );
+
 			if( (mDump[ 0xBD04 + X ] & byte_886) ) {
 				mDump[ 0xBD04 + X ] = byte_889;
-				
+				goto s2F51;
 			} else {
 				// 2F16
 				word_30 = mDump[ 0xBD01 + X ];
 				word_30 <<= 1;
 
 				byte w30 = (word_30 & 0xFF00) >> 8;
-
-				cSprite *sprite = mScreen->spriteGet( Y );
 
 				// Sprite X
 				mDump[ 0x10 + Y ] = (word_30 - 32);
@@ -881,8 +881,11 @@ s2ED5:
 					--w30;
 
 				if( (w30 & 0x80) ) {
+s2F51:;
 					// 2f51
 					A = (mDump[ 0x2F82 + Y ] ^ 0xFF);
+					A &= mDump[ 0x21 ];
+					sprite->_rEnabled = false;
 
 				} else {
 					if( w30 ) {
@@ -1160,8 +1163,9 @@ void cCreep::objectFunction( byte pX ) {
 		case 0x38CE:
 			break;
 		*/
-		//case 0x3A08:
-		//	break;
+		case 0x3A08:
+			obj_ExecRayGunLaser( pX );
+			break;
 
 		/*case 0x3A60:
 			break;*/
@@ -5110,6 +5114,37 @@ void cCreep::sub_396A( byte pA, byte pX ) {
 	// 39E8
 }
 
+// 3A08
+void cCreep::obj_ExecRayGunLaser( byte pX ) {
+	byte A = mDump[ 0xBD04 + pX ];
+
+	if( A & byte_885 ) {
+
+		A ^= byte_885;
+		A |= byte_886;
+		mDump[ 0xBD04 + pX ] = A;
+		
+		word_40 = word_4D5B + mDump[ 0xBD1E + pX ];
+		mDump[ word_40 ] = (0xFF ^ byte_4D61) & mDump[ word_40 ];
+
+		return;
+	} else {
+		if( A & byte_882 )
+			mDump[ 0xBD04 + pX ] = A ^ byte_882;
+
+		// 3A42
+		A = mDump[ 0xBD01 + pX ] + mDump[ 0xBD1F + pX ];
+		mDump[ 0xBD01 + pX ] = A;
+
+		if( A < 0xB0 )
+			if( A >= 8 )
+				return;
+		
+		mDump[ 0xBD04 + pX ] |= byte_885;
+	}
+}
+
+// 3F14
 void cCreep::sub_3F14( byte &pX ) {
 	
 	pX = 0;

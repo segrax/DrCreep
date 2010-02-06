@@ -138,6 +138,7 @@ public:
 		void	 obj_ExecForcefield( byte pX );
 		void	 sub_3757( );
 		void	 sub_396A( byte pA, byte pX );
+		void	 obj_ExecRayGunLaser( byte pX);
 		void	 sub_3F14( byte &pX );
 		void	 sub_3FD5( byte pX );
 		void	 sub_4075( byte pX, byte pY );
