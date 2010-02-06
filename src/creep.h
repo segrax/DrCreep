@@ -31,7 +31,7 @@ private:
 
 	word		 word_4D5B;											// RayGuns	
 	byte		 byte_4D5D;
-	char		 byte_4D5E, byte_4D5F;
+	byte		 byte_4D5E, byte_4D5F;
 	byte		 byte_574C, byte_4D60, byte_4D61;
 	byte		 byte_4D62, byte_4D63, byte_4D64;
 	byte		 byte_4D65, byte_4D66, byte_4D67;
@@ -150,18 +150,23 @@ public:
 		void	 obj_PrepDoors( );
 		void	 obj_PrepDoorbell( );
 		void	 obj_ExecLightningMachine( byte pX );
+		void	 sub_45E0( byte pX );
 		void	 obj_PrepLightning( );
 		void	 obj_PrepForcefield( );
 		void	 obj_PrepMummy( );
 		void	 obj_PrepTrapDoor();
+		void	 obj_ExecFloorSwitch( byte pX );
 		void	 obj_ExecConveyor( byte pX );
 		void	 obj_PrepConveyor( );
 		void	 obj_PrepFrankenstein();
 		void	 sub_41D8( byte pX, byte pY );
+		void	 sub_4647( byte pX, byte pY );
 		void	 sub_4A68( byte pX, byte pY );
+		void	 sub_4D70( byte pX, byte pY );
 		void	 sub_4EA8( byte pX, byte pY );
 		void	 sub_4DE9( byte pA );
 		void	 sub_505C( byte pA, byte pX );
+		void	 sub_5171( byte pA );
 		void	 sub_526F( char &pA );
 		bool	 sub_5750( byte &pX );
 		void	 sub_57DF( byte pX );

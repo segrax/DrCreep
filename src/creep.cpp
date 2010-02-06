@@ -4,6 +4,8 @@
 #include "sprite.h"
 #include "graphics/screenSurface.h"
 
+#include <iostream>
+
 cCreep::cCreep() {
 	size_t RomSize;
 
@@ -511,7 +513,9 @@ void cCreep::roomPrepare( ) {
 				break;
 
 			default:
-				printf("asd");
+				cout << "roomPrepare: 0x";
+				cout << std::hex << func << "\n";
+
 				break;
 		}
 
@@ -983,7 +987,8 @@ bool cCreep::ObjectActionFunction( byte pX, byte pY ) {
 			break;
 
 		default:
-			printf("objectactionfunction");
+			cout << "ObjectActionFunction: 0x";
+			cout << std::hex << func << "\n";
 			break;
 
 	}
@@ -1009,8 +1014,16 @@ bool cCreep::ObjectActionFunction2( byte pX, byte pY ) {
 			sub_41D8( pX, pY );
 			break;
 
+		case 0x4647:		// In Front Forcefield Timer
+			sub_4647( pX, pY );
+			break;
+
 		case 0x4A68:		// In Front Lock?
 			sub_4A68( pX, pY );
+			break;
+		
+		case 0x4D70:		// In Front RayGun Control
+			sub_4D70( pX, pY );
 			break;
 
 		case 0x4EA8:		// Teleport
@@ -1018,7 +1031,9 @@ bool cCreep::ObjectActionFunction2( byte pX, byte pY ) {
 			break;
 
 		default:
-			printf("objectactionfunction2");
+			cout << "ObjectActionFunction2: 0x";
+			cout << std::hex << func << "\n";
+
 			break;
 
 	}
@@ -1158,7 +1173,8 @@ void cCreep::objectFunction( byte pX ) {
 		case 0x3D6E:
 			break;*/
 		default:
-			printf("acc");
+			cout << "objectFunction: 0x";
+			cout << std::hex << func << "\n";
 			break;
 	}
 
@@ -1436,13 +1452,13 @@ void cCreep::sub_3AEB( byte pX ) {
 			Y = mDump[ 0x34D1 + Y ];
 			A = mDump[ 0xBD02 + pX ];
 			A -= mDump[ 0xBD02 + Y ];
-			if( A >= 4 )
+			if( (byte) A >= 4 )
 				continue;
 
 			// 3B4A
 			A = mDump[ 0xBD01 + pX ];
 			A -= mDump[ 0xBD01 + Y ];
-			if(A >= 0) {
+			if( (byte) A >= 0) {
 				A = mDump[ 0xBD1E + pX ];
 				if( !(A & byte_574F) )
 					continue;
@@ -1471,9 +1487,13 @@ s3B6E:
 
 		// 3B82
 		A = mDump[ 0xBD1B + pX ];
+		char a = A;
+
 		if( A != 0xFF )
-			if( A != mDump[ 0xBD1A + pX ] )
-				sub_526F(A);
+			if( A != mDump[ 0xBD1A + pX ] ) {
+				sub_526F(a);
+				A = a;
+			}
 
 		mDump[ 0xBD1A + pX ] = A;
 		mDump[ 0xBD1B + pX ] = 0xFF;
@@ -1762,10 +1782,11 @@ void cCreep::sub_3F4F() {
 					break;
 				/*case 0x44E7:
 					//sub_44E7( X );
+					break;*/
+				case 0x45E0:	// Time Delay Door
+					sub_45E0( X );
 					break;
-				case 0x45E0:
-					break;
-				case 0x4647:
+				/*case 0x4647:
 					break;
 				case 0x475E:
 					break;
@@ -1785,9 +1806,11 @@ void cCreep::sub_3F4F() {
 					obj_ExecTeleport( X );
 					break;
 				/*case 0x4EA8:
-					break;
-				case 0x50D2:
 					break;*/
+				case 0x50D2:		// Floor Switch
+					obj_ExecFloorSwitch( X );
+					break;
+
 				case 0x538B:		// Conveyor
 					obj_ExecConveyor( X );
 					break;
@@ -1796,7 +1819,8 @@ void cCreep::sub_3F4F() {
 				case 0x5611:
 					break;*/
 				default:
-					printf("aaa");
+					cout << "sub_3F4F: 0x";
+					cout << std::hex << func << "\n";
 					break;
 			}
 
@@ -2606,7 +2630,7 @@ void cCreep::drawGraphics( word pDecodeMode, word pGfxID, word pGfxPosX, word pG
 
 	byte videoPtr0, videoPtr1;
 	byte Counter2;
-	byte drawingFirst;
+	byte drawingFirst = 0;
 
 	if( pDecodeMode	!= 0 ) {
 		// Draw Text
@@ -2791,7 +2815,7 @@ void cCreep::drawGraphics( word pDecodeMode, word pGfxID, word pGfxPosX, word pG
 				}  
 			} else {
 				// 5a17
-				if( mTxtY_0 >= 0xDC || pGfxPosY < 0xDC ) {
+				if( mTxtY_0 >= 0xDC && pGfxPosY < 0xDC ) {
 					A = mTxtY_0;
 				}
 			}
@@ -2843,6 +2867,8 @@ void cCreep::drawGraphics( word pDecodeMode, word pGfxID, word pGfxPosX, word pG
 			if( drawingFirst != 1 ) {
 				if( mTxtY_0 == gfxCurrentPosY ) 
 					drawingFirst = 1;
+				else
+					goto s5AED;
 			}
 			//5A97
 			--mCount;
@@ -2875,7 +2901,7 @@ void cCreep::drawGraphics( word pDecodeMode, word pGfxID, word pGfxPosX, word pG
 			// 5AE1
 			word_30 += mTxtWidth;
 		}
-		
+s5AED:;
 		//5aed
 		if( pDecodeMode != 1 && gfxHeight_0 != 0) {
 			if( Counter2 != 1 ) {
@@ -3958,7 +3984,9 @@ void cCreep::obj_ExecRayGun( byte pX ) {
 
 					if( A < byte_4D5D ) {
 						byte_4D5D = A;
-						if( mDump[ 0xBD02 + Y ] >= 0xC8  ) {
+						A = mDump[ 0xBD02 + Y ];
+
+						if( A >= 0xC8 || A < mDump[ 0xBF02 + pX ] ) {
 							byte_4D5E = byte_4D65;
 						} else {
 							byte_4D5E = byte_4D66;
@@ -3967,7 +3995,7 @@ void cCreep::obj_ExecRayGun( byte pX ) {
 				}
 				//4B9C
 				--byte_4D5F;
-				if( byte_4D5F < 0 )
+				if( (char) byte_4D5F < 0 )
 					break;
 			}
 			// 4BA1
@@ -3980,14 +4008,19 @@ void cCreep::obj_ExecRayGun( byte pX ) {
 			mDump[ word_40 ] = A;
 		}
 		//4BB2
-		if( mDump[ word_40 ] & byte_4D65 ) {
+		A = mDump[ word_40 ];
+
+		if( A & byte_4D65 ) {
+
 			A = mDump[ word_40 + 4 ];
+
+			// Can RayGun Move Up
 			if( A != mDump[ word_40 + 2 ] ) {
-				A -= 1;
-				mDump[ word_40 + 4 ] = A;
+				mDump[ word_40 + 4 ] = A - 1;
 				sub_4DE9( 0x5C );
 			} else
 				goto s4BD9;
+
 		} else {
 			// 4BD4
 			if( !(A & byte_4D66) ) {
@@ -3997,6 +4030,8 @@ s4BD9:;
 			}
 			// 4BE1
 			A = mDump[ word_40 + 4 ];
+
+			// Can Raygun Move Down
 			if( A >= mDump[ 0xBE01 + pX ] )
 				goto s4BD9;
 
@@ -4018,6 +4053,7 @@ s4BD9:;
 	byte Y = mDump[ word_40 + 4 ] & 3;
 	Y |= byte_4D5E;
 
+	// Draw the ray gun
 	SpriteMovement( mDump[ 0x4D68 + Y ], gfxPosX, gfxPosY, 0, pX );
 
 s4C27:;
@@ -4026,6 +4062,7 @@ s4C27:;
 	if( A & byte_4D62 ) {
 		A ^= byte_4D62;
 		mDump[ word_40 ] = A;
+
 		if( !(A & byte_4D64 ))
 			return;
 	} else {
@@ -4033,6 +4070,9 @@ s4C27:;
 		if( byte_4D5D >= 5 )
 			return;
 	}
+
+	// Fire Weapon
+
 	// 4C44
 	A = mDump[ word_40 ];
 	if( (A & byte_4D61) )
@@ -4093,7 +4133,7 @@ void cCreep::obj_PrepRayGun() {
 		}
 		// 4C7E
 
-		mDump[ word_3E ] &= 0xFF ^ byte_4D61;
+		mDump[ word_3E ] &=( 0xFF ^ byte_4D61);
 		byte gfxPosX = mDump[ word_3E + 1 ];
 		byte gfxPosY = mDump[ word_3E + 2 ];
 		byte gfxCurrentID;
@@ -4436,6 +4476,39 @@ void cCreep::obj_PrepDoorbell() {
 
 }
 
+// 45E0: Forcefield Timer
+void cCreep::sub_45E0( byte pX ) {
+	--mDump[ 0xBE01 + pX ];
+	if( mDump[ 0xBE01 + pX ] != 0 )
+		return;
+
+	--mDump[ 0xBE02 + pX ];
+	byte Y = mDump[ 0xBE02 + pX ];
+	byte A = mDump[ 0x4756 + Y ];
+
+	mDump[ 0x75AB ] = A;
+	sub_21C8( 2 );
+
+	for( Y = 0; Y < 8; ++Y ) {
+		if( Y >= mDump[ 0xBE02 + pX ] )
+			A = 0x55;
+		else
+			A = 0;
+
+		mDump[ 0x6889 + Y ] = A;
+	}
+
+	drawGraphics( 0, 0x40, mDump[ 0xBF01 + pX ], mDump[ 0xBF02 + pX ], 0 );
+	if( mDump[ 0xBE02 + pX ] != 0 ) {
+		mDump[ 0xBE01 + pX ] = 0x1E;
+		return;
+	} 
+
+	// 4633
+	mDump[ 0xBF04 + pX ] ^= byte_840;
+	mDump[ 0x4750 + mDump[ 0xBE00 + pX ] ] = 1;
+}
+
 // Lightning Machine Setup
 void cCreep::obj_PrepLightning() {
 	byte	byte_44E5, byte_44E6, gfxPosX, gfxPosY;
@@ -4685,6 +4758,44 @@ void cCreep::obj_PrepTrapDoor( ) {
 		word_3E += 0x05;
 	}
 
+}
+
+// 50D2: Floor Switch
+void cCreep::obj_ExecFloorSwitch( byte pX ) {
+	
+	word_40 = word_5387 + mDump[ 0xBE00 + pX ];
+	if( mDump[ 0xBE01 + pX ] ) {
+		mTxtX_0 = mDump[ word_40 + 1 ];
+		mTxtY_0 = mDump[ word_40 + 2 ];
+
+		byte A = mDump[ 0xBE02 + pX ];
+
+		sub_5171( A );
+		drawGraphics( 1, 0, 0, 0, A );
+		if( mDump[ 0xBE02 + pX ] != 0x78 ) {
+			// 515F
+			++mDump[ 0xBE02 + pX ];
+			return;
+		}
+		
+		SpriteMovement( 0x79, mDump[ word_40 + 1 ] + 4, mDump[ word_40 + 2 ], 0, pX );
+		
+	} else {
+		// 5129
+		if( mDump[ 0xBE02 + pX ] == 0x78 )
+			sub_57DF( pX );
+		
+		byte A = mDump[ 0xBE02 + pX ];
+
+		sub_5171( A );
+		drawGraphics( 0, A, mDump[ word_40 + 1 ], mDump[ word_40 + 2 ], 0 );
+		if( mDump[ 0xBE02 + pX ] != 0x73 ) {
+			--mDump[ 0xBE02 + pX ];
+			return;
+		}
+	}
+	// 5165
+	mDump[ 0xBF04 + pX ] ^= byte_840;
 }
 
 // 538B: Conveyor
@@ -5085,6 +5196,31 @@ void cCreep::sub_41D8( byte pX, byte pY ) {
 	mDump[ 0xBF04 + pX ] |= byte_840;
 }
 
+// 4647: In Front Forcefield Timer
+void cCreep::sub_4647( byte pX, byte pY ) {
+	if(mDump[ 0xBD00 + pX ])
+		return;
+
+	if(!mDump[ 0xBD1D + pX ])
+		return;
+
+	mDump[ 0x75AB ] = 0x0C;
+	sub_21C8( 0x02 );
+	
+	mDump[ 0xBF04 + pY ] |= byte_840;
+	mDump[ 0xBE01 + pY ] = 0x1E;
+	mDump[ 0xBE02 + pY ] = 0x08;
+	mDump[ 0x6889 ] = mDump[ 0x688A ] = mDump[ 0x688B ] = 0x55;
+	mDump[ 0x688C ] = mDump[ 0x688D ] = mDump[ 0x688E ] = 0x55;
+	mDump[ 0x688F ] = mDump[ 0x6890 ] = 0x55;
+
+	mTxtX_0 = mDump[ 0xBF01 + pY ];
+	mTxtY_0 = mDump[ 0xBF02 + pY ];
+	drawGraphics( 1, 0, 0, 0, mDump[ 0xBF03 + pY ]);
+
+	mDump[ 0x4750 + mDump[ 0xBE00 + pY ] ] = 0;
+}
+
 // 4A68: In Front Lock
 void cCreep::sub_4A68( byte pX, byte pY ) {
 	byte byte_4B19 = pX;
@@ -5137,6 +5273,53 @@ bool cCreep::sub_5E8E( byte pA, byte pX, byte pY ) {
 		if( mDump[ word_30 + pY ] == byte_5ED4 )
 			return false;
 	}
+}
+
+// 4D70: In Front RayGun Control
+void cCreep::sub_4D70( byte pX, byte pY ) {
+	byte byte_4E30 = pY;
+
+	if(mDump[ 0xBD00 + pX ])
+		return;
+
+	byte A = mDump[ 0xBD01 + pX ] + mDump[ 0xBD0C + pX ];
+	A -= mDump[ 0xBF01 + pY ];
+
+	if( A >= 8 )
+		return;
+
+	if( mDump[ 0x780D + mDump[ 0xBD1C + pX ] ] != 0)
+		return;
+
+	pY = byte_4E30;
+
+	word_40 = word_4D5B + mDump[ 0xBE00 + pY ];
+	A = 0xFF;
+	A ^= byte_4D65;
+	A ^= byte_4D66;
+	A &= mDump[ word_40 ];
+
+	pY = mDump[ 0xBD1E + pX ];
+	if( !pY ) 
+		A |= byte_4D65;
+	else {
+		if( pY == 4 )
+			A |= byte_4D66;
+		else
+			if(pY != 0x80 )
+				return;
+	}
+
+	// 4DC9
+	A |= byte_4D62;
+
+	mDump[ word_40 ] = A;
+	if( mDump[ 0xBD1D + pX ] )
+		A = mDump[ word_40 ] | byte_4D64;
+	else
+		A = (0xFF ^ byte_4D64) & mDump[ word_40 ];
+
+	mDump[ word_40 ] = A;
 }
 
 
@@ -5254,6 +5437,13 @@ void cCreep::sub_505C( byte pA, byte pX ) {
 	drawGraphics( 0, 0x71, gfxPosX, gfxPosY, 0 );
 	gfxPosY += 0x08;
 	drawGraphics( 0, 0x71, gfxPosX, gfxPosY, 0 );
+}
+
+void cCreep::sub_5171( byte pA ) {
+	
+	mDump[ 0x759F ] = pA - 0x48;
+	sub_21C8(1);
+
 }
 
 void cCreep::sub_526F( char &pA ) {
