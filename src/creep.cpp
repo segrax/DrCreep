@@ -3986,12 +3986,12 @@ void cCreep::obj_ExecRayGun( byte pX ) {
 
 					if( A < byte_4D5D ) {
 						byte_4D5D = A;
-						A = mDump[ 0xBD02 + Y ];
+						byte A = mDump[ 0xBD02 + Y ];
 
-						if( A >= 0xC8 && A < mDump[ 0xBF02 + pX ] ) {
-							byte_4D5E = byte_4D65;
+						if( A >= 0xC8 || A < mDump[ 0xBF02 + pX ] ) {
+							byte_4D5E = byte_4D65;	// Will Move Up
 						} else {
-							byte_4D5E = byte_4D66;
+							byte_4D5E = byte_4D66;	// Will Move Down
 						}
 					}
 				}
