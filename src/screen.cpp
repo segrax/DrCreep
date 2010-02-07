@@ -73,7 +73,7 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 			if( source->mPixel != 0xFF ) {
 
 				// Check for any collisions
-				if( dest->mPriority == ePriority_Foreground ) {
+				if( dest->mPriority == ePriority_Foreground || dest->mSprite ) {
 					if(dest->mSprite) {
 						dest->mSprite2 = pSpriteNo; 
 						if(!col1) {
@@ -88,6 +88,11 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 						}
 					}
 				}
+
+				if( pSpriteNo && !dest->mSprite )
+					dest->mSprite = pSpriteNo;
+				else if( pSpriteNo != dest->mSprite )
+					dest->mSprite2 = pSpriteNo;
 
 				// Does this sprite have priority over the background?
 				if( !pPriority || (dest->mPriority == ePriority_Background && pPriority) ) {

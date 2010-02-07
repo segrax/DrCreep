@@ -1044,7 +1044,9 @@ bool cCreep::ObjectActionFunction2( byte pX, byte pY ) {
 	return true;
 }
 
+// 30D9
 void cCreep::ObjectHitsObject( byte pX ) {
+	cout << "objectHitsObject\n";
 
 }
 
@@ -1056,7 +1058,7 @@ void cCreep::sub_3026( byte pX ) {
 	
 	byte A = mDump[ 0x895 + Y ];
 	
-	if(A & 0x80) {
+	if(!(A & 0x80)) {
 		byte_311B = A;
 		byte_3117 = mDump[ 0xBD01 + pX ];
 		byte_3118 = byte_3117 + mDump[ 0xBD0A + pX];
@@ -1491,17 +1493,18 @@ s3B6E:
 			return;
 
 	}
-		// 3B82
-		A = mDump[ 0xBD1B + pX ];
+	
+	// 3B82
+	A = mDump[ 0xBD1B + pX ];
 
-		if( A != -1 )
-			if( A != mDump[ 0xBD1A + pX ] ) {
-				sub_526F(A);
-			}
+	if( (byte) A != 0xFF )
+		if( A != mDump[ 0xBD1A + pX ] ) {
+			sub_526F(A);
+		}
 
-		mDump[ 0xBD1A + pX ] = A;
-		mDump[ 0xBD1B + pX ] = 0xFF;
-		sub_5F6B( pX );
+	mDump[ 0xBD1A + pX ] = A;
+	mDump[ 0xBD1B + pX ] = 0xFF;
+	sub_5F6B( pX );
 
 	//3B9C
 	A = mDump[ word_3C ] & mDump[ 0xBD1C + pX ];
@@ -1785,7 +1788,7 @@ void cCreep::sub_3F4F() {
 				/*case 0x44E7:
 					//sub_44E7( X );
 					break;*/
-				case 0x45E0:	// Time Delay Door
+				case 0x45E0:	// Forcefield
 					sub_45E0( X );
 					break;
 				/*case 0x4647:
