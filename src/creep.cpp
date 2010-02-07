@@ -1425,12 +1425,12 @@ void cCreep::sub_3488( byte pX ) {
 	mDump[ 0xD027 + byte_34D6 ] = mDump[ 0x34D3 + mDump[ 0xBD1C + pX ] ];
 }
 
-// 3AEB: 
+// 3AEB: Frankie Movement
 void cCreep::sub_3AEB( byte pX ) {
 	byte Y;
 	char A = mDump[ 0xBD04 + pX ];
-	byte byte_3F0B, byte_3F10, byte_3F11, byte_3F12;
-	char byte_3F0A;
+	byte byte_3F0B, byte_3F12;
+	char byte_3F0A, byte_3F10, byte_3F11;
 
 	if( A & byte_885 ) {
 		mDump[ 0xBD04 + pX ] = (A ^ byte_885) | byte_886;
@@ -1440,13 +1440,13 @@ void cCreep::sub_3AEB( byte pX ) {
 	if( A & byte_882 ) 
 		mDump[ 0xBD04 + pX ] ^= byte_882;
 
-	word_40 = word_5748 + mDump[ 0xBD1F + pX ] + (mDump[ 0xBD1E + pX ] << 8);
+	word_40 = word_5748 + mDump[ 0xBD1F + pX ];
 	
 	if( !(mDump[ 0xBD1E + pX ] & byte_574E) ) {
 		if( mMenuIntro == 1 )
 			return;
 
-		
+		// 3B31
 		for(byte_3F0A = 1; byte_3F0A >= 0; --byte_3F0A) {
 			Y = byte_3F0A;
 
@@ -1456,13 +1456,15 @@ void cCreep::sub_3AEB( byte pX ) {
 			Y = mDump[ 0x34D1 + Y ];
 			A = mDump[ 0xBD02 + pX ];
 			A -= mDump[ 0xBD02 + Y ];
+
+			// Within 4 on the Y axis, then frank can wake up
 			if( (byte) A >= 4 )
 				continue;
 
 			// 3B4A
 			A = mDump[ 0xBD01 + pX ];
 			A -= mDump[ 0xBD01 + Y ];
-			if( (byte) A >= 0) {
+			if( !(mDump[ 0xBD01 + pX ] >= 0 && A < 0)) {
 				A = mDump[ 0xBD1E + pX ];
 				if( !(A & byte_574F) )
 					continue;
@@ -1479,7 +1481,7 @@ s3B6E:
 				mDump[ word_40 ] = A;
 				mDump[ 0xBD1D + pX ] = 0x80;
 
-				sub_21C8(7);
+				sub_21C8(0x07);
 				break;
 			}
 
@@ -1488,25 +1490,21 @@ s3B6E:
 		if(byte_3F0A < 0 )
 			return;
 
-
+	}
 		// 3B82
 		A = mDump[ 0xBD1B + pX ];
-		char a = A;
 
-		if( A != 0xFF )
+		if( A != -1 )
 			if( A != mDump[ 0xBD1A + pX ] ) {
-				sub_526F(a);
-				A = a;
+				sub_526F(A);
 			}
 
 		mDump[ 0xBD1A + pX ] = A;
 		mDump[ 0xBD1B + pX ] = 0xFF;
 		sub_5F6B( pX );
-	
-	}
 
 	//3B9C
-	A = mDump[ word_3C ] + mDump[ 0xBD1C + pX ];
+	A = mDump[ word_3C ] & mDump[ 0xBD1C + pX ];
 	byte byte_3F13 = A;
 
 	mDump[ 0xBD1C + pX ] = 0xFF;
@@ -1519,7 +1517,7 @@ s3B6E:
 		
 		// 3BBF
 		for(char Y = 6; Y >= 0;) {
-			if( !(mDump[ 0x2F82 + Y ] & byte_3F13 )) {
+			if( (mDump[ 0x2F82 + Y ] & byte_3F13 )) {
 				++byte_3F0A;
 				byte_3F0B = Y;
 			}
@@ -1550,7 +1548,7 @@ s3B6E:
 
 		// 3C15
 		for(;;) {
-			Y = byte_3F0A;
+			byte Y = byte_3F0A;
 			if( mDump[ 0x780D + Y ] == 0 ) {
 				
 				Y = mDump[ 0x34D1 + Y ];
@@ -1564,7 +1562,7 @@ s3B6E:
 				} else {
 					Y = 1;
 				}
-				if( A < mDump[ 0x3F0C + Y ] )
+				if( A < mDump[ 0x3F0C +  Y ] )
 					mDump[ 0x3F0C + Y ] = A;
 
 				Y = byte_3F0A;
@@ -1591,7 +1589,7 @@ s3B6E:
 		byte_3F10 = -1;
 		for(;;) {
 			byte_3F11 = 0x00;
-			byte_3F12 = -1;
+			byte_3F12 = 0xFF;
 			
 			for( char Y = 3; Y >= 0; --Y ) {
 				A = mDump[ 0x3F0C + Y ];
@@ -1632,7 +1630,7 @@ s3CB4:;
 			// 3ccf
 			--mDump[ 0xBD01 + pX ];
 			if( mDump[ 0xBD03 + pX ] >= 0x87 )
-				if( mDump[ 0xBD03 + pX ] >= 0x8A )
+				if( mDump[ 0xBD03 + pX ] < 0x8A )
 					goto s3D4C;
 			
 			mDump[ 0xBD03 + pX ] = 0x87;
@@ -1641,7 +1639,7 @@ s3CB4:;
 			// 3ce5
 			++mDump[ 0xBD01 + pX ];
 			if( mDump[ 0xBD03 + pX ] >= 0x84 )
-				if( mDump[ 0xBD03 + pX ] >= 0x87 )
+				if( mDump[ 0xBD03 + pX ] < 0x87 )
 					goto s3D4C;
 
 			mDump[ 0xBD03 + pX ] = 0x84;
@@ -3990,7 +3988,7 @@ void cCreep::obj_ExecRayGun( byte pX ) {
 						byte_4D5D = A;
 						A = mDump[ 0xBD02 + Y ];
 
-						if( A >= 0xC8 || A < mDump[ 0xBF02 + pX ] ) {
+						if( A >= 0xC8 && A < mDump[ 0xBF02 + pX ] ) {
 							byte_4D5E = byte_4D65;
 						} else {
 							byte_4D5E = byte_4D66;
