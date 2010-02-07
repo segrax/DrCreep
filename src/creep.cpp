@@ -1596,9 +1596,9 @@ s3B6E:
 			
 			for( char Y = 3; Y >= 0; --Y ) {
 				A = mDump[ 0x3F0C + Y ];
-				if( A >= byte_3F10 )
+				if( (byte) A >= (byte) byte_3F10 )
 					continue;
-				if( A < byte_3F11 )
+				if( (byte) A < (byte) byte_3F11 )
 					continue;
 
 				byte_3F11 = A;
@@ -1606,13 +1606,14 @@ s3B6E:
 			}
 		
 			//3C8E
-			if( byte_3F12 == 0xFF ) {
+			A = byte_3F12;
+			if( A == -1 ) {
 				mDump[ 0xBD1D + pX ] = 0x80;
 				goto s3CB4;
 			}
-			
-			Y = A << 1;
-			mDump[ 0x2F82 + Y ] = A;
+			Y = (((byte) A) << 1 );
+
+			A = mDump[ 0x2F82 + (byte_3F12 << 1) ];
 			if( A & byte_3F13 )
 				break;
 
@@ -1652,7 +1653,7 @@ s3CB4:;
 	} else {
 		// 3CFB
 		A = mDump[ 0xBD1D + pX ];
-		if(A < 0)
+		if(A & 0x80)
 			goto s3D4F;
 
 		mDump[ 0xBD01 + pX ] -= byte_5FD7;
