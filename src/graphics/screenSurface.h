@@ -39,7 +39,7 @@ public:
 	inline size_t		 widthGet()  { return mWidth; }
 
 	inline sScreenPiece *screenPiecesGet() { return mScreenPieces; }
-	inline sScreenPiece *screenPieceGet( size_t &pX, size_t &pY ) {
+	inline sScreenPiece *screenPieceGet( size_t pX, size_t pY ) {
 		return &mScreenPieces[ ((pY * mWidth) + pX) ];
 	}
 };

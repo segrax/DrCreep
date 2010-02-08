@@ -1,12 +1,15 @@
 class cScreen;
+class cPlayerInput;
 
 class cCreep {
 
 private:
 
-	byte		*mDump,			*mLevel,		*m64CharRom;
-	size_t		 mDumpSize;
-	cScreen		*mScreen;
+	byte			*mDump,			*mLevel,		*m64CharRom;
+	size_t			 mDumpSize;
+
+	cScreen			*mScreen;
+	cPlayerInput	*mInput;
 
 	byte		 mFileListingNamePtr;
 	
@@ -89,7 +92,7 @@ public:
 		void	 roomLoad();
 		void	 changeLevel( size_t pNumber );
 		void	 stringPrint(  );
-		void	 screenDraw(  word pDecodeMode, word pGfxID, word pGfxPosX, word pGfxPosY, byte pTxtCurrentID );
+		void	 screenDraw(  word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID );
 		void	 handleEvents();
 		void	 Game();
 		void	 GameMain();
@@ -123,11 +126,11 @@ public:
 		void	 sub_3026( byte pX );
 		void	 obj_ExecPlayer( byte pX );
 		void	 sub_3488( byte pX );
-		void	 sub_34EF( byte pX, byte pY );
+		void	 obj_InFrontFloorSwitch( byte pX, byte pY );
 		void	 sub_359E( );
 		void	 sub_3A60( byte pX, byte pY );
 		void	 sub_3A7F( byte pX );
-		void	 sub_3AEB( byte pX );
+		void	 obj_ExecFrankie( byte pX );
 		void	 sub_3D6E( byte pX, byte pY );
 		void	 sub_3E87( );
 		void	 sub_3F4F( );

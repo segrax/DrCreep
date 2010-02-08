@@ -25,6 +25,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="cd ..\..&#x0D;&#x0A;rev.cmd"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -100,6 +101,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="cd ..\..&#x0D;&#x0A;rev.cmd"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -195,6 +197,14 @@
 						Optimization="0"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\src\playerInput.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\playerInput.h"
+				>
 			</File>
 			<File
 				RelativePath="..\..\src\screen.cpp"
@@ -320,6 +330,10 @@
 			>
 			<File
 				RelativePath="..\..\src\creep.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\rev.h"
 				>
 			</File>
 			<File

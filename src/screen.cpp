@@ -5,25 +5,29 @@
 #include "bitmapMulticolor.h"
 #include "screen.h"
 
-cScreen::cScreen() {
-	
+const word gWidth = 360, gHeight = 265;
+
+cScreen::cScreen( string pWindowTitle ) {
+
 	for(byte Y = 0; Y < 8; ++Y ) {
 		mSprites[Y] = new cSprite();
 		mSprites[Y]->_multiColor0 = 0x0A;
 		mSprites[Y]->_multiColor1 = 0x0D;
 	}
 
-	mWindow = new cVideoWindow( 640, 400, 4 );
+	mSDLSurfaceScaled =	0;
+	mWindow = 0;
+
+	mSurface = new cScreenSurface( gWidth, gHeight );
 	mBitmap = new cBitmapMulticolor();
-	mSurface = new cScreenSurface( 640, 400 );
 
-	// Default scale
-	mScale = 0x02;
-	
+	// Default scale level
+	scaleSet(2);
+
 	// Create the SDL surfaces 
-	mSDLSurface = SDL_CreateRGBSurface(	SDL_SWSURFACE,	640,	400,	 32, 0, 0, 0, 0);
-	mSDLSurfaceScaled =	SDL_CreateRGBSurface(	SDL_SWSURFACE,	640 * mScale, 400 * mScale,	 32, 0, 0, 0, 0);
+	mSDLSurface = SDL_CreateRGBSurface(	SDL_SWSURFACE,	gWidth,	gHeight,	 32, 0, 0, 0, 0);
 
+	mWindow->titleSet( pWindowTitle );
 }
 
 cScreen::~cScreen() {
@@ -45,11 +49,29 @@ void cScreen::clear(  byte pColor = 0xFF ) {
 	mSurface->Wipe( pColor );
 }
 
+void cScreen::scaleSet( byte pScale ) {
+	word width, height;
+
+	if(pScale > 4)
+		return;
+
+	delete mSDLSurfaceScaled;
+	delete mWindow;
+
+	mScale = pScale;
+
+	width = gWidth * mScale;
+	height = gHeight * mScale;
+
+	mWindow = new cVideoWindow( width, height, 4 );
+	mSDLSurfaceScaled =	SDL_CreateRGBSurface(	SDL_SWSURFACE,	width, height,	 32, 0, 0, 0, 0);
+}
+
 void cScreen::bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 ) {
 	clear();
 
 	mBitmap->load( pBuffer, pColorData, pColorRam, pBackgroundColor0 );
-	blit( mBitmap->mSurface, 0, 0, false, false );
+	blit( mBitmap->mSurface, 24, 50, false, false );
 }
 
 void cScreen::blit( cSprite *pSprite, byte pSpriteNo ) {
@@ -65,7 +87,7 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 	sScreenPiece *source = pSurface->screenPiecesGet();
 
 	for( word y = 0; y < pSurface->heightGet(); ++y, ++pDestY ) {
-		dest = mSurface->screenPieceGet(pDestX, pDestY);
+		dest = mSurface->screenPieceGet( pDestX, (byte) pDestY);
 
 		for( word x = 0; x < pSurface->widthGet(); ++x ) {
 			
@@ -120,10 +142,10 @@ cSprite *cScreen::spriteGet( byte pCount ) {
 }
 
 void cScreen::refresh() {
-	SDL_Surface *surface = scaleTo(2);
+	SDL_Surface *surface = scaleUp();
 	
-//	mWindow->clear(0);
-	mWindow->blit( surface, 0, 0 );
+	mWindow->clear(0);
+	mWindow->blit( surface, 0, 0, 15, 30 );
 }
 
 void cScreen::spriteDisable() {
@@ -163,14 +185,7 @@ void cScreen::SDLSurfaceSet(){
 
 }
 
-SDL_Surface	*cScreen::scaleTo( size_t pScale ) {
-	if( mScale != pScale ) {
-		mScale = pScale;
-
-		delete mSDLSurfaceScaled;
-		mSDLSurfaceScaled =	SDL_CreateRGBSurface(	SDL_SWSURFACE,	mSurface->widthGet() * mScale,	mSurface->heightGet() * mScale,	 32, 0, 0, 0, 0);
-	}
-
+SDL_Surface	*cScreen::scaleUp( ) {
 	SDLSurfaceSet();
 
 	if( mScale < 2 || mScale > 4 )

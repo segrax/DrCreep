@@ -10,6 +10,9 @@ using namespace std;
 #include "types.h"
 #include "graphics/scale/scalebit.h"
 
+extern const char *SVNREV;
+extern const char *SVNDATE;
+
 // Endian functions
 // Read a word from the buffer
 inline word	readWord( const void *buffer ) {
@@ -25,3 +28,4 @@ inline word	swapWord(  word buffer ) {
 
 vector<string>	 directoryList(string pPath);
 byte			*fileRead( string pFile, size_t	&pFileSize );
+

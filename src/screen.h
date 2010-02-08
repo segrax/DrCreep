@@ -16,19 +16,21 @@ class cScreen {
 	cSprite					*mSprites[8];
 
 	size_t					 mScale;
-public:
 
-	cScreen();
-	~cScreen();
-	
-
-	void					 bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 );
 	void					 blit( cSprite *pSprite, byte pSpriteNo );
 	void					 blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority, byte pSpriteNo);
+	SDL_Surface				*scaleUp();
+	void					 SDLSurfaceSet();
+
+public:
+
+							 cScreen( string pWindowTitle );
+							~cScreen();
+	
+	void					 bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 );
 	void					 clear( byte pColor );
 
-	SDL_Surface				*scaleTo( size_t pScale );
-	void					 SDLSurfaceSet();
+	void					 scaleSet( byte pScale );
 
 	void					 spriteDisable();
 	void					 spriteDraw();

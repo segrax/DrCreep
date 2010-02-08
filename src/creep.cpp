@@ -3,21 +3,28 @@
 #include "creep.h"
 #include "sprite.h"
 #include "graphics/screenSurface.h"
+#include "playerInput.h"
 
 #include <iostream>
 
 cCreep::cCreep() {
 	size_t RomSize;
 
-	mScreen = new cScreen();
-	m64CharRom = fileRead( "char.rom", RomSize );
+	stringstream windowTitle;
+	windowTitle << "The Castles of Dr. Creep - SVN: " << SVNREV;
+	windowTitle << "(" << SVNDATE << ")";
+
 	mDumpSize = 0;
-	mDump = fileRead( "object", mDumpSize );
 	mLevel = 0;
+	mMenuMusicScore = 0xFF;
+	mUnlimitedLives = 0;
 	mQuit = false;
 
-	mUnlimitedLives = 0;
-	mMenuMusicScore = 0xFF;
+	mScreen = new cScreen( windowTitle.str() );
+	m64CharRom = fileRead( "char.rom", RomSize );
+	mDump = fileRead( "object", mDumpSize );
+
+	mInput = new cPlayerInput();
 
 	byte_839 = 0;
 	byte_840 = 0x40;
@@ -338,6 +345,7 @@ void cCreep::ScreenClear() {
 	byte Y = 0xF9;
 	
 	mScreen->clear(0);
+	mInput->inputCheck( true );
 
 	// Disable all sprites
 	mScreen->spriteDisable();
@@ -568,7 +576,7 @@ bool cCreep::Menu() {
 
 		for(;;) {
 
-			_sleep(5);
+			_sleep(10);
 
 			if( mMenuScreenTimer )
 				handleEvents();
@@ -630,81 +638,35 @@ void cCreep::optionsMenu() {
 }
 
 void cCreep::KeyboardJoystickMonitor( byte pA ) {
-	SDL_Event keyevent;
+	byte X = 0xFF, A = 0;
 	
-	SDL_PollEvent(&keyevent);
-
 	byte_5F58 = pA;
 	RunRestorePressed = false;
-	byte X = 0xFF, A = 0;
-
-	static bool pressCtrl = false, pressRight = false, pressLeft = false, pressDown = false, pressUp = false;
-
-	// FIXME: Only use joystick 0 currently
-	if(pA)
-		return;
-
-	switch( keyevent.type ) {
-		case SDL_KEYDOWN:
-			switch( keyevent.key.keysym.sym ) {
-				case SDLK_F1:
-					RunRestorePressed = true;
-					break;
-				case SDLK_RCTRL:
-					pressCtrl = true;
-					break;
-				case SDLK_LEFT:
-					pressLeft = true;
-					break;
-				case SDLK_RIGHT:
-					pressRight = true;
-					break;
-				case SDLK_DOWN:
-					pressDown = true;
-					break;
-				case SDLK_UP:
-					pressUp = true;
-					break;
-			}
-			break;
-		case SDL_KEYUP:
-			switch( keyevent.key.keysym.sym ) {
-				case SDLK_F1:
-					RunRestorePressed = false;
-					break;
-				case SDLK_RCTRL:
-					pressCtrl = false;
-					break;
-				case SDLK_LEFT:
-					pressLeft = false;
-					break;
-				case SDLK_RIGHT:
-					pressRight = false;
-					break;
-				case SDLK_DOWN:
-					pressDown = false;
-					break;
-				case SDLK_UP:
-					pressUp = false;
-					break;
-			}
-			break;
-	}
-
-	if( pressCtrl )
-		A = 1;
-
-	if( pressLeft )
-		X ^= 0x04;
 	
-	if( pressRight )
-		X ^= 0x08;
+	mInput->inputCheck();
 
-	if( pressUp )
-		X ^= 0x01;
+	sPlayerInput *input = mInput->inputGet( pA );
 
-	if( pressDown )
-		X ^= 0x02;
+	if( mInput->runRestoreGet() )
+		RunRestorePressed = true;
+
+	if(input) {
+
+		if( input->mButton )
+			A = 1;
+
+		if( input->mLeft )
+			X ^= 0x04;
+	
+		if( input->mRight )
+			X ^= 0x08;
+
+		if( input->mUp )
+			X ^= 0x01;
+
+		if( input->mDown )
+			X ^= 0x02;
+	}
 
 	X &= 0x0F;
 	byte_5F56 = mDump[ 0x5F59 + X ];
@@ -895,10 +857,10 @@ s2ED5:
 				byte w30 = (word_30 & 0xFF00) >> 8;
 
 				// Sprite X
-				mDump[ 0x10 + Y ] = (word_30 - 32);
-				sprite->_X = (word_30 - 32);
+				mDump[ 0x10 + Y ] = (word_30 - 8);
+				sprite->_X = (word_30 - 8);
 
-				if((word_30 >= 0x100) && ((word_30 - 32) < 0x100))
+				if((word_30 >= 0x100) && ((word_30 - 8) < 0x100))
 					--w30;
 
 				if( (w30 & 0x80) ) {
@@ -911,7 +873,6 @@ s2F51:;
 				} else {
 					if( w30 ) {
 						A = (mDump[ 0x20 ] | mDump[ 0x2F82 + Y ]);
-						//sprite->_X += 0x100;
 					} else
 						A = (mDump[ 0x2F82 ] ^ 0xFF) & mDump[ 0x20 ];
 
@@ -924,8 +885,8 @@ s2F51:;
 						sprite->_rEnabled = false;
 					} else {
 						// 2F5B
-						sprite->_Y = mDump[ 0xBD02 + X ];
-						mDump[ 0x18 + Y ] = mDump[ 0xBD02 + X ];// + 0x32;
+						sprite->_Y = ((char) mDump[ 0xBD02 + X ]) + 0x32;
+						mDump[ 0x18 + Y ] = mDump[ 0xBD02 + X ] + 0x32;
 						A = mDump[ 0x21 ] | mDump[ 0x2F82 + Y ];
 
 						sprite->_rEnabled = true;
@@ -1004,7 +965,7 @@ bool cCreep::ObjectActionFunction( byte pX, byte pY ) {
 			return false;
 
 		case 0x34EF:		// in front of door
-			sub_34EF( pX, pY );
+			obj_InFrontFloorSwitch( pX, pY );
 			break;
 
 		case 0x3A60:		//
@@ -1185,7 +1146,7 @@ void cCreep::objectFunction( byte pX ) {
 			obj_ExecLightning( pX );
 			break;
 
-		case 0x36B3:		// Forcefield
+		case 0x36B3:
 			obj_ExecForcefield( pX );
 			break;
 
@@ -1194,7 +1155,7 @@ void cCreep::objectFunction( byte pX ) {
 			break;
 
 		case 0x3AEB:
-			sub_3AEB( pX );
+			obj_ExecFrankie( pX );
 			break;
 
 		default:
@@ -1405,24 +1366,30 @@ s33DE:;
 				--mDump[ 0xBD03 + pX ];
 			
 			// 3436
+			// Ladder Movement 
 			A = mDump[ 0xBD03 + pX ];
 			if( A >= 0x2E ) {
 				// 3445
+				// Moving Up Ladder
 				if( A >= 0x32 )
 					mDump[ 0xBD03 + pX ] = 0x2E;
 			} else {
 				// 343D
+				// Moving Down Ladder
 				mDump[ 0xBD03 + pX ] = 0x31;
 			}
 
 		} else {
 			//3451
+			// Down Pole
 			mDump[ 0xBD03 + pX ] = 0x26;
 		}
 
 	} else {
 		// 3459
+		// Player Frame
 		++mDump[ 0xBD03 + pX ];
+
 		if( mDump[ 0xBD1F + pX ] < 4 ) {
 			// 3463
 			A = mDump[ 0xBD03 + pX ];
@@ -1431,6 +1398,7 @@ s33DE:;
 
 		} else {
 			// 3476
+			// Max frame reached?
 			if( mDump[ 0xBD03 + pX ] >= 3 )
 				mDump[ 0xBD03 + pX ] = 0;
 		}
@@ -1451,7 +1419,7 @@ void cCreep::sub_3488( byte pX ) {
 }
 
 // 3AEB: Frankie Movement
-void cCreep::sub_3AEB( byte pX ) {
+void cCreep::obj_ExecFrankie( byte pX ) {
 	byte Y;
 	char A = mDump[ 0xBD04 + pX ];
 	byte byte_3F0B, byte_3F12;
@@ -1637,17 +1605,17 @@ s3B6E:
 				mDump[ 0xBD1D + pX ] = 0x80;
 				goto s3CB4;
 			}
-			Y = (((byte) A) << 1 );
 
 			A = mDump[ 0x2F82 + (byte_3F12 << 1) ];
-			if( A & byte_3F13 )
+			if( A & byte_3F13 ) {
+				// 3CB0
+				mDump[ 0xBD1D + pX ] = (byte_3F12 << 1);
 				break;
+			}
 
 			byte_3F10 = byte_3F11;
 		}
 
-		// 3CB0
-		mDump[ 0xBD1D + pX ] = Y;
 	}
 
 	// 3CB4
@@ -2195,12 +2163,12 @@ sF99:;
 
 			bool cf = false;
 
-			if( (A - 16) < 0 )
+			if( (A - 4) < 0 )
 				cf = true;
-			A -= 16;
+			A -= 4;
 			A <<= 1;
 
-			posX -= 16;
+			posX -= 4;
 			posX <<= 1;
 			
 			Y = mDump[ 0x11D8 ];
@@ -2208,7 +2176,7 @@ sF99:;
 
 			// Sprite X
 			mDump[ 0x10 + Y ] = A;
-			sprite->_X = posX;
+			sprite->_X = posX ;
 
 			if( cf ) {
 				A = mDump[ 0x2F82 + Y ] | mDump[ 0x20 ];
@@ -2222,7 +2190,7 @@ sF99:;
 			A = mDump[ word_42 + 2 ];
 			A += mDump[ word_40 + 6 ];
 			A += mDump[ 0x11DE + mDump[ 0x11D9 ] ];
-			//A += 0x32;
+			A += 0x32;
 
 			// Sprite Y
 			sprite->_Y = A;
@@ -2382,7 +2350,7 @@ s10EB:;
 	mDump[ 0x11D0 ] = 0;
 }
 
-void cCreep::sub_34EF( byte pX, byte pY ) {
+void cCreep::obj_InFrontFloorSwitch( byte pX, byte pY ) {
 	byte A;
 	if( mDump[ 0xBF00 + pY ] == 0x0B ) {
 		
@@ -2467,7 +2435,7 @@ void cCreep::GameMain() {
 	byte_B83 = 0;
 
 	for(;;) {
-		_sleep(5);
+		_sleep(10);
 		mScreen->refresh();
 
 		handleEvents();
@@ -2653,7 +2621,7 @@ void cCreep::stringPrint( ) {
 }
 
 // 580D
-void cCreep::screenDraw( word pDecodeMode, word pGfxID, word pGfxPosX, word pGfxPosY, byte pTxtCurrentID = 0 ) {
+void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID = 0 ) {
 	byte gfxPosTopY;
 	byte gfxHeight_0;
 
@@ -3925,7 +3893,7 @@ void cCreep::obj_InFrontDoor( byte pX, byte pY ) {
 
 	//40DD
 	word word_41D6 = *((word*) &mDump[ word_40 + 3 ]);
-	lvlPtrCalculate( word_41D6 );
+	lvlPtrCalculate( (word_41D6 & 0xFF) );
 	
 	mDump[ word_42 ] |= byte_8C0;
 
@@ -5109,11 +5077,11 @@ void cCreep::obj_PrepConveyor() {
 		byte gfxCurrentID = 0x82;
 		byte gfxDecodeMode = 0;
 
-		if( mDump[ word_3E ] & byte_5648 == 0 ) {
+		if( (mDump[ word_3E ] & byte_5648) == 0 ) {
 			mDump[ 0x70A6 ] = 0xC0;
 			mDump[ 0x70A8 ] = 0xC0;
 		} else {
-			if( mDump[ word_3E ] & byte_5647 == 0 ) {
+			if( (mDump[ word_3E ] & byte_5647) == 0 ) {
 				// 55BE
 				mDump[ 0x70A6 ] = 0xC0;
 				mDump[ 0x70A8 ] = 0x20;

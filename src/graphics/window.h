@@ -33,5 +33,9 @@
 
 			SDL_UpdateRect(  _surface, 0,0,0,0);
 		}
+
+		void titleSet( string pWindowTitle ) {
+			SDL_WM_SetCaption( pWindowTitle.c_str(), 0 );
+		}
 	};
 
