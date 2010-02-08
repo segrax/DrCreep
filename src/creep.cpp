@@ -328,6 +328,8 @@ void cCreep::sub_95F() {
 // 0B84
 void cCreep::mainLoop() {
 
+	mScreen->bitmapLoad( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
+
 	while(!mQuit) {
 		
 		if( Menu() == true )
@@ -559,8 +561,6 @@ bool cCreep::Menu() {
 
 			ScreenClear();
 			roomPrepare( );
-			
-			mScreen->bitmapLoad( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
 		}
 		
 		// 0BE1
@@ -685,9 +685,6 @@ void cCreep::handleEvents() {
 	sub_2E79();
 	sub_3F4F();
 	++byte_2E36;
-
-	mScreen->bitmapLoad( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
-	mScreen->spriteDraw();
 }
 
 void cCreep::sub_29AE() {
@@ -1771,12 +1768,6 @@ void cCreep::sub_3F4F() {
 				case 0x3FD5:		// Teleport
 					sub_3FD5( X );
 					break;
-				/*case 0x4075:
-					//obj_InFrontDoor( X );
-					break;
-				case 0x41D8:
-					//obj_InFrontButton( X );
-					break;*/
 				case 0x42AD:	// Lightning
 					obj_ExecLightningMachine( X );
 					break;
@@ -1786,38 +1777,18 @@ void cCreep::sub_3F4F() {
 				case 0x45E0:	// Forcefield
 					sub_45E0( X );
 					break;
-				/*case 0x4647:
-					break;
-				case 0x475E:
-					break;
-				case 0x47A7:
-					break;
-				case 0x4990:
-					break;
-				case 0x4A68:
-					break;*/
 				case 0x4B1A:		// RayGun Control
 					obj_ExecRayGun( X );
 					break;
-				/*case 0x4D70:
-					break;
-				*/
 				case 0x4E32:		// Teleport Flash
 					obj_ExecTeleport( X );
 					break;
-				/*case 0x4EA8:
-					break;*/
 				case 0x50D2:		// Floor Switch
 					obj_ExecFloorSwitch( X );
 					break;
-
 				case 0x538B:		// Conveyor
 					obj_ExecConveyor( X );
 					break;
-				/*case 0x548B:
-					break;
-				case 0x5611:
-					break;*/
 				default:
 					cout << "sub_3F4F: 0x";
 					cout << std::hex << func << "\n";
@@ -2326,10 +2297,6 @@ s10EB:;
 		mDump[ 0x11D7 ] ^= 0x01;
 		// TODO: Wait for vic interrupts
 
-
-		mScreen->bitmapLoad( &mDump[ 0xE000 ], &mDump[ 0xCC00 ], &mDump[ 0xD800 ], 0 );
-		mScreen->spriteDraw();
-		
 		mScreen->refresh();
 	}
 	// 11A5
