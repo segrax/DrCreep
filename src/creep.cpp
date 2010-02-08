@@ -5404,7 +5404,7 @@ void cCreep::obj_ExecMummy( byte pX ) {
 
 	AA = mDump[ 0xBD01 + pX ];
 	AA -= mDump[ 0xBD01 + Y ];
-	if( !(AA > 0)) {
+	if( AA < 0 ) {
 		AA ^= 0xFF;
 		++AA;
 	}
@@ -5415,7 +5415,7 @@ void cCreep::obj_ExecMummy( byte pX ) {
 	++mDump[ 0xBD03 + pX ];
 	if( mDump[ 0xBD01 + pX ] < mDump[ 0xBD01 + Y ] ) {
 		// 3881
-		if( (mDump[ word_3C ] & 4) == 0 )
+		if( !(mDump[ word_3C ] & 0x04) )
 			return;
 		
 		// 3889
@@ -5431,7 +5431,7 @@ void cCreep::obj_ExecMummy( byte pX ) {
 
 		--mDump[ 0xBD01 + pX ];
 		A = mDump[ 0xBD03 + pX ];
-		if( A >= 0x4B || A >= 0x4E)
+		if( A < 0x4B || A >= 0x4E)
 			mDump[ 0xBD03 + pX ] = 0x4B;
 	}
 
