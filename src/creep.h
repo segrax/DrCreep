@@ -22,7 +22,7 @@ private:
 	byte		 byte_20DE, byte_24FD, RunRestorePressed;
 	byte		 byte_2E02;
 
-	byte		 byte_2E35, byte_2E36, byte_2232;					// Conveyor
+	byte		 mInterruptCounter, byte_2E36, byte_2232;					// Conveyor
 
 	byte		 byte_34D6, byte_3638;
 	word		 word_41D3;
@@ -193,4 +193,6 @@ public:
 		void	 stringDraw( );
 		void	 roomPrepare( );
 		void	 run();
+
+		void	 interruptWait();
 };

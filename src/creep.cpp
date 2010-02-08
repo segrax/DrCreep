@@ -52,7 +52,7 @@ cCreep::cCreep() {
 
 	byte_20DE = 0x00;
 	byte_24FD = 0x00;
-	byte_2E35 = 0x00;
+	mInterruptCounter = 0x00;
 	byte_2E36 = 0xA0;
 
 	byte_3638 = 0xBA;
@@ -99,6 +99,14 @@ void cCreep::run() {
 	
 	start();
 
+}
+
+void cCreep::interruptWait() {
+
+	// TODO: Proper time check 
+	_sleep(10);
+	--mInterruptCounter;
+	
 }
 
 //08C2
@@ -323,6 +331,11 @@ void cCreep::sub_95F() {
 	mDump[ 0x21 ] = 0;
 
 	mScreen->spriteDisable();
+
+	mInterruptCounter = 2;
+	while(mInterruptCounter > 0)
+		interruptWait();
+
 }
 
 // 0B84
@@ -576,17 +589,14 @@ bool cCreep::Menu() {
 
 		for(;;) {
 
-			_sleep(10);
-
 			if( mMenuScreenTimer )
 				handleEvents();
 			else {
 				// C0D
-				// TODO
-				//while(byte_2E35)
-				//	;
+				while(mInterruptCounter > 0)
+					interruptWait();
 
-				byte_2E35 = 2;
+				mInterruptCounter = 2;
 			}
 
 			mScreen->refresh();
@@ -675,11 +685,10 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 
 void cCreep::handleEvents() {
 	// 2E1D
-	//TODO
-	//while(byte_2E35)
-	// ;
+	while(mInterruptCounter > 0)
+		interruptWait();
 	
-	byte_2E35 = 2;
+	mInterruptCounter = 2;
 
 	sub_2E37();
 	sub_2E79();
@@ -2242,7 +2251,7 @@ s10EB:;
 
 	// 110E
 	for( ;; ) {
-		byte_2E35 = 1;
+		mInterruptCounter = 1;
 
 		byte X = mDump[ 0x11D7 ];
 
@@ -2295,7 +2304,9 @@ s10EB:;
 		
 		// 1195
 		mDump[ 0x11D7 ] ^= 0x01;
-		// TODO: Wait for vic interrupts
+
+		while(mInterruptCounter > 0)
+			interruptWait();
 
 		mScreen->refresh();
 	}
@@ -2402,7 +2413,6 @@ void cCreep::GameMain() {
 	byte_B83 = 0;
 
 	for(;;) {
-		_sleep(10);
 		mScreen->refresh();
 
 		handleEvents();
@@ -2413,10 +2423,18 @@ void cCreep::GameMain() {
 		}
 		
 		if( RunRestorePressed == 1 ) {
-			byte_2E35 = 3;
+			//150E
+			for(;;) {
+				mInterruptCounter = 3;
 			
-			KeyboardJoystickMonitor( 0 );
-			// TODO: 150E
+				while(mInterruptCounter > 0)
+					interruptWait();
+
+				KeyboardJoystickMonitor( 0 );						
+			
+				if( RunRestorePressed != 1 )
+					break;
+			}
 
 		}
 		// 156B
@@ -3219,11 +3237,13 @@ void cCreep::obj_MultiDraw() {
 void cCreep::sub_1935( byte pA ) {
 	byte byte_194F = pA;
 
-	/*for( byte X = 6;; --X ) {
-		byte_2E35 = byte_194F;
+	for( byte X = 6; X > 0; --X ) {
+		mInterruptCounter = byte_194F;
 
-	}*/
-	// TODO: Some type of sleep function
+		while(mInterruptCounter > 0)
+			interruptWait();
+	}
+
 }
 
 // 1950: 
@@ -3326,7 +3346,11 @@ void cCreep::sub_1950() {
 		mDump[ 0xD027 + Y ] = A;
 		sprite->_color = A;
 		--mDump[ 0x1AE4 ];
-		byte_2E35 = 2;
+		mInterruptCounter = 2;
+
+		// 1A95
+		while(mInterruptCounter > 0)
+			interruptWait();
 	}
 
 	// 1AA7
