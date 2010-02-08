@@ -5412,8 +5412,10 @@ void cCreep::obj_ExecMummy( byte pX ) {
 	if( AA < 2 )
 		return;
 
+	// Frame
 	++mDump[ 0xBD03 + pX ];
 	if( mDump[ 0xBD01 + pX ] < mDump[ 0xBD01 + Y ] ) {
+		// Walking Right
 		// 3881
 		if( !(mDump[ word_3C ] & 0x04) )
 			return;
@@ -5425,6 +5427,7 @@ void cCreep::obj_ExecMummy( byte pX ) {
 				mDump[ 0xBD03 + pX ] = 0x4E;
 	
 	} else {
+		// Walking Left
 		// 389F
 		if( !(mDump[ word_3C ] & 0x40) )
 			return;
