@@ -1075,8 +1075,33 @@ bool cCreep::objectActionInFront( byte pX, byte pY ) {
 
 // 30D9
 void cCreep::ObjectHitsObject( byte pX ) {
-	cout << "objectHitsObject\n";
+	
+	if( mDump[ 0xBD04 + pX ] & byte_884 )
+		return;
 
+	mDump[ 0x311D ] = 1;
+	//mDump[ 0x311C ] = pY;
+	
+	byte Y = mDump[ 0xBD00 + pX ] << 3;
+	word func = *((word*) &mDump[ 0x891 + Y ]);
+	
+	switch( func ) {
+
+		case 0x3534:				// Lightning Hit Player
+			sub_3534( pX, pY );
+			break;
+
+		default:
+			cout << "objectHitsObject: 0x";
+			cout << std::hex << func << "\n";
+			break;
+	}
+
+	// 3104
+	if( mDump[ 0x311D ] != 1 )
+		return;
+
+	mDump[ 0xBD04 + pX ] |= byte_883;
 }
 
 void cCreep::sub_3026( byte pX ) {
