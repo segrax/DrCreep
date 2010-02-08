@@ -16,6 +16,7 @@ private:
 	bool		 mMenuIntro;
 	byte		 mMenuMusicScore, mMenuScreenCount, mMenuScreenTimer;
 	byte		 mUnlimitedLives;
+	timeb		 mTimePrevious;
 
 	bool		 mQuit;
 
@@ -126,8 +127,9 @@ public:
 		void	 sub_3026( byte pX );
 		void	 obj_ExecPlayer( byte pX );
 		void	 sub_3488( byte pX );
-		void	 obj_InFrontFloorSwitch( byte pX, byte pY );
+		void	 obj_InFrontPlayer( byte pX, byte pY );
 		void	 sub_359E( );
+		void	 sub_38CE( byte pX, byte pY );
 		void	 sub_3A60( byte pX, byte pY );
 		void	 sub_3A7F( byte pX );
 		void	 obj_ExecFrankie( byte pX );
@@ -139,10 +141,13 @@ public:
 		void	 obj_ExecForcefield( byte pX );
 		void	 sub_3757( );
 		void	 sub_396A( byte pA, byte pX );
-		void	 obj_ExecRayGunLaser( byte pX);
+		void	 obj_ExecMummy( byte pX );
+		void	 obj_ExecRayGunLaser( byte pX );
 		void	 sub_3F14( byte &pX );
 		void	 sub_3FD5( byte pX );
-		
+
+		void	 obj_InFrontMummyRelease( byte pX, byte pY );
+
 		void	 obj_PrepFrankenstein();
 		void	 obj_PrepKey( );
 		void	 obj_PrepLadder();
@@ -159,11 +164,12 @@ public:
 		void	 obj_PrepTrapDoor();
 		void	 obj_PrepWalkway( );
 		
-		void	 sub_45E0( byte pX );
+		void	 obj_ExecForcefieldTimer( byte pX );
 
 		void	 obj_ExecConveyor( byte pX );
 		void	 obj_ExecFloorSwitch( byte pX );
 		void	 obj_ExecLightningMachine( byte pX );
+		void	 obj_ExecMummyRelease( byte pX );
 		void	 obj_ExecRayGun( byte pX );
 		void	 obj_ExecTeleport( byte pX );
 

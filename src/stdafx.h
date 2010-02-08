@@ -1,14 +1,17 @@
+#include <iostream>
 #include <vector>
 #include <string>
 #include <sstream>
 #include <fstream>
 #include <map>
+#include <sys/timeb.h>
 
 using namespace std;
 
 #include <sdl.h>
 #include "types.h"
 #include "graphics/scale/scalebit.h"
+
 
 extern const char *SVNREV;
 extern const char *SVNDATE;
