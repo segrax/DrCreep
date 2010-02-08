@@ -25,6 +25,8 @@ private:
 
 	byte		 mInterruptCounter, byte_2E36, byte_2232;					// Conveyor
 
+	byte		 byte_311D;
+
 	byte		 byte_34D6, byte_3638;
 	word		 word_41D3;
 
@@ -97,7 +99,7 @@ public:
 		void	 handleEvents();
 		void	 Game();
 		void	 GameMain();
-		void	 GameAction();
+		void	 sprite_FlashOnOff( byte pX );
 		void	 gameMenuDisplaySetup();
 		void	 KeyboardJoystickMonitor( byte pA );
 		void	 mainLoop();
@@ -105,7 +107,7 @@ public:
 		void	 ObjectActions( byte pX );
 		bool	 ObjectActionFunction( byte pX, byte pY );
 		bool	 objectActionInFront( byte pX, byte pY );
-		void	 ObjectHitsObject( byte pX );
+		void	 ObjectHitsObject( byte pX, byte pY );
 		void	 objectFunction( byte pX );
 		void	 optionsMenu();
 		bool	 Menu();
@@ -128,12 +130,14 @@ public:
 		void	 obj_ExecPlayer( byte pX );
 		void	 sub_3488( byte pX );
 		void	 obj_InFrontPlayer( byte pX, byte pY );
+		void	 obj_HitPlayer( byte pX, byte pY );
 		void	 sub_359E( );
 		void	 sub_38CE( byte pX, byte pY );
 		void	 sub_3A60( byte pX, byte pY );
 		void	 sub_3A7F( byte pX );
 		void	 obj_ExecFrankie( byte pX );
 		void	 sub_3D6E( byte pX, byte pY );
+		void	 obj_HitFrankie( byte pX, byte pY );
 		void	 sub_3E87( );
 		void	 sub_3F4F( );
 		void	 obj_ExecLightning( byte pX );

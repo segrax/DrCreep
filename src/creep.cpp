@@ -706,6 +706,8 @@ void cCreep::handleEvents() {
 	sub_2E79();
 	sub_3F4F();
 	++byte_2E36;
+
+	mScreen->refresh();
 }
 
 void cCreep::sub_29AE() {
@@ -847,7 +849,7 @@ void cCreep::sub_2E79( ) {
 				} else {
 					// 2EF3
 s2EF3:
-					GameAction();
+					sprite_FlashOnOff( X );
 				}
 
 			} else {
@@ -1074,21 +1076,31 @@ bool cCreep::objectActionInFront( byte pX, byte pY ) {
 }
 
 // 30D9
-void cCreep::ObjectHitsObject( byte pX ) {
+void cCreep::ObjectHitsObject( byte pX, byte pY ) {
 	
 	if( mDump[ 0xBD04 + pX ] & byte_884 )
 		return;
 
-	mDump[ 0x311D ] = 1;
-	//mDump[ 0x311C ] = pY;
+	byte_311D = 1;
+	mDump[ 0x311C ] = pY;
 	
 	byte Y = mDump[ 0xBD00 + pX ] << 3;
 	word func = *((word*) &mDump[ 0x891 + Y ]);
-	
-	switch( func ) {
 
-		case 0x3534:				// Lightning Hit Player
-			sub_3534( pX, pY );
+	switch( func ) {
+		case 0:
+			break;
+
+		case 0x3534:				//  Hit Player
+			obj_HitPlayer( pX, pY );
+			break;
+
+		case 0x3682:
+			byte_311D = 0;
+			break;
+
+		case 0x3DDE:				//  Hit Frankie
+			obj_HitFrankie( pX, pY );
 			break;
 
 		default:
@@ -1098,7 +1110,7 @@ void cCreep::ObjectHitsObject( byte pX ) {
 	}
 
 	// 3104
-	if( mDump[ 0x311D ] != 1 )
+	if( byte_311D != 1 )
 		return;
 
 	mDump[ 0xBD04 + pX ] |= byte_883;
@@ -1148,10 +1160,10 @@ void cCreep::sub_3026( byte pX ) {
 										// 30A5
 										if( byte_311A >= mDump[ 0xBD02 + Y ] ) {
 											if( (mDump[ 0xBD02 + Y ] + mDump[ 0xBD0B + Y ]) >= byte_3119 ) {
-												ObjectHitsObject( pX );
+												ObjectHitsObject( pX, Y);
 												pX = byte_3116;
 												Y = byte_3115;
-												ObjectHitsObject( pX );
+												ObjectHitsObject( pX, Y );
 											}
 											// 30C5
 											pX = byte_3115;
@@ -1176,8 +1188,69 @@ void cCreep::sub_3026( byte pX ) {
 	// 30D5
 }
 
-void cCreep::GameAction() {
+//2F8A
+void cCreep::sprite_FlashOnOff( byte pX ) {
+	byte A = mDump[ 0xBD04 + pX ];
 
+	cSprite *sprite = mScreen->spriteGet( pX >> 5 );
+
+	if( !(A & byte_883) ) {
+		
+		if( !(mDump[ 0xBD08 + pX ] )) {
+			A = mDump[ 0xBD04 + pX ] ^ byte_884;
+		} else
+			goto s2FE9;
+	
+	} else {
+		// 2FA3
+		A ^= byte_883;
+		mDump[ 0xBD04 + pX ] = A;
+		byte Y = mDump[ 0xBD00 + pX ] << 3;
+		
+		A = mDump[ 0x896 + Y ];
+		if(!(A & byte_88E))
+			A = mDump[ 0xBD04 + pX ];
+		else
+			goto s2FC4;
+	}
+	// 2FBB
+	mDump[ 0xBD04 + pX ] = A | byte_885;
+	return;
+
+s2FC4:;
+	mDump[ 0xBD08 + pX ] = 8;
+	byte Y = pX >> 5;
+
+	// Sprite multicolor mode
+	mDump[ 0xD01C ] = (mDump[ 0x2F82 + Y ] ^ 0xFF) & mDump[ 0xD01C ];
+	sprite->_rMultiColored = false;
+	
+	mDump[ 0xBD04 + pX ] |= byte_884;
+	mDump[ 0xBD06 + pX ] = 1;
+
+s2FE9:;
+	if(! (byte_2E36 & 1) ) {
+		// Flash On
+		// 2FF0
+		Y = pX >> 5;
+		sprite->_color = 1;
+
+		mDump[ 0xD027 + Y ] = 1;
+		--mDump[ 0xBD08 + pX ];
+
+		mDump[ 0x760C ] = mDump[ 0xBD08 + pX ] << 3;
+		sub_21C8(8);
+		
+	} else {
+		// Flash Off
+		// 3010
+		Y = pX >> 5;
+		sprite->_color = 0;
+		mDump[ 0xD027 + Y ] = 0;
+	}
+
+	// 301C
+	mDump[ 0xBD05 + pX ] = mDump[ 0xBD06 + pX ];
 }
 
 // Originally this was not a function, but its too big to bother
@@ -1769,6 +1842,69 @@ void cCreep::sub_3D6E( byte pX, byte pY ) {
 	}
 }
 
+// 3DDE: Franky Hit 
+void cCreep::obj_HitFrankie(byte pX, byte pY) {
+	if( mDump[ 0xBD1E + pX ] & byte_574E ) {
+		byte A = mDump[ 0xBD00 + pY ];
+
+		if( A && A != 2 && A != 3 ) {
+			// 3DF3
+			if( A != 5 ) {
+			
+				word_40 = word_5748 + mDump[ 0xBD1F + pX ];
+				mDump[ word_40 ] = ((byte_574E ^ 0xFF) & mDump[ word_40 ]) | byte_574D;
+				return;
+
+			} else {
+				// 3E18
+				A = mDump[ 0xBD03 + pX ];
+				if( A >= 0x8A && A < 0x8F ) {
+					// 3E23
+					A = mDump[ 0xBD03 + pY ];
+					if( A < 0x8A || A >= 0x8F ) {
+						byte_311D = 0;
+						return;
+					}
+					// 3E2E
+					if( mDump[ 0xBD02 + pX ] == mDump[ 0xBD02 + pY ] ) {
+						byte_311D = 0;
+						return;
+					}
+					if( mDump[ 0xBD02 + pX ] < mDump[ 0xBD02 + pY ] ) {
+						mDump[ 0xBD1C + pX ] &= 0xEF;
+						byte_311D = 0;
+						return;
+					}
+					// 3E43
+					mDump[ 0xBD1C + pX ] &= 0xFE;
+					byte_311D = 0;
+					return;
+				}
+				// 3E4E
+				byte A =  mDump[ 0xBD03 + pX ];
+				byte B = mDump[ 0xBD03 + pY ];
+
+				// 3E51
+				if( A < 0x84 || A >= 0x8A || B < 0x84 || B >= 0x8A ) {
+					byte_311D = 0;
+					return;
+				}
+				if( mDump[ 0xBD01 + pX ] < mDump[ 0xBD01 + pY ] ) {
+					mDump[ 0xBD1C + pX ] &= 0xFB;
+					byte_311D = 0;
+					return;
+				}
+				// 3E77
+				mDump[ 0xBD1C + pX ] &= 0xBF;
+			}
+		} 	
+	}
+
+	// 3E4B
+	byte_311D = 0;
+	return;
+}			
+
 // 3E87: 
 void cCreep::sub_3E87() {
 	if( mDump[ word_3E ] & byte_574D )
@@ -2115,6 +2251,7 @@ sEFC:;
 					mDump[ 0xF62 ] = 1;
 				} else {
 				// EDE
+					// Player Died
 					if( mUnlimitedLives != 0xFF ) {
 						--mDump[ 0x7807 + X ];
 						byte A = mDump[ 0x7807 + X ];
@@ -2408,6 +2545,50 @@ void cCreep::obj_InFrontPlayer( byte pX, byte pY ) {
 	return;
 }
 
+// 3534: Hit Player
+void cCreep::obj_HitPlayer( byte pX, byte pY ) {
+	byte A = mDump[ 0xBD00 + pY ];
+
+	if( A == 2 ) {
+		byte_311D = 0;
+		return;
+	}
+
+	if( A != 0 ) {
+		// 358C
+		if( mDump[ 0x780D + mDump[ 0xBD1C + pX ] ] != 0 ) {
+			byte_311D = 0;
+			return;
+		}
+
+		mDump[ 0x780D + mDump[ 0xBD1C + pX ] ] = 2;
+		return;
+	}
+	// 353F
+
+	A = mDump[ 0xBD03 + pY ];
+
+	if( A == 0x2E || A == 0x2F || A == 0x30 || A == 0x31 || A == 0x26 ) {
+		byte_311D = 0;
+		return;
+	} 
+	
+	if( mDump[ 0xBD02 + pY ] == mDump[ 0xBD02 + pX ] ) {
+		byte_311D = 0;
+		return;
+	}
+	if( mDump[ 0xBD02 + pY ] >= mDump[ 0xBD02 + pX ] ) {
+		mDump[ 0xBD18 + pX ] = 0xEF;
+		byte_311D = 0;
+		return;
+	}
+
+	mDump[ 0xBD18 + pX ] = 0xFE;
+	byte_311D = 0;
+	return;
+}
+
+// 359E
 void cCreep::sub_359E( ) {
 	byte X;
 	sub_3F14( X );
@@ -2465,7 +2646,6 @@ void cCreep::GameMain() {
 	byte_B83 = 0;
 
 	for(;;) {
-		mScreen->refresh();
 
 		handleEvents();
 		if( byte_5F6A == 1 ) {
