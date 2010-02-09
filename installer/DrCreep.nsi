@@ -186,7 +186,7 @@ no:
    
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
   
-  Delete "$DESKTOP\creep.lnk"
+  Delete "$DESKTOP\DrCreep.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\DrCreep.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
   RMDir  "$SMPROGRAMS\$MUI_TEMP"
