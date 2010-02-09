@@ -63,7 +63,7 @@ private:
 	byte		 byte_3FD4;
 
 	byte		 byte_840, byte_841, byte_883, byte_884, byte_885, byte_886, byte_887, byte_888, byte_889, byte_88A, byte_88B, byte_88C, byte_88D, byte_88E, byte_882, byte_D10, byte_D12;
-	byte		 byte_839, byte_83E, byte_83F, byte_8C0, byte_8C1, byte_5CE2;
+	byte		 byte_839, mImageCount, byte_83F, byte_8C0, byte_8C1, byte_5CE2;
 	byte		 byte_B83, byte_603A, byte_5FD7;
 	byte		 byte_5FD5, byte_5FD6, byte_5FD8, byte_5F6A;
 	
@@ -118,12 +118,12 @@ public:
 		bool	 Menu();
 		void	 SavePosition();
 		void	 SpriteDraw();
-		void	 SpriteMovement( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
+		void	 img_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
 		void	 start( size_t pStartLevel );	
 		void	 sub_95F();
 		void	 mapRoomDraw();
 		void	 obj_MultiDraw(); 
-		void	 sub_1935( byte pA );
+		void	 hw_IntSleep( byte pA );
 		void	 gameEscapeCastle();
 		void	 sub_1B9F();
 		void	 highscoresDisplay();
@@ -134,31 +134,31 @@ public:
 		void	 sub_2973();
 		void	 sub_29AE();
 		void	 sub_29D0( byte pA, byte pY );
-		void	 sub_2E37();
-		void	 sub_2E79( );
-		void	 sub_3026( byte pX );
+		void	 obj_CollisionSet();
+		void	 obj_Execute( );
+		void	 obj_CheckCollisions( byte pX );
 		void	 obj_ExecPlayer( byte pX );
-		void	 sub_3488( byte pX );
+		void	 obj_Player_Unk( byte pX );
 		void	 obj_InFrontPlayer( byte pX, byte pY );
 		void	 obj_HitPlayer( byte pX, byte pY );
-		void	 sub_359E( );
-		void	 sub_38CE( byte pX, byte pY );
+		void	 obj_Player_Add( );
+		void	 obj_Mummy_Unk2( byte pX, byte pY );
 		void	 sub_3A60( byte pX, byte pY );
-		void	 sub_3A7F( byte pX );
+		void	 obj_RayGun_Laser_Create( byte pX );
 		void	 obj_ExecFrankie( byte pX );
 		void	 sub_3D6E( byte pX, byte pY );
 		void	 obj_HitFrankie( byte pX, byte pY );
-		void	 sub_3E87( );
-		void	 sub_3F4F( );
+		void	 obj_Frank_Create( );
+		void	 img_Execute( );
 		void	 obj_ExecLightning( byte pX );
-		void	 sub_368A( byte &pY );
+		void	 obj_Lightning_Unk( byte &pY );
 		void	 obj_ExecForcefield( byte pX );
-		void	 sub_3757( );
-		void	 sub_396A( byte pA, byte pX );
+		void	 obj_Forcefield_Create( );
+		void	 obj_Mummy_Unk( byte pA, byte pX );
 		void	 obj_ExecMummy( byte pX );
 		void	 obj_ExecRayGunLaser( byte pX );
-		void	 sub_3F14( byte &pX );
-		void	 sub_3FD5( byte pX );
+		void	 obj_FindFree( byte &pX );
+		void	 obj_ExecDoor( byte pX );
 
 		void	 obj_InFrontMummyRelease( byte pX, byte pY );
 
@@ -198,18 +198,18 @@ public:
 		void	 obj_InFrontRaygunControl( byte pX, byte pY );
 		void	 obj_InFrontTeleport( byte pX, byte pY );
 
-		void	 sub_4DE9( byte pA );
+		void	 obj_RayGun_UpdateControl( byte pA );
 		void	 sub_505C( byte pA, byte pX );
 		void	 sub_5171( byte pA );
 		void	 sub_526F( char &pA );
-		bool	 sub_5750( byte &pX );
+		bool	 img_FindFree( byte &pX );
 		void	 sub_57DF( byte pX );
 		bool	 sub_5E8E( byte pA, byte pX, byte pY );
 
 		void	 hw_SaveFile( );
 		void	 hw_SpritePrepare( byte &pX );
 
-		byte	 sub_5ED5( );
+		byte	 seedGet( );
 		void	 sub_5F6B( byte &pX );
 		void	 sub_5FA3();
 		void	 sub_6009( byte pA );
