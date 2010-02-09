@@ -24,7 +24,7 @@ void cPlayerInput::inputCheck( bool pClearAll ) {
 
 		KeyboardCheck();
 		KeyboardInputSet1( &mInput[ 0 ] );
-
+		KeyboardInputSet2( &mInput[ 1 ] );
 	}
 
 	return;
@@ -80,6 +80,50 @@ void cPlayerInput::KeyboardInputSet1( sPlayerInput *pInput ) {
 			break;
 
 		case SDLK_UP:
+			if( mEvent.type == SDL_KEYDOWN )
+				pInput->mUp = true;
+			else
+				pInput->mUp = false;
+
+			break;
+	}
+}
+
+void cPlayerInput::KeyboardInputSet2( sPlayerInput *pInput ) {
+	switch( mEvent.key.keysym.sym ) {
+		case SDLK_KP0:
+			if( mEvent.type == SDL_KEYDOWN )
+				pInput->mButton = true;
+			else
+				pInput->mButton = false;
+
+			break;
+
+		case SDLK_KP4:
+
+			if( mEvent.type == SDL_KEYDOWN )
+				pInput->mLeft = true;
+			else
+				pInput->mLeft = false;
+
+			break;
+
+		case SDLK_KP6:
+			if( mEvent.type == SDL_KEYDOWN )
+				pInput->mRight = true;
+			else
+				pInput->mRight = false;
+
+			break;
+
+		case SDLK_KP2:
+			if( mEvent.type == SDL_KEYDOWN )
+				pInput->mDown = true;
+			else
+				pInput->mDown = false;
+			break;
+
+		case SDLK_KP8:
 			if( mEvent.type == SDL_KEYDOWN )
 				pInput->mUp = true;
 			else

@@ -19,6 +19,7 @@ private:
 
 	void		 KeyboardCheck();
 	void		 KeyboardInputSet1( sPlayerInput *pInput );
+	void		 KeyboardInputSet2( sPlayerInput *pInput );
 
 public:
 				 cPlayerInput();

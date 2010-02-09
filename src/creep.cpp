@@ -2859,7 +2859,7 @@ void cCreep::obj_Player_Add( ) {
 	obj_FindFree( X );
 	
 	byte Y = byte_3638;
-	mDump[ 0x34D1 + Y ] = X;
+	mDump[ 0x34D1 + Y ] = X;		// Set player object number
 	
 	byte A = mDump[ 0x780B + Y ];
 	A <<= 3;
