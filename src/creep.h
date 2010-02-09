@@ -103,7 +103,7 @@ public:
 		void	 gameMenuDisplaySetup();
 		void	 KeyboardJoystickMonitor( byte pA );
 		void	 mainLoop();
-		void	 MapDisplay();
+		void	 mapDisplay();
 		void	 ObjectActions( byte pX );
 		bool	 ObjectActionFunction( byte pX, byte pY );
 		bool	 objectActionInFront( byte pX, byte pY );

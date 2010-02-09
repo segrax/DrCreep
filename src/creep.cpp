@@ -670,9 +670,11 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 
 	sPlayerInput *input = mInput->inputGet( pA );
 
+	// Pause the game, or enter the options menu
 	if( mInput->runStopGet() )
 		mRunStopPressed = true;
 
+	// Kill the player(s) if the restore key is pressed
 	if( mInput->restoreGet() ) {
 		byte_B83 = 1;
 	}
@@ -2219,7 +2221,7 @@ void cCreep::Game() {
 		}
 
 		// E7D
-		MapDisplay();
+		mapDisplay();
 		GameMain();
 		ScreenClear();
 		
@@ -2297,7 +2299,7 @@ sEFC:;
 }
 
 // F94: Display the map/time taken screen
-void cCreep::MapDisplay() {
+void cCreep::mapDisplay() {
 	byte gfxPosX, gfxPosY;
 
 sF99:;
@@ -2309,6 +2311,7 @@ sF99:;
 	// Draw both players Name/Time/Arrows
 	// FA9
 	for(;; ) {
+
 		byte X = mDump[ 0x11D7 ];
 
 		if( mDump[ 0x11C9 + X ] == 1 ) {
@@ -2369,7 +2372,7 @@ sF99:;
 			// Sprite Y
 			sprite->_Y = A;
 			mDump[ 0x18 + mDump[ 0x11D8 ] ] = A;
-			mDump[ 0xBD03 + X ] = mDump[ 0x11E2 + Y ];
+			mDump[ 0xBD03 + X ] = mDump[ 0x11E2 + mDump[0x11D9] ];
 			
 			// Enable the Arrow sprite
 			hw_SpritePrepare( X );
@@ -2379,20 +2382,22 @@ sF99:;
 			sprite->_rEnabled = true;
 
 			// 103C
-			X = mDump[ 0x7807 + mDump[ 0x11D7 ] ];
+			Y = mDump[ 0x11D7 ];
+			X = mDump[ 0x7807 + Y ];
 			A = mDump[ 0x11E5 + X ];
 
+			
 			mDump[ 0x11EF ] = mDump[ 0x11FA ] = A;
 			X = Y << 1;
 			
+			// Player (One Up / Two Up)
 			word_3E = mDump[ 0x11E9 + X ];
 			word_3E += (mDump[ 0x11EA + X ] << 8);
 
-			// Player (One Up / Two Up)
 			stringPrint();
 
 			// 1058
-			word_3E = (Y << 1);
+			word_3E = (Y << 2);
 			word_3E += 0x7855;
 
 			sub_29AE();
