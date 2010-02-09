@@ -61,7 +61,8 @@ void cScreen::scaleSet( byte pScale ) {
 
 	mWindow = new cVideoWindow( width, height, 4 );
 	mSDLSurfaceScaled =	SDL_CreateRGBSurface(	SDL_SWSURFACE,	width, height,	 32, 0, 0, 0, 0);
-	mWindow->titleSet( mWindowTitle );
+
+	levelNameSet("");
 }
 
 void cScreen::bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 ) {
@@ -144,6 +145,18 @@ cSprite *cScreen::spriteGet( byte pCount ) {
 		return 0;
 
 	return mSprites[pCount];
+}
+
+void cScreen::levelNameSet( string pName ) {
+	stringstream windowTitle;
+
+	windowTitle << mWindowTitle;
+	windowTitle << ". '";
+	windowTitle << pName;
+	windowTitle << "' (SVN: " << SVNREV;
+	windowTitle << "-" << SVNDATE << ")";
+
+	mWindow->titleSet( windowTitle.str() );
 }
 
 void cScreen::refresh() {

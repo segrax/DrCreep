@@ -16,8 +16,7 @@ cCreep::cCreep() {
 	size_t RomSize;
 
 	stringstream windowTitle;
-	windowTitle << "The Castles of Dr. Creep - SVN: " << SVNREV;
-	windowTitle << "(" << SVNDATE << ")";
+	windowTitle << "The Castles of Dr. Creep";
 
 	mScreen = new cScreen( windowTitle.str() );
 	mOrigObjectSize = 0;
@@ -139,27 +138,17 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 		cin >> lvl;
 
 		playLevel = atoi( lvl.c_str() );
+		
+		// Level numbers begin at 1 on the list, but 0 in the actual game
+		if(playLevel)
+			--playLevel;
+
 	}
 
-#ifdef WIN32
 	if( !consoleShow ) {
 		HWND hWnd = GetConsoleWindow();
 		ShowWindow( hWnd, SW_HIDE );
-	} else {
-		// Display the console
-	    AllocConsole();
-	    SetConsoleTitle( L"The Castles of Dr.Creep" );
-
-        // Assign Standard Output
-	    HANDLE handle_out = GetStdHandle(STD_OUTPUT_HANDLE);
-        int hCrt = _open_osfhandle((long) handle_out, _O_TEXT);
-        FILE* hf_out = _fdopen(hCrt, "w");
-        setvbuf(hf_out, NULL, _IONBF, 1);
-        *stdout = *hf_out;
-	    // --Assign Standard Output
-
 	}
-#endif
 
 	mScreen->scaleSet( 2 );
 	start( playLevel );
@@ -261,7 +250,8 @@ void cCreep::start( size_t pStartLevel ) {
 
 		}
 
-		changeLevel( pStartLevel );
+		if(changeLevel( pStartLevel ) == false)
+			return;
 
 	} else {
 		// 0x953
@@ -275,7 +265,7 @@ void cCreep::displayLevels() {
 	vector<string> files = directoryList( "castles\\Z*" );
 	vector<string>::iterator fileIT;
 
-	size_t number = 0;
+	size_t number = 1;
 
 	for(fileIT = files.begin(); fileIT != files.end(); ++fileIT ) {
 		string castleName = (*fileIT).substr(1);
@@ -289,22 +279,40 @@ void cCreep::displayLevels() {
 
 }
 
-void cCreep::changeLevel( size_t pNumber ) {
+bool cCreep::changeLevel( size_t pNumber ) {
 	vector<string> files = directoryList( "castles\\Z*" );
 	
 	size_t size = 0;
 	string lvlFile = "castles\\";
-	if(files.size() < pNumber)
-		return;
 
-	cout << "Loading Castle '" << files[pNumber] << "'\n";
+	// Are any castles available?
+	if(files.size() == 0 )
+		return false;
 
+	// Select first available if a bad number was provided
+	if( files.size() < (pNumber+1) )
+		pNumber = 0;
+
+	// Generate castle name
+	string castleName = files[pNumber].substr(1);
+	std::transform(castleName.begin(), castleName.end(), castleName.begin(), tolower);
+	castleName[0] = toupper( castleName[0] );
+
+	cout << "Loading Castle '" << castleName << "'\n";
+	
+	// Set the window title screen
+	mScreen->levelNameSet( castleName );
+
+	// Filename to load
 	lvlFile.append( files[pNumber] );
 
 	delete mLevel;
 	mLevel = fileRead( lvlFile, size );
 
+	// Copy it into the memory region
 	memcpy( &mDump[0x9800], mLevel + 2, size - 2 );
+
+	return true;
 }
 
 // 0x7572

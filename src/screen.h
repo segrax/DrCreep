@@ -39,6 +39,8 @@ public:
 	void					 spriteDisable();
 	void					 spriteDraw();
 	cSprite					*spriteGet( byte pCount );
+
+	void					 levelNameSet( string pName );
 	void					 refresh();
 
 	inline vector< sScreenPiece* > *collisionsGet() { return &mCollisions; }

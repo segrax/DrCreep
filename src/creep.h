@@ -96,7 +96,7 @@ public:
 		void	 ScreenClear();
 		void	 roomLoad();
 		void	 displayLevels();
-		void	 changeLevel( size_t pNumber );
+		bool	 changeLevel( size_t pNumber );
 
 		void	 obj_stringPrint(  );
 		void	 sub_1AE6();

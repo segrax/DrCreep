@@ -7,6 +7,10 @@ const char	 *gDataPath = "data\\";
 cCreep		 *gCreep;
 
 int	main( int argc, char *argv[] ) {
+	
+#ifdef WIN32
+	SetConsoleTitle( L"The Castles of Dr.Creep" );
+#endif
 
 	gCreep = new cCreep();
 	
