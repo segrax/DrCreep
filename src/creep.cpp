@@ -1185,7 +1185,9 @@ void cCreep::ObjectActions( byte pX ) {
 		return;
 
 	byte_31EF = byte_83E << 3;
-	for( byte Y = 0; Y != byte_31EF; Y = byte_31F0 + 8) {
+	word tmp = byte_83E << 3;
+
+	for( word Y = 0; Y != tmp; Y = byte_31F0 + 8) {
 
 		byte_31F0 = Y;
 		if( mDump[ 0xBF04 + Y ] & byte_83F )
