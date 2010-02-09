@@ -117,6 +117,7 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	size_t	playLevel = 0;
 	bool	playLevelSet = false;
 
+	// Check command line parameters
 	while( count < pArgCount ) {
 		string arg = string( pArgs[count] );
 
@@ -131,6 +132,7 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 		++count;
 	}
 
+	// If the level wasn't set on command line, request it from the user
 	if(!playLevelSet) {
 		castleDisplayList();
 		string lvl;
@@ -138,21 +140,23 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 		cin >> lvl;
 
 		playLevel = atoi( lvl.c_str() );
-		
-		// Level numbers begin at 1 on the list, but 0 in the actual game
-		if(playLevel)
-			--playLevel;
-
 	}
 
+	// Level numbers begin at 1 in the list, but 0 in the actual game
+	if(playLevel)
+		--playLevel;
+
+	// Hide the console unless its requested by user
 	if( !consoleShow ) {
 		HWND hWnd = GetConsoleWindow();
 		ShowWindow( hWnd, SW_HIDE );
 	}
 
+	// Set the default screen scale
 	mScreen->scaleSet( 2 );
-	start( playLevel );
 
+	// Start main loop
+	start( playLevel );
 }
 
 void cCreep::interruptWait( byte pCount) {
