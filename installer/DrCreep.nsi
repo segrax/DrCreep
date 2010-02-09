@@ -105,8 +105,8 @@ Section "Copy Files" drcreepInst
     ;CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DrCreep.lnk" "$INSTDIR\creep.exe"
     ;CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
     
-    MessageBox MB_YESNO "Would you like to create a desktop shortcut?" IDNO no
-		CreateShortCut "$DESKTOP\creep.lnk" "$INSTDIR\creep.exe"
+    #MessageBox MB_YESNO "Would you like to create a desktop shortcut?" IDNO no
+		CreateShortCut "$DESKTOP\DrCreep.lnk" "$INSTDIR\creep.exe"
     
     no:
 
@@ -187,7 +187,7 @@ no:
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
   
   Delete "$DESKTOP\creep.lnk"
-  Delete "$SMPROGRAMS\$MUI_TEMP\creep.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\DrCreep.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
   RMDir  "$SMPROGRAMS\$MUI_TEMP"
   
