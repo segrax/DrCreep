@@ -102,7 +102,7 @@ Section "Copy Files" drcreepInst
     
     ;Create shortcuts
     ;CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    ;CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\creep.lnk" "$INSTDIR\creep.exe"
+    ;CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DrCreep.lnk" "$INSTDIR\creep.exe"
     ;CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
     
     MessageBox MB_YESNO "Would you like to create a desktop shortcut?" IDNO no
