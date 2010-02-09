@@ -81,6 +81,7 @@ Section "Copy Files" drcreepInst
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
 
+  File "..\License.txt"
   File "..\Readme.txt"
   File "..\run\creep.exe"
   File "..\run\SDL.dll"
