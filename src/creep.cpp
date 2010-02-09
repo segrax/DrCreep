@@ -492,8 +492,6 @@ void cCreep::mainLoop() {
 		if( Menu() == true )
 			continue;
 
-		// FIXME: HACK
-		changeLevel(1);
 		Game();
 	}
 
@@ -674,6 +672,9 @@ void cCreep::roomPrepare( ) {
 				break;
 			case 0x0833:	// String Print
 				obj_stringPrint();
+				break;
+			case 0x0836:
+				sub_1AE6();
 				break;
 
 			case 0x0821:
@@ -3627,6 +3628,59 @@ s13CD:;
 
 }
 
+void cCreep::sub_1AE6() {
+	*((word*) &mDump[ 0x6067 ]) = word_3E;
+	
+	byte gfxDecodeMode = 0, gfxCurrentID = 0x16;
+
+	word_32 = (mDump[ word_3E + 1 ] - 1) >> 3;
+	++word_32;
+
+	byte X =  mDump[ word_3E ];
+
+	word_30 = 0;
+	
+	//1B18
+	for(;;) {
+		if( X == 0 )
+			break;
+
+		word_30 += word_32;
+		X--;
+	}
+	// 1B2D
+	word_30 <<= 1;
+	X = mDump[ word_3E + 1 ];
+
+	for(;;) {
+		if(X == 0 )
+			break;
+
+		word_30 += mDump[ word_3E ];
+		--X;
+	}
+	// 1B4D
+	word_30 += 3;
+
+	word_3E += word_30;
+
+	//1B67
+	for(;;) {
+		byte A = mDump[ word_3E ];
+		if( !A ) {
+			
+			++word_3E;
+			break;
+
+		} else {
+			// 1B7D
+			screenDraw( gfxDecodeMode, gfxCurrentID, A, mDump[ word_3E + 1 ], 0 );
+			
+			word_3E += 2;
+		}
+	}
+}
+
 // 160A: Draw multiples of an object
 void cCreep::obj_MultiDraw() {
 	byte gfxCurrentID, gfxPosX, gfxPosY;
@@ -3722,14 +3776,16 @@ void cCreep::gameEscapeCastle() {
 			if( mDump[ 0x1AE3 ] != 1 ) {
 				// 1A0A
 				++mDump[ 0xBD03 + X];
-				if( mDump[ 0xBD03 + X] >= 0x9B || mDump[ 0xBD03 + X] < 0x97 ) {
+				A = mDump[ 0xBD03 + X ];
+				if( A >= 0x9B || A < 0x97 ) {
 					A = 0x97;
 				}
 			} else {
 				// 1A33
 				--mDump[ 0xBD01 + X];
 				++mDump[ 0xBD03 + X];
-				if( mDump[ 0xBD03 + X ] >= 3 )
+				A = mDump[ 0xBD03 + X ];
+				if( A >= 3 )
 					A = 0;
 			}
 
@@ -3737,7 +3793,8 @@ void cCreep::gameEscapeCastle() {
 			// 1A1D
 			++mDump[ 0xBD01 + X];
 			++mDump[ 0xBD03 + X];
-			if( mDump[ 0xBD03 + X ] >= 6 || mDump[ 0xBD03 + X ] < 3 )
+			A = mDump[ 0xBD03 + X ];
+			if( A >= 6 || A < 3 )
 				A = 0x03;
 		}
 
@@ -3767,6 +3824,8 @@ void cCreep::gameEscapeCastle() {
 
 		// 1A95
 		interruptWait(2);
+		mScreen->refresh();
+		mInput->inputCheck();
 	}
 
 	// 1AA7

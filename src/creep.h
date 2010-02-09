@@ -97,6 +97,7 @@ public:
 		void	 roomLoad();
 		void	 changeLevel( size_t pNumber );
 		void	 obj_stringPrint(  );
+		void	 sub_1AE6();
 		void	 screenDraw(  word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID );
 		void	 handleEvents();
 		void	 Game();
