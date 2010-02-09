@@ -15,7 +15,7 @@ class cPlayerInput {
 private:
 	SDL_Event			 mEvent;
 	sPlayerInput		 mInput[2];
-	bool				 mRunRestore;
+	bool				 mRunStop,	mRestore;
 
 	void		 KeyboardCheck();
 	void		 KeyboardInputSet1( sPlayerInput *pInput );
@@ -33,5 +33,6 @@ public:
 		return& mInput[ pNumber ];
 	}
 
-	bool		 runRestoreGet() { return mRunRestore; }
+	bool		 runStopGet() { return mRunStop; }
+	bool		 restoreGet() { return mRestore; }
 };

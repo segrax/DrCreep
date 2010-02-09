@@ -3,12 +3,14 @@
 
 cPlayerInput::cPlayerInput() {
 
-	mRunRestore = false;
+	mRunStop = false;
+	mRestore = false;
 }
 
 void cPlayerInput::inputCheck( bool pClearAll ) {
 	
-	mRunRestore = false;
+	mRunStop = false;
+	mRestore = false;
 
 	if(pClearAll) {
 		mInput[0].clear();
@@ -27,9 +29,14 @@ void cPlayerInput::inputCheck( bool pClearAll ) {
 
 void cPlayerInput::KeyboardCheck() {
 
-	if( mEvent.type == SDL_KEYDOWN )
+	if( mEvent.type == SDL_KEYDOWN ) {
+
 		if( mEvent.key.keysym.sym == SDLK_F1 )
-			mRunRestore = true;
+			mRunStop = true;
+
+		if( mEvent.key.keysym.sym == SDLK_ESCAPE )
+			mRestore = true;
+	}
 	
 }
 

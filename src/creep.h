@@ -20,7 +20,7 @@ private:
 
 	bool		 mQuit;
 
-	byte		 byte_20DE, byte_24FD, RunRestorePressed;
+	byte		 byte_20DE, byte_24FD, mRunStopPressed;
 	byte		 byte_2E02;
 
 	byte		 mInterruptCounter, byte_2E36, byte_2232;					// Conveyor

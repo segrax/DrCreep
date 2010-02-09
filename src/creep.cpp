@@ -619,7 +619,7 @@ bool cCreep::Menu() {
 				break;
 
 			byte_D10 ^= 0x01;
-			if( RunRestorePressed == 1 ) {
+			if( mRunStopPressed == 1 ) {
 				optionsMenu();
 				if( byte_24FD == 1 ) {
 					byte_5F57 = 1;
@@ -659,18 +659,23 @@ void cCreep::optionsMenu() {
 
 }
 
+// 5EFC
 void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	byte X = 0xFF, A = 0;
 	
 	byte_5F58 = pA;
-	RunRestorePressed = false;
+	mRunStopPressed = false;
 	
 	mInput->inputCheck();
 
 	sPlayerInput *input = mInput->inputGet( pA );
 
-	if( mInput->runRestoreGet() )
-		RunRestorePressed = true;
+	if( mInput->runStopGet() )
+		mRunStopPressed = true;
+
+	if( mInput->restoreGet() ) {
+		byte_B83 = 1;
+	}
 
 	if(input) {
 
@@ -2479,7 +2484,7 @@ s10EB:;
 			//sub_2C08();
 			goto sF99;
 		}
-		if( RunRestorePressed == 1 ) {
+		if( mRunStopPressed == 1 ) {
 			SavePosition();
 			goto sF99;
 		}
@@ -2653,8 +2658,9 @@ void cCreep::GameMain() {
 			//sub_2C08;
 			// TODO: Figure out what this does
 		}
-		
-		if( RunRestorePressed == 1 ) {
+
+		// Do pause?
+		if( mRunStopPressed == 1 ) {
 			//150E
 			for(;;) {
 				mInterruptCounter = 3;
@@ -2664,7 +2670,7 @@ void cCreep::GameMain() {
 
 				KeyboardJoystickMonitor( 0 );						
 			
-				if( RunRestorePressed != 1 )
+				if( mRunStopPressed == 1 )
 					break;
 			}
 
@@ -5009,6 +5015,7 @@ void cCreep::obj_PrepMummy( ) {
 			while( byte_498E ) {
 				screenDraw( 1, gfxCurrentID, gfxPosX, gfxPosY, 0x42 );
 				mTxtX_0 += 4;
+				--byte_498E;
 			}
 			
 			gfxPosX = mTxtX_0 - 0x0C;
