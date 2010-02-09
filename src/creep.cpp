@@ -132,7 +132,7 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	}
 
 	if(!playLevelSet) {
-		displayLevels();
+		castleDisplayList();
 		string lvl;
 		cout << "\nSelect a level: ";
 		cin >> lvl;
@@ -250,7 +250,7 @@ void cCreep::start( size_t pStartLevel ) {
 
 		}
 
-		if(changeLevel( pStartLevel ) == false)
+		if(castleChangeLevel( pStartLevel ) == false)
 			return;
 
 	} else {
@@ -261,7 +261,7 @@ void cCreep::start( size_t pStartLevel ) {
 	mainLoop();
 }
 
-void cCreep::displayLevels() {
+void cCreep::castleDisplayList() {
 	vector<string> files = directoryList( "castles\\Z*" );
 	vector<string>::iterator fileIT;
 
@@ -279,7 +279,7 @@ void cCreep::displayLevels() {
 
 }
 
-bool cCreep::changeLevel( size_t pNumber ) {
+bool cCreep::castleChangeLevel( size_t pNumber ) {
 	vector<string> files = directoryList( "castles\\Z*" );
 	
 	size_t size = 0;

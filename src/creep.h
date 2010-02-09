@@ -95,8 +95,8 @@ public:
 		word	 lvlPtrCalculate( byte pCount );
 		void	 ScreenClear();
 		void	 roomLoad();
-		void	 displayLevels();
-		bool	 changeLevel( size_t pNumber );
+		void	 castleDisplayList();
+		bool	 castleChangeLevel( size_t pNumber );
 
 		void	 obj_stringPrint(  );
 		void	 sub_1AE6();
