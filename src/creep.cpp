@@ -3407,14 +3407,17 @@ s1349:;
 
 	//135C
 	byte A = mDump[ word_40 + 2 ];
+	A &= 3;
 
 	if( !( A & 3) ) {
 		mTxtY_0 = byte_13ED;
 	} else {
 		// 136D
 		if( A == 2 ) {
+			// 136F
 			mTxtY_0 = (byte_13EF << 3) + byte_13ED;
 			mTxtY_0 -= 3;
+
 		} else {
 			// 13A0
 			mTxtY_0 = byte_13ED + mDump[ word_40 + 6 ];
@@ -3427,14 +3430,19 @@ s1349:;
 				mTxtX_0 = byte_13EC;
 				A = 0x10;
 			}
+			
+			goto s13CD;
 		}
-		goto s13CD;
 	}
-
+s1381:;
 	// 1381
-	mTxtX_0 = byte_13EC + mDump[ word_40 + 5 ];
-	if( mTxtX_0 & 2 ) {
-		mTxtX_0 ^= mTxtX_0;
+	mTxtX_0 = A = byte_13EC + mDump[ word_40 + 5 ];
+
+	A &= 2;
+	
+	if( A ) {
+		A ^= mTxtX_0;
+		mTxtX_0 = A;
 		A = 0x0F;
 	} else 
 		A = 0x0E;
