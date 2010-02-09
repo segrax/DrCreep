@@ -110,7 +110,7 @@ Section "Copy Files" drcreepInst
     
     no:
 
-     MessageBox MB_YESNO|MB_ICONQUESTION \
+     #MessageBox MB_YESNO|MB_ICONQUESTION \
              "Setup has completed. View the readme?" \
              IDNO NoReadme
     ExecShell open '$INSTDIR\Readme.txt'

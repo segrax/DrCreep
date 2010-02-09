@@ -1804,6 +1804,10 @@ void cCreep::obj_Player_Unk( byte pX ) {
 	byte_34D6 = pX >> 5;
 
 	mDump[ 0xD027 + byte_34D6 ] = mDump[ 0x34D3 + mDump[ 0xBD1C + pX ] ];
+	
+	cSprite *sprite = mScreen->spriteGet( byte_34D6 );
+
+	sprite->_color = mDump[ 0x34D3 + mDump[ 0xBD1C + pX ] ];
 }
 
 // 3AEB: Frankie Movement
