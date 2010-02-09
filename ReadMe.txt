@@ -9,6 +9,19 @@ The Castles of Dr. Creep is a clone of the 1984 game written by Ed Hobbs.
 
 Controls:
 ---------
-Right Ctrl = Joystick Button 
-Arrows = Left/Right/Up/Down   (NOT the numpad)
-Escape = Self Kill
+
+ Escape = Self Kill
+
+ Player 1:
+ ---------
+
+ Right Ctrl = Joystick Button 
+ Arrows = Left/Right/Up/Down   (NOT the numpad)
+
+ Player 2:
+ ---------
+ 
+ Numpad 0 = Joystick Button
+ Numpad Arrows = Left/Right/Up/Down
+
+
