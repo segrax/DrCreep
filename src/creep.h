@@ -98,27 +98,25 @@ public:
 		void	 castleDisplayList();
 		bool	 castleChangeLevel( size_t pNumber );
 
+		void	 Game();
+		void	 GameMain();
+
 		void	 obj_stringPrint(  );
 		void	 sub_1AE6();
 		void	 screenDraw(  word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID );
-		void	 handleEvents();
-		void	 Game();
-		void	 GameMain();
+		void	 events_Execute();
+
 		void	 sprite_FlashOnOff( byte pX );
 		void	 gameMenuDisplaySetup();
 		void	 KeyboardJoystickMonitor( byte pA );
 		void	 mainLoop();
 		void	 mapDisplay();
-		void	 ObjectActions( byte pX );
-		bool	 ObjectActionFunction( byte pX, byte pY );
-		bool	 objectActionInFront( byte pX, byte pY );
-		void	 ObjectHitsObject( byte pX, byte pY );
-		void	 objectFunction( byte pX );
+
 		void	 optionsMenu();
 		bool	 Menu();
 		void	 SavePosition();
-		void	 SpriteDraw();
-		void	 img_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
+
+
 		void	 start( size_t pStartLevel );	
 		void	 sub_95F();
 		void	 mapRoomDraw();
@@ -134,75 +132,100 @@ public:
 		void	 sub_2973();
 		void	 sub_29AE();
 		void	 sub_29D0( byte pA, byte pY );
-		void	 obj_CollisionSet();
-		void	 obj_Execute( );
-		void	 obj_CheckCollisions( byte pX );
-		void	 obj_ExecPlayer( byte pX );
-		void	 obj_Player_Unk( byte pX );
-		void	 obj_InFrontPlayer( byte pX, byte pY );
-		void	 obj_HitPlayer( byte pX, byte pY );
-		void	 obj_Player_Add( );
-		void	 obj_Mummy_Unk2( byte pX, byte pY );
-		void	 sub_3A60( byte pX, byte pY );
-		void	 obj_RayGun_Laser_Create( byte pX );
-		void	 obj_ExecFrankie( byte pX );
-		void	 sub_3D6E( byte pX, byte pY );
-		void	 obj_HitFrankie( byte pX, byte pY );
-		void	 obj_Frank_Create( );
-		void	 img_Execute( );
-		void	 obj_ExecLightning( byte pX );
-		void	 obj_Lightning_Unk( byte &pY );
-		void	 obj_ExecForcefield( byte pX );
-		void	 obj_Forcefield_Create( );
-		void	 obj_Mummy_Unk( byte pA, byte pX );
-		void	 obj_ExecMummy( byte pX );
-		void	 obj_ExecRayGunLaser( byte pX );
-		void	 obj_FindFree( byte &pX );
-		void	 obj_ExecDoor( byte pX );
 
-		void	 obj_InFrontMummyRelease( byte pX, byte pY );
-
-		void	 obj_PrepFrankenstein();
-		void	 obj_PrepKey( );
-		void	 obj_PrepLadder();
-		void	 obj_PrepLock( );
-		void	 obj_PrepDoors( );
-		void	 obj_PrepDoorbell( );
-		void	 obj_PrepConveyor( );
-		void	 obj_PrepLightning( );
-		void	 obj_PrepForcefield( );
-		void	 obj_PrepMummy( );
-		void	 obj_PrepRayGun( );
-		void	 obj_PrepSlidingPole( );
-		void	 obj_PrepTeleport( );
-		void	 obj_PrepTrapDoor();
-		void	 obj_PrepWalkway( );
 		
-		void	 obj_ExecForcefieldTimer( byte pX );
+		void	 obj_Actions( );
+		bool	 obj_Actions_Collision( byte pX, byte pY );
+		bool	 obj_Actions_InFront( byte pX, byte pY );
+		void	 obj_Actions_Hit( byte pX, byte pY );
+		void	 obj_Actions_Execute( byte pX );
 
-		void	 obj_ExecConveyor( byte pX );
-		void	 obj_ExecFloorSwitch( byte pX );
-		void	 obj_ExecLightningMachine( byte pX );
-		void	 obj_ExecMummyRelease( byte pX );
-		void	 obj_ExecRayGun( byte pX );
-		void	 obj_ExecTeleport( byte pX );
+		void	 obj_CheckCollisions( byte pX );
+		void	 obj_CollisionSet();
+		void	 obj_OverlapCheck( byte pX );
 
-		void	 obj_InFrontButton( byte pX, byte pY );
-		void	 obj_InFrontConveyor( byte pX, byte pY );
-		void	 obj_InFrontConveyorControl( byte pX, byte pY );
-		void	 obj_InFrontDoor( byte pX, byte pY );
-		void	 obj_InFrontForcefieldTimer( byte pX, byte pY );
-		void	 obj_InFrontKey( byte pX, byte pY );
-		void	 obj_InFrontLightningSwitch( byte pX, byte pY );
-		void	 obj_InFrontLock( byte pX, byte pY );
-		void	 obj_InFrontRaygunControl( byte pX, byte pY );
-		void	 obj_InFrontTeleport( byte pX, byte pY );
+		void	 img_Actions( );
+		bool	 img_FindFree( byte &pX );
+		void	 img_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
 
-		void	 obj_RayGun_UpdateControl( byte pA );
+		void	 obj_FindFree( byte &pX );
+		
+		void	 sub_3A60( byte pX, byte pY );
+
+		// Object Functions
+		void	 obj_Conveyor_Prepare( );
+		void	 obj_Conveyor_InFront( byte pX, byte pY );
+		void	 obj_Conveyor_Control_InFront( byte pX, byte pY );
+		void	 obj_Conveyor_Img_Execute( byte pX );
+
+		void	 obj_Door_Prepare( );
+		void	 obj_Door_InFront( byte pX, byte pY );
+		void	 obj_Door_Img_Execute( byte pX );
+
+		void	 obj_Door_Button_Prepare( );
+		void	 obj_Door_Button_InFront( byte pX, byte pY );
+
+		void	 obj_Door_Lock_InFront( byte pX, byte pY );
+		void	 obj_Door_Lock_Prepare( );
+		
+		void	 obj_Forcefield_Prepare( );
+		void	 obj_Forcefield_Execute( byte pX );
+		void	 obj_Forcefield_Create( );
+		void	 obj_Forcefield_Img_Timer_Execute( byte pX );
+		void	 obj_Forcefield_Timer_InFront( byte pX, byte pY );
+		
+		void	 obj_Frankie_Add( );
+		void	 obj_Frankie_Collision( byte pX, byte pY );
+		void	 obj_Frankie_Load();
+		void	 obj_Frankie_Hit( byte pX, byte pY );
+		void	 obj_Frankie_Execute( byte pX );
+
+		void	 obj_Key_Infront( byte pX, byte pY );
+		void	 obj_Key_Load( );
+
+		void	 obj_Ladder_Prepare();
+
+		void	 obj_Lightning_Prepare( );
+		void	 obj_Lightning_Add( byte &pY );
+		void	 obj_Lightning_Execute( byte pX );
+		void	 obj_Lightning_Img_Execute( byte pX );
+		void	 obj_Lightning_Switch_InFront( byte pX, byte pY );
+		
+		void	 obj_Mummy_Prepare( );
+		void	 obj_Mummy_Add( byte pA, byte pX );
+		void	 obj_Mummy_Collision( byte pX, byte pY );
+		void	 obj_Mummy_Execute( byte pX );
+		void	 obj_Mummy_Infront( byte pX, byte pY );
+		void	 obj_Mummy_Img_Execute( byte pX );
+
+		void	 obj_Player_Add( );
+		void	 obj_Player_Collision( byte pX, byte pY );
+		void	 obj_Player_Hit( byte pX, byte pY );
+		void	 obj_Player_Execute( byte pX );
+		void	 obj_Player_Unk( byte pX );
+		
+		void	 obj_SlidingPole_Prepare( );
+
+		void	 obj_Teleport_Prepare( );
+		void	 obj_Teleport_Img_Execute( byte pX );
+		void	 obj_Teleport_InFront( byte pX, byte pY );
+
+		void	 obj_TrapDoor_Prepare();
+		void	 obj_TrapDoor_Switch_Img_Execute( byte pX );
+
+		void	 obj_RayGun_Prepare( );
+		void	 obj_RayGun_Laser_Add( byte pX );
+		void	 obj_RayGun_Laser_Execute( byte pX );
+		void	 obj_RayGun_Img_Execute( byte pX );
+		void	 obj_RayGun_Control_InFront( byte pX, byte pY );
+		void	 obj_RayGun_Control_Update( byte pA );
+
+		void	 obj_Walkway_Prepare( );
+
 		void	 sub_505C( byte pA, byte pX );
 		void	 sub_5171( byte pA );
 		void	 sub_526F( char &pA );
-		bool	 img_FindFree( byte &pX );
+		
 		void	 sub_57DF( byte pX );
 		bool	 sub_5E8E( byte pA, byte pX, byte pY );
 

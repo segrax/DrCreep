@@ -30,7 +30,7 @@ cCreep::cCreep() {
 	mDumpSize = 0x10000;
 	mDump = new byte[ mDumpSize ];
 	
-	for( char x = 0; x < mDumpSize; ++x )
+	for( size_t x = 0; x < mDumpSize; ++x )
 		mDump[x] = 0;
 
 	mOrigObject = fileRead( "OBJECT", mOrigObjectSize );
@@ -688,49 +688,49 @@ void cCreep::roomPrepare( ) {
 				return;
 
 			case 0x0803:	// Doors
-				obj_PrepDoors( );
+				obj_Door_Prepare( );
 				break;
 			case 0x0806:	// Walkway
-				obj_PrepWalkway( );
+				obj_Walkway_Prepare( );
 				break;
 			case 0x0809:	// Sliding Pole
-				obj_PrepSlidingPole( );
+				obj_SlidingPole_Prepare( );
 				break;
 			case 0x080C:	// Ladder
-				obj_PrepLadder( );
+				obj_Ladder_Prepare( );
 				break;
 			case 0x080F:	// Doorbell
-				obj_PrepDoorbell( );
+				obj_Door_Button_Prepare( );
 				break;
 			case 0x0812:	// Lightning Machine
-				obj_PrepLightning( );
+				obj_Lightning_Prepare( );
 				break;
 			case 0x0815:	// Forcefield
-				obj_PrepForcefield( );
+				obj_Forcefield_Prepare( );
 				break;
 			case 0x0818:	// Mummy
-				obj_PrepMummy( );
+				obj_Mummy_Prepare( );
 				break;
 			case 0x081B:	// Key
-				obj_PrepKey( );
+				obj_Key_Load( );
 				break;
 			case 0x081E:	// Lock
-				obj_PrepLock( );
+				obj_Door_Lock_Prepare( );
 				break;
 			case 0x0824:	// Ray Gun
-				obj_PrepRayGun( );
+				obj_RayGun_Prepare( );
 				break;
 			case 0x0827:	// Teleport
-				obj_PrepTeleport( );
+				obj_Teleport_Prepare( );
 				break;
 			case 0x082A:	// Trap Door
-				obj_PrepTrapDoor( );
+				obj_TrapDoor_Prepare( );
 				break;
 			case 0x082D:	// Conveyor
-				obj_PrepConveyor( );
+				obj_Conveyor_Prepare( );
 				break;
 			case 0x0830:	// Frankenstein
-				obj_PrepFrankenstein( );
+				obj_Frankie_Load( );
 				break;
 			case 0x0833:	// String Print
 				obj_stringPrint();
@@ -802,7 +802,7 @@ bool cCreep::Menu() {
 		for(;;) {
 
 			if( mMenuScreenTimer )
-				handleEvents();
+				events_Execute();
 			else {
 				// C0D
 				interruptWait( 2 );
@@ -934,7 +934,7 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	byte_5F57 = A;
 }
 
-void cCreep::handleEvents() {
+void cCreep::events_Execute() {
 	// 2E1D
 	interruptWait( 2 );
 	
@@ -943,12 +943,12 @@ void cCreep::handleEvents() {
 	// Get collisions from the hardware, and set them in the objects
 	obj_CollisionSet();
 
-	// Check for any 'sprite' actions to execute, 
+	// Check for any actions to execute, 
 	// including collisions, movement, general checks
-	obj_Execute();
+	obj_Actions();
 
 	// Check for any other 'background' actions to execute
-	img_Execute();
+	img_Actions();
 	++byte_2E36;
 
 	mScreen->refresh();
@@ -1051,7 +1051,8 @@ void cCreep::obj_CollisionSet() {
 	}
 }
 
-void cCreep::obj_Execute( ) {
+// 2E79: Execute any objects with actions / collisions, enable their sprites
+void cCreep::obj_Actions( ) {
 	byte X = 0, A;
 
 	for(;;) {
@@ -1078,7 +1079,7 @@ void cCreep::obj_Execute( ) {
 						if(A & byte_884) 
 							goto s2EF3;
 						if((A & byte_887)) {
-							ObjectActions( X );
+							obj_OverlapCheck( X );
 							if( mDump[ 0xBD04 + X ] & byte_883)
 								goto s2EF3;
 						}
@@ -1102,7 +1103,7 @@ s2EF3:
 			} else {
 				// 2ED5
 s2ED5:
-				objectFunction(X);
+				obj_Actions_Execute(X);
 				if( mDump[ 0xBD04 + X ] & byte_883 )
 					goto s2EF3;
 			}
@@ -1177,7 +1178,7 @@ s2F72:
 }
 
 // 311E
-void cCreep::ObjectActions( byte pX ) {
+void cCreep::obj_OverlapCheck( byte pX ) {
 
 	byte_31F1 = mDump[ 0xBD01 + pX ];
 	byte_31F2 = byte_31F1 + mDump[ 0xBD0A + pX ];
@@ -1194,37 +1195,37 @@ void cCreep::ObjectActions( byte pX ) {
 		return;
 
 	byte_31EF = mImageCount << 3;
-	word tmp = mImageCount << 3;
 
-	for( word Y = 0; Y != tmp; Y = byte_31F0 + 8) {
+	byte Y = 0;
 
+	do {
 		byte_31F0 = Y;
-		if( mDump[ 0xBF04 + Y ] & byte_83F )
-			continue;
-		if( byte_31F2 < mDump[ 0xBF01 + Y ] )
-			continue;
-		if( mDump[ 0xBF01 + Y ] + mDump[ 0xBF05 + Y ] < byte_31F1 )
-			continue;
-		if( byte_31F4 < mDump[ 0xBF02 + Y ] )
-			continue;
-		if( mDump[ 0xBF02 + Y ] + mDump[ 0xBF06 + Y ] < byte_31F3 )
-			continue;
-		//318C
-		byte_31F5 = 1;
-		Y = mDump[ 0xBD00 + pX ]  << 3;
 
-		if( ObjectActionFunction( pX, Y ) == true ) {
+		if( !(mDump[ 0xBF04 + Y ] & byte_83F ))
+			if( !(byte_31F2 < mDump[ 0xBF01 + Y ] ))
+				if( !(mDump[ 0xBF01 + Y ] + mDump[ 0xBF05 + Y ] < byte_31F1))
+					if( !(byte_31F4 < mDump[ 0xBF02 + Y ]) )
+						if( !(mDump[ 0xBF02 + Y ] + mDump[ 0xBF06 + Y ] < byte_31F3) ) {
+						//318C
+							byte_31F5 = 1;
+							Y = mDump[ 0xBD00 + pX ]  << 3;
 
-			if( byte_31F5 == 1 ) 
-				mDump[ 0xBD04 + pX ] |= byte_883;
-		}
+							if( obj_Actions_Collision( pX, Y ) == true ) {
 
-		Y = mDump[ 0xBF00 + byte_31F0 ] << 2;
-		objectActionInFront( pX, Y );
-	}
+								if( byte_31F5 == 1 ) 
+									mDump[ 0xBD04 + pX ] |= byte_883;
+							}
+
+							Y = mDump[ 0xBF00 + byte_31F0 ] << 2;
+							obj_Actions_InFront( pX, Y );
+						} 
+
+		Y = byte_31F0 + 8;
+
+	} while(Y);
 }
 
-bool cCreep::ObjectActionFunction( byte pX, byte pY ) {
+bool cCreep::obj_Actions_Collision( byte pX, byte pY ) {
 	word func = *((word*) &mDump[ 0x893 + pY ]);
 	
 	pY = byte_31F0;
@@ -1234,11 +1235,11 @@ bool cCreep::ObjectActionFunction( byte pX, byte pY ) {
 			return false;
 
 		case 0x34EF:		// Player In Front
-			obj_InFrontPlayer( pX, pY );
+			obj_Player_Collision( pX, pY );
 			break;
 
 		case 0x38CE:		// Mummy
-			obj_Mummy_Unk2( pX, pY );
+			obj_Mummy_Collision( pX, pY );
 			break;
 
 		case 0x3940:
@@ -1251,11 +1252,11 @@ bool cCreep::ObjectActionFunction( byte pX, byte pY ) {
 			break;
 
 		case 0x3D6E:		// Frankie
-			sub_3D6E( pX, pY );
+			obj_Frankie_Collision( pX, pY );
 			break;
 
 		default:
-			cout << "ObjectActionFunction: 0x";
+			cout << "obj_Actions_Collision: 0x";
 			cout << std::hex << func << "\n";
 			break;
 
@@ -1264,7 +1265,7 @@ bool cCreep::ObjectActionFunction( byte pX, byte pY ) {
 	return true;
 }
 
-bool cCreep::objectActionInFront( byte pX, byte pY ) {
+bool cCreep::obj_Actions_InFront( byte pX, byte pY ) {
 	word func = *((word*) &mDump[ 0x844 + pY ]);
 	
 	pY = byte_31F0;
@@ -1275,51 +1276,51 @@ bool cCreep::objectActionInFront( byte pX, byte pY ) {
 			break;
 		
 		case 0x4075:		// In Front Door
-			obj_InFrontDoor( pX, pY );
+			obj_Door_InFront( pX, pY );
 			break;
 
 		case 0x41D8:		// In Front Button
-			obj_InFrontButton( pX, pY );
+			obj_Door_Button_InFront( pX, pY );
 			break;
 		
 		case 0x44E7:		// In Front Lightning Switch
-			obj_InFrontLightningSwitch( pX, pY );
+			obj_Lightning_Switch_InFront( pX, pY );
 			break;
 
 		case 0x4647:		// In Front Forcefield Timer
-			obj_InFrontForcefieldTimer( pX, pY );
+			obj_Forcefield_Timer_InFront( pX, pY );
 			break;
 
 		case 0x47A7:		// In Front Mummy Release
-			obj_InFrontMummyRelease( pX, pY );
+			obj_Mummy_Infront( pX, pY );
 			break;
 
 		case 0x4990:		// In Front Key
-			obj_InFrontKey( pX, pY );
+			obj_Key_Infront( pX, pY );
 			break;
 
 		case 0x4A68:		// In Front Lock
-			obj_InFrontLock( pX, pY );
+			obj_Door_Lock_InFront( pX, pY );
 			break;
 		
 		case 0x4D70:		// In Front RayGun Control
-			obj_InFrontRaygunControl( pX, pY );
+			obj_RayGun_Control_InFront( pX, pY );
 			break;
 
 		case 0x4EA8:		// In Front Teleport
-			obj_InFrontTeleport( pX, pY );
+			obj_Teleport_InFront( pX, pY );
 			break;
 		
 		case 0x548B:		// In Front Conveyor
-			obj_InFrontConveyor( pX, pY );
+			obj_Conveyor_InFront( pX, pY );
 			break;
 
 		case 0x5611:		// In Front Conveyor Control
-			obj_InFrontConveyorControl( pX, pY );
+			obj_Conveyor_Control_InFront( pX, pY );
 			break;
 
 		default:
-			cout << "objectActionInFront: 0x";
+			cout << "obj_Actions_InFront: 0x";
 			cout << std::hex << func << "\n";
 
 			break;
@@ -1330,7 +1331,7 @@ bool cCreep::objectActionInFront( byte pX, byte pY ) {
 }
 
 // 30D9
-void cCreep::ObjectHitsObject( byte pX, byte pY ) {
+void cCreep::obj_Actions_Hit( byte pX, byte pY ) {
 	
 	if( mDump[ 0xBD04 + pX ] & byte_884 )
 		return;
@@ -1346,7 +1347,7 @@ void cCreep::ObjectHitsObject( byte pX, byte pY ) {
 			break;
 
 		case 0x3534:				//  Hit Player
-			obj_HitPlayer( pX, pY );
+			obj_Player_Hit( pX, pY );
 			break;
 
 		case 0x3682:
@@ -1354,11 +1355,11 @@ void cCreep::ObjectHitsObject( byte pX, byte pY ) {
 			break;
 
 		case 0x3DDE:				//  Hit Frankie
-			obj_HitFrankie( pX, pY );
+			obj_Frankie_Hit( pX, pY );
 			break;
 
 		default:
-			cout << "objectHitsObject: 0x";
+			cout << "obj_Actions_Hit: 0x";
 			cout << std::hex << func << "\n";
 			break;
 	}
@@ -1415,10 +1416,10 @@ void cCreep::obj_CheckCollisions( byte pX ) {
 										// 30A5
 										if( byte_311A >= mDump[ 0xBD02 + Y ] ) {
 											if( (mDump[ 0xBD02 + Y ] + mDump[ 0xBD0B + Y ]) >= byte_3119 ) {
-												ObjectHitsObject( pX, Y);
+												obj_Actions_Hit( pX, Y);
 												pX = byte_3116;
 												Y = byte_3115;
-												ObjectHitsObject( pX, Y );
+												obj_Actions_Hit( pX, Y );
 											}
 											// 30C5
 											pX = byte_3115;
@@ -1510,7 +1511,7 @@ s2FE9:;
 
 // Originally this was not a function, but its too big to bother
 // implementing in the original location
-void cCreep::objectFunction( byte pX ) {
+void cCreep::obj_Actions_Execute( byte pX ) {
 	//2ED5
 	byte Y =  mDump[ 0xBD00 + pX ] << 3;
 	word func = *((word*) &mDump[ 0x88F + Y ]);
@@ -1518,38 +1519,38 @@ void cCreep::objectFunction( byte pX ) {
 	switch(func) {
 
 		case 0x31F6:
-			obj_ExecPlayer( pX );
+			obj_Player_Execute( pX );
 			break;
 		
 		case 0x3639:
-			obj_ExecLightning( pX );
+			obj_Lightning_Execute( pX );
 			break;
 
 		case 0x36B3:
-			obj_ExecForcefield( pX );
+			obj_Forcefield_Execute( pX );
 			break;
 		
 		case 0x379A:
-			obj_ExecMummy( pX );
+			obj_Mummy_Execute( pX );
 			break;
 
 		case 0x3A08:
-			obj_ExecRayGunLaser( pX );
+			obj_RayGun_Laser_Execute( pX );
 			break;
 
 		case 0x3AEB:
-			obj_ExecFrankie( pX );
+			obj_Frankie_Execute( pX );
 			break;
 
 		default:
-			cout << "objectFunction: 0x";
+			cout << "obj_Actions_Execute: 0x";
 			cout << std::hex << func << "\n";
 			break;
 	}
 
 }
 
-void cCreep::obj_ExecPlayer( byte pX ) {
+void cCreep::obj_Player_Execute( byte pX ) {
 	byte A =  mDump[ 0xBD04 + pX ];
 
 	if( A & byte_885 ) {
@@ -1802,7 +1803,7 @@ void cCreep::obj_Player_Unk( byte pX ) {
 }
 
 // 3AEB: Frankie Movement
-void cCreep::obj_ExecFrankie( byte pX ) {
+void cCreep::obj_Frankie_Execute( byte pX ) {
 	byte Y;
 	char A = mDump[ 0xBD04 + pX ];
 	byte byte_3F0B, byte_3F12;
@@ -2063,7 +2064,7 @@ s3D4F:;
 }
 
 // 3D6E: Frankie?
-void cCreep::sub_3D6E( byte pX, byte pY ) {
+void cCreep::obj_Frankie_Collision( byte pX, byte pY ) {
 	char A = mDump[ 0xBD01 + pX ] + mDump[ 0xBD0C + pX ];
 	A -= mDump[ 0xBF01 + pY ];
 	if( A >= 4 ) {
@@ -2098,7 +2099,7 @@ void cCreep::sub_3D6E( byte pX, byte pY ) {
 }
 
 // 3DDE: Franky Hit 
-void cCreep::obj_HitFrankie(byte pX, byte pY) {
+void cCreep::obj_Frankie_Hit(byte pX, byte pY) {
 	if( mDump[ 0xBD1E + pX ] & byte_574E ) {
 		byte A = mDump[ 0xBD00 + pY ];
 
@@ -2161,7 +2162,7 @@ void cCreep::obj_HitFrankie(byte pX, byte pY) {
 }			
 
 // 3E87: 
-void cCreep::obj_Frank_Create() {
+void cCreep::obj_Frankie_Add() {
 	if( mDump[ word_3E ] & byte_574D )
 		return;
 
@@ -2193,7 +2194,7 @@ void cCreep::obj_Frank_Create() {
 	mDump[ 0xBD05 + X ] = 2;
 }
 
-void cCreep::img_Execute() {
+void cCreep::img_Actions() {
 	byte X;
 
 	byte_3FD4 = 0;
@@ -2214,32 +2215,32 @@ void cCreep::img_Execute() {
 				case 0:
 					mDump[ 0xBF04 + X ] ^= byte_840;
 					break;
-				case 0x3FD5:		// Door Open
-					obj_ExecDoor( X );
+				case 0x3FD5:
+					obj_Door_Img_Execute( X );
 					break;
-				case 0x42AD:		// Lightning
-					obj_ExecLightningMachine( X );
+				case 0x42AD:
+					obj_Lightning_Img_Execute( X );
 					break;
-				case 0x45E0:		// Forcefield
-					obj_ExecForcefieldTimer( X );
+				case 0x45E0:	
+					obj_Forcefield_Img_Timer_Execute( X );
 					break;
-				case 0x475E:		// Mummy Release
-					obj_ExecMummyRelease( X );
+				case 0x475E:
+					obj_Mummy_Img_Execute( X );
 					break;
-				case 0x4B1A:		// RayGun Control
-					obj_ExecRayGun( X );
+				case 0x4B1A:
+					obj_RayGun_Img_Execute( X );
 					break;
-				case 0x4E32:		// Teleport Flash
-					obj_ExecTeleport( X );
+				case 0x4E32:
+					obj_Teleport_Img_Execute( X );
 					break;
-				case 0x50D2:		// Floor Switch
-					obj_ExecFloorSwitch( X );
+				case 0x50D2:
+					obj_TrapDoor_Switch_Img_Execute( X );
 					break;
-				case 0x538B:		// Conveyor
-					obj_ExecConveyor( X );
+				case 0x538B:
+					obj_Conveyor_Img_Execute( X );
 					break;
 				default:
-					cout << "img_Execute: 0x";
+					cout << "img_Actions: 0x";
 					cout << std::hex << func << "\n";
 					break;
 			}
@@ -2281,7 +2282,7 @@ void cCreep::img_Execute() {
 }
 
 // 3639: 
-void cCreep::obj_ExecLightning( byte pX ) {
+void cCreep::obj_Lightning_Execute( byte pX ) {
 	byte A = mDump[ 0xBD04 + pX ];
 	if( A & byte_885 ) {
 		mDump[ 0xBD04 + pX ] = (A ^ byte_885) | byte_886;
@@ -2312,7 +2313,7 @@ void cCreep::obj_ExecLightning( byte pX ) {
 	hw_SpritePrepare( pX );
 }
 
-void cCreep::obj_Lightning_Unk( byte &pY  ) {
+void cCreep::obj_Lightning_Add( byte &pY  ) {
 	byte X;
 
 	obj_FindFree( X );
@@ -2325,7 +2326,7 @@ void cCreep::obj_Lightning_Unk( byte &pY  ) {
 }
 
 // 36B3: Forcefield
-void cCreep::obj_ExecForcefield( byte pX ) {
+void cCreep::obj_Forcefield_Execute( byte pX ) {
 	byte A = mDump[ 0xBD04 + pX ];
 	byte Y;
 
@@ -2777,7 +2778,7 @@ s10EB:;
 	mDump[ 0x11D0 ] = 0;
 }
 
-void cCreep::obj_InFrontPlayer( byte pX, byte pY ) {
+void cCreep::obj_Player_Collision( byte pX, byte pY ) {
 	byte A;
 	if( mDump[ 0xBF00 + pY ] == 0x0B ) {
 		
@@ -2806,7 +2807,7 @@ void cCreep::obj_InFrontPlayer( byte pX, byte pY ) {
 }
 
 // 3534: Hit Player
-void cCreep::obj_HitPlayer( byte pX, byte pY ) {
+void cCreep::obj_Player_Hit( byte pX, byte pY ) {
 	byte A = mDump[ 0xBD00 + pY ];
 
 	if( A == 2 ) {
@@ -2907,7 +2908,7 @@ void cCreep::GameMain() {
 
 	for(;;) {
 
-		handleEvents();
+		events_Execute();
 		if( byte_5F6A == 1 ) {
 			byte_2E02 = 0;
 			//sub_2C08;
@@ -2971,7 +2972,7 @@ s15B4:;
 	mDump[ 0x15D7] = 0;
 
 	for( byte X = 0x1E; X; --X ) 
-		handleEvents();
+		events_Execute();
 }
 
 void cCreep::sub_6009( byte pA ) {
@@ -4128,6 +4129,7 @@ void cCreep::highscoresDisplay() {
 	obj_stringPrint();
 }
 
+// 21C8
 void cCreep::sub_21C8( char pA ) {
 	char byte_2231 = pA;
 
@@ -4157,7 +4159,7 @@ void cCreep::sub_21C8( char pA ) {
 	mDump[ 0xDC0E ] = 0x01;
 }
 
-void cCreep::obj_PrepWalkway() {
+void cCreep::obj_Walkway_Prepare() {
 	byte byte_1744, byte_1745, byte_1746;
 	byte gfxCurrentID, gfxPosX, gfxPosY;
 
@@ -4464,7 +4466,7 @@ void cCreep::sub_5FA3() {
 	word_3C += A;
 }
 
-void cCreep::obj_PrepSlidingPole() {
+void cCreep::obj_SlidingPole_Prepare() {
 	byte byte_17ED;
 	byte A, gfxPosX, gfxPosY;
 
@@ -4513,7 +4515,7 @@ void cCreep::obj_PrepSlidingPole() {
 	}
 }
 
-void cCreep::obj_PrepLadder() {
+void cCreep::obj_Ladder_Prepare() {
 	byte byte_18E3, gfxPosX, gfxPosY;
 	
 	for(;;) {
@@ -4586,7 +4588,7 @@ void cCreep::obj_PrepLadder() {
 }
 
 // 3FD5: Door Opening
-void cCreep::obj_ExecDoor( byte pX ) {
+void cCreep::obj_Door_Img_Execute( byte pX ) {
 
 	if( mDump[ 0xBE01 + pX ] == 0 ) {
 		mDump[ 0xBE01 + pX ] = 1;
@@ -4625,7 +4627,7 @@ void cCreep::obj_ExecDoor( byte pX ) {
 }
 
 // 4075: In Front Door
-void cCreep::obj_InFrontDoor( byte pX, byte pY ) {
+void cCreep::obj_Door_InFront( byte pX, byte pY ) {
 	byte byte_41D5 = pY;
 	if( mDump[ 0xBE01 + pY ] == 0 )
 		return;
@@ -4671,7 +4673,7 @@ void cCreep::obj_InFrontDoor( byte pX, byte pY ) {
 }
 
 // 4F5C: Load the rooms' Teleports
-void cCreep::obj_PrepTeleport() {
+void cCreep::obj_Teleport_Prepare() {
 	mTxtX_0 = mDump[ word_3E ];
 	mTxtY_0 = mDump[ word_3E + 1 ];
 
@@ -4729,7 +4731,7 @@ void cCreep::obj_PrepTeleport() {
 }
 
 // 475E: Mummy Releasing
-void cCreep::obj_ExecMummyRelease( byte pX ) {
+void cCreep::obj_Mummy_Img_Execute( byte pX ) {
 	if( byte_2E36 & 3 )
 		return;
 
@@ -4757,7 +4759,7 @@ void cCreep::obj_ExecMummyRelease( byte pX ) {
 }
 
 // 4B1A: 
-void cCreep::obj_ExecRayGun( byte pX ) {
+void cCreep::obj_RayGun_Img_Execute( byte pX ) {
 	if( byte_2E36 & 3 )
 		return;
 
@@ -4818,7 +4820,7 @@ void cCreep::obj_ExecRayGun( byte pX ) {
 			// Can RayGun Move Up
 			if( A != mDump[ word_40 + 2 ] ) {
 				mDump[ word_40 + 4 ] = A - 1;
-				obj_RayGun_UpdateControl( 0x5C );
+				obj_RayGun_Control_Update( 0x5C );
 			} else
 				goto s4BD9;
 
@@ -4826,7 +4828,7 @@ void cCreep::obj_ExecRayGun( byte pX ) {
 			// 4BD4
 			if( !(A & byte_4D66) ) {
 s4BD9:;
-				obj_RayGun_UpdateControl( 0xCC );
+				obj_RayGun_Control_Update( 0xCC );
 				goto s4C27;
 			}
 			// 4BE1
@@ -4837,7 +4839,7 @@ s4BD9:;
 				goto s4BD9;
 
 			mDump[ word_40 + 4 ] = A + 1;
-			obj_RayGun_UpdateControl( 0xC2 );
+			obj_RayGun_Control_Update( 0xC2 );
 		}	
 	}
 	// 4BF4
@@ -4879,13 +4881,13 @@ s4C27:;
 	if( (A & byte_4D61) )
 		return;
 
-	obj_RayGun_Laser_Create( pX );
+	obj_RayGun_Laser_Add( pX );
 	A |= byte_4D61;
 	mDump[ word_40 ] = A;
 }
 
 // 4E32: Teleport?
-void cCreep::obj_ExecTeleport( byte pX ) {
+void cCreep::obj_Teleport_Img_Execute( byte pX ) {
 	if( byte_2E36 & 1 )
 		return;
 
@@ -4922,7 +4924,7 @@ void cCreep::obj_ExecTeleport( byte pX ) {
 }
 
 // 4C58: Load the rooms' Ray Guns
-void cCreep::obj_PrepRayGun() {
+void cCreep::obj_RayGun_Prepare() {
 
 	word_4D5B = word_3E;
 	byte_4D5D = 0;
@@ -4997,7 +4999,7 @@ void cCreep::obj_PrepRayGun() {
 }
 
 // 49F8: Load the rooms' Keys
-void cCreep::obj_PrepKey() {
+void cCreep::obj_Key_Load() {
 	word_4A65 = word_3E;
 
 	byte_4A64 = 0;
@@ -5030,7 +5032,7 @@ void cCreep::obj_PrepKey() {
 
 }
 
-void cCreep::obj_PrepLock() {
+void cCreep::obj_Door_Lock_Prepare() {
 	
 	byte X, gfxPosX, gfxPosY;
 
@@ -5061,7 +5063,7 @@ void cCreep::obj_PrepLock() {
 	++word_3E;
 }
 
-void cCreep::obj_PrepDoors() {
+void cCreep::obj_Door_Prepare() {
 	byte byte_41D0 = *level(word_3E++);
 	word_41D3 = word_3E;
 	
@@ -5120,7 +5122,7 @@ void cCreep::obj_PrepDoors() {
 }
 
 // 42AD: Lightning Machine pole movement
-void cCreep::obj_ExecLightningMachine( byte pX ) {
+void cCreep::obj_Lightning_Img_Execute( byte pX ) {
 	byte gfxPosX, gfxPosY;
 
 	byte byte_43E2, byte_43E3;
@@ -5130,7 +5132,7 @@ void cCreep::obj_ExecLightningMachine( byte pX ) {
 	if( mDump[ 0xBE01 + pX ] != 1 ) {
 		mDump[ 0xBE01 + pX ] = 1;
 
-		obj_Lightning_Unk( pX );
+		obj_Lightning_Add( pX );
 
 	} else {
 		// 42CF
@@ -5223,7 +5225,7 @@ void cCreep::obj_ExecLightningMachine( byte pX ) {
 
 }
 
-void cCreep::obj_PrepDoorbell() {
+void cCreep::obj_Door_Button_Prepare() {
 	byte gfxCurrentID, gfxPosX, gfxPosY;
 	byte byte_42AB;
 
@@ -5278,7 +5280,7 @@ void cCreep::obj_PrepDoorbell() {
 }
 
 // 44E7: Lightning Switch
-void cCreep::obj_InFrontLightningSwitch( byte pX, byte pY ) {
+void cCreep::obj_Lightning_Switch_InFront( byte pX, byte pY ) {
 	if( mDump[ 0xBD00 + pX ] )
 		return;
 
@@ -5348,7 +5350,7 @@ void cCreep::obj_InFrontLightningSwitch( byte pX, byte pY ) {
 }
 
 // 45E0: Forcefield Timer
-void cCreep::obj_ExecForcefieldTimer( byte pX ) {
+void cCreep::obj_Forcefield_Img_Timer_Execute( byte pX ) {
 	--mDump[ 0xBE01 + pX ];
 	if( mDump[ 0xBE01 + pX ] != 0 )
 		return;
@@ -5381,7 +5383,7 @@ void cCreep::obj_ExecForcefieldTimer( byte pX ) {
 }
 
 // Lightning Machine Setup
-void cCreep::obj_PrepLightning() {
+void cCreep::obj_Lightning_Prepare() {
 	byte	byte_44E5, byte_44E6, gfxPosX, gfxPosY;
 
 	word_45DB = word_3E;
@@ -5448,7 +5450,7 @@ void cCreep::obj_PrepLightning() {
 }
 
 // 46AE: Forcefield
-void cCreep::obj_PrepForcefield() {
+void cCreep::obj_Forcefield_Prepare() {
 	byte X = 0;
 	byte gfxPosX, gfxPosY;
 
@@ -5499,7 +5501,7 @@ void cCreep::obj_PrepForcefield() {
 }
 
 // 4872 : Load the rooms' Mummys
-void cCreep::obj_PrepMummy( ) {
+void cCreep::obj_Mummy_Prepare( ) {
 	byte	byte_498D = 0, byte_498E, byte_498F;
 	byte	X;
 	byte	gfxCurrentID;
@@ -5562,7 +5564,7 @@ void cCreep::obj_PrepMummy( ) {
 			screenDraw( 0, 0x43, gfxPosX, gfxPosY, 0x42 );
 			
 			if( mDump[ word_3E ] == 2 ) {
-				obj_Mummy_Unk(0xFF, X);
+				obj_Mummy_Add(0xFF, X);
 			}
 		}
 		// 496E
@@ -5572,7 +5574,7 @@ void cCreep::obj_PrepMummy( ) {
 }
 
 // 517F : Load the rooms' Trapdoors
-void cCreep::obj_PrepTrapDoor( ) {
+void cCreep::obj_TrapDoor_Prepare( ) {
 	byte	byte_5381;
 	word_5387 = word_3E;
 
@@ -5633,7 +5635,7 @@ void cCreep::obj_PrepTrapDoor( ) {
 }
 
 // 50D2: Floor Switch
-void cCreep::obj_ExecFloorSwitch( byte pX ) {
+void cCreep::obj_TrapDoor_Switch_Img_Execute( byte pX ) {
 	
 	word_40 = word_5387 + mDump[ 0xBE00 + pX ];
 	if( mDump[ 0xBE01 + pX ] ) {
@@ -5671,7 +5673,7 @@ void cCreep::obj_ExecFloorSwitch( byte pX ) {
 }
 
 // 538B: Conveyor
-void cCreep::obj_ExecConveyor( byte pX ) {
+void cCreep::obj_Conveyor_Img_Execute( byte pX ) {
 	
 	word_40 = word_564B + mDump[ 0xBE00 + pX ];
 	byte A = mDump[ word_40 ];
@@ -5763,7 +5765,7 @@ s53B3:;
 }
 
 // 47A7: In Front Mummy Release
-void cCreep::obj_InFrontMummyRelease( byte pX, byte pY ) {
+void cCreep::obj_Mummy_Infront( byte pX, byte pY ) {
 	byte byte_486F = pX;
 	byte byte_4870 = pY;
 	
@@ -5810,11 +5812,11 @@ void cCreep::obj_InFrontMummyRelease( byte pX, byte pY ) {
 	byte gfxPosY = mTxtY_0;
 
 	screenDraw( 0, 0x43, gfxPosX, gfxPosY, 0 );
-	obj_Mummy_Unk(0, byte_4870 );
+	obj_Mummy_Add(0, byte_4870 );
 }
 
 // 564E: Load the rooms' frankensteins
-void cCreep::obj_PrepFrankenstein() {
+void cCreep::obj_Frankie_Load() {
 	word_5748 = word_3E;
 	byte byte_574B;
 
@@ -5867,7 +5869,7 @@ void cCreep::obj_PrepFrankenstein() {
 			gfxPosY += 0x18;
 			screenDraw( 0, 0x1C, gfxPosX, gfxPosY, 0 );
 		}
-		obj_Frank_Create();
+		obj_Frankie_Add();
 
 		word_3E += 0x07;
 		byte_574A += 0x07;
@@ -5876,7 +5878,7 @@ void cCreep::obj_PrepFrankenstein() {
 }
 
 // 5501: Load the rooms' Conveyors
-void cCreep::obj_PrepConveyor() {
+void cCreep::obj_Conveyor_Prepare() {
 	word_564B = word_3E;
 
 	byte byte_5649 = 0, gfxPosX = 0, gfxPosY = 0;
@@ -5968,7 +5970,7 @@ void cCreep::obj_Forcefield_Create() {
 }
 
 // 38CE: Mummy ?
-void cCreep::obj_Mummy_Unk2( byte pX, byte pY ) {
+void cCreep::obj_Mummy_Collision( byte pX, byte pY ) {
 	byte byte_3A07 = pY;
 	if( mDump[ 0xBF00 + pY ] == 0x0B ) {
 		
@@ -6017,7 +6019,7 @@ void cCreep::sub_3A60( byte pX, byte pY ) {
 	byte_31F5 = 0;
 }
 
-void cCreep::obj_RayGun_Laser_Create( byte pX ) {
+void cCreep::obj_RayGun_Laser_Add( byte pX ) {
 	byte Y = pX;
 
 	byte A = mDump[ 0xBE00 + Y ] + 0x07;
@@ -6050,7 +6052,7 @@ void cCreep::obj_RayGun_Laser_Create( byte pX ) {
 }
 
 // 396A: 
-void cCreep::obj_Mummy_Unk( byte pA, byte pX ) {
+void cCreep::obj_Mummy_Add( byte pA, byte pX ) {
 	byte byte_39EE = pA;
 	byte X;
 	byte Y = pX;
@@ -6087,7 +6089,7 @@ void cCreep::obj_Mummy_Unk( byte pA, byte pX ) {
 }
 
 // 379A: Mummy
-void cCreep::obj_ExecMummy( byte pX ) {
+void cCreep::obj_Mummy_Execute( byte pX ) {
 	byte A = mDump[ 0xBD04 + pX ];
 
 	if( A & byte_885 ) {
@@ -6198,7 +6200,7 @@ void cCreep::obj_ExecMummy( byte pX ) {
 }
 
 // 3A08
-void cCreep::obj_ExecRayGunLaser( byte pX ) {
+void cCreep::obj_RayGun_Laser_Execute( byte pX ) {
 	byte A = mDump[ 0xBD04 + pX ];
 
 	if( A & byte_885 ) {
@@ -6282,7 +6284,7 @@ void cCreep::img_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCur
 }
 
 // 41D8: In Front Button?
-void cCreep::obj_InFrontButton( byte pX, byte pY ) {
+void cCreep::obj_Door_Button_InFront( byte pX, byte pY ) {
 	byte byte_42AC = pX;
 	if( mDump[ 0xBD00 + pX ] )
 		return;
@@ -6315,7 +6317,7 @@ void cCreep::obj_InFrontButton( byte pX, byte pY ) {
 }
 
 // 4647: In Front Forcefield Timer
-void cCreep::obj_InFrontForcefieldTimer( byte pX, byte pY ) {
+void cCreep::obj_Forcefield_Timer_InFront( byte pX, byte pY ) {
 	if(mDump[ 0xBD00 + pX ])
 		return;
 
@@ -6340,7 +6342,7 @@ void cCreep::obj_InFrontForcefieldTimer( byte pX, byte pY ) {
 }
 
 // 4990: In front of key
-void cCreep::obj_InFrontKey( byte pX, byte pY ) {
+void cCreep::obj_Key_Infront( byte pX, byte pY ) {
 	byte byte_4A67 = pY;
 
 	if( mDump[ 0xBD00 + pX ] )
@@ -6372,7 +6374,7 @@ void cCreep::obj_InFrontKey( byte pX, byte pY ) {
 }
 
 // 4A68: In Front Lock
-void cCreep::obj_InFrontLock( byte pX, byte pY ) {
+void cCreep::obj_Door_Lock_InFront( byte pX, byte pY ) {
 	byte byte_4B19 = pX;
 
 	if( mDump[ 0xBD00 + pX ] )
@@ -6426,7 +6428,7 @@ bool cCreep::sub_5E8E( byte pA, byte pX, byte pY ) {
 }
 
 // 4D70: In Front RayGun Control
-void cCreep::obj_InFrontRaygunControl( byte pX, byte pY ) {
+void cCreep::obj_RayGun_Control_InFront( byte pX, byte pY ) {
 	byte byte_4E30 = pY;
 
 	if(mDump[ 0xBD00 + pX ])
@@ -6474,7 +6476,7 @@ void cCreep::obj_InFrontRaygunControl( byte pX, byte pY ) {
 
 
 // 4EA8: Teleport?
-void cCreep::obj_InFrontTeleport( byte pX, byte pY ) {
+void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 	byte byte_50CE, byte_50CF;
 	
 	if( mDump[ 0xBF04 + pY ] & byte_840 )
@@ -6549,7 +6551,7 @@ void cCreep::obj_InFrontTeleport( byte pX, byte pY ) {
 }
 
 // 4DE9: 
-void cCreep::obj_RayGun_UpdateControl( byte pA ) {
+void cCreep::obj_RayGun_Control_Update( byte pA ) {
 	byte byte_4E31 = pA;
 	
 	mDump[ 0x6DBF ] = pA;
@@ -6664,7 +6666,7 @@ void cCreep::sub_526F( char &pA ) {
 }
 
 // 548B: In Front Conveyor
-void cCreep::obj_InFrontConveyor( byte pX, byte pY ) {
+void cCreep::obj_Conveyor_InFront( byte pX, byte pY ) {
 	byte byte_564D;
 	word_40 = word_564B + mDump[ 0xBE00 + pY ];
 
@@ -6714,7 +6716,7 @@ s54F4:;
 }
 
 // 5611: In Front Conveyor Control
-void cCreep::obj_InFrontConveyorControl( byte pX, byte pY ) {
+void cCreep::obj_Conveyor_Control_InFront( byte pX, byte pY ) {
 	if( mDump[ 0xBD00 + pX ] )
 		return;
 
