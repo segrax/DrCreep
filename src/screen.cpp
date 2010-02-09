@@ -17,17 +17,13 @@ cScreen::cScreen( string pWindowTitle ) {
 
 	mSDLSurfaceScaled =	0;
 	mWindow = 0;
+	mWindowTitle = pWindowTitle;
 
 	mSurface = new cScreenSurface( gWidth, gHeight );
 	mBitmap = new cBitmapMulticolor();
 
-	// Default scale level
-	scaleSet(2);
-
 	// Create the SDL surfaces 
 	mSDLSurface = SDL_CreateRGBSurface(	SDL_SWSURFACE,	gWidth,	gHeight,	 32, 0, 0, 0, 0);
-
-	mWindow->titleSet( pWindowTitle );
 }
 
 cScreen::~cScreen() {
@@ -65,6 +61,7 @@ void cScreen::scaleSet( byte pScale ) {
 
 	mWindow = new cVideoWindow( width, height, 4 );
 	mSDLSurfaceScaled =	SDL_CreateRGBSurface(	SDL_SWSURFACE,	width, height,	 32, 0, 0, 0, 0);
+	mWindow->titleSet( mWindowTitle );
 }
 
 void cScreen::bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 ) {

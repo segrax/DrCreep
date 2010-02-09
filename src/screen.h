@@ -17,6 +17,7 @@ class cScreen {
 	cSprite					*mSprites[8];
 
 	size_t					 mScale;
+	string					 mWindowTitle;
 
 	void					 bitmapRefresh();
 	void					 blit( cSprite *pSprite, byte pSpriteNo );

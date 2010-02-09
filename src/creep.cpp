@@ -5,6 +5,13 @@
 #include "graphics/screenSurface.h"
 #include "playerInput.h"
 
+#ifdef WIN32
+#include <fcntl.h>
+#include <io.h>
+#endif
+
+#include<algorithm>
+
 cCreep::cCreep() {
 	size_t RomSize;
 
@@ -12,6 +19,7 @@ cCreep::cCreep() {
 	windowTitle << "The Castles of Dr. Creep - SVN: " << SVNREV;
 	windowTitle << "(" << SVNDATE << ")";
 
+	mScreen = new cScreen( windowTitle.str() );
 	mOrigObjectSize = 0;
 	mDumpSize = 0;
 	mLevel = 0;
@@ -19,7 +27,6 @@ cCreep::cCreep() {
 	mUnlimitedLives = 0;
 	mQuit = false;
 
-	mScreen = new cScreen( windowTitle.str() );
 	m64CharRom = fileRead( "char.rom", RomSize );
 	mDumpSize = 0x10000;
 	mDump = new byte[ mDumpSize ];
@@ -109,6 +116,7 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 
 	int	count = 0;
 	size_t	playLevel = 0;
+	bool	playLevelSet = false;
 
 	while( count < pArgCount ) {
 		string arg = string( pArgs[count] );
@@ -118,16 +126,42 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 		
 		if( arg == "-l" ) {
 			playLevel = atoi( pArgs[ ++count ] );
+			playLevelSet = true;
 		}
 
 		++count;
 	}
 
+	if(!playLevelSet) {
+		displayLevels();
+		string lvl;
+		cout << "\nSelect a level: ";
+		cin >> lvl;
+
+		playLevel = atoi( lvl.c_str() );
+	}
+
+#ifdef WIN32
 	if( !consoleShow ) {
 		HWND hWnd = GetConsoleWindow();
 		ShowWindow( hWnd, SW_HIDE );
-	}
+	} else {
+		// Display the console
+	    AllocConsole();
+	    SetConsoleTitle( L"The Castles of Dr.Creep" );
 
+        // Assign Standard Output
+	    HANDLE handle_out = GetStdHandle(STD_OUTPUT_HANDLE);
+        int hCrt = _open_osfhandle((long) handle_out, _O_TEXT);
+        FILE* hf_out = _fdopen(hCrt, "w");
+        setvbuf(hf_out, NULL, _IONBF, 1);
+        *stdout = *hf_out;
+	    // --Assign Standard Output
+
+	}
+#endif
+
+	mScreen->scaleSet( 2 );
 	start( playLevel );
 
 }
@@ -237,6 +271,24 @@ void cCreep::start( size_t pStartLevel ) {
 	mainLoop();
 }
 
+void cCreep::displayLevels() {
+	vector<string> files = directoryList( "castles\\Z*" );
+	vector<string>::iterator fileIT;
+
+	size_t number = 0;
+
+	for(fileIT = files.begin(); fileIT != files.end(); ++fileIT ) {
+		string castleName = (*fileIT).substr(1);
+ 
+		std::transform(castleName.begin(), castleName.end(), castleName.begin(), tolower);
+		
+		castleName[0] = toupper( castleName[0] );
+		cout << number++ << ". ";
+		cout << castleName << "\n";
+	}
+
+}
+
 void cCreep::changeLevel( size_t pNumber ) {
 	vector<string> files = directoryList( "castles\\Z*" );
 	
@@ -244,6 +296,8 @@ void cCreep::changeLevel( size_t pNumber ) {
 	string lvlFile = "castles\\";
 	if(files.size() < pNumber)
 		return;
+
+	cout << "Loading Castle '" << files[pNumber] << "'\n";
 
 	lvlFile.append( files[pNumber] );
 
