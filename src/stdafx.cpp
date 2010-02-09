@@ -1,4 +1,3 @@
-#include <windows.h>
 #include <direct.h>
 #include "stdafx.h"
 #include "creep.h"
@@ -11,7 +10,7 @@ int	main( int argc, char *argv[] ) {
 
 	gCreep = new cCreep();
 	
-	gCreep->run();
+	gCreep->run( argc, argv );
 
 	delete gCreep;
 

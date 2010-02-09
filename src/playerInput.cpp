@@ -19,6 +19,9 @@ void cPlayerInput::inputCheck( bool pClearAll ) {
 
 	while( SDL_PollEvent(&mEvent) ) {
 
+		if( mEvent.type == SDL_QUIT )
+			exit(0);
+
 		KeyboardCheck();
 		KeyboardInputSet1( &mInput[ 0 ] );
 

@@ -5,8 +5,8 @@ class cCreep {
 
 private:
 
-	byte			*mDump,			*mLevel,		*m64CharRom;
-	size_t			 mDumpSize;
+	byte			*mDump,			*mOrigObject,		*mLevel,		*m64CharRom;
+	size_t			 mDumpSize,		 mOrigObjectSize;
 
 	cScreen			*mScreen;
 	cPlayerInput	*mInput;
@@ -19,6 +19,8 @@ private:
 	timeb		 mTimePrevious;
 
 	bool		 mQuit;
+
+	byte		 mStrLength;
 
 	byte		 byte_20DE, byte_24FD, mRunStopPressed;
 	byte		 byte_2E02;
@@ -94,7 +96,7 @@ public:
 		void	 ScreenClear();
 		void	 roomLoad();
 		void	 changeLevel( size_t pNumber );
-		void	 stringPrint(  );
+		void	 obj_stringPrint(  );
 		void	 screenDraw(  word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID );
 		void	 handleEvents();
 		void	 Game();
@@ -114,13 +116,18 @@ public:
 		void	 SavePosition();
 		void	 SpriteDraw();
 		void	 SpriteMovement( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
-		void	 start();	
+		void	 start( size_t pStartLevel );	
 		void	 sub_95F();
 		void	 mapRoomDraw();
 		void	 obj_MultiDraw(); 
 		void	 sub_1935( byte pA );
-		void	 sub_1950();
+		void	 gameEscapeCastle();
+		void	 sub_1B9F();
+		void	 highscoresDisplay();
 		void	 sub_21C8( char pA );
+		void	 textShow();
+		void	 sub_2772();
+		byte	 sub_27A8();
 		void	 sub_2973();
 		void	 sub_29AE();
 		void	 sub_29D0( byte pA, byte pY );
@@ -195,14 +202,17 @@ public:
 		bool	 sub_5750( byte &pX );
 		void	 sub_57DF( byte pX );
 		bool	 sub_5E8E( byte pA, byte pX, byte pY );
+
+		void	 hw_SaveFile( );
 		void	 hw_SpritePrepare( byte &pX );
+
 		byte	 sub_5ED5( );
 		void	 sub_5F6B( byte &pX );
 		void	 sub_5FA3();
 		void	 sub_6009( byte pA );
 		void	 stringDraw( );
 		void	 roomPrepare( );
-		void	 run();
+		void	 run( int pArgCount, char *pArgs[] );
 
-		void	 interruptWait();
+		void	 interruptWait( byte pCount );
 };
