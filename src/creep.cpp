@@ -2774,8 +2774,8 @@ s10EB:;
 			mMemory[ 0x11D0 ] = 0;
 			return;
 		}
+
 		// 115A
-		
 		KeyboardJoystickMonitor( X );
 		if( byte_5F6A == 1 ) {
 			byte_2E02 = 1;
@@ -2789,6 +2789,7 @@ s10EB:;
 			gamePositionSave();
 			goto sF99;
 		}
+
 		// 117D
 		if( byte_5F57 )
 			mMemory[ 0x11CC + X ] = 1;
@@ -2822,6 +2823,7 @@ s10EB:;
 	mMemory[ 0x11D0 ] = 0;
 }
 
+// 34EF
 void cCreep::obj_Player_Collision( byte pX, byte pY ) {
 	byte A;
 	if( mMemory[ 0xBF00 + pY ] == 0x0B ) {
@@ -2835,7 +2837,7 @@ void cCreep::obj_Player_Collision( byte pX, byte pY ) {
 		}
 
 	} 
-	//3505
+	// 3505
 	byte_31F5 = 0;
 	if( mMemory[ 0xBF00 + pY ] != 0x0C ) 
 		return;

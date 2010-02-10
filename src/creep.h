@@ -158,7 +158,6 @@ public:
 		void	 sprite_FlashOnOff( byte pX );			// Flash a sprite on and off
 		void	 stringDraw( );							// Draw a string
 
-
 		void	 textShow();
 
 		void	 roomLoad();
@@ -183,6 +182,11 @@ public:
 		void	 sub_5F6B( byte &pX );
 		void	 sub_5FA3();
 		void	 sub_6009( byte pA );
+		
+		// Image Handling Functions
+		void	 img_Actions( );
+		bool	 img_FindFree( byte &pX );
+		void	 img_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
 
 		// object Handling Functions
 		void	 obj_Actions( );
@@ -197,12 +201,6 @@ public:
 
 		void	 obj_MultiDraw();					// Draw multiple objects
 		void	 obj_stringPrint(  );				// Draw a string
-
-		// Image Handling Functions
-		void	 img_Actions( );
-		bool	 img_FindFree( byte &pX );
-		void	 img_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
-		
 
 		// Object Functions
 		void	 obj_Conveyor_Prepare( );
