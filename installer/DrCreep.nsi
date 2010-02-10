@@ -162,6 +162,7 @@ FunctionEnd
 
 Section "Uninstall"
 
+    Delete "$INSTDIR\License.txt"
     Delete "$INSTDIR\creep.exe"
     Delete "$INSTDIR\Uninstall.exe"
     Delete "$INSTDIR\Readme.txt"
