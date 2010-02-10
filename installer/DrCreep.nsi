@@ -26,7 +26,7 @@ SetCompressor lzma
 
 	Name	"Dr. Creep"
 	Caption "The Castles Dr. Creep v${VERSION} Installer (${BUILDDATE})"
-	OutFile  ..\DrCreep-${VERSION}.exe
+	OutFile  ..\packages\DrCreep-${VERSION}.exe
 
 	;Default installation folder
 	InstallDir "$PROGRAMFILES\DrCreep"
