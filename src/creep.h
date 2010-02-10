@@ -173,6 +173,7 @@ public:
 		void	 sub_2973();
 		void	 sub_29AE();
 		void	 sub_29D0( byte pA, byte pY );
+		void	 sub_3940( byte pX, byte pY );
 		void	 sub_3A60( byte pX, byte pY );
 		void	 sub_505C( byte pA, byte pX );
 		void	 sub_5171( byte pA );

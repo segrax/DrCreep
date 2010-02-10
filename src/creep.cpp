@@ -705,7 +705,7 @@ void cCreep::roomLoad() {
 
 	//14AC
 	// Ptr to start of room data
-	word_3E = *( (word*) &mMemory[word_42 + 6] );
+	word_3E = readWord( &mMemory[word_42 + 6] );
 
 	if(mMenuIntro)
 		word_3E += 0x2000;
@@ -724,7 +724,7 @@ void cCreep::roomPrepare( ) {
 		word_3E  += 2;
 
 		switch( func ) {
-			case 0:
+			case 0:			// Finished
 				return;
 
 			case 0x0803:	// Doors
@@ -1283,8 +1283,7 @@ bool cCreep::obj_Actions_Collision( byte pX, byte pY ) {
 			break;
 
 		case 0x3940:
-			// TODO
-			//sub_3940( pX, pY );
+			sub_3940( pX, pY );
 			break;
 
 		case 0x3A60:		//
@@ -6049,7 +6048,20 @@ void cCreep::obj_Mummy_Collision( byte pX, byte pY ) {
 	mMemory[ 0xBD1C + pX ] = mMemory[ 0xBE00 + pY ];
 }
 
-// 3A60 
+// 3940: 
+void cCreep::sub_3940( byte pX, byte pY ) {
+	byte A = mMemory[ 0xBD00 + pY ];
+	if( A == 0 || A == 5 ) {
+		byte_311D = 0;
+		return;
+	}
+
+	word_40 = word_498B + mMemory[ 0xBD1D + pX ];
+
+	mMemory[ word_40 ] = 3;
+}
+
+// 3A60:  
 void cCreep::sub_3A60( byte pX, byte pY ) {
 	byte A = mMemory[ 0xBF00 + pY ] ;
 	
