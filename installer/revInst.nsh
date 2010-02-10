@@ -1,2 +1,2 @@
-!define VERSION "105"
-!define BUILDDATE "2010/02/10 17:10:29"
+!define VERSION "106"
+!define BUILDDATE "2010/02/10 21:02:27"
