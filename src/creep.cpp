@@ -553,7 +553,7 @@ void cCreep::mainLoop() {
 
 	while(!mQuit) {
 		
-		if( Menu() == true )
+		if( Intro() == true )
 			continue;
 
 		Game();
@@ -562,7 +562,7 @@ void cCreep::mainLoop() {
 }
 
 // 18E4
-void cCreep::ScreenClear() {
+void cCreep::screenClear() {
 	word word_30 = 0xFF00;
 
 	byte Y = 0xF9;
@@ -596,7 +596,7 @@ void cCreep::ScreenClear() {
 // 13F0
 void cCreep::roomLoad() {
 	
-	ScreenClear();
+	screenClear();
 
 	word_30 = 0xC000;
 
@@ -762,7 +762,7 @@ void cCreep::roomPrepare( ) {
 }
 
 // B8D
-bool cCreep::Menu() {
+bool cCreep::Intro() {
 
 	mMenuMusicScore = 0;
 	mMenuScreenTimer = 3;
@@ -786,7 +786,7 @@ bool cCreep::Menu() {
 		} else {
 			word_3E = 0x0D1A;
 
-			ScreenClear();
+			screenClear();
 			roomPrepare( );
 		}
 		
@@ -2475,7 +2475,7 @@ void cCreep::Game() {
 		// E7D
 		mapDisplay();
 		GameMain();
-		ScreenClear();
+		screenClear();
 		
 		mDump[ 0xF62 ] = 0;
 
@@ -2528,7 +2528,7 @@ sEFC:;
 		// Game Over Check
 		// F0B
 		if( mDump[ 0xF62 ] == 1 ) {
-			ScreenClear();
+			screenClear();
 
 			word_3E = 0x0F64;		// Game Over
 			obj_stringPrint();
@@ -2561,7 +2561,7 @@ void cCreep::mapDisplay() {
 	byte gfxPosX, gfxPosY;
 
 sF99:;
-	ScreenClear();
+	screenClear();
 
 	mDump[ 0xD028 ] = mDump[ 0xD027 ] = 0;
 	mDump[ 0x11D7 ] = 0;
@@ -2748,7 +2748,7 @@ s10EB:;
 			goto sF99;
 		}
 		if( mRunStopPressed == 1 ) {
-			SavePosition();
+			gamePositionSave();
 			goto sF99;
 		}
 		// 117D
@@ -3804,7 +3804,7 @@ void cCreep::hw_IntSleep( byte pA ) {
 // 1950: Player Escapes from the Castle
 void cCreep::gameEscapeCastle() {
 	
-	ScreenClear();
+	screenClear();
 	mDump[ 0x0B72 ] = 6;
 	if( mDump[ 0x7802 ] & 0x80 ) {
 		word_3E = readWord( &mDump[ 0x785F ] );
@@ -3989,7 +3989,7 @@ s1BE7:;
 	// 1C4D
 	word_30 = readWord( &mDump[ 0x1D03 ] );
 	mDump[ word_30 ] = 0;
-	highscoresDisplay();
+	gameHighScores();
 
 	// 1C60
 
@@ -4047,8 +4047,8 @@ s1BE7:;
 }
 
 // 1D42: 
-void cCreep::highscoresDisplay() {
-	ScreenClear();
+void cCreep::gameHighScores() {
+	screenClear();
 
 	byte X = mDump[ 0x2399 ];
 	byte Y = mDump[ 0xBA01 + X ];
@@ -4443,7 +4443,7 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 }
 
 // 24FF
-void cCreep::SavePosition() {
+void cCreep::gamePositionSave() {
 	// TODO
 }
 

@@ -92,65 +92,92 @@ public:
 					return m64CharRom[ pAddress - 0xD000 ];
 				}
 
+		void	 start( size_t pStartLevel );							// Game Entry Point
+		void	 run( int pArgCount, char *pArgs[] );					// Executed from main()
+
 		word	 lvlPtrCalculate( byte pCount );
-		void	 ScreenClear();
-		void	 roomLoad();
+		
 		void	 castleDisplayList();
 		bool	 castleChangeLevel( size_t pNumber );
 
 		void	 Game();
 		void	 GameMain();
 
-		void	 obj_stringPrint(  );
-		void	 sub_1AE6();
-		void	 screenDraw(  word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID );
 		void	 events_Execute();
-
-		void	 sprite_FlashOnOff( byte pX );
-		void	 gameMenuDisplaySetup();
 		void	 KeyboardJoystickMonitor( byte pA );
-		void	 mainLoop();
-		void	 mapDisplay();
 
-		void	 optionsMenu();
-		bool	 Menu();
-		void	 SavePosition();
-
-
-		void	 start( size_t pStartLevel );	
-		void	 sub_95F();
-		void	 mapRoomDraw();
-		void	 obj_MultiDraw(); 
-		void	 hw_IntSleep( byte pA );
 		void	 gameEscapeCastle();
-		void	 sub_1B9F();
-		void	 highscoresDisplay();
-		void	 sub_21C8( char pA );
+		void	 gameHighScores();
+		void	 gameMenuDisplaySetup();
+		void	 gamePositionSave();
+
+		void	 hw_IntSleep( byte pA );				// hardware interrupt wait loop
+		void	 hw_SaveFile( );						// save a file
+		void	 hw_SpritePrepare( byte &pX );			// prepare a sprite 
+
+		bool	 Intro();								// Intro Loop
+		void	 interruptWait( byte pCount );			// Wait 'pCount' amount of VIC-II interrupt executions
+
+		void	 mainLoop();							// Main Intro/Game Loop
+
+		void	 mapDisplay();							// Map Screen
+		void	 mapRoomDraw();							// Draw the rooms on the map
+
+		void	 optionsMenu();							// In-Game Options Menu
+
+		void	 screenClear();							// Clear the screen
+		void	 screenDraw(  word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID );
+		
+		byte	 seedGet( );
+
+		void	 sprite_FlashOnOff( byte pX );			// Flash a sprite on and off
+		void	 stringDraw( );							// Draw a string
+
+
 		void	 textShow();
+
+		void	 roomLoad();
+		void	 roomPrepare( );
+		
+		void	 sub_95F();
+		void	 sub_1AE6();
+		void	 sub_1B9F();
+		void	 sub_21C8( char pA );
+		
 		void	 sub_2772();
 		byte	 sub_27A8();
 		void	 sub_2973();
 		void	 sub_29AE();
 		void	 sub_29D0( byte pA, byte pY );
+		void	 sub_3A60( byte pX, byte pY );
+		void	 sub_505C( byte pA, byte pX );
+		void	 sub_5171( byte pA );
+		void	 sub_526F( char &pA );
+		void	 sub_57DF( byte pX );
+		bool	 sub_5E8E( byte pA, byte pX, byte pY );
+		void	 sub_5F6B( byte &pX );
+		void	 sub_5FA3();
+		void	 sub_6009( byte pA );
 
-		
+		// object Handling Functions
 		void	 obj_Actions( );
 		bool	 obj_Actions_Collision( byte pX, byte pY );
 		bool	 obj_Actions_InFront( byte pX, byte pY );
 		void	 obj_Actions_Hit( byte pX, byte pY );
 		void	 obj_Actions_Execute( byte pX );
-
 		void	 obj_CheckCollisions( byte pX );
 		void	 obj_CollisionSet();
+		void	 obj_FindFree( byte &pX );
 		void	 obj_OverlapCheck( byte pX );
 
+		void	 obj_MultiDraw();					// Draw multiple objects
+		void	 obj_stringPrint(  );				// Draw a string
+
+		// Image Handling Functions
 		void	 img_Actions( );
 		bool	 img_FindFree( byte &pX );
 		void	 img_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
-
-		void	 obj_FindFree( byte &pX );
 		
-		void	 sub_3A60( byte pX, byte pY );
 
 		// Object Functions
 		void	 obj_Conveyor_Prepare( );
@@ -221,24 +248,4 @@ public:
 		void	 obj_RayGun_Control_Update( byte pA );
 
 		void	 obj_Walkway_Prepare( );
-
-		void	 sub_505C( byte pA, byte pX );
-		void	 sub_5171( byte pA );
-		void	 sub_526F( char &pA );
-		
-		void	 sub_57DF( byte pX );
-		bool	 sub_5E8E( byte pA, byte pX, byte pY );
-
-		void	 hw_SaveFile( );
-		void	 hw_SpritePrepare( byte &pX );
-
-		byte	 seedGet( );
-		void	 sub_5F6B( byte &pX );
-		void	 sub_5FA3();
-		void	 sub_6009( byte pA );
-		void	 stringDraw( );
-		void	 roomPrepare( );
-		void	 run( int pArgCount, char *pArgs[] );
-
-		void	 interruptWait( byte pCount );
 };
