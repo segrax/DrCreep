@@ -77,5 +77,5 @@ extern const char *SVNDATE;
 #endif
 
 vector<string>	 directoryList(string pPath);
-byte			*fileRead( string pFile, size_t	&pFileSize );
+byte			*local_FileRead( string pFile, size_t	&pFileSize );
 

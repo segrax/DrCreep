@@ -25,17 +25,19 @@
 
 class cScreen;
 class cPlayerInput;
+class cD64;
 
 class cCreep {
 
 private:
 
 	byte			*mMemory,			*mOrigObject,		*mLevel,		*m64CharRom;
-	size_t			 mMemorySize,		 mOrigObjectSize;
+	size_t			 mMemorySize;
 
+	cD64			*mD64;				// Game Disk
 	cScreen			*mScreen;
 	cPlayerInput	*mInput;
-
+	
 	byte		 mFileListingNamePtr;
 	
 	bool		 mMenuIntro;
@@ -100,6 +102,11 @@ private:
 	byte		 mCount;
 	 
 	word		 word_30, word_32, word_34, word_3C, word_3E, word_40, word_42, word_44;
+
+	vector<string>  D64CastleList();
+	string			D64Find( string pExtension );
+	bool			D64Open( );
+	size_t			fileLoad( byte **pBuffer, string pFilename );
 
 public:
 

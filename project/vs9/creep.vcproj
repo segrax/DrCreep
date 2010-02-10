@@ -200,6 +200,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\src\d64.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\playerInput.cpp"
 				>
 			</File>
@@ -331,6 +335,10 @@
 			>
 			<File
 				RelativePath="..\..\src\creep.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\d64.h"
 				>
 			</File>
 			<File

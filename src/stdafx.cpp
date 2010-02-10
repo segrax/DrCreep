@@ -46,7 +46,7 @@ int	main( int argc, char *argv[] ) {
 	return 0;
 }
 
-byte *fileRead( string pFile, size_t	&pFileSize ) {
+byte *local_FileRead( string pFile, size_t	&pFileSize ) {
 	stringstream	 filePathFinal;
 	ifstream		*fileStream;
 	byte			*fileBuffer = 0;
