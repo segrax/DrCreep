@@ -75,20 +75,30 @@ void cCastleManager::localCleanup() {
 
 void cCastleManager::castlesFind() {
 	
+	// Cleanup current open files
 	castlesCleanup();
 	diskCleanup();
 	localCleanup();
 
+	// Find any d64 images in data
 	disksFind( "*.d64" );
 
+	// Load castles from Disk images, and from data\castles folder
 	diskLoadCastles();
 	localLoadCastles();
+
+	// Ensure atleast one disk was found
+	if( mDisks.size() == 0 ) {
+		cout << "No Disk Image found in data directory\n";
+		exit(1);
+	}
 
 }
 
 cCastleInfo *cCastleManager::castleGet( string pName ) {
 	vector< cCastleInfo* >::iterator castleIT;
 
+	// Find a castle
 	for( castleIT = mCastles.begin(); castleIT != mCastles.end(); ++castleIT )
 		if( (*castleIT)->nameGet() == pName )
 			return (*castleIT);
@@ -99,7 +109,8 @@ cCastleInfo *cCastleManager::castleGet( string pName ) {
 void cCastleManager::castleListDisplay() {
 	vector< cCastleInfo* >::iterator castleIT;
 	size_t number = 1;
-
+	
+	// Display a list of castles
 	for(castleIT = mCastles.begin(); castleIT != mCastles.end(); ++castleIT ) {
 	
 		cout << number++ << ". ";

@@ -4,7 +4,30 @@ The Castles of Dr. Creep
 
 About:
 ------
- The Castles of Dr. Creep is a clone of the 1984 game written by Ed Hobbs.
+ The Castles of Dr. Creep is a reimplementation of the 1984 
+  Commodore 64 game by Ed Hobbs.
+
+
+Whats Missing:
+--------------
+ *high scores
+ *music/sound effects
+ *options menu
+ *progress loading/saving
+
+
+Required To Play:
+----------------- 
+ Commodore 64 Disk Image (D64) of "The Castles of Dr. Creep", 
+  which should be placed inside the game 'data' folder. 
+
+
+Command Line Parameters:
+------------------------
+
+ -u    : Unlimited Lives
+ -c    : Display Console
+ -l xx : Start Castle number 'xx'
 
 
 Controls:
@@ -35,19 +58,4 @@ Playing:
 
  To start a 1 player game, press the Player1 Joystick Button
  To start a 2 player game, press the Player2 Joystick Button
-
-
-Command Line Parameters:
-------------------------
-
- -u    : Unlimited Lives
- -c    : Display COnsole
- -l xx : Start Castle number 'xx'
-
-
-Castles:
---------
-
- D64 files containing castles may be placed in the 'data' folder, and individual castles may  be placed in the 'data\castles' folder.
-
 
