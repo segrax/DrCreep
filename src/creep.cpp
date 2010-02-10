@@ -29,6 +29,7 @@
 #include "sprite.h"
 #include "graphics/screenSurface.h"
 #include "playerInput.h"
+#include "castle.h"
 #include "castleManager.h"
 
 #ifdef WIN32
@@ -134,7 +135,7 @@ cCreep::~cCreep() {
 
 	delete m64CharRom;
 	delete mMemory;
-	delete mLevel;
+	delete mCastleManager;
 }
 
 void cCreep::run( int pArgCount, char *pArgs[] ) {
