@@ -10,9 +10,8 @@
 ;
 ; NSIS Installer script
 
-!define VER_MAJOR 0
-!define VER_MINOR 1
-!define VER_REV   0
+!include revInst.nsh
+
 SetCompressor lzma
 ;--------------------------------
 ;Include Modern UI
@@ -20,15 +19,14 @@ SetCompressor lzma
   !include MUI2.nsh
   !include LogicLib.nsh
   
-  
 ;--------------------------------
 ;General
 	XPStyle on
 	
 
 	Name	"Dr. Creep"
-	Caption "The Castles Dr. Creep Installer"
-	OutFile  ..\drcreep-${VER_MAJOR}${VER_MINOR}${VER_REV}.exe
+	Caption "The Castles Dr. Creep v${VERSION} Installer (${BUILDDATE})"
+	OutFile  ..\DrCreep-${VERSION}.exe
 
 	;Default installation folder
 	InstallDir "$PROGRAMFILES\DrCreep"

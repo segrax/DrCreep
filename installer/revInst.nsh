@@ -1,0 +1,2 @@
+!define VERSION "89"
+!define BUILDDATE "2010/02/10 11:16:04"
