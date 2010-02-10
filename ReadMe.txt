@@ -34,3 +34,11 @@ Playing:
  To start a 1 player game, press the Player1 Joystick Button
  To start a 2 player game, press the Player2 Joystick Button
 
+
+Command Line Parameters:
+
+ -u    : Unlimited Lives
+ -c    : Display COnsole
+ -l xx : Start Castle number 'xx'
+
+

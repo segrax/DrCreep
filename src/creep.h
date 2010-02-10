@@ -30,8 +30,8 @@ class cCreep {
 
 private:
 
-	byte			*mDump,			*mOrigObject,		*mLevel,		*m64CharRom;
-	size_t			 mDumpSize,		 mOrigObjectSize;
+	byte			*mMemory,			*mOrigObject,		*mLevel,		*m64CharRom;
+	size_t			 mMemorySize,		 mOrigObjectSize;
 
 	cScreen			*mScreen;
 	cPlayerInput	*mInput;
@@ -110,14 +110,14 @@ public:
 					if(mMenuIntro)
 						return &mLevel[(pAddress - 0x9800) + 2];
 					else
-						return &mDump[pAddress];
+						return &mMemory[pAddress];
 				}
 				
 				inline byte charRom( word pAddress ) {
 					return m64CharRom[ pAddress - 0xD000 ];
 				}
 
-		void	 start( size_t pStartLevel );							// Game Entry Point
+		void	 start( size_t pStartLevel, bool pUnlimited );			// Game Entry Point
 		void	 run( int pArgCount, char *pArgs[] );					// Executed from main()
 
 		word	 lvlPtrCalculate( byte pCount );
