@@ -30,7 +30,7 @@
 		size_t			 _pixelBytes;
 
 	public:
-						 cVideoWindow( size_t pWidth, size_t pHeight, size_t pBytesPixel );
+						 cVideoWindow( size_t pWidth, size_t pHeight, size_t pBytesPixel, bool pFullScreen );
 						~cVideoWindow();
 
 		void clear( byte color ) {

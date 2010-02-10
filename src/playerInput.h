@@ -36,18 +36,22 @@ struct sPlayerInput {
 	}
 };
 
+class cCreep;
+
 class cPlayerInput {
 private:
 	SDL_Event			 mEvent;
 	sPlayerInput		 mInput[2];
+	cCreep				*mCreep;
 	bool				 mRunStop,	mRestore;
+	bool				 mFullscreen;
 
 	void		 KeyboardCheck();
 	void		 KeyboardInputSet1( sPlayerInput *pInput );
 	void		 KeyboardInputSet2( sPlayerInput *pInput );
 
 public:
-				 cPlayerInput();
+				 cPlayerInput( cCreep *pCreep );
 
 	void		 inputCheck( bool pClearAll = false );
 	
@@ -61,4 +65,5 @@ public:
 
 	bool		 runStopGet() { return mRunStop; }
 	bool		 restoreGet() { return mRestore; }
+	inline bool	 fullscreenGet() { return mFullscreen; }
 };

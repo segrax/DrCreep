@@ -25,8 +25,11 @@
 
 #include "stdafx.h"
 #include "playerInput.h"
+#include "creep.h"
+#include "screen.h"
 
-cPlayerInput::cPlayerInput() {
+cPlayerInput::cPlayerInput( cCreep *pCreep ) {
+	mCreep = pCreep;
 
 	mRunStop = false;
 	mRestore = false;
@@ -61,9 +64,13 @@ void cPlayerInput::KeyboardCheck() {
 
 		if( mEvent.key.keysym.sym == SDLK_F1 )
 			mRunStop = true;
-
+	
 		if( mEvent.key.keysym.sym == SDLK_ESCAPE )
 			mRestore = true;
+
+		if( mEvent.key.keysym.sym == SDLK_F10 ) {
+			mCreep->screenGet()->fullscreenToggle();
+		}
 	}
 	
 }

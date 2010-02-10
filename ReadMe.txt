@@ -11,6 +11,8 @@ Controls:
 ---------
 
  Escape = Self Kill
+ F1 = Restore Key (Pause/Resume)
+ F10 = Fullscreen Toggle
 
 
  Player 1:

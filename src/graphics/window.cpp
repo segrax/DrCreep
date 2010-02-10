@@ -26,8 +26,12 @@
 #include "../stdafx.h"
 #include "window.h"
 
-cVideoWindow::cVideoWindow( size_t pWidth, size_t pHeight, size_t pBytesPixel) {
-	
+cVideoWindow::cVideoWindow( size_t pWidth, size_t pHeight, size_t pBytesPixel, bool pFullScreen ) {
+	size_t flags = SDL_ANYFORMAT;
+
+	if( pFullScreen )
+		flags |= SDL_FULLSCREEN;
+
 	_width = pWidth;
 	_height = pHeight;
 	_pixelBytes = pBytesPixel;
@@ -35,7 +39,7 @@ cVideoWindow::cVideoWindow( size_t pWidth, size_t pHeight, size_t pBytesPixel) {
 	SDL_Init ( SDL_INIT_VIDEO ); 
 	atexit ( SDL_Quit ) ;
 
-	_surface = SDL_SetVideoMode ( pWidth , pHeight , pBytesPixel * 8 , SDL_ANYFORMAT ) ;
+	_surface = SDL_SetVideoMode ( pWidth , pHeight , pBytesPixel * 8 , flags ) ;
 	
 	if(!_surface)
 		return;

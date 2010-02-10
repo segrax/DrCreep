@@ -55,8 +55,8 @@ cCreep::cCreep() {
 		mMemory[x] = 0;
 
 	mCastleManager = new cCastleManager();
-	mInput = new cPlayerInput();
-	mScreen = new cScreen( windowTitle.str() );
+	mInput = new cPlayerInput( this );
+	mScreen = new cScreen( this, windowTitle.str() );
 	
 	// Load the C64 Character Rom
 	m64CharRom = local_FileRead( "char.rom", romSize );

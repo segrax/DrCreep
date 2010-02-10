@@ -29,10 +29,13 @@
 #include "sprite.h"
 #include "bitmapMulticolor.h"
 #include "screen.h"
+#include "creep.h"
 
 const word gWidth = 360, gHeight = 265;
 
-cScreen::cScreen( string pWindowTitle ) {
+cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
+
+	mCreep = pCreep;
 
 	for(byte Y = 0; Y < 8; ++Y ) {
 		mSprites[Y] = new cSprite();
@@ -40,12 +43,13 @@ cScreen::cScreen( string pWindowTitle ) {
 		mSprites[Y]->_multiColor1 = 0x0D;
 	}
 
-	mSDLSurfaceScaled =	0;
-	mWindow = 0;
-	mWindowTitle = pWindowTitle;
+	mFullScreen			= false;
+	mSDLSurfaceScaled	= 0;
+	mWindow				= 0;
+	mWindowTitle		= pWindowTitle;
 
-	mSurface = new cScreenSurface( gWidth, gHeight );
-	mBitmap = new cBitmapMulticolor();
+	mSurface	= new cScreenSurface( gWidth, gHeight );
+	mBitmap		= new cBitmapMulticolor();
 
 	// Create the SDL surfaces 
 	mSDLSurface = SDL_CreateRGBSurface(	SDL_SWSURFACE,	gWidth,	gHeight,	 32, 0, 0, 0, 0);
@@ -76,7 +80,7 @@ void cScreen::scaleSet( byte pScale ) {
 	if(pScale > 4)
 		return;
 
-	delete mSDLSurfaceScaled;
+	SDL_FreeSurface( mSDLSurfaceScaled );
 	delete mWindow;
 
 	mScale = pScale;
@@ -84,7 +88,7 @@ void cScreen::scaleSet( byte pScale ) {
 	width = gWidth * mScale;
 	height = gHeight * mScale;
 
-	mWindow = new cVideoWindow( width, height, 4 );
+	mWindow = new cVideoWindow( width, height, 4, mFullScreen );
 	mSDLSurfaceScaled =	SDL_CreateRGBSurface(	SDL_SWSURFACE,	width, height,	 32, 0, 0, 0, 0);
 
 	levelNameSet("");

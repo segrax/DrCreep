@@ -23,6 +23,7 @@
  *  ------------------------------------------
  */
 
+class cCreep;
 class cVideoWindow;
 class cBitmapMulticolor;
 class cSprite;
@@ -35,12 +36,15 @@ class cScreen {
 	cVideoWindow			*mWindow;
 	cBitmapMulticolor		*mBitmap;
 	cScreenSurface			*mSurface;
+	cCreep					*mCreep;
+
 	SDL_Surface				*mSDLSurface;
 	SDL_Surface				*mSDLSurfaceScaled;
 	
 	vector< sScreenPiece* >  mCollisions;
 	cSprite					*mSprites[8];
 
+	bool					 mFullScreen;
 	size_t					 mScale;
 	string					 mWindowTitle;
 
@@ -52,7 +56,7 @@ class cScreen {
 
 public:
 
-							 cScreen( string pWindowTitle );
+							 cScreen( cCreep *pCreep, string pWindowTitle );
 							~cScreen();
 	
 	void					 bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 );
@@ -69,4 +73,11 @@ public:
 	void					 refresh();
 
 	inline vector< sScreenPiece* > *collisionsGet() { return &mCollisions; }
+	inline void						fullscreenToggle() {	mFullScreen = !mFullScreen;
+															
+															if( mFullScreen )
+																scaleSet( 3 );
+															else 
+																scaleSet( 2 );
+														}
 };

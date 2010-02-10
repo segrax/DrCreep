@@ -119,6 +119,9 @@ public:
 					return m64CharRom[ pAddress - 0xD000 ];
 				}
 
+		inline cPlayerInput		*inputGet()		{ return mInput; }
+		inline cScreen			*screenGet()	{ return mScreen; }
+
 		void	 start( size_t pStartLevel, bool pUnlimited );			// Game Entry Point
 		void	 run( int pArgCount, char *pArgs[] );					// Executed from main()
 
