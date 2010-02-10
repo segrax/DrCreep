@@ -42,21 +42,24 @@ struct sFile {
 
 class cD64 {
 private:
-	byte				*mBuffer;
+	byte				*mBuffer;										// Disk image buffer
 	size_t				 mBufferSize, mTrackCount;
-	vector< sFile* >	 mFiles;
+	vector< sFile* >	 mFiles;										// Files in disk
 	
-	void				 directoryLoad();
-	bool				 fileLoad( sFile *pFile );
+	void				 directoryLoad();								// Load the disk directory
+	bool				 fileLoad( sFile *pFile );						// Load a file 
 
-	size_t				 trackRange(size_t pTrack);
-	byte				*sectorRead( size_t pTrack, size_t pSector );
+	byte				*sectorPtr( size_t pTrack, size_t pSector );	// Read a sector
+
+	inline size_t		 trackRange(size_t pTrack) {					// Number of sectors in 'pTrack'
+		return 21 - (pTrack > 17) * 2 - (pTrack > 24) - (pTrack > 30);
+	}
 
 public:
 						 cD64( string pD64 );
 						~cD64( );
 
-	vector< sFile* >	 directoryGet( string pFind );
-	vector< sFile* >	*directoryGet();
-	sFile				*fileGet( string pFilename );
+	vector< sFile* >	 directoryGet( string pFind );		// Get a file list, with all files starting with 'pFind'
+	vector< sFile* >	*directoryGet();					// Get the file list
+	sFile				*fileGet( string pFilename );		// Get a file
 };

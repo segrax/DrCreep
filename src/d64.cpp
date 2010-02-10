@@ -26,6 +26,16 @@
 #include "stdafx.h"
 #include "d64.h"
 
+string stringRip(byte *pBuffer, byte pTerminator, size_t pLengthMax) {
+	string tmpString;
+
+	for(size_t i = 0; *pBuffer != pTerminator && i <= pLengthMax; i++) {
+		tmpString += (char) *pBuffer++;
+	}
+
+	return tmpString;
+}
+
 cD64::cD64( string pD64 ) {
 	mBufferSize = 0;
 
@@ -37,115 +47,139 @@ cD64::cD64( string pD64 ) {
 }
 
 cD64::~cD64( ) {
-
 	vector< sFile * >::iterator		fileIT;
 
+	// Cleanup files
 	for( fileIT = mFiles.begin(); fileIT != mFiles.end(); ++fileIT )
 		delete *fileIT;
 
 	delete mBuffer;
-
-}
-
-size_t cD64::trackRange(size_t pTrack) {
-	return 21 - (pTrack > 17) * 2 - (pTrack > 24) - (pTrack > 30);
-}
-
-string stringRip(byte *pBuffer, byte pTerminator, size_t pLengthMax) {
-	string tmpString;
-
-	for(size_t i = 0; *pBuffer != pTerminator && i <= pLengthMax; i++) {
-		tmpString += (char) *pBuffer++;
-	}
-
-	return tmpString;
 }
 
 void cD64::directoryLoad() {
-	size_t   Track = 0x12, Sector = 1;
+	// Directory starts at Track 18, sector 1
+	size_t   currentTrack = 0x12, currentSector = 1;
 	byte	*sectorBuffer;
 
-	while( (Track > 0 && Track < mTrackCount) && (Sector <= trackRange( Track )) ) {
-		sectorBuffer = sectorRead( Track, Sector );
+	// Loop until the current Track/Sector is invalid
+	while( (currentTrack > 0 && currentTrack < mTrackCount) && (currentSector <= trackRange( currentTrack )) ) {
+		sectorBuffer = sectorPtr( currentTrack, currentSector );
 		byte *buffer = sectorBuffer;
+		
+		if(!buffer)
+			break;
 
 		for( byte i = 0; i <= 7; ++i ) {
-			
 			sFile *file = new sFile();
 			
+			// Get the filename
 			file->mName = stringRip( buffer + 0x05, 0xA0, 16 );
 			if( file->mName.size() == 0 ) {
 				delete file;
 				continue;
 			}
 			
+			// Get the starting Track/Sector
 			file->mTrack = *(buffer + 0x03);
 			file->mSector = *(buffer + 0x04);
 			
+			// Total number of blocks
 			file->mFileSize = readWord( buffer + 0x1E );
+
+			// Load the file into a new buffer
 			if(file->mFileSize > 0)
 				fileLoad( file );
-			
+				
+			mFiles.push_back( file );	
+
+			// Next Entry
 			buffer += 0x20;
-			mFiles.push_back( file );
 		}
 
-		Track = sectorBuffer[0];
-		Sector = sectorBuffer[1];
+		// Get the next Track/Sector in the chain
+		currentTrack = sectorBuffer[0];
+		currentSector = sectorBuffer[1];
 	}
 }
 
 bool cD64::fileLoad( sFile *pFile ) {
 	size_t copySize = 254;
-	size_t Track = pFile->mTrack, Sector = pFile->mSector;
+	size_t currentTrack = pFile->mTrack, currentSector = pFile->mSector;
 
+	// 
+	delete pFile->mBuffer;
+	
+	// Prepare the buffer, (Each block is 254 bytes)
 	pFile->mBuffer = new byte[ pFile->mFileSize * 254 ];
 	pFile->mBufferSize = pFile->mFileSize * 254;
 
+	// Temp buffer ptr
 	byte *destBuffer = pFile->mBuffer;
 
-	while( Track > 0 && (Sector <= trackRange( Track )) ) {
+	// Loop until invalid track/sector
+	while( currentTrack > 0 && (currentSector <= trackRange( currentTrack )) ) {
 		
-		byte *buffer = sectorRead( Track, Sector );
+		// Get ptr to current sector
+		byte *buffer = sectorPtr( currentTrack, currentSector );
+
 		if(!buffer)
 			return false;
 		
+		// Last Sector of file? 
 		if( buffer[0] == 0 ) {
+
+			// Bytes used is stored in the T/S chain sector value
 			copySize = (buffer[1] - 1);
+
+			// Decrease filesize
 			pFile->mFileSize -= (254 - copySize);
 		}
 
 		// Copy sector data, excluding the T/S Chain data
 		memcpy( destBuffer, buffer + 2, copySize );
 		
+		// Move the dest buffer forward
 		destBuffer += copySize;
 
-		Track = buffer[0];
-		Sector = buffer[1];
+		// Next Track/Sector for this file
+		currentTrack = buffer[0];
+		currentSector = buffer[1];
 	}
 
-	
 	return true;
 }
 
-byte *cD64::sectorRead( size_t pTrack, size_t pSector ) {
-	size_t T,S,R = 0;
-	long Offset = 0;
+byte *cD64::sectorPtr( size_t pTrack, size_t pSector ) {
+	size_t	currentTrack, currentSector, currentRange;
+	dword	offset = 0;
 
+	// Invalid track?
 	if(pTrack <= 0 || pTrack > mTrackCount)
 		return 0;
 
+	// Invalid sector?
 	if(pSector < 0 || pSector > trackRange(pTrack))
 		return 0;
 
-	for(T = 1; T <= pTrack; T++) {
-		R = trackRange(T);
+	// Loop through each track, and add up
+	for(currentTrack = 1; currentTrack <= pTrack; currentTrack++) {
+		currentRange = trackRange( currentTrack );
 
-		for(S = 0; S < R; S++) {
-			if(pTrack == T && pSector == S)
-				return mBuffer + Offset;
+		// If we're not looking for this track
+		if(currentTrack != pTrack) {
 
-			Offset += 256;
+			//increase the offset to the end of the track
+			offset += (256 * currentRange);
+			continue;
+		} else {
+			//increase offset to the sector we're after
+			offset += (256 * pSector);
+
+			if( offset >= mBufferSize )
+				return 0;
+
+			// Return pointer
+			return (mBuffer + offset);
 		}
 	}
 
@@ -154,8 +188,10 @@ byte *cD64::sectorRead( size_t pTrack, size_t pSector ) {
 
 sFile *cD64::fileGet( string pFilename ) {
 	vector< sFile* >::iterator fileIT;
-
+	
+	// Loop thro all files on disk for specific filename
 	for( fileIT = mFiles.begin(); fileIT != mFiles.end(); ++fileIT ) {
+
 		if( (*fileIT)->mName == pFilename )
 			return *fileIT;
 	}
@@ -167,6 +203,7 @@ vector< sFile* > cD64::directoryGet( string pFind ) {
 	vector< sFile* > result;
 	vector< sFile* >::iterator	fileIT;
 	
+	// Strip any astrix
 	size_t	pos = pFind.find("*");
 	if(pos != string::npos)
 		pFind = pFind.substr(0, pos);
@@ -174,6 +211,7 @@ vector< sFile* > cD64::directoryGet( string pFind ) {
 	for( fileIT = mFiles.begin(); fileIT != mFiles.end(); ++fileIT ) {
 		sFile *file = *fileIT;
 
+		// Check if the current file matches the 'pFind' string
 		if( file->mName.substr(0, pFind.length()) ==  pFind )
 			result.push_back( file );
 	}
