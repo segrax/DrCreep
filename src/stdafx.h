@@ -3,6 +3,7 @@
 #endif
 
 #include <iostream>
+#include<algorithm>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -20,18 +21,35 @@ using namespace std;
 extern const char *SVNREV;
 extern const char *SVNDATE;
 
-// Endian functions
-// Read a word from the buffer
-inline word	readWord( const void *buffer ) {
-	const byte *wordByte = (const byte *) buffer;
-	return (wordByte[0] << 8) + wordByte[1];
-}
+#define ENDIAN_SMALL
 
-// Endian swap a word
-inline word	swapWord(  word buffer ) {
-	const byte *wordByte = (const byte *) &buffer;
-	return (wordByte[0] << 8) + wordByte[1];
-}
+// Endian functions
+#ifdef ENDIAN_BIG
+
+	// Read a word from the buffer
+	inline word	readWord( const void *buffer ) {
+		const byte *wordByte = (const byte *) buffer;
+		return (wordByte[0] << 8) + wordByte[1];
+	}
+
+	// Swap the bytes around in a word
+	inline word	swapWord(  word buffer ) {
+		const byte *wordByte = (const byte *) &buffer;
+		return (wordByte[0] << 8) + wordByte[1];
+	}
+#else
+
+	// Read a word from the buffer
+	inline word readWord( const void *buffer ) {
+		const word *wordBytes = (const word *) buffer;
+		return *wordBytes;
+	}
+
+	// Swap the bytes around in a word
+	inline word swapWord(  word buffer ) {
+		return buffer;
+	}
+#endif
 
 vector<string>	 directoryList(string pPath);
 byte			*fileRead( string pFile, size_t	&pFileSize );

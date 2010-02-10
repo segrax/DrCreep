@@ -10,8 +10,6 @@
 #include <io.h>
 #endif
 
-#include<algorithm>
-
 cCreep::cCreep() {
 	size_t RomSize;
 
@@ -684,7 +682,7 @@ void cCreep::roomPrepare( ) {
 
 	while(func) {
 
-		func = *((word*) &mDump[ word_3E ]);
+		func = readWord( &mDump[ word_3E ]);
 		word_3E  += 2;
 
 		switch( func ) {
@@ -1230,7 +1228,7 @@ void cCreep::obj_OverlapCheck( byte pX ) {
 }
 
 bool cCreep::obj_Actions_Collision( byte pX, byte pY ) {
-	word func = *((word*) &mDump[ 0x893 + pY ]);
+	word func = readWord( &mDump[ 0x893 + pY ]);
 	
 	pY = byte_31F0;
 
@@ -1270,7 +1268,7 @@ bool cCreep::obj_Actions_Collision( byte pX, byte pY ) {
 }
 
 bool cCreep::obj_Actions_InFront( byte pX, byte pY ) {
-	word func = *((word*) &mDump[ 0x844 + pY ]);
+	word func = readWord( &mDump[ 0x844 + pY ] );
 	
 	pY = byte_31F0;
 
@@ -1344,7 +1342,7 @@ void cCreep::obj_Actions_Hit( byte pX, byte pY ) {
 	mDump[ 0x311C ] = pY;
 	
 	byte Y = mDump[ 0xBD00 + pX ] << 3;
-	word func = *((word*) &mDump[ 0x891 + Y ]);
+	word func = readWord( &mDump[ 0x891 + Y ] );
 
 	switch( func ) {
 		case 0:
@@ -1518,7 +1516,7 @@ s2FE9:;
 void cCreep::obj_Actions_Execute( byte pX ) {
 	//2ED5
 	byte Y =  mDump[ 0xBD00 + pX ] << 3;
-	word func = *((word*) &mDump[ 0x88F + Y ]);
+	word func = readWord( &mDump[ 0x88F + Y ]);
 	
 	switch(func) {
 
@@ -1564,8 +1562,8 @@ void cCreep::obj_Player_Execute( byte pX ) {
 		A = mDump[ 0xBD1C + pX ];
 		A <<= 1;
 
-		word_30 = *((word*) &mDump[ 0x34E7 + A ]);
-		word_32 = *((word*) &mDump[ 0x34EB + A ]);
+		word_30 = readWord( &mDump[ 0x34E7 + A ] );
+		word_32 = readWord( &mDump[ 0x34EB + A ] );
 		
 		for( char Y = 3; Y >= 0; --Y ) 
 			mDump[ word_32 + Y ] = mDump[ word_30 + Y ];
@@ -1582,8 +1580,8 @@ void cCreep::obj_Player_Execute( byte pX ) {
 		// Current Player
 		char Y = mDump[ 0xBD1C + pX ] << 1;
 		
-		word_32 = *((word*) &mDump[ 0x34E7 + Y ]);
-		word_30 = *((word*) &mDump[ 0x34EB + Y ]);
+		word_32 = readWord( &mDump[ 0x34E7 + Y ] );
+		word_30 = readWord( &mDump[ 0x34EB + Y ] );
 
 		for( Y = 3; Y >= 0; --Y ) 
 			mDump[ word_32 + Y ] = mDump[ word_30 + Y ];
@@ -2217,7 +2215,7 @@ void cCreep::img_Actions() {
 		if(A & byte_840) {
 			byte Y = mDump[ 0xBF00 + X ] << 2;
 		
-			word func = *((word*) &mDump[ 0x842 + Y ]);
+			word func = readWord( &mDump[ 0x842 + Y ] );
 		
 			switch( func ) {
 				case 0:
@@ -2986,7 +2984,7 @@ s15B4:;
 void cCreep::sub_6009( byte pA ) {
 	byte_603A = pA;
 
-	word_40 = *((word*) &mDump[ word_42 + 4]);
+	word_40 = readWord( &mDump[ word_42 + 4] );
 	
 	byte A2 = mDump[ word_40 ];
 	
@@ -3168,7 +3166,7 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 		byte_38 = pGfxID << 1;
 		byte_38 += 0x603B;
 		
-		word_32 = *((word*)(&mDump[ byte_38 ]));
+		word_32 = readWord( &mDump[ byte_38 ] );
 		
 		mGfxWidth = mDump[ word_32 ];
 		mGfxHeight = mDump[ word_32 + 1 ];
@@ -3690,7 +3688,7 @@ s1349:;
 			goto s13CD;
 		}
 	}
-s1381:;
+
 	// 1381
 	mTxtX_0 = A = byte_13EC + mDump[ word_40 + 5 ];
 
@@ -3809,7 +3807,7 @@ void cCreep::gameEscapeCastle() {
 	ScreenClear();
 	mDump[ 0x0B72 ] = 6;
 	if( mDump[ 0x7802 ] & 0x80 ) {
-		word_3E = *((word*) &mDump[ 0x785F ]);
+		word_3E = readWord( &mDump[ 0x785F ] );
 		roomPrepare();
 	}
 
@@ -3989,7 +3987,7 @@ s1BE7:;
 		mDump[ word_30 + Y ] = mDump[ 0x1CF9 + Y ];
 	
 	// 1C4D
-	word_30 = *((word*) &mDump[ 0x1D03 ]);
+	word_30 = readWord( &mDump[ 0x1D03 ] );
 	mDump[ word_30 ] = 0;
 	highscoresDisplay();
 
@@ -4006,7 +4004,7 @@ s1BE7:;
 	mDump[ 0x278B ] = 1;
 
 	textShow();
-	word_30 = *((word*) &mDump[ 0x1D03 ]);
+	word_30 = readWord( &mDump[ 0x1D03 ] );
 
 	for(Y = 0; Y < 3; ++Y) {
 		if( Y >= 3 )
@@ -4153,7 +4151,7 @@ void cCreep::sub_21C8( char pA ) {
 	byte_2232 = byte_2231;
 
 	byte Y = byte_2232 << 1;
-	word_44 = *((word*) &mDump[ 0x7572 + Y ]);
+	word_44 = readWord( &mDump[ 0x7572 + Y ] );
 
 	mDump[ 0xD404 ] = mDump[ 0xD40B ] = mDump[ 0xD412 ] = mDump[ 0xD417 ] = 0;
 	mDump[ 0x20DC ] = mDump[ 0x20DD ] = 0;
@@ -4328,7 +4326,7 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 
 	word_38 += 0x603B;
 	
-	word_30 = *((word*) &mDump[ word_38 ]);
+	word_30 = readWord( &mDump[ word_38 ] );
 	
 	mDump[ 0xBD09 + pX ] = mDump[ word_30 + 2 ];
 	
@@ -4670,7 +4668,7 @@ void cCreep::obj_Door_InFront( byte pX, byte pY ) {
 	}
 
 	//40DD
-	word word_41D6 = *((word*) &mDump[ word_40 + 3 ]);
+	word word_41D6 = readWord( &mDump[ word_40 + 3 ] );
 	lvlPtrCalculate( (word_41D6 & 0xFF) );
 	
 	mDump[ word_42 ] |= byte_8C0;
@@ -6499,7 +6497,7 @@ void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 		return;
 
 	// 4EC5
-	word_40 = *((word*) &mDump[ 0xBE00 + pY ]);
+	word_40 = readWord( &mDump[ 0xBE00 + pY ] );
 	if(! (mDump[ 0xBD1D + pX ]) ) {
 		// 4ED4
 		if( (mDump[ 0xBD1E + pX ]) )
@@ -6585,7 +6583,7 @@ void cCreep::sub_505C( byte pA, byte pX ) {
 	mDump[ 0x6E70 ] = mDump[ 0x6E71 ] = mDump[ 0x6E72 ] = A;
 	mDump[ 0x6E73 ] = mDump[ 0x6E74 ] = mDump[ 0x6E75 ] = 0x0F;
 
-	word_40 = *((word*) &mDump[ 0xBE00 + pX ]);
+	word_40 = readWord( &mDump[ 0xBE00 + pX ] );
 
 	byte gfxPosX = mDump[ word_40 ] + 4;
 	byte gfxPosY = mDump[ word_40 + 1 ] ;
