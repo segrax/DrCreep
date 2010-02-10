@@ -29,7 +29,7 @@
 #include "sprite.h"
 #include "graphics/screenSurface.h"
 #include "playerInput.h"
-#include "d64.h"
+#include "castleManager.h"
 
 #ifdef WIN32
 #include <fcntl.h>
@@ -53,18 +53,14 @@ cCreep::cCreep() {
 	for( size_t x = 0; x < mMemorySize; ++x )
 		mMemory[x] = 0;
 
+	mCastleManager = new cCastleManager();
+	mInput = new cPlayerInput();
 	mScreen = new cScreen( windowTitle.str() );
-
+	
 	// Load the C64 Character Rom
 	m64CharRom = local_FileRead( "char.rom", romSize );
 	
-	mOrigObject = 0;
-
-	mInput = new cPlayerInput();
-
-	D64Open();
-
-	romSize = fileLoad( &mOrigObject, "OBJECT" );
+	mOrigObject = mCastleManager->fileLoad( "OBJECT", romSize );
 
 	if(romSize)
 		// Copy the game data into the memory buffer
@@ -139,57 +135,6 @@ cCreep::~cCreep() {
 	delete m64CharRom;
 	delete mMemory;
 	delete mLevel;
-	delete mD64;
-}
-
-string cCreep::D64Find( string pExtension ) {
-	vector<string> disks = directoryList( pExtension );
-	//vector<string>::iterator diskIT;
-
-	//for( diskIT = disks.begin(); diskIT != disks.end(); ++diskIT ) {
-		
-	//}
-
-	if( disks.size() > 0 )
-		return disks[0];
-
-	return "";
-}
-
-bool cCreep::D64Open() {
-	string diskImage;
-	
-	// Find a disk image
-	diskImage = D64Find( "*.d64" );
-	
-	if(diskImage.length() == 0 )
-		diskImage = D64Find( "*.D64" );
-
-	if( diskImage.length() == 0 ) {
-		cout << "No disk image found in data directory\n";
-		return false;
-	}
-
-	// Load the disk image
-	mD64 = new cD64( diskImage );
-
-	return true;
-}
-
-size_t cCreep::fileLoad( byte **pBuffer, string pFilename ) {
-	size_t size;
-
-	// Attempt to load from the D64
-	sFile *file = mD64->fileGet( pFilename );
-	if( file ) {
-		*pBuffer = file->mBuffer;
-		size = file->mBufferSize;
-
-	} else
-		// Attempt to load from local filesystem
-		*pBuffer = local_FileRead( pFilename, size );
-
-	return size;
 }
 
 void cCreep::run( int pArgCount, char *pArgs[] ) {
@@ -220,7 +165,8 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 
 	// If the level wasn't set on command line, request it from the user
 	if(!playLevelSet) {
-		castleDisplayList();
+		mCastleManager->castleListDisplay();
+
 		string lvl;
 		cout << "\nSelect a level: ";
 		cin >> lvl;
@@ -354,79 +300,22 @@ void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
 	mainLoop();
 }
 
-vector<string> cCreep::D64CastleList() {
-	vector<sFile*>				files = mD64->directoryGet( "Z*" );
-	vector<sFile*>::iterator	fileIT;
-	vector<string>				results;
-
-	for( fileIT = files.begin(); fileIT != files.end(); ++fileIT ) {
-		results.push_back( (*fileIT)->mName );	
-	}
-
-	return results;
-}
-
-void cCreep::castleDisplayList() {
-	vector<string>			 files;
-	vector<string>::iterator fileIT;
-	size_t					 number = 1;
-
-	files = D64CastleList();
-	if(files.size() == 0 )
-		files = directoryList( "castles\\Z*" );
-
-	for(fileIT = files.begin(); fileIT != files.end(); ++fileIT ) {
-		string castleName = (*fileIT).substr(1);
- 
-		std::transform(castleName.begin(), castleName.end(), castleName.begin(), tolower);
-		
-		castleName[0] = toupper( castleName[0] );
-		cout << number++ << ". ";
-		cout << castleName << "\n";
-	}
-
-}
-
 bool cCreep::castleChangeLevel( size_t pNumber ) {
 	vector<string>  files;
 	string			lvlFile;
 	size_t			size = 0;
 
-	files = D64CastleList();
-	if(files.size() == 0 ) {
-		files = directoryList( "castles\\Z*" );
-		lvlFile	 = "castles\\";
-	}
+	cCastle			*castle = mCastleManager->castleGet( pNumber );
 
-	// Are any castles available?
-	if(files.size() == 0 )
-		return false;
-
-	// Select first available if a bad number was provided
-	if( files.size() < (pNumber+1) )
-		pNumber = 0;
-
-	// Generate castle name
-	string castleName = files[pNumber].substr(1);
-	std::transform(castleName.begin(), castleName.end(), castleName.begin(), tolower);
-	castleName[0] = toupper( castleName[0] );
-
-	cout << "Loading Castle '" << castleName << "'\n";
-	
 	// Set the window title screen
-	mScreen->levelNameSet( castleName );
+	mScreen->levelNameSet( castle->nameGet() );
 
-	// Filename to load
-	lvlFile.append( files[pNumber] );
+	mLevel = castle->bufferGet( size );
 
-	delete mLevel;
-	size = fileLoad( &mLevel, lvlFile );
-	if(!size) {
-		cout << "Castle load failed\n";
-		exit(1);
-	}
 	// Copy it into the memory region
 	memcpy( &mMemory[0x9800], mLevel + 2, size - 2 );
+
+	delete castle;
 
 	return true;
 }
@@ -5726,7 +5615,9 @@ void cCreep::obj_TrapDoor_Prepare( ) {
 
 			gfxPosX = mTxtX_0 + 4;
 			gfxPosY = mTxtY_0;
+
 			img_Update( 0x79, gfxPosX, gfxPosY, 0x7B, X );
+
 			mMemory[ 0x6F2E ] = 0x20;
 			mMemory[ 0x6F30 ] = 0xCC;
 			byte_5FD5 = mMemory[ word_3E + 1 ] >> 2;

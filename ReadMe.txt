@@ -4,7 +4,7 @@ The Castles of Dr. Creep
 
 About:
 ------
-The Castles of Dr. Creep is a clone of the 1984 game written by Ed Hobbs.
+ The Castles of Dr. Creep is a clone of the 1984 game written by Ed Hobbs.
 
 
 Controls:
@@ -36,9 +36,16 @@ Playing:
 
 
 Command Line Parameters:
+------------------------
 
  -u    : Unlimited Lives
  -c    : Display COnsole
  -l xx : Start Castle number 'xx'
+
+
+Castles:
+--------
+
+ D64 files containing castles may be placed in the 'data' folder, and individual castles may  be placed in the 'data\castles' folder.
 
 

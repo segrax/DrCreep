@@ -28,7 +28,7 @@
 #endif
 
 #include <iostream>
-#include<algorithm>
+#include <algorithm>
 #include <vector>
 #include <string>
 #include <sstream>
