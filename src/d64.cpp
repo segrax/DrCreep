@@ -150,7 +150,7 @@ bool cD64::fileLoad( sFile *pFile ) {
 }
 
 byte *cD64::sectorPtr( size_t pTrack, size_t pSector ) {
-	size_t	currentTrack, currentSector, currentRange;
+	size_t	currentTrack, currentRange;
 	dword	offset = 0;
 
 	// Invalid track?
