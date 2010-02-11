@@ -163,6 +163,7 @@ public:
 		void	 stringDraw( );							// Draw a string
 
 		void	 textShow();
+		void	 titleDisplay();						// Display 'PIC A TITLE'
 
 		void	 roomLoad();
 		void	 roomPrepare( );

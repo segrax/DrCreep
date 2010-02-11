@@ -79,5 +79,7 @@ public:
 																scaleSet( 3 );
 															else 
 																scaleSet( 2 );
+
+															refresh();
 														}
 };

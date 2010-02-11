@@ -138,6 +138,21 @@ cCreep::~cCreep() {
 	delete mCastleManager;
 }
 
+void cCreep::titleDisplay() {
+	size_t size;
+	byte *buffer = mCastleManager->fileLoad( "PIC A TITLE", size );
+	if(!buffer)
+		return;
+
+	// Skip load address
+	buffer += 0x02;	
+	
+	mScreen->bitmapLoad( buffer,  buffer + 0x1F40, buffer + 0x2328, 1 );
+	mScreen->refresh();
+
+	interruptWait(100);
+}
+
 void cCreep::run( int pArgCount, char *pArgs[] ) {
 	bool consoleShow = false;
 
@@ -188,6 +203,11 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	// Set the default screen scale
 	mScreen->scaleSet( 2 );
 
+	// Display the title screen
+#ifndef _DEBUG
+	titleDisplay();
+#endif
+
 	// Start main loop
 	start( playLevel, unlimited );
 }
@@ -201,6 +221,8 @@ void cCreep::interruptWait( byte pCount) {
 	// TODO: Proper time check 
 	
 	while(mInterruptCounter > 0 ) {
+		mInput->inputCheck();
+
 		time_t diffSec = tickNow.time - mTimePrevious.time;
 		int diffMil = tickNow.millitm - mTimePrevious.millitm;
 
