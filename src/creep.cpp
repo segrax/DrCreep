@@ -24,13 +24,13 @@
  */
 
 #include "stdafx.h"
-#include "screen.h"
-#include "creep.h"
-#include "sprite.h"
 #include "graphics/screenSurface.h"
+#include "vic-ii/screen.h"
+#include "vic-ii/sprite.h"
 #include "playerInput.h"
 #include "castle.h"
 #include "castleManager.h"
+#include "creep.h"
 
 #ifdef WIN32
 #include <fcntl.h>
@@ -310,9 +310,8 @@ void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
 			word_32 += 0x100;
 			word_30 += 0x100;
 
-			if( word_30 &= 0x7800 )
+			if( word_30 >= 0x7800 )
 				break;
-
 		}
 
 		if( mCastleManager->castleLoad( pStartLevel ) == 0)
@@ -547,8 +546,8 @@ void cCreep::sub_95F() {
 
 	mMemory[ 0xD025 ] = 0x0A;
 	mMemory[ 0xD026 ] = 0x0D;
-	mMemory[ 0x21 ] = 0;
 
+	mMemory[ 0x21 ] = 0;
 	mScreen->spriteDisable();
 
 	interruptWait( 2 );
@@ -582,6 +581,7 @@ void cCreep::screenClear() {
 	// Disable all sprites
 	mScreen->spriteDisable();
 
+	// Clear screen memory
 	for( ; word_30 >= 0xE000; word_30 -= 0x0100) {
 
 		for(;;) {
@@ -1559,17 +1559,22 @@ void cCreep::obj_Actions_Execute( byte pX ) {
 void cCreep::obj_Player_Execute( byte pX ) {
 	byte A =  mMemory[ 0xBD04 + pX ];
 
+	// Player leaving room?
 	if( A & byte_885 ) {
 		A ^= byte_885;
 		A |= byte_886;
 		mMemory[ 0xBD04 + pX ] = A;
-		A = mMemory[ 0xBD1C + pX ];
-		A <<= 1;
 
-		word_30 = readWord( &mMemory[ 0x34E7 + A ] );
-		word_32 = readWord( &mMemory[ 0x34EB + A ] );
+		char Y = mMemory[ 0xBD1C + pX ] << 1;
 		
-		for( char Y = 3; Y >= 0; --Y ) 
+		// TODO: add a timer 
+
+		// Ptr to CIA Timer
+		word_30 = readWord( &mMemory[ 0x34E7 + Y ] );
+		word_32 = readWord( &mMemory[ 0x34EB + Y ] );
+		
+		// Store CIA Timer
+		for( Y = 3; Y >= 0; --Y ) 
 			mMemory[ word_32 + Y ] = mMemory[ word_30 + Y ];
 
 		return;
@@ -1583,10 +1588,14 @@ void cCreep::obj_Player_Execute( byte pX ) {
 
 		// Current Player
 		char Y = mMemory[ 0xBD1C + pX ] << 1;
+
+		// TODO: add a timer 
 		
+		// Get Ptr to CIA Timer and store area
 		word_32 = readWord( &mMemory[ 0x34E7 + Y ] );
 		word_30 = readWord( &mMemory[ 0x34EB + Y ] );
 
+		// Restore CIA Timer
 		for( Y = 3; Y >= 0; --Y ) 
 			mMemory[ word_32 + Y ] = mMemory[ word_30 + Y ];
 		
@@ -2420,8 +2429,8 @@ void cCreep::Game() {
 
 		word_34 = mMemory[ 0x9800 ];
 		word_34 |= (mMemory[ 0x9801 ] << 8);
-		
-		// Hope this is correct
+
+		// 
 		memcpy( &mMemory[ word_32 ], &mMemory[ word_30 ], word_34 );
 
 		// DC6
@@ -2431,10 +2440,10 @@ void cCreep::Game() {
 			mMemory[ 0x7855 + Y ] = 0;
 
 		mMemory[ 0x785D ] = mMemory[ 0x785E ] = 0;
-		mMemory[ 0x7809 ] = mMemory[ 0x7803 ];
-		mMemory[ 0x780A ] = mMemory[ 0x7804 ];
-		mMemory[ 0x780B ] = mMemory[ 0x7805 ];
-		mMemory[ 0x780C ] = mMemory[ 0x7806 ];
+		mMemory[ 0x7809 ] = mMemory[ 0x7803 ];	// Player1 Start Room
+		mMemory[ 0x780A ] = mMemory[ 0x7804 ];	// Player2 Start Room
+		mMemory[ 0x780B ] = mMemory[ 0x7805 ];	// Player1 Start Door
+		mMemory[ 0x780C ] = mMemory[ 0x7806 ];	// Player2 Start Door
 		mMemory[ 0x7811 ] = 0;
 		mMemory[ 0x780F ] = 1;
 
@@ -2453,7 +2462,11 @@ void cCreep::Game() {
 				break;
 		// E2A
 		if( mMemory[ 0x780F ] == 1 && mMemory[ 0x7810 ] == 1 ) {
+
+			// Player1 and 2 in same room?
 			if( mMemory[ 0x7809 ] != mMemory[ 0x780A ] ) {
+
+				// No
 				byte X = mMemory[ 0x7811 ];
 
 				mMemory[ 0x11C9 + X ] = 0;
@@ -2521,6 +2534,7 @@ sEFC:;
 						if(A == 0)
 							goto sEFC;
 					}
+					// Set player1/2 start room
 					mMemory[ 0x7809 + X ] = mMemory[ 0x7803 + X ];
 					mMemory[ 0x780B + X ] = mMemory[ 0x7805 + X ];
 				}
@@ -4656,6 +4670,7 @@ void cCreep::obj_Door_InFront( byte pX, byte pY ) {
 	if( A != 0 )
 		return;
 
+	// Enter the door
 	mMemory[ 0x780D + pY ] = 6;
 	mMemory[ 0xBD1B + pX ] = 0;
 	mMemory[ 0xBD06 + pX ] = 3;
@@ -4680,6 +4695,8 @@ void cCreep::obj_Door_InFront( byte pX, byte pY ) {
 	mMemory[ word_42 ] |= byte_8C0;
 
 	pY = mMemory[ 0xBD1C + pX ];
+
+	// Set player room / door
 	mMemory[ 0x7809 + pY ] = word_41D6 & 0xFF;
 	mMemory[ 0x780B + pY ] = (word_41D6 & 0xFF00) >> 8;
 }

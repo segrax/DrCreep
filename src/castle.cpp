@@ -27,7 +27,7 @@
 #include "castle.h"
 #include "castleManager.h"
 #include "creep.h"
-#include "screen.h"
+#include "vic-ii/screen.h"
 
 cCastle::cCastle( cCastleInfo *pCastleInfo ) {
 	mName = pCastleInfo->nameGet();

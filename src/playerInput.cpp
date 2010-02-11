@@ -26,7 +26,7 @@
 #include "stdafx.h"
 #include "playerInput.h"
 #include "creep.h"
-#include "screen.h"
+#include "vic-ii/screen.h"
 
 cPlayerInput::cPlayerInput( cCreep *pCreep ) {
 	mCreep = pCreep;
