@@ -23,19 +23,31 @@
  *  ------------------------------------------
  */
 
-struct sFile {
-	byte	*mBuffer;
-	size_t	 mBufferSize, mTrack, mSector;
-	size_t	 mFileSize;
-	string	 mName;
-	
-	sFile() {
+enum eD64FileType {
+	eD64FileType_DEL = 0,
+	eD64FileType_SEQ = 1,
+	eD64FileType_PRG = 2,
+	eD64FileType_USR = 3,
+	eD64FileType_REL = 4,
+	eD64FileType_UNK
+};
+
+struct sD64File {
+	string	  mName;					// Name of the file
+	size_t	  mTrack, mSector;			// Starting T/S of file
+	size_t	  mFileSize;				// Number of blocks used by file
+	eD64FileType mFileType;				// Type of file
+
+	byte	*mBuffer;					// Copy of file
+	size_t	 mBufferSize;				// Size of 'mBuffer'
+
+	sD64File() {
 		mBuffer = 0;
 		mBufferSize = 0;
 		mFileSize = 0;
 	}
 
-	~sFile() {
+	~sD64File() {
 		delete mBuffer;
 	}
 };
@@ -44,10 +56,10 @@ class cD64 {
 private:
 	byte				*mBuffer;										// Disk image buffer
 	size_t				 mBufferSize, mTrackCount;
-	vector< sFile* >	 mFiles;										// Files in disk
+	vector< sD64File* >	 mFiles;										// Files in disk
 	
 	void				 directoryLoad();								// Load the disk directory
-	bool				 fileLoad( sFile *pFile );						// Load a file 
+	bool				 fileLoad( sD64File *pFile );						// Load a file 
 
 	byte				*sectorPtr( size_t pTrack, size_t pSector );	// Read a sector
 
@@ -59,7 +71,7 @@ public:
 						 cD64( string pD64 );
 						~cD64( );
 
-	vector< sFile* >	 directoryGet( string pFind );		// Get a file list, with all files starting with 'pFind'
-	vector< sFile* >	*directoryGet();					// Get the file list
-	sFile				*fileGet( string pFilename );		// Get a file
+	vector< sD64File* >	 directoryGet( string pFind );		// Get a file list, with all files starting with 'pFind'
+	vector< sD64File* >	*directoryGet();					// Get the file list
+	sD64File				*fileGet( string pFilename );		// Get a file
 };

@@ -194,6 +194,9 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	if(playLevel)
 		--playLevel;
 
+#ifdef _DEBUG
+	consoleShow = true;
+#endif
 	// Hide the console unless its requested by user
 	if( !consoleShow ) {
 		HWND hWnd = GetConsoleWindow();
@@ -312,7 +315,7 @@ void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
 
 		}
 
-		if(castleChangeLevel( pStartLevel ) == false)
+		if( mCastleManager->castleLoad( pStartLevel ) == 0)
 			return;
 
 	} else {
@@ -321,26 +324,6 @@ void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
 	}
 
 	mainLoop();
-}
-
-bool cCreep::castleChangeLevel( size_t pNumber ) {
-	vector<string>  files;
-	string			lvlFile;
-	size_t			size = 0;
-
-	cCastle			*castle = mCastleManager->castleGet( pNumber );
-
-	// Set the window title screen
-	mScreen->levelNameSet( castle->nameGet() );
-
-	mLevel = castle->bufferGet( size );
-
-	// Copy it into the memory region
-	memcpy( &mMemory[0x9800], mLevel + 2, size - 2 );
-
-	delete castle;
-
-	return true;
 }
 
 // 0x7572
@@ -638,7 +621,7 @@ void cCreep::roomLoad() {
 	else
 		X = 0;
 
-	if( mMenuIntro )
+	if( mIntro )
 		A = mMenuScreenCount;
 	else
 		A = mMemory[ 0x7809 + X ];
@@ -695,7 +678,7 @@ void cCreep::roomLoad() {
 	// Ptr to start of room data
 	word_3E = readWord( &mMemory[word_42 + 6] );
 
-	if(mMenuIntro)
+	if(mIntro)
 		word_3E += 0x2000;
 
 	// Function ptr
@@ -761,19 +744,15 @@ void cCreep::roomPrepare( ) {
 				obj_Frankie_Load( );
 				break;
 			case 0x0833:	// String Print
+			case 0x2A6D:
 				obj_stringPrint();
 				break;
 			case 0x0836:
-				sub_1AE6();
+				obj_Image_Draw();
 				break;
-
 			case 0x0821:
 			case 0x160A:	// Intro
 				obj_MultiDraw( );
-				break;
-			
-			case 0x2A6D:
-				obj_stringPrint( );
 				break;
 
 			default:
@@ -793,7 +772,7 @@ bool cCreep::Intro() {
 	mMenuMusicScore = 0;
 	mMenuScreenTimer = 3;
 	mMenuScreenCount = 0;
-	mMenuIntro = true;
+	mIntro = true;
 	byte_D10 = 0;
 
 	for(;;) {
@@ -866,7 +845,7 @@ bool cCreep::Intro() {
 	
 	// 0CDD
 	byte_20DE = 0;
-	mMenuIntro = 0;
+	mIntro = 0;
 	
 	char X = 0x0E;
 
@@ -1851,7 +1830,7 @@ void cCreep::obj_Frankie_Execute( byte pX ) {
 	word_40 = word_5748 + mMemory[ 0xBD1F + pX ];
 	
 	if( !(mMemory[ 0xBD1E + pX ] & byte_574E) ) {
-		if( mMenuIntro == 1 )
+		if( mIntro == 1 )
 			return;
 
 		// 3B31
@@ -2422,7 +2401,7 @@ word cCreep::lvlPtrCalculate( byte pCount ) {
 	word_42 <<= 1;
 	word_42 <<= 1;
 	word_42 |= (0x79 << 8);
-	if( mMenuIntro )
+	if( mIntro )
 		word_42 += (0x20 << 8);
 
 	return word_42;
@@ -2499,7 +2478,7 @@ void cCreep::Game() {
 
 		// E7D
 		mapDisplay();
-		GameMain();
+		roomMain();
 		screenClear();
 		
 		mMemory[ 0xF62 ] = 0;
@@ -2918,7 +2897,7 @@ void cCreep::obj_Player_Add( ) {
 	mMemory[ 0xBD19 + X ] = mMemory[ 0xBD1A + X ] = mMemory[ 0xBD18 + X ] = 0xFF;
 }
 
-void cCreep::GameMain() {
+void cCreep::roomMain() {
 
 	roomLoad();
 
@@ -3738,7 +3717,7 @@ s13CD:;
 
 }
 
-void cCreep::sub_1AE6() {
+void cCreep::obj_Image_Draw() {
 	*((word*) &mMemory[ 0x6067 ]) = word_3E;
 	
 	byte gfxDecodeMode = 0, gfxCurrentID = 0x16;
@@ -4166,7 +4145,7 @@ void cCreep::gameHighScores() {
 void cCreep::sub_21C8( char pA ) {
 	char byte_2231 = pA;
 
-	if( mMenuIntro == 1 )
+	if( mIntro == 1 )
 		return;
 
 	if( byte_839 == 1 )
@@ -4800,7 +4779,7 @@ void cCreep::obj_RayGun_Img_Execute( byte pX ) {
 
 	byte A = mMemory[ 0xBF04 + pX ];
 	if(!( A & byte_83F )) {
-		if( mMenuIntro == 1 )
+		if( mIntro == 1 )
 			return;
 
 		// 4B46
@@ -5086,8 +5065,8 @@ void cCreep::obj_Door_Lock_Prepare() {
 		for( char Y = 8; Y >= 0; --Y )
 			mMemory[ 0x6C53 + Y ] = A;
 
-		mMemory[ 0xBE00 + X ] = mMemory[ word_3E ];
-		mMemory[ 0xBE01 + X ] = mMemory[ word_3E + 2 ];
+		mMemory[ 0xBE00 + X ] = *level( word_3E );
+		mMemory[ 0xBE01 + X ] = *level( word_3E + 2 );
 		img_Update( 0x58, gfxPosX, gfxPosY, 0, X );
 
 		word_3E += 0x05;

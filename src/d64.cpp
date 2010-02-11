@@ -47,7 +47,7 @@ cD64::cD64( string pD64 ) {
 }
 
 cD64::~cD64( ) {
-	vector< sFile * >::iterator		fileIT;
+	vector< sD64File * >::iterator		fileIT;
 
 	// Cleanup files
 	for( fileIT = mFiles.begin(); fileIT != mFiles.end(); ++fileIT )
@@ -69,9 +69,12 @@ void cD64::directoryLoad() {
 		if(!buffer)
 			break;
 
-		for( byte i = 0; i <= 7; ++i ) {
-			sFile *file = new sFile();
+		for( byte i = 0; i <= 7; ++i, buffer += 0x20 ) {
+			sD64File *file = new sD64File();
 			
+			// Get the filetype
+			file->mFileType = (eD64FileType) (*(buffer + 0x02) & 0x0F);
+
 			// Get the filename
 			file->mName = stringRip( buffer + 0x05, 0xA0, 16 );
 			if( file->mName.size() == 0 ) {
@@ -91,9 +94,6 @@ void cD64::directoryLoad() {
 				fileLoad( file );
 				
 			mFiles.push_back( file );	
-
-			// Next Entry
-			buffer += 0x20;
 		}
 
 		// Get the next Track/Sector in the chain
@@ -102,9 +102,11 @@ void cD64::directoryLoad() {
 	}
 }
 
-bool cD64::fileLoad( sFile *pFile ) {
+bool cD64::fileLoad( sD64File *pFile ) {
+	size_t bytesCopied = 0;
 	size_t copySize = 254;
 	size_t currentTrack = pFile->mTrack, currentSector = pFile->mSector;
+	bool   noCopy = false;
 
 	// 
 	delete pFile->mBuffer;
@@ -125,25 +127,35 @@ bool cD64::fileLoad( sFile *pFile ) {
 		if(!buffer)
 			return false;
 		
+		// T/S is broken, or the directory entry is wrong about size
+		if( bytesCopied >= pFile->mBufferSize )
+			noCopy = true;
+
 		// Last Sector of file? 
 		if( buffer[0] == 0 ) {
-
 			// Bytes used is stored in the T/S chain sector value
 			copySize = (buffer[1] - 1);
-
-			// Decrease filesize
-			pFile->mFileSize -= (254 - copySize);
 		}
 
 		// Copy sector data, excluding the T/S Chain data
-		memcpy( destBuffer, buffer + 2, copySize );
+		if(!noCopy)
+			memcpy( destBuffer, buffer + 2, copySize );
 		
 		// Move the dest buffer forward
 		destBuffer += copySize;
+		bytesCopied += copySize;
 
 		// Next Track/Sector for this file
 		currentTrack = buffer[0];
 		currentSector = buffer[1];
+	}
+
+	// If it failed because of a broken T/S or wrong directory entry
+	// Do it again with the proper size
+	if(noCopy) {
+		pFile->mFileSize = (bytesCopied / 254) + 1;
+		
+		return fileLoad( pFile );
 	}
 
 	return true;
@@ -186,8 +198,8 @@ byte *cD64::sectorPtr( size_t pTrack, size_t pSector ) {
 	return 0;
 }
 
-sFile *cD64::fileGet( string pFilename ) {
-	vector< sFile* >::iterator fileIT;
+sD64File *cD64::fileGet( string pFilename ) {
+	vector< sD64File* >::iterator fileIT;
 	
 	// Loop thro all files on disk for specific filename
 	for( fileIT = mFiles.begin(); fileIT != mFiles.end(); ++fileIT ) {
@@ -199,18 +211,23 @@ sFile *cD64::fileGet( string pFilename ) {
 	return 0;
 }
 
-vector< sFile* > cD64::directoryGet( string pFind ) {
-	vector< sFile* > result;
-	vector< sFile* >::iterator	fileIT;
+vector< sD64File* > cD64::directoryGet( string pFind ) {
+	vector< sD64File* > result;
+	vector< sD64File* >::iterator	fileIT;
 	
 	// Strip any astrix
 	size_t	pos = pFind.find("*");
 	if(pos != string::npos)
 		pFind = pFind.substr(0, pos);
 
+	// Loop all files found in directory
 	for( fileIT = mFiles.begin(); fileIT != mFiles.end(); ++fileIT ) {
-		sFile *file = *fileIT;
+		sD64File *file = *fileIT;
 
+		// Skip deleted files
+		if(file->mFileType == eD64FileType_DEL )
+			continue;
+		
 		// Check if the current file matches the 'pFind' string
 		if( file->mName.substr(0, pFind.length()) ==  pFind )
 			result.push_back( file );

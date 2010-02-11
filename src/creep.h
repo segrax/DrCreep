@@ -40,7 +40,7 @@ private:
 	
 	byte		 mFileListingNamePtr;
 	
-	bool		 mMenuIntro;
+	bool		 mIntro;
 	byte		 mMenuMusicScore, mMenuScreenCount, mMenuScreenTimer;
 	byte		 mUnlimitedLives;
 	timeb		 mTimePrevious;
@@ -109,14 +109,18 @@ public:
 				~cCreep();
 
 				inline byte	*level( word pAddress ) {
-					if(mMenuIntro)
-						return &mLevel[(pAddress - 0x9800) + 2];
+					if(mIntro)
+						return &mMemory[pAddress];
 					else
 						return &mMemory[pAddress];
 				}
 				
 				inline byte charRom( word pAddress ) {
 					return m64CharRom[ pAddress - 0xD000 ];
+				}
+
+				inline byte *memory( word pAddress ) {
+					return &mMemory[ pAddress ];
 				}
 
 		inline cPlayerInput		*inputGet()		{ return mInput; }
@@ -126,11 +130,9 @@ public:
 		void	 run( int pArgCount, char *pArgs[] );					// Executed from main()
 
 		word	 lvlPtrCalculate( byte pCount );
-		
-		bool	 castleChangeLevel( size_t pNumber );
 
 		void	 Game();
-		void	 GameMain();
+		void	 roomMain();
 
 		void	 events_Execute();
 		void	 KeyboardJoystickMonitor( byte pA );
@@ -169,7 +171,7 @@ public:
 		void	 roomPrepare( );
 		
 		void	 sub_95F();
-		void	 sub_1AE6();
+		void	 obj_Image_Draw();
 		void	 sub_1B9F();
 		void	 sub_21C8( char pA );
 		

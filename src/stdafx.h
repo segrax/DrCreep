@@ -42,9 +42,11 @@ using namespace std;
 #include "types.h"
 #include "graphics/scale/scalebit.h"
 
+class cCreep;
 
 extern const char *SVNREV;
 extern const char *SVNDATE;
+extern cCreep	  *gCreep;
 
 #define ENDIAN_SMALL
 

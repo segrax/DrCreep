@@ -26,11 +26,19 @@
 #include "stdafx.h"
 #include "castle.h"
 #include "castleManager.h"
+#include "creep.h"
+#include "screen.h"
 
 cCastle::cCastle( cCastleInfo *pCastleInfo ) {
 	mName = pCastleInfo->nameGet();
 	mBuffer = pCastleInfo->bufferGet();
 	mCastleInfo = pCastleInfo;
+
+	// Set the window title screen
+	gCreep->screenGet()->levelNameSet( mName );
+
+	// Copy it into the memory region
+	memcpy( gCreep->memory(0x9800), mBuffer + 2, pCastleInfo->bufferSizeGet() - 2 );
 
 }
 
@@ -42,3 +50,4 @@ byte *cCastle::bufferGet(size_t &pBufferSize) {
 	pBufferSize = mCastleInfo->bufferSizeGet();
 	return mBuffer;
 }
+

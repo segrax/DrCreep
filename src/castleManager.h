@@ -25,20 +25,20 @@
 
 class cCastle;
 class cD64;
-class sFile;
+struct sD64File;
 
-struct sFileLocal {
+struct sD64FileLocal {
 	string	 mFilename;
 	byte	*mBuffer;
 	size_t	 mBufferSize;
 
-	sFileLocal( string pFilename, byte *pBuffer, size_t pBufferSize ) {
+	sD64FileLocal( string pFilename, byte *pBuffer, size_t pBufferSize ) {
 		mFilename = pFilename;
 		mBuffer = pBuffer;
 		mBufferSize = pBufferSize;
 	}
 
-	~sFileLocal() {
+	~sD64FileLocal() {
 		delete mBuffer;
 	}
 };
@@ -67,33 +67,34 @@ public:
 class cCastleInfoD64 : public cCastleInfo {
 private:
 	cD64			*mD64;
-	sFile			*mFile;
+	sD64File			*mFile;
 
 public:
-					 cCastleInfoD64( cD64 *pD64, sFile *pFile );
+					 cCastleInfoD64( cD64 *pD64, sD64File *pFile );
 
 	byte			*bufferGet();
 };
 
 class cCastleInfoLocal : public cCastleInfo {
 private:
-	sFileLocal		*mLocal;
+	sD64FileLocal		*mLocal;
 	
 public:
-					 cCastleInfoLocal( sFileLocal *pFileLocal );
+					 cCastleInfoLocal( sD64FileLocal *pFileLocal );
 
 	byte			*bufferGet();
 };
 
 class cCastleManager {
 private:
+	cCastle					*mCastle;				// Current Castle
 	vector< cCastleInfo* >	 mCastles;				// All castles found
 	vector< cD64* >			 mDisks;				// Open disk images
-	vector< sFileLocal* >	 mFiles;				// Open Files
+	vector< sD64FileLocal* > mFiles;				// Open Files
 
 	void					 castlesCleanup();		// Cleanup mCastles vector
 	void					 castlesFind();			// Find all available castles
-	cCastleInfo				*castleGet( string pName );
+
 
 	void					 diskCleanup();			// Cleanup mDisks vector
 	void					 diskLoadCastles();		// Load all castles off disks
@@ -105,12 +106,15 @@ private:
 public:
 							 cCastleManager();
 							~cCastleManager();
-	
-	cCastle					*castleGet( size_t pNumber );		
+
+	cCastle					*castleLoad( size_t pNumber );
+	cCastleInfo				*castleInfoGet( string pName );
+	cCastleInfo				*castleInfoGet( size_t pNumber );
+
 	void					 castleListDisplay();	// Display list of castles
 
 	byte					*diskLoadFile( string pFilename, size_t &pBufferSize );
 	
-	sFileLocal				*fileFind( string pFilename );
+	sD64FileLocal				*fileFind( string pFilename );
 	byte					*fileLoad( string pFilename, size_t &pBufferSize );
 };
