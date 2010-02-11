@@ -21,9 +21,9 @@ SetCompressor lzma
   
 ;--------------------------------
 ;General
-	XPStyle on
+	;XPStyle on
 	
-
+	RequestExecutionLevel admin
 	Name	"Dr. Creep"
 	Caption "The Castles Dr. Creep r${VERSION} Installer (${BUILDDATE})"
 	OutFile  ..\packages\DrCreep-${VERSION}.exe
@@ -32,13 +32,12 @@ SetCompressor lzma
 	InstallDir "$PROGRAMFILES\DrCreep"
   
 	;Get installation folder from registry if available
-	InstallDirRegKey HKCU "Software\drcreep" ""
+	InstallDirRegKey HKCU "Software\DrCreep" ""
 
 ;--------------------------------
 ;Variables
 
-  Var MUI_TEMP
-  ;Var STARTMENU_FOLDER
+  Var StartMenuFolder
 
 ;--------------------------------
 ;Interface Settings
@@ -51,18 +50,19 @@ SetCompressor lzma
   !insertmacro MUI_PAGE_WELCOME
 
   !insertmacro MUI_PAGE_LICENSE "..\License.txt"
-  !insertmacro MUI_PAGE_COMPONENTS
+  ;!insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
   
   ;Start Menu Folder Page Configuration
-  ;!define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU" 
-  ;!define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\drcreep" 
-  ;!define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
-  
-  ;!insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
-  
+  !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU" 
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\DrCreep" 
+  !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Castles of Dr Creep"
+
+!insertmacro MUI_PAGE_STARTMENU Application $StartMenuFolder
+
   !insertmacro MUI_PAGE_INSTFILES
-  
+  !insertmacro MUI_PAGE_FINISH 
+
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
 
@@ -78,7 +78,8 @@ Section "Copy Files" drcreepInst
 
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
-
+  
+  File "..\packages\vcredist_x86.exe"
   File "..\License.txt"
   File "..\Readme.txt"
   File "..\run\creep.exe"
@@ -97,25 +98,20 @@ Section "Copy Files" drcreepInst
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   
-  ;!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+ 	!insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     
-    ;Create shortcuts
-    ;CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    ;CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\DrCreep.lnk" "$INSTDIR\creep.exe"
-    ;CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-    
-    #MessageBox MB_YESNO "Would you like to create a desktop shortcut?" IDNO no
-		CreateShortCut "$DESKTOP\DrCreep.lnk" "$INSTDIR\creep.exe"
-    
-    no:
+    	;Create shortcuts
+     CreateDirectory "$SMPROGRAMS\$StartMenuFolder"
+     CreateShortCut "$SMPROGRAMS\$StartMenuFolder\DrCreep.lnk" "$INSTDIR\creep.exe"
+     CreateShortCut "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
 
-     #MessageBox MB_YESNO|MB_ICONQUESTION \
-             "Setup has completed. View the readme?" \
-             IDNO NoReadme
-    ExecShell open '$INSTDIR\Readme.txt'
-  NoReadme:
+    	!insertmacro MUI_STARTMENU_WRITE_END
 
-	;!insertmacro MUI_STARTMENU_WRITE_END
+	CreateShortCut "$DESKTOP\DrCreep.lnk" "$INSTDIR\creep.exe"
+
+	MessageBox MB_YESNO|MB_ICONQUESTION "Install Microsoft Visual C++ 2008 Redistributable Package?" IDNO NoRunVC
+    Exec "$INSTDIR\vcredist_x86.exe"
+  NoRunVC:
 
 SectionEnd 
 
@@ -127,7 +123,7 @@ SectionEnd
 
 	;Assign language strings to sections
 	!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-		!insertmacro MUI_DESCRIPTION_TEXT ${creepInst} $(DESC_creepInst)
+	!insertmacro MUI_DESCRIPTION_TEXT ${creepInst} $(DESC_creepInst)
 	!insertmacro MUI_FUNCTION_DESCRIPTION_END
  
 ;--------------------------------
@@ -147,10 +143,7 @@ FunctionEnd
 
 Function .onInstSuccess
 
-#MessageBox MB_YESNO|MB_ICONQUESTION "Install Microsoft Visual C++ 2008 Redistributable Package?" IDNO NoRunVC
-    Exec "$INSTDIR\vcredist_x86.exe"
-  NoRunVC:
-
+ExecShell open '$INSTDIR\Readme.txt'
 
 MessageBox MB_YESNO|MB_ICONQUESTION "Launch Dr. Creep?" IDNO NoRun
     Exec "$INSTDIR\creep.exe"
@@ -161,7 +154,9 @@ FunctionEnd
 ;Uninstaller Section
 
 Section "Uninstall"
+!insertmacro MUI_STARTMENU_GETFOLDER Application $StartMenuFolder
 
+    Delete "$INSTDIR\vcredist_x86.exe"
     Delete "$INSTDIR\License.txt"
     Delete "$INSTDIR\creep.exe"
     Delete "$INSTDIR\Uninstall.exe"
@@ -184,26 +179,11 @@ Section "Uninstall"
       MessageBox MB_OK|MB_ICONEXCLAMATION "Note: $INSTDIR could not be removed."
 no:
    
-  !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
-  
   Delete "$DESKTOP\DrCreep.lnk"
-  Delete "$SMPROGRAMS\$MUI_TEMP\DrCreep.lnk"
-  Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
-  RMDir  "$SMPROGRAMS\$MUI_TEMP"
-  
-  ;Delete empty start menu parent diretories
-  StrCpy $MUI_TEMP "$SMPROGRAMS\$MUI_TEMP"
+  Delete "$SMPROGRAMS\$StartMenuFolder\DrCreep.lnk" 
+  Delete "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk"
+  RMDir  "$SMPROGRAMS\$StartMenuFolder"
  
-  startMenuDeleteLoop:
-	ClearErrors
-    RMDir $MUI_TEMP
-    GetFullPathName $MUI_TEMP "$MUI_TEMP\.."
-    
-    IfErrors startMenuDeleteLoopDone
-  
-    StrCmp $MUI_TEMP $SMPROGRAMS startMenuDeleteLoopDone startMenuDeleteLoop
-  startMenuDeleteLoopDone:
-
-  DeleteRegKey /ifempty HKCU "Software\creep"
+  DeleteRegKey /ifempty HKCU "Software\DrCreep"
 
 SectionEnd
