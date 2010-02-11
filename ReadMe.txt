@@ -4,8 +4,8 @@ The Castles of Dr. Creep
 
 About:
 ------
- The Castles of Dr. Creep is a reimplementation of the 1984 
-  Commodore 64 game by Ed Hobbs.
+ The Castles of Dr. Creep is a reimplementation of the 
+  original 1984 Commodore 64 game by Ed Hobbs.
 
 
 Whats Missing:
@@ -14,7 +14,7 @@ Whats Missing:
  *music/sound effects
  *options menu
  *progress loading/saving
-
+ *time taken
 
 Required To Play:
 ----------------- 
