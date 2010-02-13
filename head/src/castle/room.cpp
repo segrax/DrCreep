@@ -212,6 +212,26 @@ void cCastle_Room::obj_Door_Button_Load( byte *&pObjectBuffer ) {
 	}
 }
 
+void cCastle_Room::obj_Lightning_Load( byte *&pObjectBuffer ) {
+	cCastle_Object	*object = 0;
+	
+	mDataLightingPtr = pObjectBuffer;
+
+	for( byte count = 0;; ++count) {
+
+		if( *pObjectBuffer & byte_45DF )
+			break;
+
+		object = new cCastle_Object_Lightning( this, pObjectBuffer );
+
+		mObjects.push_back( object );
+
+		pObjectBuffer += 0x08;
+	}
+
+	++pObjectBuffer;
+}
+
 void cCastle_Room::obj_Load() {
 	word			 func = 0x01;
 	byte			*roomPtr = mRoomPtr;
@@ -240,13 +260,15 @@ void cCastle_Room::obj_Load() {
 			case 0x080C:
 				obj_Ladder_Load( roomPtr );
 				break;
+
 			case 0x080F:
 				obj_Door_Button_Load( roomPtr );
 				break;
-			/*case 0x0812:
-				//obj_Lightning_Prepare( );
+
+			case 0x0812:
+				obj_Lightning_Load( roomPtr );
 				break;
-			case 0x0815:
+			/*case 0x0815:
 				//obj_Forcefield_Prepare( );
 				break;
 			case 0x0818:

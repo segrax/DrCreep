@@ -4,3 +4,4 @@
 #include "player.h"
 #include "slidingpole.h"
 #include "ladder.h"
+#include "lightning.h"

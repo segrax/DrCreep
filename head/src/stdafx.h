@@ -84,3 +84,7 @@ byte			*local_FileRead( string pFile, size_t	&pFileSize );
 const byte byte_83F = 0x80;
 const byte byte_840 = 0x40;
 const byte byte_841 = 0x20;
+
+const byte byte_45DD = 0x80;
+const byte byte_45DE = 0x40;
+const byte byte_45DF = 0x20;

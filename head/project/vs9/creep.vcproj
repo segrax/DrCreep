@@ -420,6 +420,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\src\castle\object\lightning.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\lightning.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\src\castle\object\object.cpp"
 						>
 					</File>
