@@ -28,22 +28,32 @@
 #include "castleManager.h"
 #include "creep.h"
 #include "vic-ii/screen.h"
+#include "room.h"
+#include "castle/object/object.h"
+#include "castle/object/player.h"
 
-cCastle::cCastle( cCastleInfo *pCastleInfo ) {
+cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
+	mCastleInfo = pCastleInfo;
+	mCreep = pCreep;
+	
 	mName = pCastleInfo->nameGet();
 	mBuffer = pCastleInfo->bufferGet();
-	mCastleInfo = pCastleInfo;
+	mBuffer += 2;
 
 	// Set the window title screen
 	gCreep->screenGet()->levelNameSet( mName );
 
 	// Copy it into the memory region
-	memcpy( gCreep->memory(0x9800), mBuffer + 2, pCastleInfo->bufferSizeGet() - 2 );
+	memcpy( gCreep->memory(0x9800), mBuffer, pCastleInfo->bufferSizeGet() - 2 );
 
+	loadHeader();
 }
 
 cCastle::~cCastle() {
-	
+	map< size_t, cCastle_Room* >::iterator	roomIT;
+
+	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT )
+		delete (*roomIT).second;
 }
 
 byte *cCastle::bufferGet(size_t &pBufferSize) {
@@ -51,3 +61,54 @@ byte *cCastle::bufferGet(size_t &pBufferSize) {
 	return mBuffer;
 }
 
+void cCastle::castleStart( size_t pPlayers ) {
+
+	for( byte count = 0; count < pPlayers; ++count ) {
+		mPlayer[count] = new cCastle_Object_Player( mStartRoom[count], mStartDoor[count] );
+	}
+
+	draw();
+	
+	mCreep->screenGet()->refresh();
+}
+
+void cCastle::draw() {
+	cCastle_Room *room = mPlayer[ 0 ] ->roomGet();
+
+	room->draw();
+}
+
+cCastle_Room *cCastle::roomGet( size_t pRoomNumber ) {
+	map< size_t, cCastle_Room * >::iterator		roomIT;
+
+	roomIT = mRooms.find( pRoomNumber );
+	if(roomIT == mRooms.end())
+		return 0;
+
+	return roomIT->second;
+}
+
+void cCastle::loadHeader() {
+	byte		 *roomDirectoryBuffer = 0;
+	cCastle_Room *room = 0;
+
+	for( size_t X = 0; ; ++X ) {
+		roomDirectoryBuffer = roomDirPtrGet( X );
+
+		room = new cCastle_Room( this, roomDirectoryBuffer );
+		
+		mRooms.insert( make_pair( X, room ) );
+
+		roomDirectoryBuffer += 0x08;
+
+		if(*roomDirectoryBuffer == 0xFF || *roomDirectoryBuffer == 0x40 )
+			break;
+	}
+
+	mStartRoom[0] = roomGet( *(mBuffer + 3) );
+	mStartRoom[1] = roomGet( *(mBuffer + 4) );
+
+	mStartDoor[0] = mStartRoom[0]->objectDoorGet( *(mBuffer + 5) );
+	mStartDoor[1] = mStartRoom[1]->objectDoorGet( *(mBuffer + 6) );
+
+}

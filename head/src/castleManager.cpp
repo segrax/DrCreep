@@ -25,7 +25,7 @@
 
 #include "stdafx.h"
 #include "d64.h"
-#include "castle.h"
+#include "castle/castle.h"
 #include "castleManager.h"
 
 cCastleInfoD64::cCastleInfoD64( cD64 *pD64, sD64File *pFile ) : cCastleInfo( pFile->mName ) {
@@ -265,7 +265,7 @@ cCastle *cCastleManager::castleLoad( size_t pNumber ) {
 		return 0;
 
 	delete mCastle;
-	mCastle = new cCastle( mCastles[ pNumber ] );
+	mCastle = new cCastle( gCreep, mCastles[ pNumber ] );
 
 	return mCastle;
 }

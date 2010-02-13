@@ -43,6 +43,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				InlineFunctionExpansion="0"
+				AdditionalIncludeDirectories="..\..\\src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -181,19 +182,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\bitmapMulticolor.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\bitmapMulticolor.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\castle.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\castleManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\castleManager.h"
 				>
 			</File>
 			<File
@@ -209,7 +202,15 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\src\creep.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\d64.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\d64.h"
 				>
 			</File>
 			<File
@@ -221,23 +222,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\screen.cpp"
+				RelativePath=".\resource.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\screen.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\sprite.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\sprite.h"
+				RelativePath="..\..\rev.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\stdafx.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\types.h"
 				>
 			</File>
 			<Filter
@@ -336,44 +337,126 @@
 					>
 				</File>
 			</Filter>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath="..\..\src\castle.h"
+			<Filter
+				Name="vic-ii"
 				>
-			</File>
-			<File
-				RelativePath="..\..\src\castleManager.h"
+				<File
+					RelativePath="..\..\src\vic-ii\bitmapMulticolor.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\vic-ii\bitmapMulticolor.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\vic-ii\screen.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\vic-ii\screen.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\vic-ii\sprite.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\vic-ii\sprite.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="castle"
 				>
-			</File>
-			<File
-				RelativePath="..\..\src\creep.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\d64.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\resource.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\rev.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\types.h"
-				>
-			</File>
+				<File
+					RelativePath="..\..\src\castle\castle.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\castle\castle.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\castle\image.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\castle\image.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\castle\room.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\castle\room.h"
+					>
+				</File>
+				<Filter
+					Name="object"
+					>
+					<File
+						RelativePath="..\..\src\castle\object\door.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\door.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\doorButton.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\doorButton.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\ladder.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\ladder.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\object.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\object.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\objects.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\player.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\player.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\slidingpole.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\slidingpole.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\walkway.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\walkway.h"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
