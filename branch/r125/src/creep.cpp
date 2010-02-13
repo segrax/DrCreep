@@ -4525,19 +4525,20 @@ void cCreep::obj_SlidingPole_Prepare() {
 
 		//1781
 		for(;;) {
+			// Has walkway?
 			if (mMemory[ word_3C ]  & 0x44) {
 				mTxtX_0 = gfxPosX - 4;
 				mTxtY_0 = gfxPosY;
 				
+				// Draw hole in walkway
 				screenDraw( 2, 0x27, gfxPosX, gfxPosY, 0x25 );
 			} else {
 				// 17AA
+				// Draw pole
 				screenDraw( 0, 0x24, gfxPosX, gfxPosY );
 			}
 
-			A = mMemory[ word_3C ];
-			A |= 0x10;
-			mMemory[ word_3C ] = A;
+			mMemory[ word_3C ] |= 0x10;
 
 			--byte_17ED;
 			if( !byte_17ED ) {
@@ -4552,12 +4553,12 @@ void cCreep::obj_SlidingPole_Prepare() {
 }
 
 void cCreep::obj_Ladder_Prepare() {
-	byte byte_18E3, gfxPosX, gfxPosY;
+	byte length, gfxPosX, gfxPosY;
 	
 	for(;;) {
 	
-		byte_18E3 = mMemory[ word_3E ];
-		if( byte_18E3 == 0 ) {
+		length = mMemory[ word_3E ];
+		if( length == 0 ) {
 			++word_3E;
 			return;
 		}
@@ -4566,12 +4567,8 @@ void cCreep::obj_Ladder_Prepare() {
 		gfxPosX = mMemory[ word_3E + 1 ];
 		gfxPosY = mMemory[ word_3E + 2 ];
 
-		byte A = gfxPosX >> 2;
-		A -= 0x04;
-
-		byte_5FD5 = A;
-		A = (gfxPosY >> 3);
-		byte_5FD6 = A;
+		byte_5FD5 =  (gfxPosX >> 2) - 0x04;
+		byte_5FD6 = (gfxPosY >> 3);
 
 		objectMapGet();
 
@@ -4580,7 +4577,7 @@ void cCreep::obj_Ladder_Prepare() {
 			if( (mMemory[ word_3C ] & 0x44) == 0 ) {
 				byte  gfxCurrentID;
 
-				if( byte_18E3 != 1 ) 
+				if( length != 1 ) 
 					gfxCurrentID = 0x28;
 				else
 					gfxCurrentID = 0x2B;
@@ -4589,7 +4586,7 @@ void cCreep::obj_Ladder_Prepare() {
 
 			} else {
 				// 184C
-				if( byte_18E3 == 1 ) {
+				if( length == 1 ) {
 					mTxtX_0 = gfxPosX;
 					mTxtY_0 = gfxPosY;
 
@@ -4604,11 +4601,11 @@ void cCreep::obj_Ladder_Prepare() {
 				}
 			}
 			// 189C
-			if( byte_18E3 != mMemory[ word_3E ] )
+			if( length != mMemory[ word_3E ] )
 				mMemory[ word_3C ] = ( mMemory[ word_3C ] | 1);
 			
-			--byte_18E3;
-			if( byte_18E3 == 0 ) { 
+			--length;
+			if( length == 0 ) { 
 			
 				word_3E += 3;
 				break;
@@ -5162,7 +5159,7 @@ void cCreep::obj_Lightning_Img_Execute( byte pX ) {
 	byte gfxPosX, gfxPosY;
 
 	byte byte_43E2, byte_43E3;
-	word_40 = word_45DB + mMemory[ 0xBE00 + pX ];
+	word_40 = mDataLightingPtr + mMemory[ 0xBE00 + pX ];
 	byte Y = 0;
 
 	if( mMemory[ 0xBE01 + pX ] != 1 ) {
@@ -5328,7 +5325,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pX, byte pY ) {
 
 	// 4507
 	byte byte_45D7 = 0;
-	word_30 = word_45DB + mMemory[ 0xBE00 + pY ];
+	word_30 = mDataLightingPtr + mMemory[ 0xBE00 + pY ];
 	byte byte_45D8 = pY;
 
 	if( !(mMemory[ word_30 ] & byte_45DE )) {
@@ -5351,7 +5348,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pX, byte pY ) {
 
 		// 4553
 		byte byte_45DA = A;
-		word_32 = word_45DB + A;
+		word_32 = mDataLightingPtr + A;
 		
 		mMemory[ word_32 ] ^= byte_45DE;
 		byte Y;
@@ -5422,7 +5419,7 @@ void cCreep::obj_Forcefield_Img_Timer_Execute( byte pX ) {
 void cCreep::obj_Lightning_Prepare() {
 	byte	byte_44E5, byte_44E6, gfxPosX, gfxPosY;
 
-	word_45DB = word_3E;
+	mDataLightingPtr = word_3E;
 	byte_44E5 = 0;
 
 	byte X = 0, A;
