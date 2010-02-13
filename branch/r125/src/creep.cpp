@@ -2890,11 +2890,13 @@ void cCreep::obj_Player_Add( ) {
 	byte Y = byte_3638;
 	mMemory[ 0x34D1 + Y ] = X;		// Set player object number
 	
+	// Start Door
 	byte A = mMemory[ 0x780B + Y ];
 	A <<= 3;
-	word_40 = A + word_41D3;
+	word_40 = A + mDataDoorPtr;
 	
 	// 35C0
+	// Is door open
 	if( mMemory[ word_40 + 2 ] & 0x80 ) {
 		mMemory[ 0x780D + byte_3638 ] = 6;
 		mMemory[ 0xBD01 + X ] = mMemory[ word_40 ] + 0x0B;
@@ -4193,14 +4195,14 @@ void cCreep::sub_21C8( char pA ) {
 }
 
 void cCreep::obj_Walkway_Prepare() {
-	byte byte_1744, byte_1745, byte_1746;
+	byte byte_1744, byte_1745, walkwayLength;
 	byte gfxCurrentID, gfxPosX, gfxPosY;
 
 	for(;;) {
 		
-		byte_1746 = mMemory[ word_3E ];
+		walkwayLength = mMemory[ word_3E ];
 
-		if( ! byte_1746 ) {
+		if( ! walkwayLength ) {
 			++word_3E;
 			return;
 		}
@@ -4214,7 +4216,7 @@ void cCreep::obj_Walkway_Prepare() {
 		byte_5FD5 -= 4;
 
 		byte_5FD6 = (gfxPosY >> 3);
-		sub_5FA3();
+		objectMapGet();
 
 		// 16A9
 		
@@ -4222,7 +4224,7 @@ void cCreep::obj_Walkway_Prepare() {
 			byte A;
 
 			if( byte_1744 != 1 ) {
-				if( byte_1744 != byte_1746 )
+				if( byte_1744 != walkwayLength )
 					A = 0x1C;
 				else
 					A = 0x1D;
@@ -4230,17 +4232,18 @@ void cCreep::obj_Walkway_Prepare() {
 				A = 0x1B;
 
 			// 16C1
+			// Draw Walkway Piece
+
 			gfxCurrentID = A;
 			screenDraw( 0, gfxCurrentID, gfxPosX, gfxPosY );
-
 			byte_1745 = 1;
 			
 			// 16D1
-			for(;;) {
+			for(;;) {	
 				
 				if( byte_1744 != 1 ) {
 					
-					if( byte_1744 != byte_1746 )
+					if( byte_1744 != walkwayLength )
 						A = 0x44;
 
 					else {
@@ -4273,7 +4276,7 @@ void cCreep::obj_Walkway_Prepare() {
 			gfxPosX += (mGfxWidth << 2);
 			++byte_1744;
 
-			if( byte_1744 > byte_1746 )
+			if( byte_1744 > walkwayLength )
 				break;
 		}
 		// 1732
@@ -4484,10 +4487,10 @@ void cCreep::sub_5F6B( byte &pX ) {
 	byte_5FD8 = byte_5FD6 & 7;
 	byte_5FD6 >>= 3;
 	
-	sub_5FA3();
+	objectMapGet();
 }
 
-void cCreep::sub_5FA3() {
+void cCreep::objectMapGet() {
 	// 5fa6
 	word_3C = mMemory[ 0x5CE6 + byte_5FD6 ];
 	word_3C += mMemory[ 0x5D06 + byte_5FD6 ] << 8;
@@ -4518,7 +4521,7 @@ void cCreep::obj_SlidingPole_Prepare() {
 		byte_5FD5 = (gfxPosX >> 2) - 0x04;
 		byte_5FD6 = (gfxPosY >> 3);
 
-		sub_5FA3();
+		objectMapGet();
 
 		//1781
 		for(;;) {
@@ -4570,7 +4573,7 @@ void cCreep::obj_Ladder_Prepare() {
 		A = (gfxPosY >> 3);
 		byte_5FD6 = A;
 
-		sub_5FA3();
+		objectMapGet();
 
 		// 1828
 		for(;;) {
@@ -4627,7 +4630,7 @@ void cCreep::obj_Door_Img_Execute( byte pX ) {
 		mMemory[ 0xBE01 + pX ] = 1;
 		mMemory[ 0xBE02 + pX ] = 0x0E;
 
-		word_40 = (mMemory[ 0xBE00 + pX ] << 3) + word_41D3;
+		word_40 = (mMemory[ 0xBE00 + pX ] << 3) + mDataDoorPtr;
 		
 		mMemory[ word_40 + 2 ] |= 0x80;
 		byte A = mMemory[ word_40 + 4 ];
@@ -4684,7 +4687,7 @@ void cCreep::obj_Door_InFront( byte pX, byte pY ) {
 	A = mMemory[ 0xBE00 + byte_41D5 ];
 	A <<= 3;
 
-	word_40 = word_41D3 + A;
+	word_40 = mDataDoorPtr + A;
 
 	// 40BB
 
@@ -5098,7 +5101,7 @@ void cCreep::obj_Door_Lock_Prepare() {
 
 void cCreep::obj_Door_Prepare() {
 	byte byte_41D0 = *level(word_3E++);
-	word_41D3 = word_3E;
+	mDataDoorPtr = word_3E;
 	
 	byte X, gfxCurrentID, gfxPosX, gfxPosY;
 
@@ -5647,7 +5650,7 @@ void cCreep::obj_TrapDoor_Prepare( ) {
 			byte_5FD5 -= 4;
 			
 			byte_5FD6 = mMemory[ word_3E + 2 ] >> 3;
-			sub_5FA3();
+			objectMapGet();
 
 			mMemory[ word_3C ] = mMemory[ word_3C ] & 0xFB;
 			mMemory[ word_3C + 4 ] = mMemory[ word_3C + 4 ] & 0xBF;
@@ -5871,7 +5874,7 @@ void cCreep::obj_Frankie_Load() {
 		byte_5FD5 = (mTxtX_0 >> 2) - 4;
 		byte_5FD6 = (mTxtY_0 >> 3);
 
-		sub_5FA3();
+		objectMapGet();
 		byte A;
 
 		if( ( mMemory[ word_3E ] & byte_574F )) {
@@ -6682,7 +6685,7 @@ void cCreep::sub_526F( char &pA ) {
 		byte_5FD5 = (mMemory[ word_40 + 1 ] >> 2) - 4;
 		byte_5FD6 = mMemory[ word_40 + 2 ] >> 3;
 
-		sub_5FA3();
+		objectMapGet();
 
 		mMemory[ word_3C ] |= 0x04;
 		mMemory[ word_3C + 4 ] |= 0x40;
@@ -6697,7 +6700,7 @@ void cCreep::sub_526F( char &pA ) {
 		byte_5FD5 = (mMemory[ word_40 + 1 ] >> 2) - 4;
 		byte_5FD6 = mMemory[ word_40 + 2 ] >> 3;
 
-		sub_5FA3();
+		objectMapGet();
 
 		mMemory[ word_3C ] &= 0xFB;
 		mMemory[ word_3C + 4 ] &= 0xBF;

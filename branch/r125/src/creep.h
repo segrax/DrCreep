@@ -57,7 +57,7 @@ private:
 	byte		 byte_311D;
 
 	byte		 byte_34D6, byte_3638;
-	word		 word_41D3;
+	word		 mDataDoorPtr;
 
 	word		 word_4A65;											// Keys
 	byte		 byte_4A64;
@@ -186,7 +186,7 @@ public:
 		void	 sub_57DF( byte pX );
 		bool	 sub_5E8E( byte pA, byte pX, byte pY );
 		void	 sub_5F6B( byte &pX );
-		void	 sub_5FA3();
+		void	 objectMapGet();
 		void	 sub_6009( byte pA );
 		
 		// Image Handling Functions
