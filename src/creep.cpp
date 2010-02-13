@@ -28,7 +28,7 @@
 #include "vic-ii/screen.h"
 #include "vic-ii/sprite.h"
 #include "playerInput.h"
-#include "castle.h"
+#include "castle/castle.h"
 #include "castleManager.h"
 #include "creep.h"
 
@@ -61,15 +61,15 @@ cCreep::cCreep() {
 	// Load the C64 Character Rom
 	m64CharRom = local_FileRead( "char.rom", romSize );
 	
-	mOrigObject = mCastleManager->fileLoad( "OBJECT", romSize );
+	mGameData = mCastleManager->fileLoad( "OBJECT", romSize ) + 2;
+	romSize -= 2;
 
 	if(romSize)
 		// Copy the game data into the memory buffer
-		memcpy( &mMemory[ 0x800 ], mOrigObject + 2, romSize - 2 );
+		memcpy( &mMemory[ 0x800 ], mGameData, romSize );
 
 	byte_839 = 0;
-	byte_840 = 0x40;
-	byte_841 = 0x20;
+
 	byte_882 = 0x80;
 	byte_883 = 0x40;
 	byte_884 = 0x20;
@@ -83,8 +83,6 @@ cCreep::cCreep() {
 	byte_88C = 0x20;
 	byte_88D = 0x10;
 	byte_88E = 0x01;
-	
-	byte_83F = 0x80;
 	
 	byte_8C0 = 0x80;
 	byte_8C1 = 0x40;
@@ -314,7 +312,7 @@ void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
 				break;
 		}
 
-		if( mCastleManager->castleLoad( pStartLevel ) == 0)
+		if( (mCastle = mCastleManager->castleLoad( pStartLevel )) == 0)
 			return;
 
 	} else {
@@ -559,6 +557,10 @@ void cCreep::mainLoop() {
 
 	mScreen->bitmapLoad( &mMemory[ 0xE000 ], &mMemory[ 0xCC00 ], &mMemory[ 0xD800 ], 0 );
 
+	mCastle->castleStart( 2 );
+
+	
+
 	while(!mQuit) {
 		
 		if( Intro() == true )
@@ -631,48 +633,7 @@ void cCreep::roomLoad() {
 	// Room Color
 	A = mMemory[word_42] & 0xF;
 
-	// Set floor colours
-	// 1438
-	mMemory[ 0x6481 ] = A;
-	A <<= 4;
-	A |= mMemory[ 0x6481 ];
-
-	mMemory[ 0x6481 ] = A;
-	mMemory[ 0x648E ] = A;
-	mMemory[ 0x649B ] = A;
-	mMemory[ 0x65CC ] = A;
-	mMemory[ 0x65CE ] = A;
-	mMemory[ 0x6EAE ] = A;
-	mMemory[ 0x6EAF ] = A;
-	mMemory[ 0x6EB0 ] = A;
-	mMemory[ 0x6EC6 ] = A;
-	mMemory[ 0x6EC7 ] = A;
-	mMemory[ 0x6EC8 ] = A;
-	mMemory[ 0x6EDB ] = A;
-	mMemory[ 0x6EDC ] = A;
-	mMemory[ 0x6EED ] = A;
-	mMemory[ 0x6EEE ] = A;
-	mMemory[ 0x6EEF ] = A;
-	mMemory[ 0x6EFC ] = A;
-	mMemory[ 0x6EFD ] = A;
-	mMemory[ 0x6EFE ] = A;
-	mMemory[ 0x6F08 ] = A;
-	mMemory[ 0x6F09 ] = A;
-	mMemory[ 0x6F0A ] = A;
-
-	//1487
-
-	for( char Y = 7; Y >= 0; --Y ) {
-		mMemory[ 0x6FB2 + Y ] = A;
-		mMemory[ 0x6FF5 + Y ] = A;
-		mMemory[ 0x7038 + Y ] = A;
-		mMemory[ 0x707B + Y ] = A;
-	}
-	
-	A &= 0x0F;
-	A |= 0x10;
-	mMemory[ 0x6584 ] = A;
-	mMemory[ 0x659B ] = mMemory[ 0x65CD ] = (mMemory[ 0x649B ] & 0xF0) | 0x01;
+	graphicRoomColorsSet( A );
 
 	//14AC
 	// Ptr to start of room data
@@ -683,6 +644,51 @@ void cCreep::roomLoad() {
 
 	// Function ptr
 	roomPrepare( );
+}
+
+void cCreep::graphicRoomColorsSet( byte pRoomColor ) {
+	// Set floor colours
+	// 1438
+	*gameData( 0x6481 )= pRoomColor;
+	pRoomColor <<= 4;
+	pRoomColor |= *gameData( 0x6481 );
+
+	*gameData( 0x6481 ) = pRoomColor;
+	*gameData( 0x648E ) = pRoomColor;
+	*gameData( 0x649B ) = pRoomColor;
+	*gameData( 0x65CC ) = pRoomColor;
+	*gameData( 0x65CE ) = pRoomColor;
+	*gameData( 0x6EAE ) = pRoomColor;
+	*gameData( 0x6EAF ) = pRoomColor;
+	*gameData( 0x6EB0 ) = pRoomColor;
+	*gameData( 0x6EC6 ) = pRoomColor;
+	*gameData( 0x6EC7 ) = pRoomColor;
+	*gameData( 0x6EC8 ) = pRoomColor;
+	*gameData( 0x6EDB ) = pRoomColor;
+	*gameData( 0x6EDC ) = pRoomColor;
+	*gameData( 0x6EED ) = pRoomColor;
+	*gameData( 0x6EEE ) = pRoomColor;
+	*gameData( 0x6EEF ) = pRoomColor;
+	*gameData( 0x6EFC ) = pRoomColor;
+	*gameData( 0x6EFD ) = pRoomColor;
+	*gameData( 0x6EFE ) = pRoomColor;
+	*gameData( 0x6F08 ) = pRoomColor;
+	*gameData( 0x6F09 ) = pRoomColor;
+	*gameData( 0x6F0A ) = pRoomColor;
+
+	//1487
+
+	for( char Y = 7; Y >= 0; --Y ) {
+		*gameData( 0x6FB2 + Y ) = pRoomColor;
+		*gameData( 0x6FF5 + Y ) = pRoomColor;
+		*gameData( 0x7038 + Y ) = pRoomColor;
+		*gameData( 0x707B + Y ) = pRoomColor;
+	}
+	
+	pRoomColor &= 0x0F;
+	pRoomColor |= 0x10;
+	*gameData( 0x6584 ) = pRoomColor;
+	*gameData( 0x659B ) = *gameData( 0x65CD ) = (*gameData( 0x649B ) & 0xF0) | 0x01;
 }
 
 // 15E0
@@ -2272,15 +2278,18 @@ void cCreep::img_Actions() {
 		// Key picked up
 		if( A & byte_841 ) {
 			sub_57DF( X );
+			// Decrease image count
 			--mImageCount;
 			A = mImageCount << 3;
 
+			// Last image?
 			if( X == A )
 				break;
 
 			byte Y = A;
 			byte byte_3FD3 = 8;
 
+			// Copy the last image entry, into the keys position
 			for(;;) {
 				mMemory[ 0xBF00 + X ] = mMemory[ 0xBF00 + Y ];
 				mMemory[ 0xBE00 + X ] = mMemory[ 0xBE00 + Y ];
@@ -2409,9 +2418,9 @@ word cCreep::lvlPtrCalculate( byte pCount ) {
 	word_42 <<= 1;
 	word_42 <<= 1;
 	word_42 <<= 1;
-	word_42 |= (0x79 << 8);
+	word_42 += 0x7900;
 	if( mIntro )
-		word_42 += (0x20 << 8);
+		word_42 += 0x2000;
 
 	return word_42;
 }
@@ -2427,15 +2436,16 @@ void cCreep::Game() {
 		word_30 = 0x9800;
 		word_32 = 0x7800;
 
-		word_34 = mMemory[ 0x9800 ];
-		word_34 |= (mMemory[ 0x9801 ] << 8);
+		word_34 = readWord( &mMemory[ 0x9800 ] );
 
 		// 
 		memcpy( &mMemory[ word_32 ], &mMemory[ word_30 ], word_34 );
 
 		// DC6
+		// Which joystick was selected when button press was detected (in intro)
 		mMemory[ 0x7812 ] = byte_D10;
 
+		// Clear Stored CIA Timers
 		for( char Y = 7; Y >= 0; --Y )
 			mMemory[ 0x7855 + Y ] = 0;
 
@@ -2607,7 +2617,7 @@ sF99:;
 			
 			word posX;
 			
-			A = mMemory[ word_42 + 1 ];
+			A = mMemory[ word_42 + 1 ];	// X
 			A += mMemory[ word_40 + 5 ];
 
 			byte Y = mMemory[ 0x11D9 ];
@@ -2640,7 +2650,7 @@ sF99:;
 			mMemory[ 0x20 ] = A;
 
 			// 100D
-			A = mMemory[ word_42 + 2 ];
+			A = mMemory[ word_42 + 2 ];		// Y
 			A += mMemory[ word_40 + 6 ];
 			A += mMemory[ 0x11DE + mMemory[ 0x11D9 ] ];
 			A += 0x32;
@@ -3583,10 +3593,10 @@ void cCreep::mapRoomDraw() {
 			//1224
 			
 			mMemory[ 0x63E7 ] = mMemory[ word_42 ] & 0xF;
-			byte_13EC = mMemory[ word_42 + 1 ];
-			byte_13ED = mMemory[ word_42 + 2 ];
-			byte_13EF = mMemory[ word_42 + 3 ] & 7;
-			byte_13EE = (mMemory[ word_42 + 3 ] >> 3) & 7;
+			byte_13EC = mMemory[ word_42 + 1 ];	// top left x
+			byte_13ED = mMemory[ word_42 + 2 ]; // top left y
+			byte_13EF = mMemory[ word_42 + 3 ] & 7; // width
+			byte_13EE = (mMemory[ word_42 + 3 ] >> 3) & 7; // height
 
 			gfxPosY = byte_13ED;
 

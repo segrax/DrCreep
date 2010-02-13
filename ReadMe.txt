@@ -4,7 +4,7 @@ The Castles of Dr. Creep
 
 About:
 ------
- The Castles of Dr. Creep is a reimplementation of the 
+ The Castles of Dr. Creep is an open source reimplementation of the 
   original 1984 Commodore 64 game by Ed Hobbs.
 
 
@@ -48,7 +48,7 @@ Controls:
  Player 2:
  ---------
  
- Numpad 0 = Joystick Button
+ Numpad 0 = Button
  Numpad Arrows = Left/Right/Up/Down
 
 
@@ -59,3 +59,9 @@ Playing:
  To start a 1 player game, press the Player1 Joystick Button
  To start a 2 player game, press the Player2 Joystick Button
 
+
+Thanks:
+-------
+
+Ed Hobbs, for the original game
+Christian Bauer, for the excellent 'VIC-II' article (https://sh.scs-trc.net/vic/)

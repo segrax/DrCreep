@@ -23,6 +23,7 @@
  *  ------------------------------------------
  */
 
+class cCastle;
 class cCastleManager;
 class cScreen;
 class cPlayerInput;
@@ -31,9 +32,10 @@ class cCreep {
 
 private:
 
-	byte			*mMemory,			*mOrigObject,		*mLevel,		*m64CharRom;
+	byte			*mMemory,			*mGameData,		*mLevel,		*m64CharRom;
 	size_t			 mMemorySize;
 
+	cCastle			*mCastle;
 	cCastleManager	*mCastleManager;
 	cScreen			*mScreen;
 	cPlayerInput	*mInput;
@@ -89,14 +91,14 @@ private:
 	byte		 byte_5647, byte_5648, byte_5F58, byte_5F57, byte_5F56;
 	byte		 byte_3FD4;
 
-	byte		 byte_840, byte_841, byte_883, byte_884, byte_885, byte_886, byte_887, byte_888, byte_889, byte_88A, byte_88B, byte_88C, byte_88D, byte_88E, byte_882, byte_D10, byte_D12;
-	byte		 byte_839, mImageCount, byte_83F, byte_8C0, byte_8C1, byte_5CE2;
+	byte		 byte_883, byte_884, byte_885, byte_886, byte_887, byte_888, byte_889, byte_88A, byte_88B, byte_88C, byte_88D, byte_88E, byte_882, byte_D10, byte_D12;
+	byte		 byte_839, mImageCount, byte_8C0, byte_8C1, byte_5CE2;
 	byte		 byte_B83, byte_603A, byte_5FD7;
 	byte		 byte_5FD5, byte_5FD6, byte_5FD8, byte_5F6A;
 	
 	byte		 mGfxEdgeOfScreenX;
 	byte		 mTextXPos, mTextYPos, mTextColor, mTextFont, mTextFontt;
-	byte		 mTxtX_0, mTxtY_0, mTxtPosLowerY, mTxtDestXLeft, mTxtDestX, mTxtEdgeScreenX;
+	byte		 mTxtPosLowerY, mTxtDestXLeft, mTxtDestX, mTxtEdgeScreenX;
 	byte		 mTxtDestXRight, mTxtWidth, mTxtHeight;
 	byte		 mGfxWidth, mGfxHeight;
 	byte		 mCount;
@@ -104,6 +106,7 @@ private:
 	word		 word_30, word_32, word_34, word_3C, word_3E, word_40, word_42, word_44;
 
 public:
+	byte		 mTxtX_0, mTxtY_0;
 
 				 cCreep();
 				~cCreep();
@@ -121,6 +124,18 @@ public:
 
 				inline byte *memory( word pAddress ) {
 					return &mMemory[ pAddress ];
+				}
+
+				inline byte *gameData( word pAddress ) {
+					return &mGameData[ pAddress - 0x800 ];
+				}
+
+				inline byte *gfxPtr( word pID ) {
+					word  gfxAddress  = (0x603B + (pID << 1));
+					byte *gfxTablePtr = gameData( gfxAddress );
+					byte *gfxPtr = gameData( readWord( gfxTablePtr ));
+					
+					return gfxPtr;
 				}
 
 		inline cPlayerInput		*inputGet()		{ return mInput; }
@@ -141,6 +156,8 @@ public:
 		void	 gameHighScores();
 		void	 gameMenuDisplaySetup();
 		void	 gamePositionSave();
+
+		void	 graphicRoomColorsSet( byte pRoomColor );
 
 		void	 hw_IntSleep( byte pA );				// hardware interrupt wait loop
 		void	 hw_SaveFile( );						// save a file
