@@ -39,7 +39,7 @@ private:
 	byte			*mRoomDirPtr;						// pointer in the castle room directory
 	byte			*mRoomPtr;							// pointer to start of room data
 
-	byte			*mDataDoorPtr;
+	byte			*mDataDoorPtr, *mDataLightingPtr;
 
 	vector< cCastle_Object* >	 mObjects;				// objects in room
 
@@ -53,7 +53,9 @@ private:
 	void						 obj_SlidingPole_Load( byte *&pObjectBuffer );
 	void						 obj_Ladder_Load( byte *&pObjectBuffer );
 	void						 obj_Door_Button_Load( byte *&pObjectBuffer );
-	void						 obj_Load();	
+	void						 obj_Lightning_Load( byte *&pObjectBuffer );
+
+	void						 obj_Load();									// Load all objects in room
 
 public:
 
