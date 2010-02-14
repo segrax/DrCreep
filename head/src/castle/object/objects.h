@@ -8,3 +8,4 @@
 #include "forcefield.h"
 #include "mummy.h"
 #include "key.h"
+#include "door_lock.h"

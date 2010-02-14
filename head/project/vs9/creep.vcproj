@@ -404,6 +404,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\src\castle\object\door_lock.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\door_lock.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\src\castle\object\doorButton.cpp"
 						>
 					</File>
