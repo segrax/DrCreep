@@ -62,7 +62,7 @@ private:
 	word		 word_4A65;											// Keys
 	byte		 byte_4A64;
 
-	word		 word_498B;											// Mummys
+	word		 mDataMummyPtr;											// Mummys
 
 	word		 word_4D5B;											// RayGuns	
 	byte		 byte_4D5D;
@@ -82,7 +82,7 @@ private:
 
 	word		 word_45DB;											// Lightning
 	byte		 byte_44E5, byte_45DD, byte_45DE, byte_45DF;		// Lightning
-	byte		 byte_474F;
+	byte		 forcefieldCount;
 	
 	word		 word_564B;													// Conveyor
 	byte		 byte_5642, byte_5643, byte_5644, byte_5645, byte_5646;		// Conveyor

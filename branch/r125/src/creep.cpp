@@ -5487,7 +5487,7 @@ void cCreep::obj_Forcefield_Prepare() {
 	byte X = 0;
 	byte gfxPosX, gfxPosY;
 
-	byte_474F = 0;
+	forcefieldCount = 0;
 	
 	for(;;) {
 		
@@ -5516,8 +5516,8 @@ void cCreep::obj_Forcefield_Prepare() {
 		// Draw inside of timer
 		img_Update( 0x40, gfxPosX, gfxPosY, 0, X );
 
-		mMemory[ 0xBE00 + X ] = byte_474F;
-		mMemory[ 0x4750 + byte_474F ] = 1;
+		mMemory[ 0xBE00 + X ] = forcefieldCount;
+		mMemory[ 0x4750 + forcefieldCount ] = 1;
 
 		obj_Forcefield_Create( );
 
@@ -5527,7 +5527,7 @@ void cCreep::obj_Forcefield_Prepare() {
 		// Draw top of forcefield
 		screenDraw( 0, 0x3E, gfxPosX, gfxPosY, 0 );
 		
-		++byte_474F;
+		++forcefieldCount;
 		word_3E += 0x04;
 	}
 
@@ -5539,7 +5539,7 @@ void cCreep::obj_Mummy_Prepare( ) {
 	byte	X;
 	byte	gfxCurrentID;
 
-	word_498B = word_3E;
+	mDataMummyPtr = word_3E;
 
 	for(;;) {
 		
@@ -5813,7 +5813,7 @@ void cCreep::obj_Mummy_Infront( byte pX, byte pY ) {
 	if( A >= 8 )
 		return;
 
-	word_40 = word_498B + mMemory[ 0xBE00 + pY ];
+	word_40 = mDataMummyPtr + mMemory[ 0xBE00 + pY ];
 
 	// 47D1
 	if( mMemory[ word_40 ] != 1 )
@@ -5997,7 +5997,7 @@ void cCreep::obj_Forcefield_Create() {
 	mMemory[ 0xBD02 + X ] = mMemory[ word_3E + 3 ] + 2;
 	mMemory[ 0xBD03 + X ] = 0x35;
 
-	mMemory[ 0xBD1F + X ] = byte_474F;
+	mMemory[ 0xBD1F + X ] = forcefieldCount;
 	mMemory[ 0xBD1E + X ] = 0;
 	mMemory[ 0xBD06 + X ] = 4;
 	mMemory[ 0xBD0C + X ] = 2;
@@ -6017,7 +6017,7 @@ void cCreep::obj_Mummy_Collision( byte pX, byte pY ) {
 			// 38F7
 			if( mMemory[ word_40 ] & byte_538A ) {
 				// 3900
-				word_40 = word_498B + mMemory[ 0xBD1D + pX ];
+				word_40 = mDataMummyPtr + mMemory[ 0xBD1D + pX ];
 				mMemory[ word_40 ] = 3;
 				return;
 			}
@@ -6046,7 +6046,7 @@ void cCreep::sub_3940( byte pX, byte pY ) {
 		return;
 	}
 
-	word_40 = word_498B + mMemory[ 0xBD1D + pX ];
+	word_40 = mDataMummyPtr + mMemory[ 0xBD1D + pX ];
 
 	mMemory[ word_40 ] = 3;
 }
@@ -6112,7 +6112,7 @@ void cCreep::obj_Mummy_Add( byte pA, byte pX ) {
 	mMemory[ 0xBD1C + X ] = 0xFF;
 	mMemory[ 0xBD1D + X ] = mMemory[ 0xBE00 + Y ];
 	
-	word_40 = word_498B + mMemory[ 0xBD1D + X ];
+	word_40 = mDataMummyPtr + mMemory[ 0xBD1D + X ];
 	//3998
 
 	mMemory[ 0xBD0C + X ] = 5;
@@ -6163,7 +6163,7 @@ void cCreep::obj_Mummy_Execute( byte pX ) {
 	// 37D5
 	mMemory[ 0xBD1B + pX ] = AA;
 	mMemory[ 0xBD1C + pX ] = 0xFF;
-	word_40 = word_498B + mMemory[ 0xBD1D + pX ];
+	word_40 = mDataMummyPtr + mMemory[ 0xBD1D + pX ];
 	if( mMemory[ 0xBD1E + pX ] == 0 ) {
 		++mMemory[ 0xBD1F + pX ];
 		byte Y = mMemory[ 0xBD1F + pX ];
