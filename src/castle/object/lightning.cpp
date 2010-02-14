@@ -20,7 +20,6 @@ void cCastle_Object_Lightning::graphicUpdate() {
 void cCastle_Object_Lightning::prepare() {
 	byte byte_44E6;
 	
-	// TODO: Untested
 	cCastle_Image *image = 0;
 	cCastle_Object_Image *objectImage = 0;
 	
