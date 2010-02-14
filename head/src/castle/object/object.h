@@ -25,6 +25,7 @@
 
 class cCastle_Room;
 class cCastle_Image;
+class cCastle_Object;
 
 class cBD00 {
 public:
@@ -44,6 +45,9 @@ public:
 	byte			mField_1A, mField_1B;
 	byte			mPlayerNumber;	// BD1C
 	byte			mField_1D, mField_1E, mField_1F;
+
+	cCastle_Object	*mImage;		// 0x1D
+	cCastle_Object	*mObject;		// 0x1F
 };
 
 class cCastle_Object_Image {
@@ -78,6 +82,11 @@ public:
 
 	cCastle_Image					*imageCreate( );
 	vector<cCastle_Image*>			*imagesGet() { return &mImages; }
+	cCastle_Image					*imageGet( size_t pNumber ) { if( pNumber >= mImages.size() )
+																		return 0;
+																	else
+																		return mImages[ pNumber ]; 
+																}
 
 	cCastle_Object_Image			*objectImageCreate();
 	vector<cCastle_Object_Image*>	*objectImageGet() { return &mObjectImage; }

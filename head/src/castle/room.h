@@ -40,6 +40,7 @@ private:
 	byte			*mRoomPtr;							// pointer to start of room data
 
 	byte			*mDataDoorPtr, *mDataLightingPtr;
+	byte			*mDataMummyPtr;
 
 	vector< cCastle_Object* >	 mObjects;				// objects in room
 
@@ -54,6 +55,15 @@ private:
 	void						 obj_Ladder_Load( byte *&pObjectBuffer );
 	void						 obj_Door_Button_Load( byte *&pObjectBuffer );
 	void						 obj_Lightning_Load( byte *&pObjectBuffer );
+	void						 obj_Forcefield_Load( byte *&pObjectBuffer );
+	void						 obj_Mummy_Load( byte *&pObjectBuffer );
+	void						 obj_Key_Load( byte *&pObjectBuffer );
+	void						 obj_Door_Lock_Load( byte *&pObjectBuffer );
+	void						 obj_RayGun_Load( byte *&pObjectBuffer );
+	void						 obj_Teleport_Load( byte *&pObjectBuffer );
+	void						 obj_TrapDoor_Load( byte *&pObjectBuffer );
+	void						 obj_Conveyor_Load( byte *&pObjectBuffer );
+	void						 obj_Frankie_Load( byte *&pObjectBuffer );
 
 	void						 obj_Load();									// Load all objects in room
 

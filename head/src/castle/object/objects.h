@@ -5,3 +5,5 @@
 #include "slidingpole.h"
 #include "ladder.h"
 #include "lightning.h"
+#include "forcefield.h"
+#include "mummy.h"

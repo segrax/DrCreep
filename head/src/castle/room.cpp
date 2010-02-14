@@ -232,6 +232,70 @@ void cCastle_Room::obj_Lightning_Load( byte *&pObjectBuffer ) {
 	++pObjectBuffer;
 }
 
+void cCastle_Room::obj_Forcefield_Load( byte *&pObjectBuffer ) {
+	cCastle_Object *object = 0;
+
+	for( byte count = 0;; ++count ) {
+		
+		if( *pObjectBuffer == 0 )
+			break;
+
+		object = new cCastle_Object_Forcefield( this, pObjectBuffer );
+		mObjects.push_back( object );
+
+		pObjectBuffer += 0x04;
+	}
+
+	++pObjectBuffer;
+}
+
+void cCastle_Room::obj_Mummy_Load( byte *&pObjectBuffer ) {
+	cCastle_Object *object = 0;
+
+	mDataMummyPtr = pObjectBuffer;
+
+	for( byte count = 0;; ++count ) {
+		
+		if( *pObjectBuffer == 0x00 )
+			break;
+
+		object = new cCastle_Object_Mummy( this, pObjectBuffer );
+		mObjects.push_back( object );
+
+		pObjectBuffer += 0x07;
+	}
+
+	++pObjectBuffer;
+}
+
+void cCastle_Room::obj_Key_Load( byte *&pObjectBuffer ) {
+
+}
+
+void cCastle_Room::obj_Door_Lock_Load( byte *&pObjectBuffer ) {
+
+}
+
+void cCastle_Room::obj_RayGun_Load( byte *&pObjectBuffer ) {
+
+}
+
+void cCastle_Room::obj_Teleport_Load( byte *&pObjectBuffer ) {
+
+}
+
+void cCastle_Room::obj_TrapDoor_Load( byte *&pObjectBUffer ) {
+
+}
+
+void cCastle_Room::obj_Conveyor_Load( byte *&pObjectBuffer ) {
+
+}
+
+void cCastle_Room::obj_Frankie_Load( byte *&pObjectBuffer ) {
+
+}
+
 void cCastle_Room::obj_Load() {
 	word			 func = 0x01;
 	byte			*roomPtr = mRoomPtr;
@@ -268,34 +332,44 @@ void cCastle_Room::obj_Load() {
 			case 0x0812:
 				obj_Lightning_Load( roomPtr );
 				break;
-			/*case 0x0815:
-				//obj_Forcefield_Prepare( );
+
+			case 0x0815:
+				obj_Forcefield_Load( roomPtr );
 				break;
+
 			case 0x0818:
-				//obj_Mummy_Prepare( );
+				obj_Mummy_Load( roomPtr );
 				break;
+
 			case 0x081B:
-				//obj_Key_Load( );
+				obj_Key_Load( roomPtr );
 				break;
+
 			case 0x081E:
-				//obj_Door_Lock_Prepare( );
+				obj_Door_Lock_Load( roomPtr );
 				break;
+
 			case 0x0824:
-				//obj_RayGun_Prepare( );
+				obj_RayGun_Load( roomPtr );
 				break;
+
 			case 0x0827:
-				//obj_Teleport_Prepare( );
+				obj_Teleport_Load( roomPtr );
 				break;
+
 			case 0x082A:
-				//obj_TrapDoor_Prepare( );
+				obj_TrapDoor_Load( roomPtr );
 				break;
+
 			case 0x082D:
-				//obj_Conveyor_Prepare( );
+				obj_Conveyor_Load( roomPtr );
 				break;
+
 			case 0x0830:
-				//obj_Frankie_Load( );
+				obj_Frankie_Load( roomPtr );
 				break;
-			case 0x0833:
+
+			/*case 0x0833:
 			case 0x2A6D:
 				//obj_stringPrint();
 				break;
