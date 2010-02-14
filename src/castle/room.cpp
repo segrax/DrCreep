@@ -286,11 +286,24 @@ void cCastle_Room::obj_Key_Load( byte *&pObjectBuffer ) {
 }
 
 void cCastle_Room::obj_Door_Lock_Load( byte *&pObjectBuffer ) {
+	cCastle_Object *object = 0;
 
+	for( byte count = 0;; ++count ) {
+		
+		if( *pObjectBuffer == 0x00 )
+			break;
+
+		object = new cCastle_Object_Door_Lock( this, pObjectBuffer );
+		mObjects.push_back( object );
+
+		pObjectBuffer += 0x05;
+	}
+
+	++pObjectBuffer;
 }
 
 void cCastle_Room::obj_RayGun_Load( byte *&pObjectBuffer ) {
-
+	
 }
 
 void cCastle_Room::obj_Teleport_Load( byte *&pObjectBuffer ) {
