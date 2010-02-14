@@ -7,3 +7,4 @@
 #include "lightning.h"
 #include "forcefield.h"
 #include "mummy.h"
+#include "key.h"

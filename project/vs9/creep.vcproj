@@ -420,6 +420,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\src\castle\object\key.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\object\key.h"
+						>
+					</File>
+					<File
 						RelativePath="..\..\src\castle\object\ladder.cpp"
 						>
 					</File>
