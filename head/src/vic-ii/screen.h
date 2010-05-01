@@ -44,7 +44,7 @@ class cScreen {
 	vector< sScreenPiece* >  mCollisions;
 	cSprite					*mSprites[8];
 
-	bool					 mFullScreen;
+	bool					 mFullScreen,		mScreenRedraw;
 	size_t					 mScale;
 	string					 mWindowTitle;
 
@@ -68,7 +68,7 @@ public:
 	void					 spriteDisable();
 	void					 spriteDraw();
 	cSprite					*spriteGet( byte pCount );
-
+	
 	void					 levelNameSet( string pName );
 	void					 refresh();
 
@@ -82,4 +82,6 @@ public:
 
 															refresh();
 														}
+
+	inline void				 screenRedrawSet() { mScreenRedraw = true; }
 };

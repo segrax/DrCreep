@@ -31,6 +31,8 @@
 #include "castle/castle.h"
 #include "castleManager.h"
 #include "creep.h"
+#include "sound/sound.h"
+#include "resid-0.16/sid.h"
 
 #ifdef WIN32
 #include <fcntl.h>
@@ -126,7 +128,14 @@ cCreep::cCreep() {
 
 	byte_5F57 = 0xA0;
 
+	mMusicCurrent = "MUSIC0";
+	mMusicBuffer = 0;
+	mMusicBufferStart = 0;
+	mMusicBufferSize = 0;
+
 	ftime(&mTimePrevious);
+
+	mSound = new cSound( this );
 }
 
 cCreep::~cCreep() {
@@ -557,9 +566,7 @@ void cCreep::mainLoop() {
 
 	mScreen->bitmapLoad( &mMemory[ 0xE000 ], &mMemory[ 0xCC00 ], &mMemory[ 0xD800 ], 0 );
 
-	mCastle->castleStart( 2 );
-
-	
+	//mCastle->castleStart( 2 );
 
 	while(!mQuit) {
 		
@@ -602,6 +609,7 @@ void cCreep::screenClear() {
 	}
 
 	mImageCount = 0;
+	mScreen->screenRedrawSet();
 }
 
 // 13F0
@@ -649,46 +657,46 @@ void cCreep::roomLoad() {
 void cCreep::graphicRoomColorsSet( byte pRoomColor ) {
 	// Set floor colours
 	// 1438
-	*gameData( 0x6481 )= pRoomColor;
+	*memory( 0x6481 )= pRoomColor;
 	pRoomColor <<= 4;
-	pRoomColor |= *gameData( 0x6481 );
+	pRoomColor |= *memory( 0x6481 );
 
-	*gameData( 0x6481 ) = pRoomColor;
-	*gameData( 0x648E ) = pRoomColor;
-	*gameData( 0x649B ) = pRoomColor;
-	*gameData( 0x65CC ) = pRoomColor;
-	*gameData( 0x65CE ) = pRoomColor;
-	*gameData( 0x6EAE ) = pRoomColor;
-	*gameData( 0x6EAF ) = pRoomColor;
-	*gameData( 0x6EB0 ) = pRoomColor;
-	*gameData( 0x6EC6 ) = pRoomColor;
-	*gameData( 0x6EC7 ) = pRoomColor;
-	*gameData( 0x6EC8 ) = pRoomColor;
-	*gameData( 0x6EDB ) = pRoomColor;
-	*gameData( 0x6EDC ) = pRoomColor;
-	*gameData( 0x6EED ) = pRoomColor;
-	*gameData( 0x6EEE ) = pRoomColor;
-	*gameData( 0x6EEF ) = pRoomColor;
-	*gameData( 0x6EFC ) = pRoomColor;
-	*gameData( 0x6EFD ) = pRoomColor;
-	*gameData( 0x6EFE ) = pRoomColor;
-	*gameData( 0x6F08 ) = pRoomColor;
-	*gameData( 0x6F09 ) = pRoomColor;
-	*gameData( 0x6F0A ) = pRoomColor;
+	*memory( 0x6481 ) = pRoomColor;
+	*memory( 0x648E ) = pRoomColor;
+	*memory( 0x649B ) = pRoomColor;
+	*memory( 0x65CC ) = pRoomColor;
+	*memory( 0x65CE ) = pRoomColor;
+	*memory( 0x6EAE ) = pRoomColor;
+	*memory( 0x6EAF ) = pRoomColor;
+	*memory( 0x6EB0 ) = pRoomColor;
+	*memory( 0x6EC6 ) = pRoomColor;
+	*memory( 0x6EC7 ) = pRoomColor;
+	*memory( 0x6EC8 ) = pRoomColor;
+	*memory( 0x6EDB ) = pRoomColor;
+	*memory( 0x6EDC ) = pRoomColor;
+	*memory( 0x6EED ) = pRoomColor;
+	*memory( 0x6EEE ) = pRoomColor;
+	*memory( 0x6EEF ) = pRoomColor;
+	*memory( 0x6EFC ) = pRoomColor;
+	*memory( 0x6EFD ) = pRoomColor;
+	*memory( 0x6EFE ) = pRoomColor;
+	*memory( 0x6F08 ) = pRoomColor;
+	*memory( 0x6F09 ) = pRoomColor;
+	*memory( 0x6F0A ) = pRoomColor;
 
 	//1487
 
 	for( char Y = 7; Y >= 0; --Y ) {
-		*gameData( 0x6FB2 + Y ) = pRoomColor;
-		*gameData( 0x6FF5 + Y ) = pRoomColor;
-		*gameData( 0x7038 + Y ) = pRoomColor;
-		*gameData( 0x707B + Y ) = pRoomColor;
+		*memory( 0x6FB2 + Y ) = pRoomColor;
+		*memory( 0x6FF5 + Y ) = pRoomColor;
+		*memory( 0x7038 + Y ) = pRoomColor;
+		*memory( 0x707B + Y ) = pRoomColor;
 	}
 	
 	pRoomColor &= 0x0F;
 	pRoomColor |= 0x10;
-	*gameData( 0x6584 ) = pRoomColor;
-	*gameData( 0x659B ) = *gameData( 0x65CD ) = (*gameData( 0x649B ) & 0xF0) | 0x01;
+	*memory( 0x6584 ) = pRoomColor;
+	*memory( 0x659B ) = *memory( 0x65CD ) = (*memory( 0x649B ) & 0xF0) | 0x01;
 }
 
 // 15E0
@@ -808,6 +816,9 @@ bool cCreep::Intro() {
 			else {
 				// TODO 
 				// 0C49
+				musicChange();
+				byte_20DE = 1;
+				return true;
 			}
 
 		byte_D12 = 0xC8;
@@ -824,6 +835,8 @@ bool cCreep::Intro() {
 			}
 
 			mScreen->refresh();
+			if(mMusicBuffer)
+				musicBufferFeed();
 
 			// C17
 			KeyboardJoystickMonitor( byte_D10 );
@@ -858,6 +871,7 @@ bool cCreep::Intro() {
 	for(;;) {
 		mMemory[ 0x20EF + X ] &= 0xFE;
 		mMemory[ 0xD404 + X ] = mMemory[ 0x20EF + X ];
+		mSound->sidGet()->write(0x04 + X, mMemory[ 0x20EF + X ]);
 
 		X -= 0x07;
 		if( X < 0 )
@@ -865,6 +879,180 @@ bool cCreep::Intro() {
 	}
 
 	return false;
+}
+
+// 20A9 : 
+void cCreep::musicPtrsSet() {
+	byte X = (*memory( 0x20CB ) & 3);
+	
+	mVoiceNum = X;
+
+	X <<= 1;
+
+	mVoice = *((word*) memory( 0x20DF + X));
+	mVoiceTmp = *((word*) memory( 0x20E5 + X));
+}
+
+// 1F29 : Play Music Buffer
+void cCreep::musicBufferFeed() {
+	bool done = false;
+
+	for(; !done ;) {
+		byte A = *mMusicBuffer;
+		A >>= 2;
+
+		byte X;
+
+		X = *memory( 0x20D2 + A );
+
+		for( char Y = X - 1; Y >= 0; --Y )
+			*memory( 0x20CB + Y ) = *(mMusicBuffer + Y);
+
+		// 1F60
+
+		mMusicBuffer += X;
+
+		A = *memory( 0x20CB );
+		A >>= 2;
+		switch( A ) {
+			case 0:
+				musicPtrsSet();
+				
+				X = *memory( 0x20CB ) & 3;
+
+				X = *memory( 0x20CC ) + *memory( 0x2104 + X );
+				A = *memory( 0x2108 + X );
+
+				mSound->sidGet()->write( (mVoiceNum * 7), A );
+				*memory( mVoiceTmp ) = A;
+
+				A = *memory( 0x2168 + X );
+				mSound->sidGet()->write( (mVoiceNum * 7) + 1, A );
+				*memory( mVoiceTmp + 1) = A;
+			
+				A = *memory( mVoiceTmp + 4 );
+				A |= 1;
+				mSound->sidGet()->write( (mVoiceNum * 7) + 4, A );
+				*memory( mVoiceTmp + 4 ) = A;
+
+
+				continue;
+
+			case 1:
+				musicPtrsSet();
+				
+				A = *memory( mVoiceTmp + 4 );
+				A &= 0xFE;
+
+				*memory( mVoiceTmp + 4 ) = A;
+				mSound->sidGet()->write( (mVoiceNum * 7) + 4, A );
+				
+				continue;
+
+			case 2:
+				*memory( 0x20DC ) = *memory( 0x20CC );
+				return;
+
+			case 3:
+				*memory( 0x20DD ) = *memory( 0x20CC );
+				return;
+
+			case 4:
+				musicPtrsSet();
+				
+				for( char Y = 2; Y <= 7; ++Y ) {
+					if( Y != 4 ) {
+						// 1FDD
+						byte A = *memory( 0x20CA + Y );
+						mSound->sidGet()->write( (mVoiceNum * 7) + Y, A );
+						*memory( mVoiceTmp + Y ) = A;
+
+					} else {
+						// 1FE7
+						byte A = *memory( mVoiceTmp + Y );
+						A &= 1;
+						A |= *memory( 0x20CA + Y );
+						mSound->sidGet()->write( (mVoiceNum * 7) + Y, A );
+						*memory( mVoiceTmp + Y ) = A;
+					}
+				}
+
+				continue;
+
+			case 5:
+				break;
+
+			case 6:
+				X = *memory( 0x20CB ) & 3;
+				*memory( 0x2104 + X ) = *memory( 0x20CC );
+
+				continue;
+
+			case 7:
+				A = (*memory(0x2103) & 0xF0) | *memory(0x20CC);
+				*memory(0x2103) = A;
+				
+				mSound->sidGet()->write( 0x18, A );
+				continue;
+
+			case 8:
+				A = *memory(0x20CC);
+				*memory(0x2107) = A;
+				A <<= 2;
+				A |= 3;
+				// TODO: TimerA is changed to A here
+				continue;
+
+			default:
+				done = true;
+				break;
+		}
+
+	}	// for
+	
+	if( !mIntro ) {
+		*memory( 0x2232 ) = 0xFF;
+		mMusicBuffer = 0;
+
+	} else {
+		mMusicBuffer = mMusicBufferStart;
+		*memory( 0x20DD ) = 0x02;
+	}
+
+}
+
+// C49 : Music Change
+void cCreep::musicChange() {
+	vector<string>				musicFiles = mCastleManager->musicGet();
+	vector<string>::iterator	musicIT;
+	bool						ok = false;
+
+	if(mMusicCurrent == "")
+		ok = true;
+
+	for( musicIT = musicFiles.begin(); musicIT != musicFiles.end(); ++musicIT ) {
+		
+		// Found current track?
+		if( (*musicIT).compare( mMusicCurrent ) == 0 ) {
+			ok = true;
+		}
+
+		if(ok) 
+			break;
+	}
+
+	if( (!ok) || musicIT == musicFiles.end()) {
+		mMusicCurrent = "";
+		return;
+	}
+	
+	mMusicBufferSize = 0;
+
+	mMusicCurrent = *musicIT;
+	mMusicBuffer = mCastleManager->fileLoad( mMusicCurrent, mMusicBufferSize ) + 4;		// Skip PRG load address, and the first 2 bytes of the real-data
+	mMusicBufferStart = mMusicBuffer;
+	//0C9A
+	
 }
 
 // 2233 : Intro Menu
@@ -1459,7 +1647,8 @@ void cCreep::obj_CheckCollisions( byte pX ) {
 //2F8A
 void cCreep::sprite_FlashOnOff( byte pX ) {
 	byte A = mMemory[ 0xBD04 + pX ];
-
+	
+	mScreen->screenRedrawSet();
 	cSprite *sprite = mScreen->spriteGet( pX >> 5 );
 
 	if( !(A & byte_883) ) {
@@ -2750,10 +2939,12 @@ s10EB:;
 					// 1133
 					mMemory[ 0xD027 ] ^= 0x01;
 					mScreen->spriteGet( 0 )->_color ^= 0x01;
+					mScreen->screenRedrawSet();
 				} else {
 					// 113E
 					mMemory[ 0xD028 ] ^= 0x01;
 					mScreen->spriteGet( 1 )->_color ^= 0x01;
+					mScreen->screenRedrawSet();
 				}
 			}
 		}
@@ -3147,6 +3338,8 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 	byte videoPtr0, videoPtr1;
 	byte Counter2;
 	byte drawingFirst = 0;
+
+	mScreen->screenRedrawSet();
 
 	if( pDecodeMode	!= 0 ) {
 		// Draw Text
@@ -4470,6 +4663,7 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	mMemory[ 0xD01C ] = A;
 
 	sprite->streamLoad( &mMemory[ dataSrc ] );
+	mScreen->screenRedrawSet();
 }
 
 // 24FF

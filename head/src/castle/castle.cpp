@@ -46,7 +46,7 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 	// Copy it into the memory region
 	memcpy( gCreep->memory(0x9800), mBuffer, pCastleInfo->bufferSizeGet() - 2 );
 
-	loadHeader();
+	//loadHeader();
 }
 
 cCastle::~cCastle() {
