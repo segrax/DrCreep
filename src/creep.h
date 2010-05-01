@@ -27,6 +27,7 @@ class cCastle;
 class cCastleManager;
 class cScreen;
 class cPlayerInput;
+class cSound;
 
 class cCreep {
 
@@ -39,13 +40,21 @@ private:
 	cCastleManager	*mCastleManager;
 	cScreen			*mScreen;
 	cPlayerInput	*mInput;
-	
+	cSound			*mSound;
+
+	string			 mMusicCurrent;
+	byte			*mMusicBuffer, *mMusicBufferStart;
+	size_t			 mMusicBufferSize;
+
 	byte		 mFileListingNamePtr;
 	
 	bool		 mIntro;
 	byte		 mMenuMusicScore, mMenuScreenCount, mMenuScreenTimer;
 	byte		 mUnlimitedLives;
 	timeb		 mTimePrevious;
+
+	word		 mVoice, mVoiceTmp;
+	byte		 mVoiceNum;
 
 	bool		 mQuit;
 
@@ -125,7 +134,7 @@ public:
 				inline byte *memory( word pAddress ) {
 					return &mMemory[ pAddress ];
 				}
-
+				
 				inline byte *gameData( word pAddress ) {
 					return &mGameData[ pAddress - 0x800 ];
 				}
@@ -170,6 +179,10 @@ public:
 
 		void	 mapDisplay();							// Map Screen
 		void	 mapRoomDraw();							// Draw the rooms on the map
+		
+		void     musicChange();
+		void	 musicBufferFeed();
+		void	 musicPtrsSet();
 
 		void	 optionsMenu();							// In-Game Options Menu
 

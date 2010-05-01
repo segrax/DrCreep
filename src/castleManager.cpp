@@ -39,7 +39,7 @@ byte *cCastleInfoD64::bufferGet() {
 	return mFile->mBuffer;
 }
 
-cCastleInfoLocal::cCastleInfoLocal( sD64FileLocal *pFileLocal ) : cCastleInfo( pFileLocal->mFilename ) {
+cCastleInfoLocal::cCastleInfoLocal( sFileLocal *pFileLocal ) : cCastleInfo( pFileLocal->mFilename ) {
 	mLocal = pFileLocal;
 	mBufferSize = mLocal->mBufferSize;
 
@@ -71,7 +71,7 @@ void cCastleManager::castlesCleanup() {
 }
 
 void cCastleManager::localCleanup() {
-	vector< sD64FileLocal* >::iterator		fileIT;
+	vector< sFileLocal* >::iterator		fileIT;
 
 	for( fileIT = mFiles.begin(); fileIT != mFiles.end(); ++fileIT )
 		delete (*fileIT);
@@ -197,7 +197,7 @@ void cCastleManager::localLoadCastles() {
 	vector<string>::iterator fileIT;
 
 	for( fileIT = files.begin(); fileIT != files.end(); ++fileIT ) {
-		sD64FileLocal *file = fileFind( (*fileIT) );
+		sFileLocal *file = fileFind( (*fileIT) );
 
 		if(!file) {
 			string final = "castles\\";
@@ -206,7 +206,7 @@ void cCastleManager::localLoadCastles() {
 			size_t size = 0;
 			byte *buffer = local_FileRead( final, size );
 			if(buffer)
-				mFiles.push_back( file = new sD64FileLocal( (*fileIT), buffer, size ));
+				mFiles.push_back( file = new sFileLocal( (*fileIT), buffer, size ));
 			else
 				continue;
 
@@ -224,8 +224,8 @@ void cCastleManager::localLoadCastles() {
 	
 }
 
-sD64FileLocal *cCastleManager::fileFind( string pFilename ) {
-	vector< sD64FileLocal* >::iterator fileIT;
+sFileLocal *cCastleManager::fileFind( string pFilename ) {
+	vector< sFileLocal* >::iterator fileIT;
 	
 	for( fileIT = mFiles.begin(); fileIT != mFiles.end(); ++fileIT ) {
 		if( (*fileIT)->mFilename == pFilename )
@@ -233,6 +233,32 @@ sD64FileLocal *cCastleManager::fileFind( string pFilename ) {
 	}
 
 	return 0;
+}
+
+vector<string>	cCastleManager::filesFind( string pFilemask ) {
+	vector< cD64* >::iterator		diskIT;
+	vector< sD64File*>::iterator	fileIT;
+	vector< string >				musicFiles;
+
+	// Loop thro each file starting with MUSIC of each disk
+	for( diskIT = mDisks.begin(); diskIT != mDisks.end(); ++diskIT ) {
+		vector<sD64File*>	files = (*diskIT)->directoryGet( pFilemask );
+
+		for( fileIT = files.begin(); fileIT != files.end(); ++fileIT ) {
+			
+			if( find( musicFiles.begin(), musicFiles.end(), (*fileIT)->mName ) == musicFiles.end() )
+				musicFiles.push_back( (*fileIT)->mName );
+
+		}
+	}
+
+	return musicFiles;
+}
+
+vector<string> cCastleManager::musicGet() {
+	vector<string>		musicFiles = filesFind("MUSIC*");
+
+	return musicFiles;
 }
 
 byte *cCastleManager::fileLoad( string pFilename, size_t &pBufferSize ) {
@@ -246,10 +272,10 @@ byte *cCastleManager::fileLoad( string pFilename, size_t &pBufferSize ) {
 	// Load from local if that fails
 	if(!pBufferSize) {
 		
-		sD64FileLocal *file = fileFind( pFilename );
+		sFileLocal *file = fileFind( pFilename );
 		if(!file) {
 			buffer = local_FileRead( pFilename, size );
-			mFiles.push_back( file = new sD64FileLocal( pFilename, buffer, size ));
+			mFiles.push_back( file = new sFileLocal( pFilename, buffer, size ));
 		}
 
 		buffer = file->mBuffer;

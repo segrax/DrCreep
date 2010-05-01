@@ -27,18 +27,18 @@ class cCastle;
 class cD64;
 struct sD64File;
 
-struct sD64FileLocal {
+struct sFileLocal {
 	string	 mFilename;
 	byte	*mBuffer;
 	size_t	 mBufferSize;
 
-	sD64FileLocal( string pFilename, byte *pBuffer, size_t pBufferSize ) {
+	sFileLocal( string pFilename, byte *pBuffer, size_t pBufferSize ) {
 		mFilename = pFilename;
 		mBuffer = pBuffer;
 		mBufferSize = pBufferSize;
 	}
 
-	~sD64FileLocal() {
+	~sFileLocal() {
 		delete mBuffer;
 	}
 };
@@ -77,10 +77,10 @@ public:
 
 class cCastleInfoLocal : public cCastleInfo {
 private:
-	sD64FileLocal		*mLocal;
+	sFileLocal		*mLocal;
 	
 public:
-					 cCastleInfoLocal( sD64FileLocal *pFileLocal );
+					 cCastleInfoLocal( sFileLocal *pFileLocal );
 
 	byte			*bufferGet();
 };
@@ -90,7 +90,7 @@ private:
 	cCastle					*mCastle;				// Current Castle
 	vector< cCastleInfo* >	 mCastles;				// All castles found
 	vector< cD64* >			 mDisks;				// Open disk images
-	vector< sD64FileLocal* > mFiles;				// Open Files
+	vector< sFileLocal* > mFiles;				// Open Files
 
 	void					 castlesCleanup();		// Cleanup mCastles vector
 	void					 castlesFind();			// Find all available castles
@@ -115,6 +115,9 @@ public:
 
 	byte					*diskLoadFile( string pFilename, size_t &pBufferSize );
 	
-	sD64FileLocal				*fileFind( string pFilename );
+	sFileLocal				*fileFind( string pFilename );
 	byte					*fileLoad( string pFilename, size_t &pBufferSize );
+	vector<string>			 filesFind( string pFilemask );
+
+	vector<string>			 musicGet();
 };

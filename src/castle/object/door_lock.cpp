@@ -19,8 +19,6 @@ void cCastle_Object_Door_Lock::graphicUpdate() {
 }
 
 void cCastle_Object_Door_Lock::prepare() {
-	byte byte_44E6;
-	
 	cCastle_Image *image = 0;
 	
 	byte gfxPosX = *(mObjectBuffer + 3);
