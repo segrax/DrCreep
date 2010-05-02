@@ -81,8 +81,7 @@ void cSprite::drawMulti( byte *pBuffer ) {
 				else if(pixel == 3)
 					color = _multiColor1;
 				
-				_surface->pixelDraw(X+1, Y, color, priority);
-				_surface->pixelDraw(X, Y, color, priority);
+				_surface->pixelDraw(X, Y, color, priority, 2);
 
 				if( _rDoubleHeight ) {
 					_surface->pixelDraw(X+1, Y+1, color, priority);

@@ -41,8 +41,6 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 	byte		pixel;
 	ePriority	priority;
 
-	mSurface->Wipe(0xFF);
-
 	// Draw 200 Rows
 	for( size_t Y = 0; Y < 200; Y += 8) {
 		size_t drawY = Y;

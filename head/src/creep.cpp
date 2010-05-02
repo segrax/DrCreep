@@ -815,7 +815,6 @@ bool cCreep::Intro() {
 				if( mMenuMusicScore == 0 )
 					++mMenuMusicScore;
 				else {
-					// TODO 
 					// 0C49
 					musicChange();
 					byte_20DE = 1;
@@ -4398,6 +4397,15 @@ void cCreep::sub_21C8( char pA ) {
 
 	byte Y = byte_2232 << 1;
 	word_44 = readWord( &mMemory[ 0x7572 + Y ] );
+
+	mSound->sidGet()->write( 0x04, 0 );
+	mSound->sidGet()->write( 0x0B, 0 );
+	mSound->sidGet()->write( 0x12, 0 );
+	mSound->sidGet()->write( 0x17, 0 );
+
+	mMusicBuffer = memory( readWord(memory( 0x7572 + Y )) );
+
+	mSound->sidGet()->write( 0x18, 0x0F );
 
 	mMemory[ 0xD404 ] = mMemory[ 0xD40B ] = mMemory[ 0xD412 ] = mMemory[ 0xD417 ] = 0;
 	mMemory[ 0x20DC ] = mMemory[ 0x20DD ] = 0;

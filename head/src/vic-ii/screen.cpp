@@ -199,7 +199,7 @@ void cScreen::refresh() {
 		mScreenRedraw = false;
 
 		SDL_Surface *surface = scaleUp();
-	
+		mWindow->clear(0);
 		mWindow->blit( surface, 0, 0, 15, 30 );
 	}
 }
