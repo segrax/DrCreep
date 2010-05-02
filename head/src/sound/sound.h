@@ -16,5 +16,6 @@ public:
 	~cSound();
 
 	cSID			*sidGet() { return mSID; }
+	cCreep			*creepGet() { return mCreep; }
 
 };

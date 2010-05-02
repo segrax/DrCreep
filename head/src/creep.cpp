@@ -811,15 +811,16 @@ bool cCreep::Intro() {
 		
 		// 0BE1
 		if( byte_20DE != 1 )
-			if( mMenuMusicScore == 0 )
-				++mMenuMusicScore;
-			else {
-				// TODO 
-				// 0C49
-				musicChange();
-				byte_20DE = 1;
-				return true;
-			}
+			if( !mMenuScreenTimer )
+				if( mMenuMusicScore == 0 )
+					++mMenuMusicScore;
+				else {
+					// TODO 
+					// 0C49
+					musicChange();
+					byte_20DE = 1;
+					return true;
+				}
 
 		byte_D12 = 0xC8;
 
@@ -835,8 +836,6 @@ bool cCreep::Intro() {
 			}
 
 			mScreen->refresh();
-			if(mMusicBuffer)
-				musicBufferFeed();
 
 			// C17
 			KeyboardJoystickMonitor( byte_D10 );
@@ -896,6 +895,9 @@ void cCreep::musicPtrsSet() {
 // 1F29 : Play Music Buffer
 void cCreep::musicBufferFeed() {
 	bool done = false;
+
+	if(!mMusicBuffer)
+		return;
 
 	for(; !done ;) {
 		byte A = *mMusicBuffer;
@@ -960,7 +962,7 @@ void cCreep::musicBufferFeed() {
 			case 4:
 				musicPtrsSet();
 				
-				for( char Y = 2; Y <= 7; ++Y ) {
+				for( char Y = 2; Y < 7; ++Y ) {
 					if( Y != 4 ) {
 						// 1FDD
 						byte A = *memory( 0x20CA + Y );
@@ -1000,7 +1002,8 @@ void cCreep::musicBufferFeed() {
 				*memory(0x2107) = A;
 				A <<= 2;
 				A |= 3;
-				// TODO: TimerA is changed to A here
+
+				*memory(0xDC05) = A;
 				continue;
 
 			default:
@@ -1035,6 +1038,7 @@ void cCreep::musicChange() {
 		// Found current track?
 		if( (*musicIT).compare( mMusicCurrent ) == 0 ) {
 			ok = true;
+			continue;
 		}
 
 		if(ok) 
@@ -1051,8 +1055,27 @@ void cCreep::musicChange() {
 	mMusicCurrent = *musicIT;
 	mMusicBuffer = mCastleManager->fileLoad( mMusicCurrent, mMusicBufferSize ) + 4;		// Skip PRG load address, and the first 2 bytes of the real-data
 	mMusicBufferStart = mMusicBuffer;
+
+	byte A = 0;
+
 	//0C9A
-	
+	for( char X = 0x0E; X >= 0; X -= 7 ) {
+		A = *memory( 0x20EF + X );
+
+		A &= 0xFE;
+		*memory( 0x20EF + X ) = A;
+		mSound->sidGet()->write( 0x04 + X, A );
+	}
+
+	A = *memory( 0x2102 ) & 0xF0;
+	mSound->sidGet()->write( 0x17, A );
+	*memory( 0x2102 ) = A;
+	*memory( 0x20DC ) = 0;
+	*memory( 0x20DD ) = 0;
+	*memory( 0x2107 ) = 0x14;
+	*memory( 0x20DE ) = 1;
+
+	*memory(0xDC05) = (0x14 << 2) | 3;
 }
 
 // 2233 : Intro Menu

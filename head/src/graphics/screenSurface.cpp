@@ -73,20 +73,24 @@ void cScreenSurface::palettePrepare() {
 void cScreenSurface::Wipe( dword pColor ) {
 	
 	for( size_t count = 0; count < mScreenSize; ++count ) {
-		mScreenPieces[ count ].mPixel = pColor;
+		//mScreenPieces[ count ].mPixel = pColor;
 		mScreenPieces[ count ].mPriority = ePriority_Background;
 		mScreenPieces[ count ].mSprite = mScreenPieces[ count ].mSprite2 = 0;
 	}
 
 }
 
-void cScreenSurface::pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePriority pPriority ) {
+void cScreenSurface::pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePriority pPriority, size_t pCount ) {
 	sScreenPiece *piece = screenPieceGet(pX,pY);
-	
-	if( pPaletteIndex > 15 )
-		piece->mPixel = 0xFF;
-	else
-		piece->mPixel = mPalette[ pPaletteIndex ];
 
-	piece->mPriority = pPriority;
+	for( size_t count = 0; count < pCount; ++count ) {
+		if( pPaletteIndex > 15 )
+			piece->mPixel = 0xFF;
+		else
+			piece->mPixel = mPalette[ pPaletteIndex ];
+
+		piece->mPriority = pPriority;
+
+		++piece;
+	}
 }

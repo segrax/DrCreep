@@ -7,12 +7,26 @@ cSound *g_Sound;
 
 /* Prototype of our callback function */
 void my_audio_callback(void *userdata, Uint8 *stream, int len) {
+	int ticks = 1;
 
-	for( int i = 0; i < 0x00008000; ++i ) {
-		g_Sound->sidGet()->clock();
+	for( int i = 0; i < len; ++i ) {
+		
+		if( ticks <= 0 ) {
+			ticks =* g_Sound->creepGet()->memory(0xDC05) * 345;
+
+			g_Sound->creepGet()->musicBufferFeed();
+		}
+		
+		if(ticks==0)
+			return;
+
+		--ticks;
+
+		g_Sound->sidGet()->clock(10);
 		int ss = g_Sound->sidGet()->output(8);
 		*stream++ = (byte) ss;
 	}
+
 }
 
 cSound::cSound( cCreep *pCreep ) {
@@ -42,14 +56,13 @@ cSound::~cSound() {
 }
 
 bool cSound::devicePrepare() {
-
-	g_Sound = this;
-
 	/* Open the audio device */
 	SDL_AudioSpec *desired, *obtained;
 
+	g_Sound = this;
+
 	/* Allocate a desired SDL_AudioSpec */
-	desired = (SDL_AudioSpec*) malloc(sizeof(SDL_AudioSpec));
+	desired = new SDL_AudioSpec();
 
 	/* Allocate space for the obtained SDL_AudioSpec */
 	obtained = new SDL_AudioSpec();
@@ -80,7 +93,7 @@ bool cSound::devicePrepare() {
 	mAudioSpec = obtained;
 
 	/* desired spec is no longer needed */
-	free(desired);
+	delete desired;
 
 	SDL_PauseAudio(0);
 }
