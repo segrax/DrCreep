@@ -61,7 +61,6 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 				else
 					priority = ePriority_Foreground;
 
-
 				if(pixel == 0)
 					color = pBackgroundColor0;
 
@@ -74,8 +73,7 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 				else if(pixel == 3)
 					color = *pColorRam & 0x0F;
 
-				mSurface->pixelDraw(drawX++, drawY, color, priority);
-				mSurface->pixelDraw(drawX, drawY, color, priority);
+				mSurface->pixelDraw(drawX++, drawY, color, priority, 2);
 				data <<= 2;
 			} // X
 
@@ -90,4 +88,5 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 		}
 
 	}	// Y
+
 }

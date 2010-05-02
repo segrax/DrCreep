@@ -108,7 +108,7 @@ void cScreen::bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte
 
 void cScreen::bitmapRefresh() {
 	clear();
-
+	
 	mBitmap->load( mBitmapBuffer, mBitmapColorData, mBitmapColorRam, mBitmapBackgroundColor );
 	blit( mBitmap->mSurface, 24, 50, false, false );
 }
@@ -200,7 +200,6 @@ void cScreen::refresh() {
 
 		SDL_Surface *surface = scaleUp();
 	
-		mWindow->clear(0);
 		mWindow->blit( surface, 0, 0, 15, 30 );
 	}
 }

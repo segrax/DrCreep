@@ -55,7 +55,7 @@ public:
 					 cScreenSurface( size_t pWidth, size_t pHeight );
 					~cScreenSurface( );
 
-	void			 pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePriority pPriority );
+	void			 pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePriority pPriority, size_t pCount = 1 );
 	void			 Wipe( dword pColor = 0xFF ) ;
 
 
