@@ -427,10 +427,10 @@ bool cD64::fileLoad( sD64File *pFile ) {
 	size_t currentTrack = pFile->mTrack, currentSector = pFile->mSector;
 	bool   noCopy = false;
 
-	// 
+	// Cleanup old buffer
 	delete pFile->mBuffer;
 	
-	// Prepare the buffer, (Each block is 254 bytes)
+	// Prepare the buffer, (Each block is 254 bytes, the remaining two is used for the T/S chain)
 	pFile->mBuffer = new byte[ pFile->mFileSize * 254 ];
 	pFile->mBufferSize = pFile->mFileSize * 254;
 
@@ -603,6 +603,7 @@ void cD64::diskWrite() {
 sD64File *cD64::fileGet( string pFilename ) {
 	vector< sD64File* >::iterator fileIT;
 	
+	// Upper case names only
 	transform( pFilename.begin(), pFilename.end(), pFilename.begin(), toupper );
 
 	// Loop thro all files on disk for specific filename
