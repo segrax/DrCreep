@@ -276,13 +276,6 @@ vector<string>	cCastleManager::filesFind( string pFilemask ) {
 	return musicFiles;
 }
 
-bool cCastleManager::positionLoad( string pFilename, byte *pTarget ) {
-	diskPosFind("*.d64");
-	// Search all open disks  for filename
-
-	return true;
-}
-
 cD64 *cCastleManager::positionDiskCreate() {
 	cD64		 *newDisk	= 0;
 	stringstream  filename;
@@ -303,6 +296,25 @@ cD64 *cCastleManager::positionDiskCreate() {
 	}
 
 	return newDisk;
+}
+
+bool cCastleManager::positionLoad( string pFilename, byte *pTarget ) {
+	diskPosFind("*.d64");
+	// Search all open disks  for filename
+
+	vector< cD64* >::iterator		 diskIT;
+	cD64							*disk = 0;
+	sD64File *file = 0;
+
+	for( diskIT = mDisksPositions.begin(); diskIT != mDisksPositions.end(); ++diskIT ) {
+		if( (file = (*diskIT)->fileGet( pFilename )) ) {
+			
+			memcpy( pTarget, file->mBuffer + 2, file->mBufferSize - 2);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool cCastleManager::positionSave( string pFilename, size_t pSaveSize, byte *pData ) {
