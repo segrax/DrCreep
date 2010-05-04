@@ -90,6 +90,9 @@ Section "Copy Files" drcreepInst
   SetOutPath "$INSTDIR\data\castles"
   File "..\run\data\castles\*"
 
+  SetOutPath "$INSTDIR\data\save"
+  File "..\run\data\save\*"
+
   SetOutPath "$INSTDIR"
   ;Store installation folder
   WriteRegStr HKCU "Software\creep" "" $INSTDIR
