@@ -32,7 +32,6 @@
 #include "castleManager.h"
 #include "creep.h"
 #include "sound/sound.h"
-#include "resid-0.16/sid.h"
 
 #ifdef WIN32
 #include <fcntl.h>
@@ -61,7 +60,7 @@ cCreep::cCreep() {
 	mScreen = new cScreen( this, windowTitle.str() );
 	
 	// Load the C64 Character Rom
-	m64CharRom = local_FileRead( "char.rom", romSize );
+	m64CharRom = local_FileRead( "char.rom", romSize, false );
 	
 	mGameData = mCastleManager->fileLoad( "OBJECT", romSize ) + 2;
 	romSize -= 2;
@@ -448,7 +447,7 @@ void cCreep::textShow() {
 	
 	while( X ) {
 		
-		sub_2772();
+		textPrintCharacter();
 		--X;
 		mTextXPos += 0x08;
 	}
@@ -458,16 +457,16 @@ void cCreep::textShow() {
 	// 26D0
 	for(;;) {
 		if( mStrLength != mMemory[ 0x278C ] ) {
-			++mMemory[ 0x27AE ];
+			++mMemory[ 0x27A3 ];
 
 			X = mMemory[ 0x27A3 ] & 3;
-			mMemory[ 0x28A2 ] = mMemory[ 0x27A4 + X ];
+			mMemory[ 0x27A2 ] = mMemory[ 0x27A4 + X ];
 			mTextXPos = (mStrLength << 3) + mMemory[ 0x2788 ];
-			sub_2772();
+			textPrintCharacter();
 		}
 
 		// 26F7
-		byte A = sub_27A8();
+		byte A = textGetKeyFromUser();
 		if( A == 0x80 ) {
 			if( byte_B83 != 1 ) {
 
@@ -479,11 +478,9 @@ void cCreep::textShow() {
 				
 				// Wait for restore key
 				do { 
-					//byte_B83 = 0;
 					interruptWait(3);
-					//} while( !byte_B83 );
-
 					mInput->inputCheck( true );
+
 				} while( !mInput->restoreGet() );
 				
 				return;
@@ -493,7 +490,7 @@ void cCreep::textShow() {
 			if( A == 8 ) {
 				if( mStrLength != mMemory[ 0x278C ] ) {
 					mMemory[ 0x78A2 ] = 0x2D;
-					sub_2772();
+					textPrintCharacter();
 				}
 				// 2744
 				if(mStrLength)
@@ -505,31 +502,38 @@ void cCreep::textShow() {
 				if( A == 0x0D )
 					return;
 				
-				X = mStrLength;
-				if( X == mMemory[ 0x278C ] )
+				if( mStrLength == mMemory[ 0x278C ] )
 					continue;
 				
-				mMemory[ 0x278E + X ] = A;
-				++X;
-				mStrLength = X;
-				sub_2772();
+				mMemory[ 0x278E + mStrLength ] = A;
+				++mStrLength;
+
+				mMemory[ 0x27A2 ] = A;
+				textPrintCharacter();
 			}
 		}
 	}
 }
 
 // 2772:
-void cCreep::sub_2772() {
+void cCreep::textPrintCharacter() {
 	mMemory[ 0x27A2 ] |= 0x80;
 
 	word_3E = 0x27A2;
 	stringDraw();
+
+	mScreen->refresh();
 }
 
 // 27A8
-byte cCreep::sub_27A8() {
-	// TODO
-	return 0;
+byte cCreep::textGetKeyFromUser() {
+
+	mInput->inputCheck( );
+	
+	if( mInput->keyGet() == 0 )
+		return 0x80;
+
+	return toupper(mInput->keyGet());
 }
 
 // 2973: 
@@ -610,6 +614,7 @@ void cCreep::screenClear() {
 
 	mImageCount = 0;
 	mScreen->screenRedrawSet();
+	mScreen->bitmapRedrawSet();
 }
 
 // 13F0
@@ -869,7 +874,7 @@ bool cCreep::Intro() {
 	for(;;) {
 		mMemory[ 0x20EF + X ] &= 0xFE;
 		mMemory[ 0xD404 + X ] = mMemory[ 0x20EF + X ];
-		mSound->sidGet()->write(0x04 + X, mMemory[ 0x20EF + X ]);
+		mSound->sidWrite(0x04 + X, mMemory[ 0x20EF + X ]);
 
 		X -= 0x07;
 		if( X < 0 )
@@ -924,16 +929,16 @@ void cCreep::musicBufferFeed() {
 				X = *memory( 0x20CC ) + *memory( 0x2104 + X );
 				A = *memory( 0x2108 + X );
 
-				mSound->sidGet()->write( (mVoiceNum * 7), A );
+				mSound->sidWrite( (mVoiceNum * 7), A );
 				*memory( mVoiceTmp ) = A;
 
 				A = *memory( 0x2168 + X );
-				mSound->sidGet()->write( (mVoiceNum * 7) + 1, A );
+				mSound->sidWrite( (mVoiceNum * 7) + 1, A );
 				*memory( mVoiceTmp + 1) = A;
 			
 				A = *memory( mVoiceTmp + 4 );
 				A |= 1;
-				mSound->sidGet()->write( (mVoiceNum * 7) + 4, A );
+				mSound->sidWrite( (mVoiceNum * 7) + 4, A );
 				*memory( mVoiceTmp + 4 ) = A;
 
 
@@ -946,7 +951,7 @@ void cCreep::musicBufferFeed() {
 				A &= 0xFE;
 
 				*memory( mVoiceTmp + 4 ) = A;
-				mSound->sidGet()->write( (mVoiceNum * 7) + 4, A );
+				mSound->sidWrite( (mVoiceNum * 7) + 4, A );
 				
 				continue;
 
@@ -965,7 +970,7 @@ void cCreep::musicBufferFeed() {
 					if( Y != 4 ) {
 						// 1FDD
 						byte A = *memory( 0x20CA + Y );
-						mSound->sidGet()->write( (mVoiceNum * 7) + Y, A );
+						mSound->sidWrite( (mVoiceNum * 7) + Y, A );
 						*memory( mVoiceTmp + Y ) = A;
 
 					} else {
@@ -973,7 +978,7 @@ void cCreep::musicBufferFeed() {
 						byte A = *memory( mVoiceTmp + Y );
 						A &= 1;
 						A |= *memory( 0x20CA + Y );
-						mSound->sidGet()->write( (mVoiceNum * 7) + Y, A );
+						mSound->sidWrite( (mVoiceNum * 7) + Y, A );
 						*memory( mVoiceTmp + Y ) = A;
 					}
 				}
@@ -993,7 +998,7 @@ void cCreep::musicBufferFeed() {
 				A = (*memory(0x2103) & 0xF0) | *memory(0x20CC);
 				*memory(0x2103) = A;
 				
-				mSound->sidGet()->write( 0x18, A );
+				mSound->sidWrite( 0x18, A );
 				continue;
 
 			case 8:
@@ -1063,11 +1068,11 @@ void cCreep::musicChange() {
 
 		A &= 0xFE;
 		*memory( 0x20EF + X ) = A;
-		mSound->sidGet()->write( 0x04 + X, A );
+		mSound->sidWrite( 0x04 + X, A );
 	}
 
 	A = *memory( 0x2102 ) & 0xF0;
-	mSound->sidGet()->write( 0x17, A );
+	mSound->sidWrite( 0x17, A );
 	*memory( 0x2102 ) = A;
 	*memory( 0x20DC ) = 0;
 	*memory( 0x20DD ) = 0;
@@ -1090,6 +1095,8 @@ void cCreep::optionsMenu() {
 			
 			for( ;Y != 0; ++Y ) 
 				mMemory[ word_30 + Y ] = A;
+
+			word_30 += 0x100;
 			if( word_30 >= 0xDC00 )
 				break;
 		}
@@ -1205,11 +1212,12 @@ void cCreep::sub_29D0( byte pA, byte pY ) {
 			
 			A = X;
 			A &= 7;
-			if( A == 0 )
+			if( A == 7 )
 				break;
 			
 			mMemory[ 0x736C + pY ] = mMemory[ 0x2A1B + X ];
 			pY += 0x08;
+			++X;
 		}
 
 		// 29FE
@@ -1670,7 +1678,7 @@ void cCreep::obj_CheckCollisions( byte pX ) {
 void cCreep::sprite_FlashOnOff( byte pX ) {
 	byte A = mMemory[ 0xBD04 + pX ];
 	
-	mScreen->screenRedrawSet();
+	mScreen->spriteRedrawSet();
 	cSprite *sprite = mScreen->spriteGet( pX >> 5 );
 
 	if( !(A & byte_883) ) {
@@ -1784,15 +1792,49 @@ void cCreep::obj_Player_Execute( byte pX ) {
 
 		char Y = mMemory[ 0xBD1C + pX ] << 1;
 		
-		// TODO: add a timer 
+		time_t diffSec;
+		timeb timeNow;
+		ftime(&timeNow);
+		size_t seconds, secondsO, minutes, hours;
+
+		// Player 1/2 Time management
+		if( Y == 0 ) {
+			diffSec = timeNow.time - mPlayer1Time.time;
+			mPlayer1Seconds += (size_t) diffSec;
+			secondsO = mPlayer1Seconds;
+		}
+		if( Y == 2 ) {
+			diffSec = timeNow.time - mPlayer2Time.time;
+			mPlayer2Seconds += (size_t) diffSec;
+			secondsO = mPlayer2Seconds;
+		}
 
 		// Ptr to CIA Timer
 		word_30 = readWord( &mMemory[ 0x34E7 + Y ] );
 		word_32 = readWord( &mMemory[ 0x34EB + Y ] );
-		
-		// Store CIA Timer
-		for( Y = 3; Y >= 0; --Y ) 
-			mMemory[ word_32 + Y ] = mMemory[ word_30 + Y ];
+
+		// Do conversions, as the time was originally stored using only 1-10 digits
+		int t = (secondsO % 60);
+		t /= 10;
+		seconds = (secondsO % 60) + (6 * t);
+ 
+		t = (secondsO / 60);
+		t /= 10;
+		minutes = (secondsO / 60) + (6 * t);
+
+		t = ((secondsO / 60) / 60);
+		t /= 10;
+		hours = ((secondsO / 60) / 60) + (6 * t);
+
+		// Store the current players time
+		// Seconds
+		mMemory[ word_32 + 1 ] = seconds;
+
+		// Minutes
+		mMemory[ word_32 + 2 ] = minutes;
+
+		// Hours
+		mMemory[ word_32 + 3 ] = hours;
 
 		return;
 	} 
@@ -1806,15 +1848,19 @@ void cCreep::obj_Player_Execute( byte pX ) {
 		// Current Player
 		char Y = mMemory[ 0xBD1C + pX ] << 1;
 
-		// TODO: add a timer 
-		
+		if( Y == 0 )
+			ftime(&mPlayer1Time);
+
+		if( Y == 2 )
+			ftime(&mPlayer2Time);
+
 		// Get Ptr to CIA Timer and store area
 		word_32 = readWord( &mMemory[ 0x34E7 + Y ] );
 		word_30 = readWord( &mMemory[ 0x34EB + Y ] );
 
 		// Restore CIA Timer
-		for( Y = 3; Y >= 0; --Y ) 
-			mMemory[ word_32 + Y ] = mMemory[ word_30 + Y ];
+		//for( Y = 3; Y >= 0; --Y ) 
+		//	mMemory[ word_32 + Y ] = mMemory[ word_30 + Y ];
 		
 		Y = mMemory[ 0xBD1C + pX ];
 		A = mMemory[ 0x780D + Y ];
@@ -1875,7 +1921,7 @@ s32DB:;
 			A = a;
 		}
 
-	mMemory[ 0xBD19 + pX ] = a;
+	mMemory[ 0xBD19 + pX ] = A;
 	mMemory[ 0xBD1A + pX ] = 0xFF;
 	sub_5F6B( pX );
 	
@@ -2036,6 +2082,7 @@ void cCreep::obj_Player_Unk( byte pX ) {
 	cSprite *sprite = mScreen->spriteGet( byte_34D6 );
 
 	sprite->_color = mMemory[ 0x34D3 + mMemory[ 0xBD1C + pX ] ];
+	mScreen->spriteRedrawSet();
 }
 
 // 3AEB: Frankie Movement
@@ -2638,6 +2685,10 @@ word cCreep::lvlPtrCalculate( byte pCount ) {
 
 // 0D71: 
 void cCreep::Game() {
+
+	mPlayer1Seconds = 0;
+	mPlayer2Seconds = 0;
+
 	if( byte_24FD == 1 ) {
 		// D7D
 		byte_24FD = 0;
@@ -2711,7 +2762,8 @@ void cCreep::Game() {
 		}
 
 		// E7D
-		mapDisplay();
+		while( mapDisplay() );
+
 		roomMain();
 		screenClear();
 		
@@ -2796,10 +2848,9 @@ sEFC:;
 }
 
 // F94: Display the map/time taken screen
-void cCreep::mapDisplay() {
+bool cCreep::mapDisplay() {
 	byte gfxPosX, gfxPosY;
 
-sF99:;
 	screenClear();
 
 	mMemory[ 0xD028 ] = mMemory[ 0xD027 ] = 0;
@@ -2807,7 +2858,7 @@ sF99:;
 
 	// Draw both players Name/Time/Arrows
 	// FA9
-	for(;; ) {
+	for(;;) {
 
 		byte X = mMemory[ 0x11D7 ];
 
@@ -2961,13 +3012,13 @@ s10EB:;
 					// 1133
 					mMemory[ 0xD027 ] ^= 0x01;
 					mScreen->spriteGet( 0 )->_color ^= 0x01;
-					mScreen->screenRedrawSet();
 				} else {
 					// 113E
 					mMemory[ 0xD028 ] ^= 0x01;
 					mScreen->spriteGet( 1 )->_color ^= 0x01;
-					mScreen->screenRedrawSet();
 				}
+				
+				mScreen->spriteRedrawSet();
 			}
 		}
 
@@ -2975,7 +3026,7 @@ s10EB:;
 		if( byte_B83 == 1 ) {
 			byte_B83 = 0;
 			mMemory[ 0x11D0 ] = 0;
-			return;
+			return false;
 		}
 
 		// 115A
@@ -2986,11 +3037,16 @@ s10EB:;
 			// TODO: Figure this out, usually a BRK instruction is
 			// Executed inside the function
 			//sub_2C08();
-			goto sF99;
+			return true;
 		}
+
+		// Check if run/stop was pressed
 		if( mRunStopPressed == 1 ) {
+
+			// Save the game
 			gamePositionSave();
-			goto sF99;
+
+			return true;
 		}
 
 		// 117D
@@ -3024,6 +3080,7 @@ s10EB:;
 
 	sub_21C8( 9 );
 	mMemory[ 0x11D0 ] = 0;
+	return false;
 }
 
 // 34EF
@@ -3361,7 +3418,7 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 	byte Counter2;
 	byte drawingFirst = 0;
 
-	mScreen->screenRedrawSet();
+	mScreen->bitmapRedrawSet();
 
 	if( pDecodeMode	!= 0 ) {
 		// Draw Text
@@ -3586,9 +3643,12 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 
 	// 5A66
 	byte gfxCurrentPosY = gfxPosTopY;
-	
-	word byte_34 = mMemory[ 0xBC00 + gfxCurrentPosY ];
-	byte_34 |= mMemory[ 0xBB00 + gfxCurrentPosY ] << 8;
+	word byte_36 = 0;
+	word byte_34 = (*memory( 0xBC00 + gfxCurrentPosY ));
+
+	word A = *memory( 0xBB00 + gfxCurrentPosY );
+
+	byte_34 |= (A << 8);
 
 	// 5A77
 	for(;;) {
@@ -3633,6 +3693,7 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 			word_30 += mTxtWidth;
 		}
 s5AED:;
+
 		//5aed
 		if( pDecodeMode != 1 && gfxHeight_0 != 0) {
 			if( Counter2 != 1 ) {
@@ -3647,15 +3708,14 @@ s5AED:;
 			if( gfxCurrentPosY < 0xC8 ) {
 				// 5b17
 				gfxCurPos = gfxDestX2;
-				word byte_36 = byte_34 +  (mGfxEdgeOfScreenX << 8);
+				byte_36 = byte_34 +  (mGfxEdgeOfScreenX << 8);
 				byte_36 += gfxDestX;
 
 				for( byte Y = 0; ; ++Y ) {
 					// 5B2E
 					if( gfxCurPos < 0x28 ) {
 						byte A = mMemory[ word_32 + Y ];
-						A |= mMemory[ byte_36 + Y];
-						mMemory[ byte_36 + Y] = A;
+						*memory( byte_36 + Y ) |= A;
 					}
 
 					if( gfxCurPos == gfxPosRightX )
@@ -4398,14 +4458,14 @@ void cCreep::sub_21C8( char pA ) {
 	byte Y = byte_2232 << 1;
 	word_44 = readWord( &mMemory[ 0x7572 + Y ] );
 
-	mSound->sidGet()->write( 0x04, 0 );
-	mSound->sidGet()->write( 0x0B, 0 );
-	mSound->sidGet()->write( 0x12, 0 );
-	mSound->sidGet()->write( 0x17, 0 );
+	mSound->sidWrite( 0x04, 0 );
+	mSound->sidWrite( 0x0B, 0 );
+	mSound->sidWrite( 0x12, 0 );
+	mSound->sidWrite( 0x17, 0 );
 
 	mMusicBuffer = memory( readWord(memory( 0x7572 + Y )) );
 
-	mSound->sidGet()->write( 0x18, 0x0F );
+	mSound->sidWrite( 0x18, 0x0F );
 
 	mMemory[ 0xD404 ] = mMemory[ 0xD40B ] = mMemory[ 0xD412 ] = mMemory[ 0xD417 ] = 0;
 	mMemory[ 0x20DC ] = mMemory[ 0x20DD ] = 0;
@@ -4694,12 +4754,61 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	mMemory[ 0xD01C ] = A;
 
 	sprite->streamLoad( &mMemory[ dataSrc ] );
-	mScreen->screenRedrawSet();
+	mScreen->spriteRedrawSet();
+}
+
+// 25B8
+void cCreep::gamePositionFilenameGet( bool pLoading ) {
+	
+	screenClear();
+	
+	word_3E = 0x2633;
+	roomPrepare();
+	
+	if( pLoading )
+		word_3E = 0x261F;
+	 else
+		word_3E = 0x2609;
+
+	roomPrepare();
+	*memory( 0x2788 ) = 0x20;
+	*memory( 0x2789 ) = 0x48;
+	*memory( 0x278C ) = 0x10;
+	*memory( 0x278A ) = 0x01;
+	*memory( 0x278B ) = 0x02;
+
+	mScreen->refresh();
+
+	textShow();
+}
+
+// 24A7
+void cCreep::gamePositionLoad() {
+	
 }
 
 // 24FF
 void cCreep::gamePositionSave() {
-	// TODO
+	
+	gamePositionFilenameGet( false );
+	if(!mStrLength)
+		return;
+
+	string filename = string( (char*) &mMemory[ 0x278E ], mStrLength );
+	// Save from 0x7800
+
+	word saveSize = readWord( memory( 0x7800 ) );
+	
+	if( mCastleManager->positionSave( filename, saveSize, memory( 0x7800 ) ) == false) {
+		word_3E = 0x25AA;
+		screenClear();
+		obj_stringPrint();
+		mScreen->refresh();
+
+		hw_IntSleep(0x23);
+	} else
+		sub_2973();
+
 }
 
 void cCreep::sub_5F6B( byte &pX ) {
@@ -6482,6 +6591,8 @@ void cCreep::obj_Mummy_Execute( byte pX ) {
 void cCreep::obj_RayGun_Laser_Execute( byte pX ) {
 	byte A = mMemory[ 0xBD04 + pX ];
 
+	mScreen->spriteRedrawSet();
+
 	if( A & byte_885 ) {
 
 		A ^= byte_885;
@@ -6564,7 +6675,7 @@ void cCreep::img_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCur
 
 // 41D8: In Front Button?
 void cCreep::obj_Door_Button_InFront( byte pX, byte pY ) {
-	byte byte_42AC = pX;
+
 	if( mMemory[ 0xBD00 + pX ] )
 		return;
 

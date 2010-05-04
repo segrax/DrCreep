@@ -28,7 +28,7 @@
 #include "bitmapMulticolor.h"
 
 cBitmapMulticolor::cBitmapMulticolor() {
-	mSurface = new cScreenSurface( 321, 201 );
+	mSurface = new cScreenSurface( 375, 295 );
 }
 
 cBitmapMulticolor::~cBitmapMulticolor() {

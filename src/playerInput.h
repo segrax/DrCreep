@@ -45,6 +45,7 @@ private:
 	cCreep				*mCreep;
 	bool				 mRunStop,	mRestore;
 	bool				 mFullscreen;
+	byte				 mKeyPressed;
 
 	void		 KeyboardCheck();
 	void		 KeyboardInputSet1( sPlayerInput *pInput );
@@ -63,6 +64,7 @@ public:
 		return& mInput[ pNumber ];
 	}
 
+	inline byte  keyGet()	  { return mKeyPressed; }
 	bool		 runStopGet() { return mRunStop; }
 	bool		 restoreGet() { return mRestore; }
 	inline bool	 fullscreenGet() { return mFullscreen; }

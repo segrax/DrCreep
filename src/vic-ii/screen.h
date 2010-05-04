@@ -44,7 +44,7 @@ class cScreen {
 	vector< sScreenPiece* >  mCollisions;
 	cSprite					*mSprites[8];
 
-	bool					 mFullScreen,		mScreenRedraw;
+	bool					 mFullScreen,		mBitmapRedraw, mSpriteRedraw, mScreenRedraw;
 	size_t					 mScale;
 	string					 mWindowTitle;
 
@@ -80,8 +80,11 @@ public:
 															else 
 																scaleSet( 2 );
 
+															mScreenRedraw = true;
 															refresh();
 														}
 
+	inline void				 bitmapRedrawSet() { mBitmapRedraw = true; }
+	inline void				 spriteRedrawSet() { mSpriteRedraw = true; }
 	inline void				 screenRedrawSet() { mScreenRedraw = true; }
 };

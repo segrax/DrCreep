@@ -31,12 +31,14 @@
 cPlayerInput::cPlayerInput( cCreep *pCreep ) {
 	mCreep = pCreep;
 
+	mKeyPressed = 0;
 	mRunStop = false;
 	mRestore = false;
 }
 
 void cPlayerInput::inputCheck( bool pClearAll ) {
-	
+	mKeyPressed = 0;
+
 	mRunStop = false;
 	mRestore = false;
 
@@ -62,17 +64,24 @@ void cPlayerInput::KeyboardCheck() {
 
 	if( mEvent.type == SDL_KEYDOWN ) {
 
-		if( mEvent.key.keysym.sym == SDLK_F1 )
+		if( mEvent.key.keysym.sym == SDLK_F1 ) {
 			mRunStop = true;
+			return;
+		}
 	
-		if( mEvent.key.keysym.sym == SDLK_ESCAPE )
+		if( mEvent.key.keysym.sym == SDLK_ESCAPE ) {
 			mRestore = true;
+			return;
+		}
 
 		if( mEvent.key.keysym.sym == SDLK_F10 ) {
 			mCreep->screenGet()->fullscreenToggle();
+			return;
 		}
+
+		mKeyPressed = mEvent.key.keysym.sym;
 	}
-	
+
 }
 
 void cPlayerInput::KeyboardInputSet1( sPlayerInput *pInput ) {

@@ -12,7 +12,7 @@ void my_audio_callback(void *userdata, Uint8 *stream, int len) {
 	for( int i = 0; i < len; ++i ) {
 		
 		if( ticks <= 0 ) {
-			ticks =* g_Sound->creepGet()->memory(0xDC05) * 345;
+			ticks =* g_Sound->creepGet()->memory(0xDC05) * 380;
 
 			g_Sound->creepGet()->musicBufferFeed();
 		}
@@ -55,7 +55,11 @@ cSound::~cSound() {
 	delete mAudioSpec;
 }
 
-bool cSound::devicePrepare() {
+void cSound::sidWrite( byte pRegister, byte pValue ) {
+	mSID->write( pRegister, pValue );
+}
+
+void cSound::devicePrepare() {
 	/* Open the audio device */
 	SDL_AudioSpec *desired, *obtained;
 
@@ -77,7 +81,7 @@ bool cSound::devicePrepare() {
 	desired->channels=0;
 
 	/* Large audio buffer reduces risk of dropouts but increases response time */
-	desired->samples=8192;
+	desired->samples=4096;
 
 	/* Our callback function */
 	desired->callback=my_audio_callback;

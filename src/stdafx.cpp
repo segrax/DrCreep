@@ -29,6 +29,8 @@
 #include "..\rev.h"
 
 const char	 *gDataPath = "data\\";
+const char	 *gSavePath = "data\\save\\";
+
 cCreep		 *gCreep;
 
 int	main( int argc, char *argv[] ) {
@@ -46,17 +48,57 @@ int	main( int argc, char *argv[] ) {
 	return 0;
 }
 
-byte *local_FileRead( string pFile, size_t	&pFileSize ) {
+string local_PathGenerate( string pFile, bool pDataSave ) {
 	stringstream	 filePathFinal;
-	ifstream		*fileStream;
-	byte			*fileBuffer = 0;
 
 	// Build the file path
-	filePathFinal << gDataPath;
+	if(!pDataSave)
+		filePathFinal << gDataPath;
+	else
+		filePathFinal << gSavePath;
+
 	filePathFinal << pFile;
+	return filePathFinal.str();
+}
+
+bool local_FileCreate( string pFile, bool pDataSave ) {
+	ofstream		*fileStream;
+	byte			*fileBuffer = 0;
+
+	string finalPath = local_PathGenerate( pFile, pDataSave );
+
+	fileStream = new ofstream ( finalPath.c_str(), ios::binary );
+	if( fileStream->is_open() == false) {
+		delete fileStream;
+		return false;
+	}
+
+	return true;
+}
+
+bool local_FileSave( string pFile, bool pDataSave, byte *pBuffer, size_t pBufferSize ) {
+	ofstream		*fileStream;
+
+	string finalPath = local_PathGenerate( pFile, pDataSave );
+	fileStream = new ofstream( finalPath.c_str(), ios::binary | ios::out );
+	if(fileStream->is_open() == false) {
+		delete fileStream;
+		return false;
+	}
+
+	fileStream->write( (char*) pBuffer, pBufferSize );
+	fileStream->close();
+
+	return true;
+}
+
+byte *local_FileRead( string pFile, size_t	&pFileSize, bool pDataSave ) {
+	ifstream		*fileStream;
+	byte			*fileBuffer = 0;
+	string finalPath = local_PathGenerate( pFile, pDataSave );
 
 	// Attempt to open the file
-	fileStream = new ifstream ( filePathFinal.str().c_str(), ios::binary );
+	fileStream = new ifstream ( finalPath.c_str(), ios::binary );
 	if(fileStream->is_open() != false) {
 
 		// Get file size
@@ -80,7 +122,7 @@ byte *local_FileRead( string pFile, size_t	&pFileSize ) {
 	return fileBuffer;
 }
 
-vector<string> directoryList(string pPath) {
+vector<string> directoryList(string pPath, bool pDataSave) {
     WIN32_FIND_DATA fdata;
     HANDLE dhandle;
 	vector<string> results;
@@ -91,7 +133,11 @@ vector<string> directoryList(string pPath) {
 	// Build the file path
 	stringstream finalPath;
 	finalPath << path << "\\";
-	finalPath << gDataPath;
+	if(!pDataSave)
+		finalPath << gDataPath;
+	else
+		finalPath << gSavePath;
+
 	finalPath << pPath;
 
 	int size = MultiByteToWideChar( 0,0, finalPath.str().c_str(), finalPath.str().length(), 0, 0);

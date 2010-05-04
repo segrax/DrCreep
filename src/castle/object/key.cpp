@@ -18,8 +18,6 @@ void cCastle_Object_Key::graphicUpdate() {
 }
 
 void cCastle_Object_Key::prepare() {
-	byte byte_44E6;
-	
 	cCastle_Image *image = 0;
 	
 	byte gfxPosX = *(mObjectBuffer + 1);
@@ -33,5 +31,4 @@ void cCastle_Object_Key::prepare() {
 	image->mBE00.mObject = this;
 
 	image->update( *(mObjectBuffer + 1), *(mObjectBuffer + 2), *(mObjectBuffer + 3 ));
-	
 }

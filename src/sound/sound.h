@@ -8,12 +8,14 @@ private:
 
 	SDL_AudioSpec	*mAudioSpec;
 
-	bool			 devicePrepare();
+	void			 devicePrepare();
 
 public:
 
 	 cSound( cCreep *pCreep );
 	~cSound();
+
+	void			 sidWrite( byte pRegister, byte pValue );
 
 	cSID			*sidGet() { return mSID; }
 	cCreep			*creepGet() { return mCreep; }

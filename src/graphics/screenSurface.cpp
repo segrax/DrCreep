@@ -71,11 +71,12 @@ void cScreenSurface::palettePrepare() {
 }
 
 void cScreenSurface::Wipe( dword pColor ) {
-	
-	for( size_t count = 0; count < mScreenSize; ++count ) {
-		mScreenPieces[ count ].mPixel = pColor;
-		mScreenPieces[ count ].mPriority = ePriority_Background;
-		mScreenPieces[ count ].mSprite = mScreenPieces[ count ].mSprite2 = 0;
+	sScreenPiece *piece = &mScreenPieces[ 0 ];
+
+	for( size_t count = 0; count < mScreenSize; ++count, ++piece ) {
+		piece->mPixel = pColor;
+		piece->mPriority = ePriority_Background;
+		piece->mSprite = piece->mSprite2 = 0;
 	}
 
 }

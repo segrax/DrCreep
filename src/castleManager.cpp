@@ -58,6 +58,7 @@ cCastleManager::cCastleManager() {
 cCastleManager::~cCastleManager() {
 	castlesCleanup();
 	diskCleanup();
+	diskPosCleanup();
 	localCleanup();
 
 	delete mCastle;
@@ -136,6 +137,14 @@ void cCastleManager::diskCleanup() {
 
 	for( diskIT = mDisks.begin(); diskIT != mDisks.end(); ++diskIT )
 		delete *diskIT;
+
+}
+
+void cCastleManager::diskPosCleanup() {
+	vector< cD64* >::iterator diskIT;
+
+	for( diskIT = mDisksPositions.begin(); diskIT != mDisksPositions.end(); ++diskIT )
+		delete *diskIT;
 }
 
 void cCastleManager::diskLoadCastles() {
@@ -183,7 +192,7 @@ byte *cCastleManager::diskLoadFile( string pFilename, size_t &pBufferSize ) {
 }
 
 void cCastleManager::disksFind( string pExtension ) {
-	vector<string> disks = directoryList( pExtension );
+	vector<string> disks = directoryList( pExtension, false );
 	vector<string>::iterator diskIT;
 
 	for( diskIT = disks.begin(); diskIT != disks.end(); ++diskIT ) {
@@ -192,8 +201,20 @@ void cCastleManager::disksFind( string pExtension ) {
 	}
 }
 
+void cCastleManager::diskPosFind( string pExtension ) {
+	vector<string> disks = directoryList( pExtension, true );
+	vector<string>::iterator diskIT;
+	
+	diskPosCleanup();
+
+	for( diskIT = disks.begin(); diskIT != disks.end(); ++diskIT ) {
+		
+		mDisksPositions.push_back( new cD64( *diskIT, false, true ) );
+	}
+}
+
 void cCastleManager::localLoadCastles() {
-	vector<string>			 files = directoryList( "castles\\Z*" );
+	vector<string>			 files = directoryList( "castles\\Z*", false);
 	vector<string>::iterator fileIT;
 
 	for( fileIT = files.begin(); fileIT != files.end(); ++fileIT ) {
@@ -204,7 +225,7 @@ void cCastleManager::localLoadCastles() {
 			final.append( (*fileIT) );
 
 			size_t size = 0;
-			byte *buffer = local_FileRead( final, size );
+			byte *buffer = local_FileRead( final, size, false );
 			if(buffer)
 				mFiles.push_back( file = new sFileLocal( (*fileIT), buffer, size ));
 			else
@@ -255,6 +276,56 @@ vector<string>	cCastleManager::filesFind( string pFilemask ) {
 	return musicFiles;
 }
 
+bool cCastleManager::positionLoad( string pFilename, byte *pTarget ) {
+	diskPosFind("*.d64");
+	// Search all open disks  for filename
+
+	return true;
+}
+
+cD64 *cCastleManager::positionDiskCreate() {
+	cD64		 *newDisk	= 0;
+	stringstream  filename;
+
+	for(size_t count = 0; count < 10; ++count) {
+		filename.str("");
+		filename << "SAVES_";
+		filename << count;
+		filename << ".D64";
+
+		newDisk = new cD64( filename.str().c_str(), true, true );
+		
+		if( newDisk->createdGet() == true )
+			break;
+
+		delete newDisk;
+		newDisk = 0;
+	}
+
+	return newDisk;
+}
+
+bool cCastleManager::positionSave( string pFilename, size_t pSaveSize, byte *pData ) {
+	vector< cD64* >::iterator		 diskIT;
+	cD64							*disk = 0;
+
+	diskPosFind("*.d64");
+	
+	for( diskIT = mDisksPositions.begin(); diskIT != mDisksPositions.end(); ++diskIT ) {
+		
+		if( (*diskIT)->sectorsFree() >= 17 )
+			break;
+	}
+
+	if( diskIT == mDisksPositions.end() )
+		disk = positionDiskCreate();
+	else
+		disk = *diskIT;
+
+	disk->fileSave( pFilename, pData, pSaveSize, 0x7800 );
+	return true;
+}
+
 vector<string> cCastleManager::musicGet() {
 	vector<string>		musicFiles = filesFind("MUSIC*");
 
@@ -274,7 +345,7 @@ byte *cCastleManager::fileLoad( string pFilename, size_t &pBufferSize ) {
 		
 		sFileLocal *file = fileFind( pFilename );
 		if(!file) {
-			buffer = local_FileRead( pFilename, size );
+			buffer = local_FileRead( pFilename, size, false );
 			mFiles.push_back( file = new sFileLocal( pFilename, buffer, size ));
 		}
 

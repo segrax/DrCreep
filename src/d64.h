@@ -32,6 +32,16 @@ enum eD64FileType {
 	eD64FileType_UNK
 };
 
+struct sD64Chain {
+	size_t mTrack, mSector;
+
+	sD64Chain( size_t pTrack, size_t pSector ) {
+		mTrack = pTrack;
+		mSector = pSector;
+	}
+};
+
+
 struct sD64File {
 	string	  mName;					// Name of the file
 	size_t	  mTrack, mSector;			// Starting T/S of file
@@ -40,6 +50,8 @@ struct sD64File {
 
 	byte	*mBuffer;					// Copy of file
 	size_t	 mBufferSize;				// Size of 'mBuffer'
+
+	vector< sD64Chain >		mTSChain;	// Track/Sectors used by file
 
 	sD64File() {
 		mBuffer = 0;
@@ -54,12 +66,34 @@ struct sD64File {
 
 class cD64 {
 private:
+	bool				 mBamTracks[35][24];
+	byte				 mBamFree[35];
+
 	byte				*mBuffer;										// Disk image buffer
 	size_t				 mBufferSize, mTrackCount;
-	vector< sD64File* >	 mFiles;										// Files in disk
 	
+	bool				 mCreated;
+
+	vector< sD64File* >	 mFiles;										// Files in disk
+	string				 mFilename;
+	bool				 mDataSave;
+
+	void				 bamCreate();									// Create Track 18/0
+	void				 bamLoad();										// Find Free Tracks/Sectors
+	void				 bamSave();
+
+	void				 bamSectorMark( size_t pTrack, size_t pSector, bool pValue = true );
+	bool				 bamSectorFree( size_t &pTrack, size_t &pSector );	// Find a free track/sector 
+
+	void				 chainLoad( sD64File *pFile );					// Gather list of all tracks/sectors used by file
+
+	void				 directoryCreate();								// Create Track 18/1
 	void				 directoryLoad();								// Load the disk directory
-	bool				 fileLoad( sD64File *pFile );						// Load a file 
+	bool				 directoryAdd( sD64File *pFile );				// Add file to directory
+	bool				 directoryEntrySet( byte pEntryPos, byte *pBuffer );
+	bool				 directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer );
+	
+	bool				 fileLoad( sD64File *pFile );					// Load a file 
 
 	byte				*sectorPtr( size_t pTrack, size_t pSector );	// Read a sector
 
@@ -68,10 +102,26 @@ private:
 	}
 
 public:
-						 cD64( string pD64 );
+						 cD64( string pD64, bool pCreate = false, bool pDataSave = false);
 						~cD64( );
 
 	vector< sD64File* >	 directoryGet( string pFind );		// Get a file list, with all files starting with 'pFind'
 	vector< sD64File* >	*directoryGet();					// Get the file list
-	sD64File				*fileGet( string pFilename );		// Get a file
+	
+	void				 diskWrite();
+
+	sD64File			*fileGet( string pFilename );		// Get a file
+	bool				 fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAddress );
+
+	inline size_t		 sectorsFree() {
+		size_t result = 0;
+
+		for(size_t i = 0; i < 35; ++i )
+			result += mBamFree[i];
+		return result;
+	}
+
+	inline bool			 createdGet() {
+		return mCreated;
+	}
 };
