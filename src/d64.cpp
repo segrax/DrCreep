@@ -222,21 +222,7 @@ bool cD64::bamSectorFree( size_t &pTrack, size_t &pSector ) {
 	if(pTrack == 0)
 		pTrack = 1;
 
-	bool done = false;
-	bool trackDone = false, sectorDone = false;
-
 	size_t startSector = pSector;
-	size_t startTrack = pTrack;
-
-	// must check all sectors in track before moving forward,
-	// check from StartSector in increments of 10
-	// once we reach end of sectors in track,
-	// back to 0
-	// do for all sectors in track
-	//
-	// 2 loops?
-	// one checks each from +10
-	// outside checks from 0 to max for track
 
 	for( size_t track = pTrack; track < mTrackCount; ++track ) {
 
@@ -277,46 +263,6 @@ bool cD64::bamSectorFree( size_t &pTrack, size_t &pSector ) {
 
 		pSector = 0;
 	}	// For Track
-
-/*
-	for(;;) {
-		size_t sector = 0;
-		done = false;
-
-		for( sector = pSector; ; sector += 10) {
-
-			if( sector < trackRange( pTrack )) {
-				if( mBamTracks[pTrack-1][sector] == true ) {
-					pSector = sector;
-					return true;
-				}
-
-			} else {
-				sector = ++pSector;
-			}
-
-			if( pSector >= trackRange( pTrack ) ) {
-				pSector = 0;
-				sector = pSector;
-				done = true;
-			}
-
-			if( pSector == startSector && done )
-				break;
-		}
-		
-		++pTrack;
-		startSector = 0;
-		pSector = 0;
-
-		if(pTrack > mTrackCount) {
-			pTrack = 1;
-			trackDone = true;
-		}
-
-		if( pTrack == startTrack && trackDone )
-			break;
-	}*/
 
 	return false;
 }
