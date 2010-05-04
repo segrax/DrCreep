@@ -83,6 +83,7 @@ extern cCreep	  *gCreep;
 	}
 #endif
 
+BOOL CtrlHandler( DWORD fdwCtrlType );
 vector<string>	 directoryList(string pPath, bool pDataSave);
 byte			*local_FileRead( string pFile, size_t	&pFileSize, bool pDataSave );
 bool			 local_FileCreate( string pFile, bool pDataSave );

@@ -169,6 +169,10 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	bool	playLevelSet = false;
 	bool	unlimited = false;
 
+	// Output console message
+	cout << "The Castles of Dr. Creep (SVN:" << SVNREV << " " << SVNDATE << ")" << endl << endl;
+	cout << "http://creep.sourceforge.net/" << endl << endl ;
+
 	// Check command line parameters
 	while( count < pArgCount ) {
 		string arg = string( pArgs[count] );
@@ -176,8 +180,10 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 		if( arg == "-c")
 			consoleShow = true;
 		
-		if( arg == "-u")
+		if( arg == "-u") {
+			cout << " Unlimited Lives enabled." << endl;
 			unlimited = true;
+		}
 
 		if( arg == "-l" ) {
 			playLevel = atoi( pArgs[ ++count ] );
@@ -192,7 +198,7 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 		mCastleManager->castleListDisplay();
 
 		string lvl;
-		cout << "\nSelect a level: ";
+		cout << "\nPlease select a Castle: ";
 		cin >> lvl;
 
 		playLevel = atoi( lvl.c_str() );
@@ -301,6 +307,7 @@ void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
 		++count;
 	}
 
+	// Removed 
 	// 0x091B
 	//copyProtection();
 	gameMenuDisplaySetup();
