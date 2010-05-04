@@ -58,7 +58,8 @@ cCreep::cCreep() {
 	mCastleManager = new cCastleManager();
 	mInput = new cPlayerInput( this );
 	mScreen = new cScreen( this, windowTitle.str() );
-	
+	mSound = 0;
+
 	// Load the C64 Character Rom
 	m64CharRom = local_FileRead( "char.rom", romSize, false );
 	
@@ -133,8 +134,6 @@ cCreep::cCreep() {
 	mMusicBufferSize = 0;
 
 	ftime(&mTimePrevious);
-
-	mSound = new cSound( this );
 }
 
 cCreep::~cCreep() {
@@ -142,6 +141,9 @@ cCreep::~cCreep() {
 	delete m64CharRom;
 	delete mMemory;
 	delete mCastleManager;
+	delete mSound;
+	delete mScreen;
+	delete mInput;
 }
 
 void cCreep::titleDisplay() {
@@ -256,6 +258,8 @@ void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
 	
 	if(pUnlimited)
 		mUnlimitedLives = 0xFF;
+
+	mSound = new cSound( this );
 
 	for(;;) {
 		
