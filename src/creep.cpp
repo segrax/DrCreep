@@ -290,7 +290,7 @@ void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
 		mMemory[ 0x5CE6 + count ] = byte_30;
 		mMemory[ 0x5D06 + count ] = byte_31;
 
-		if( (byte_30 + 0x28) > 0xFF)
+		if( (word) (byte_30 + 0x28) > 0xFF)
 			++byte_31;
 
 		byte_30 += 0x28;
@@ -2796,7 +2796,7 @@ void cCreep::Game() {
 					mMemory[ 0x1AB2 ] = X;
 					gameEscapeCastle();
 
-					if( (mMemory[ 0x7802 ] & 1 )) {
+					if(! (mMemory[ 0x7802 ] & 1 )) {
 						
 						if( mUnlimitedLives != 0xFF ) {
 							
@@ -4371,48 +4371,59 @@ s1BE7:;
 	//1CE3 20 20 29                    JSR     InterruptDisableAndReInit
 
 	// Save highscores
-	local_FileSave("Y", true, memory( 0xB800 ), readWord( memory( 0xB800 ) ) );
-
+	mCastleManager->scoresSave( mCastle->nameGet(), readWord( memory( 0xB800 ) ), memory( 0xB800 ) );
 
 	sub_2973();
 }
 
-// 1D42: 
-void cCreep::gameHighScores() {
+// 1D42: Display Highscores for this Castle
+void cCreep::gameHighScores( ) {
 	screenClear();
+
+	mMemory[ 0x2399 ] = mCastle->nameGet().size() - 1;
+	mMemory[ 0xBA01 + 0x10 ] = mCastle->nameGet().size() - 1;
+	mMemory[ 0xBA10 ] = 0x03;
 
 	byte X = mMemory[ 0x2399 ];
 	byte Y = mMemory[ 0xBA01 + X ];
 	byte A = mMemory[ 0x5CE6 + Y ];
 
-	word_30 = A + mMemory[ 0xBA00 + X ] + ((mMemory[ 0x5D06 + Y] | 0x04) >> 8);
-	
-	Y = mMemory[ 0xBA03 + X ];
-	Y -= 2;
+	word_30 = A + mMemory[ 0xBA00 + X ] + ((mMemory[ 0x5D06 + Y] | 0x04) << 8);
+
+	mMemory[ 0xBA03 + X ] = mCastle->nameGet().size() - 1;
+
+	Y =  mCastle->nameGet().size() - 1;
 
 	// 1D67
-	mMemory[ 0xB87A + Y ] = mMemory[ word_30 + Y ];
+	//mMemory[ 0xB87A + Y ] = mMemory[ word_30 + Y ];
 
-	for( ; (char) Y <= 0; --Y ) {
-		mMemory[ 0xB87A + Y ] = mMemory[ word_30 + Y ] & 0x7F;
-	}
+	// Convert name
+	for( ; (char) Y >= 0; --Y )
+		mMemory[ 0xB87A + Y ] = toupper(mCastle->nameGet()[Y]) & 0x3F;
+
+	// Mark end of name
+	mMemory[ 0xB87A + (mCastle->nameGet().size()-1) ] |= 0x80;
+
 
 	word_3E = 0xB87A;
 	//1D81
 	A = 0x15 - mMemory[ 0xBA03 + X ];
 
-	A <<= 1;
+	A <<= 2;
 	A += 0x10;
 	
-	byte mTextXPos = A;
-	byte mTextYPos = 0x10;
-	byte mTextColor = 0x01;
-	byte mTextFont = 0x02;
+	mTextXPos = A;
+	mTextYPos = 0x10;
+	mTextColor = 0x01;
+	mTextFont = 0x02;
 
+	// Draw castle name
 	stringDraw();
 
+	X = 0;
 	mTextXPos = 0x18;
-	
+	mTextFont = 0x21;
+
 	// 1DAD
 	for(;;) {
 		mMemory[ 0xB889 ] = 0;
@@ -4426,16 +4437,17 @@ void cCreep::gameHighScores() {
 			if( A != 0xFF ) {
 				mMemory[ 0xB87A ] = A;
 				mMemory[ 0xB87B ] = mMemory[ 0xB803 + X ];
+				A = *memory( 0xB804 + X );
 
 			} else {
 				// 1DD6
-				mMemory[ 0xB87A ] = mMemory[ 0xB87B ] = 0x2E; 
+				mMemory[ 0xB87A ] = mMemory[ 0xB87B ] = A = 0x2E; 
 			}
 
 			// 1DDE
 			mMemory[ 0xB87C ] = A | 0x80;
 
-			word_30 = 0xB87A; 
+			word_3E = 0xB87A; 
 			stringDraw();
 
 			if( mMemory[ 0xB802 + X ] != 0xFF ) {

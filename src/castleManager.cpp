@@ -28,7 +28,7 @@
 #include "castle/castle.h"
 #include "castleManager.h"
 
-cCastleInfoD64::cCastleInfoD64( cD64 *pD64, sD64File *pFile ) : cCastleInfo( pFile->mName ) {
+cCastleInfoD64::cCastleInfoD64( cCastleManager *pCastleManager, cD64 *pD64, sD64File *pFile ) : cCastleInfo( pCastleManager, pFile->mName ) {
 	mD64 = pD64;
 	mFile = pFile;
 
@@ -39,7 +39,7 @@ byte *cCastleInfoD64::bufferGet() {
 	return mFile->mBuffer;
 }
 
-cCastleInfoLocal::cCastleInfoLocal( sFileLocal *pFileLocal ) : cCastleInfo( pFileLocal->mFilename ) {
+cCastleInfoLocal::cCastleInfoLocal( cCastleManager *pCastleManager, sFileLocal *pFileLocal ) : cCastleInfo( pCastleManager, pFileLocal->mFilename ) {
 	mLocal = pFileLocal;
 	mBufferSize = mLocal->mBufferSize;
 
@@ -138,6 +138,7 @@ void cCastleManager::diskCleanup() {
 	for( diskIT = mDisks.begin(); diskIT != mDisks.end(); ++diskIT )
 		delete *diskIT;
 
+	mDisks.clear();
 }
 
 void cCastleManager::diskPosCleanup() {
@@ -145,6 +146,8 @@ void cCastleManager::diskPosCleanup() {
 
 	for( diskIT = mDisksPositions.begin(); diskIT != mDisksPositions.end(); ++diskIT )
 		delete *diskIT;
+
+	mDisksPositions.clear();
 }
 
 void cCastleManager::diskLoadCastles() {
@@ -157,7 +160,7 @@ void cCastleManager::diskLoadCastles() {
 
 		for( fileIT = files.begin(); fileIT != files.end(); ++fileIT ) {
 			
-			cCastleInfoD64 *castle = new cCastleInfoD64( (*diskIT), (*fileIT) );
+			cCastleInfoD64 *castle = new cCastleInfoD64( this, (*diskIT), (*fileIT) );
 
 			// Dont add castles with the same name as already existing castles
 			if( castleInfoGet( castle->nameGet() ) ) {
@@ -232,7 +235,7 @@ void cCastleManager::localLoadCastles() {
 				continue;
 
 		}
-		cCastleInfoLocal *local = new cCastleInfoLocal( file );
+		cCastleInfoLocal *local = new cCastleInfoLocal( this, file );
 		
 		// Dont add castles with the same name as already existing castles
 		if( castleInfoGet( local->nameGet() ) ) {
@@ -336,6 +339,25 @@ bool cCastleManager::positionSave( string pFilename, size_t pSaveSize, byte *pDa
 
 	disk->fileSave( pFilename, pData, pSaveSize, 0x7800 );
 	return true;
+}
+
+bool cCastleManager::scoresLoad( string pCastleName, byte *pData ) {
+	stringstream filename;
+
+	filename << "Y";
+	filename << pCastleName;
+
+	return positionLoad( filename.str().c_str(), pData );
+}
+
+bool cCastleManager::scoresSave( string pCastleName, size_t pSaveSize, byte *pData ) {
+	stringstream filename;
+
+	filename << "Y";
+	filename << pCastleName;
+
+	return positionSave( filename.str().c_str(), pSaveSize, pData );
+
 }
 
 vector<string> cCastleManager::musicGet() {

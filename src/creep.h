@@ -163,7 +163,7 @@ public:
 		void	 KeyboardJoystickMonitor( byte pA );
 
 		void	 gameEscapeCastle();
-		void	 gameHighScores();
+		void	 gameHighScores( );
 		void	 gameMenuDisplaySetup();
 
 		void	 gamePositionLoad();

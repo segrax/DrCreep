@@ -46,6 +46,17 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 	// Copy it into the memory region
 	memcpy( gCreep->memory(0x9800), mBuffer, pCastleInfo->bufferSizeGet() - 2 );
 
+	// Load the highscores for this castle
+	if( mCastleInfo->managerGet()->scoresLoad( mName, gCreep->memory(0xB800) ) == false ) {
+		
+		writeWord( gCreep->memory(0xB800), 0x007A );
+		
+		for( char Y = 0x77; Y >= 0; --Y )
+			*gCreep->memory( 0xB802 + Y ) = 0xFF;
+
+		gCreep->sub_2973();
+	}
+
 	//loadHeader();
 }
 
