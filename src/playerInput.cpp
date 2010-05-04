@@ -34,12 +34,16 @@ cPlayerInput::cPlayerInput( cCreep *pCreep ) {
 	mKeyPressed = 0;
 	mRunStop = false;
 	mRestore = false;
+	mF2 = false;
+	mF3 = false;
+
 }
 
 void cPlayerInput::inputCheck( bool pClearAll ) {
 	mKeyPressed = 0;
 
 	mF2 = false;
+	mF3 = false;
 	mRunStop = false;
 	mRestore = false;
 
@@ -75,6 +79,10 @@ void cPlayerInput::KeyboardCheck() {
 			return;
 		}
 
+		if( mEvent.key.keysym.sym == SDLK_F3 ) {
+			mF3 = true;
+			return;
+		}
 		if( mEvent.key.keysym.sym == SDLK_ESCAPE ) {
 			mRestore = true;
 			return;

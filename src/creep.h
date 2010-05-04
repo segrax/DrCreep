@@ -173,7 +173,6 @@ public:
 		void	 graphicRoomColorsSet( byte pRoomColor );
 
 		void	 hw_IntSleep( byte pA );				// hardware interrupt wait loop
-		void	 hw_SaveFile( );						// save a file
 		void	 hw_SpritePrepare( byte &pX );			// prepare a sprite 
 
 		bool	 Intro();								// Intro Loop

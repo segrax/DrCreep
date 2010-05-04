@@ -456,6 +456,8 @@ void cCreep::textShow() {
 
 	// 26D0
 	for(;;) {
+		mScreen->refresh();
+
 		if( mStrLength != mMemory[ 0x278C ] ) {
 			++mMemory[ 0x27A3 ];
 
@@ -521,8 +523,6 @@ void cCreep::textPrintCharacter() {
 
 	word_3E = 0x27A2;
 	stringDraw();
-
-	mScreen->refresh();
 }
 
 // 27A8
@@ -846,7 +846,23 @@ bool cCreep::Intro() {
 			if( byte_5F57 )
 				break;
 
+			// Change controller to check
 			byte_D10 ^= 0x01;
+
+			// Display Highscores on F3
+			if( mInput->f3Get() ) {
+				sub_95F();
+				gameHighScores();
+
+				word_3E = 0x239C;
+				obj_stringPrint();
+
+				*memory(0x278C) = 0;
+				textShow();
+
+				return true;
+			}
+
 			if( mRunStopPressed == 1 ) {
 				optionsMenu();
 				if( byte_24FD == 1 ) {
@@ -4354,7 +4370,9 @@ s1BE7:;
 	// TODO
 	//1CE3 20 20 29                    JSR     InterruptDisableAndReInit
 
-	hw_SaveFile();
+	// Save highscores
+	local_FileSave("Y", true, memory( 0xB800 ), readWord( memory( 0xB800 ) ) );
+
 
 	sub_2973();
 }
@@ -4630,12 +4648,6 @@ byte cCreep::seedGet() {
 	byte_5EFA = A;
 
 	return A;
-}
-
-// 288E
-void cCreep::hw_SaveFile( ) {
-	// TODO
-	return;
 }
 
 // 5D26: Prepare sprites
