@@ -291,10 +291,6 @@ void cD64::directoryCreate() {
 	byte *buffer = sectorPtr(18, 1);
 
 	bamCreate();
-	
-	// Set first entries blank
-	//for( byte i = 0; i <= 7; ++i, buffer += 0x20 )
-	//	directoryEntrySet( i, buffer );
 }
 
 void cD64::directoryLoad() {

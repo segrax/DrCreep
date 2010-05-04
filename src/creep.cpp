@@ -1208,21 +1208,21 @@ void cCreep::events_Execute() {
 }
 
 // 29AE: 
-void cCreep::sub_29AE() {
+void cCreep::convertTimerToTime() {
 	
 	byte A = mMemory[ word_3E + 1 ];
-	sub_29D0( A, 6 );
+	convertTimeToNumber( A, 6 );
 
 	A = mMemory[ word_3E + 2 ];
-	sub_29D0( A, 3 );
+	convertTimeToNumber( A, 3 );
 	
 	A = mMemory[ word_3E + 3 ];
-	sub_29D0( A, 0 );
+	convertTimeToNumber( A, 0 );
 
 }
 
 // 29D0: 
-void cCreep::sub_29D0( byte pA, byte pY ) {
+void cCreep::convertTimeToNumber( byte pA, byte pY ) {
 	byte byte_2A6B = pA;
 	
 	byte byte_2A6C = 0;
@@ -2814,7 +2814,7 @@ void cCreep::Game() {
 								mMemory[ 0x1CF9 + Y ] = mMemory[ word_30 + Y ];
 							
 							mMemory[ 0x1CFD ] = X;
-							sub_1B9F();
+							gameHighScoresHandle();
 						}
 					}
 					// EFC
@@ -2971,7 +2971,7 @@ bool cCreep::mapDisplay() {
 			word_3E = (Y << 2);
 			word_3E += 0x7855;
 
-			sub_29AE();
+			convertTimerToTime();
 
 			gfxPosX = mMemory[ 0x11D3 + Y ] + 8;
 			gfxPosY = 0x10;
@@ -4156,7 +4156,7 @@ void cCreep::gameEscapeCastle() {
 	word_3E = 0x1AB3;
 	obj_stringPrint();
 	word_3E = 0x7855 + (mMemory[ 0x1AB2 ] << 2);
-	sub_29AE();
+	convertTimerToTime();
 
 	screenDraw(0, 0x93, 0x68, 0x18, 0 );
 	// 19AF
@@ -4252,7 +4252,7 @@ void cCreep::gameEscapeCastle() {
 }
 
 // 1B9F
-void cCreep::sub_1B9F() {
+void cCreep::gameHighScoresHandle() {
 	if( mMemory[ 0x7812 ] ) 
 		word_30 = 0xB840;
 	else
@@ -4460,7 +4460,7 @@ void cCreep::gameHighScores( ) {
 			if( mMemory[ 0xB802 + X ] != 0xFF ) {
 				// 1DF5
 				word_3E = (X + 4) + 0xB800;
-				sub_29AE();
+				convertTimerToTime();
 				screenDraw( 0, 0x93, mTextXPos + 0x20, mTextYPos, 0x94 );
 			}
 				
@@ -5133,7 +5133,7 @@ void cCreep::obj_Teleport_Prepare() {
 	
 	img_Update( 0x70, gfxPosX, gfxPosY, 0, X );
 
-	sub_505C( (mMemory[ word_3E + 2 ] + 2), X );
+	obj_Teleport_unk( (mMemory[ word_3E + 2 ] + 2), X );
 	
 	byte_50D0 = 0x20;
 
@@ -5335,7 +5335,7 @@ void cCreep::obj_Teleport_Img_Execute( byte pX ) {
 	else
 		A = mMemory[ 0xBE02 + pX ];
 
-	sub_505C(A, pX);
+	obj_Teleport_unk(A, pX);
 	if( byte_2E36 & 3 )
 		return;
 	
@@ -6958,7 +6958,7 @@ void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 		A = mMemory[ word_40 + 2 ] + 2;
 
 		byte_50CE = pX;
-		sub_505C( A, byte_50CF );
+		obj_Teleport_unk( A, byte_50CF );
 		pX = byte_50CE;
 		
 		return;
@@ -7009,7 +7009,7 @@ void cCreep::obj_RayGun_Control_Update( byte pA ) {
 }
 
 // 505C: 
-void cCreep::sub_505C( byte pA, byte pX ) {
+void cCreep::obj_Teleport_unk( byte pA, byte pX ) {
 	byte byte_50D1 = pA;
 
 	byte A =  (pA << 4) | 0x0A;
