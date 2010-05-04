@@ -64,7 +64,7 @@ public:
 		return& mInput[ pNumber ];
 	}
 
-	inline byte  keyGet()	  { return mKeyPressed; }
+	inline byte  keyGet()	  { byte ret = mKeyPressed; mKeyPressed = 0; return ret; }
 	inline bool	 f2Get()	  { return mF2; }
 	inline bool	 f3Get()	  { return mF3; }
 	inline bool	 runStopGet() { return mRunStop; }

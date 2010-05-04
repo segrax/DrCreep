@@ -40,7 +40,6 @@ cPlayerInput::cPlayerInput( cCreep *pCreep ) {
 }
 
 void cPlayerInput::inputCheck( bool pClearAll ) {
-	mKeyPressed = 0;
 
 	mF2 = false;
 	mF3 = false;
@@ -66,6 +65,10 @@ void cPlayerInput::inputCheck( bool pClearAll ) {
 }
 
 void cPlayerInput::KeyboardCheck() {
+
+	if( mEvent.type == SDL_KEYUP ) {
+		mKeyPressed = 0;
+	}
 
 	if( mEvent.type == SDL_KEYDOWN ) {
 

@@ -454,9 +454,10 @@ void cCreep::textShow() {
 	
 	mStrLength = X;
 
+	mScreen->refresh();
+
 	// 26D0
 	for(;;) {
-		mScreen->refresh();
 
 		if( mStrLength != mMemory[ 0x278C ] ) {
 			++mMemory[ 0x27A3 ];
@@ -465,12 +466,13 @@ void cCreep::textShow() {
 			mMemory[ 0x27A2 ] = mMemory[ 0x27A4 + X ];
 			mTextXPos = (mStrLength << 3) + mMemory[ 0x2788 ];
 			textPrintCharacter();
+			mScreen->refresh();
 		}
 
 		// 26F7
 		byte A = textGetKeyFromUser();
-		if( A == 0x80 ) {
-			if( byte_B83 != 1 ) {
+		if( A == 0x80 || mInput->restoreGet() == true ) {
+			if( byte_B83 != 1 &&  mInput->restoreGet() != true) {
 
 				interruptWait( 3 );
 				continue;
@@ -493,6 +495,7 @@ void cCreep::textShow() {
 				if( mStrLength != mMemory[ 0x278C ] ) {
 					mMemory[ 0x78A2 ] = 0x2D;
 					textPrintCharacter();
+					mScreen->refresh();
 				}
 				// 2744
 				if(mStrLength)
@@ -512,6 +515,7 @@ void cCreep::textShow() {
 
 				mMemory[ 0x27A2 ] = A;
 				textPrintCharacter();
+				mScreen->refresh();
 			}
 		}
 	}
@@ -527,13 +531,14 @@ void cCreep::textPrintCharacter() {
 
 // 27A8
 byte cCreep::textGetKeyFromUser() {
+	byte key = mInput->keyGet();
 
 	mInput->inputCheck( );
 	
-	if( mInput->keyGet() == 0 )
+	if( key == 0 )
 		return 0x80;
 
-	return toupper(mInput->keyGet());
+	return toupper( key );
 }
 
 // 2973: 
@@ -1100,7 +1105,9 @@ void cCreep::musicChange() {
 
 // 2233 : Intro Menu
 void cCreep::optionsMenu() {
-	
+	// TODO:
+	return;
+
 	for(;; ) {
 		mScreen->spriteDisable();
 
