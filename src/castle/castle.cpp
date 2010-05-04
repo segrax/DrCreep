@@ -49,8 +49,12 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 	// Load the highscores for this castle
 	if( mCastleInfo->managerGet()->scoresLoad( mName, gCreep->memory(0xB800) ) == false ) {
 		
+		// No highscores found, write a blank table
+
+		// Size of table
 		writeWord( gCreep->memory(0xB800), 0x007A );
 		
+		// Entries
 		for( char Y = 0x77; Y >= 0; --Y )
 			*gCreep->memory( 0xB802 + Y ) = 0xFF;
 
