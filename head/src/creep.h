@@ -205,17 +205,17 @@ public:
 		
 		void	 sub_95F();
 		void	 obj_Image_Draw();
-		void	 sub_1B9F();
+		void	 gameHighScoresHandle();
 		void	 sub_21C8( char pA );
 		
 		void	 textPrintCharacter();
 		byte	 textGetKeyFromUser();
 		void	 sub_2973();
-		void	 sub_29AE();
-		void	 sub_29D0( byte pA, byte pY );
+		void	 convertTimerToTime();
+		void	 convertTimeToNumber( byte pA, byte pY );
 		void	 sub_3940( byte pX, byte pY );
 		void	 sub_3A60( byte pX, byte pY );
-		void	 sub_505C( byte pA, byte pX );
+		void	 obj_Teleport_unk( byte pA, byte pX );
 		void	 sub_5171( byte pA );
 		void	 sub_526F( char &pA );
 		void	 sub_57DF( byte pX );
