@@ -37,6 +37,7 @@ int	main( int argc, char *argv[] ) {
 	
 #ifdef WIN32
 	SetConsoleTitle( L"The Castles of Dr.Creep" );
+	SetConsoleCtrlHandler( (PHANDLER_ROUTINE) CtrlHandler, TRUE );
 #endif
 
 	gCreep = new cCreep();
@@ -48,6 +49,18 @@ int	main( int argc, char *argv[] ) {
 	return 0;
 }
 
+BOOL CtrlHandler( DWORD fdwCtrlType ) {
+	
+	switch( fdwCtrlType ) {
+
+		case CTRL_CLOSE_EVENT:
+		case CTRL_C_EVENT:
+			exit(0);
+
+	default:
+		return FALSE;
+	}
+}
 string local_PathGenerate( string pFile, bool pDataSave ) {
 	stringstream	 filePathFinal;
 
