@@ -3049,6 +3049,14 @@ s10EB:;
 			return true;
 		}
 
+		if( mInput->f2Get() ) {
+
+			// Load a game
+			gamePositionLoad();
+
+			return true;
+		}
+
 		// 117D
 		if( byte_5F57 )
 			mMemory[ 0x11CC + X ] = 1;
@@ -4785,6 +4793,17 @@ void cCreep::gamePositionFilenameGet( bool pLoading ) {
 // 24A7
 void cCreep::gamePositionLoad() {
 	
+	gamePositionFilenameGet( true );
+	if(!mStrLength)
+		return;
+
+	string filename = string( (char*) &mMemory[ 0x278E ], mStrLength );
+	
+	if( mCastleManager->positionLoad( filename, memory( 0x7800 ) ) == true) {
+		byte_24FD = 1;
+	}
+
+	sub_2973();
 }
 
 // 24FF

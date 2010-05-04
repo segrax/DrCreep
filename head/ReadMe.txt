@@ -33,9 +33,21 @@ Command Line Parameters:
 Controls:
 ---------
 
+
+ In Map Screen:
+ --------------
+
+ F1 = Save Game
+ F2 = Load Game
+
+
+ In Game:
+ --------
+
  Escape = Self Kill
- F1 = Restore Key (Pause/Resume)
+ F1  = Restore Key (Pause/Resume)
  F10 = Fullscreen Toggle
+
 
 
  Player 1:

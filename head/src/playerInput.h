@@ -43,7 +43,7 @@ private:
 	SDL_Event			 mEvent;
 	sPlayerInput		 mInput[2];
 	cCreep				*mCreep;
-	bool				 mRunStop,	mRestore;
+	bool				 mRunStop,	mRestore, mF2;
 	bool				 mFullscreen;
 	byte				 mKeyPressed;
 
@@ -65,6 +65,7 @@ public:
 	}
 
 	inline byte  keyGet()	  { return mKeyPressed; }
+	bool		 f2Get()	  { return mF2; }
 	bool		 runStopGet() { return mRunStop; }
 	bool		 restoreGet() { return mRestore; }
 	inline bool	 fullscreenGet() { return mFullscreen; }
