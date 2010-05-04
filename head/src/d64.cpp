@@ -484,8 +484,10 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 	pBytes += 2;	// Load Address Bytes
 	
 	size_t bytesRemain = pBytes;
-
+	
 	sD64File	File;
+	transform( pFilename.begin(), pFilename.end(), pFilename.begin(), toupper );
+
 	File.mName = pFilename;
 	File.mFileType = (eD64FileType) 0x82;		// PRG
 	File.mBufferSize = pBytes;
@@ -601,6 +603,8 @@ void cD64::diskWrite() {
 sD64File *cD64::fileGet( string pFilename ) {
 	vector< sD64File* >::iterator fileIT;
 	
+	transform( pFilename.begin(), pFilename.end(), pFilename.begin(), toupper );
+
 	// Loop thro all files on disk for specific filename
 	for( fileIT = mFiles.begin(); fileIT != mFiles.end(); ++fileIT ) {
 

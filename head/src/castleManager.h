@@ -23,6 +23,7 @@
  *  ------------------------------------------
  */
 
+class cCastleManager;
 class cCastle;
 class cD64;
 struct sD64File;
@@ -45,13 +46,15 @@ struct sFileLocal {
 
 class cCastleInfo {
 protected:
+	cCastleManager	*mCastleManager;
 	string			 mName;
 	size_t			 mBufferSize;
 
 public:
 
-	cCastleInfo( string pFilename ) {
+	cCastleInfo( cCastleManager *pCastleManager, string pFilename ) {
 		mBufferSize = 0;
+		mCastleManager = pCastleManager;
 
 		mName = pFilename.substr(1);
 		std::transform(mName.begin(), mName.end(), mName.begin(), tolower);
@@ -62,15 +65,16 @@ public:
 	size_t			  bufferSizeGet() { return mBufferSize; }
 	virtual byte	 *bufferGet() = 0;
 	
+	inline cCastleManager *managerGet() { return mCastleManager; }
 };
 
 class cCastleInfoD64 : public cCastleInfo {
 private:
 	cD64			*mD64;
-	sD64File			*mFile;
-
+	sD64File		*mFile;
+	
 public:
-					 cCastleInfoD64( cD64 *pD64, sD64File *pFile );
+					 cCastleInfoD64( cCastleManager *pCastleManager, cD64 *pD64, sD64File *pFile );
 
 	byte			*bufferGet();
 };
@@ -80,7 +84,7 @@ private:
 	sFileLocal		*mLocal;
 	
 public:
-					 cCastleInfoLocal( sFileLocal *pFileLocal );
+					 cCastleInfoLocal( cCastleManager *pCastleManager, sFileLocal *pFileLocal );
 
 	byte			*bufferGet();
 };
@@ -125,6 +129,9 @@ public:
 	bool					 positionLoad( string pFilename, byte *pTarget );
 	bool					 positionSave( string pFilename, size_t pSaveSize, byte *pData );
 	cD64					*positionDiskCreate();
+
+	bool					 scoresLoad( string pCastleName, byte *pData );
+	bool					 scoresSave( string pCastleName, size_t pSaveSize, byte *pData );
 
 	vector<string>			 musicGet();
 };
