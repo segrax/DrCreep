@@ -66,21 +66,21 @@ struct sD64File {
 
 class cD64 {
 private:
-	bool				 mBamTracks[35][24];
-	byte				 mBamFree[35];
+	bool				 mBamTracks[35][24];							// Track/Sector Availability Map
+	byte				 mBamFree[35];									// Number of free sectors per track
 
 	byte				*mBuffer;										// Disk image buffer
 	size_t				 mBufferSize, mTrackCount;
 	
-	bool				 mCreated;
+	bool				 mCreated;										// Was a file created
 
 	vector< sD64File* >	 mFiles;										// Files in disk
-	string				 mFilename;
-	bool				 mDataSave;
+	string				 mFilename;										// Name of current D64
+	bool				 mDataSave;										// Save to Saves folder?
 
 	void				 bamCreate();									// Create Track 18/0
 	void				 bamLoad();										// Find Free Tracks/Sectors
-	void				 bamSave();
+	void				 bamSave();										// Save the mBamTracks data to the buffer
 
 	void				 bamSectorMark( size_t pTrack, size_t pSector, bool pValue = true );
 	bool				 bamSectorFree( size_t &pTrack, size_t &pSector );	// Find a free track/sector 
@@ -108,12 +108,12 @@ public:
 	vector< sD64File* >	 directoryGet( string pFind );		// Get a file list, with all files starting with 'pFind'
 	vector< sD64File* >	*directoryGet();					// Get the file list
 	
-	void				 diskWrite();
+	void				 diskWrite();						// Write the buffer to the D64
 
 	sD64File			*fileGet( string pFilename );		// Get a file
-	bool				 fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAddress );
+	bool				 fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAddress );// Save a file to the disk
 
-	inline size_t		 sectorsFree() {
+	inline size_t		 sectorsFree() {					// Number of free sectors on disk
 		size_t result = 0;
 
 		for(size_t i = 0; i < 35; ++i )
@@ -121,7 +121,7 @@ public:
 		return result;
 	}
 
-	inline bool			 createdGet() {
+	inline bool			 createdGet() {						// Was file created
 		return mCreated;
 	}
 };
