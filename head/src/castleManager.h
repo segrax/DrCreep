@@ -90,16 +90,19 @@ private:
 	cCastle					*mCastle;				// Current Castle
 	vector< cCastleInfo* >	 mCastles;				// All castles found
 	vector< cD64* >			 mDisks;				// Open disk images
-	vector< sFileLocal* > mFiles;				// Open Files
+	vector< cD64* >			 mDisksPositions;		// Save Game Disks
+	vector< sFileLocal* >	 mFiles;				// Open Local Files
 
 	void					 castlesCleanup();		// Cleanup mCastles vector
 	void					 castlesFind();			// Find all available castles
 
 
 	void					 diskCleanup();			// Cleanup mDisks vector
+	void					 diskPosCleanup();
 	void					 diskLoadCastles();		// Load all castles off disks
-	void					 disksFind( string pExtension );			// Find all D64 Images
-	
+	void					 disksFind( string pExtension );	// Find all D64 Images
+	void					 diskPosFind( string pExtension );
+
 	void					 localCleanup();
 	void					 localLoadCastles();	// Load all castles in data folder
 
@@ -118,6 +121,10 @@ public:
 	sFileLocal				*fileFind( string pFilename );
 	byte					*fileLoad( string pFilename, size_t &pBufferSize );
 	vector<string>			 filesFind( string pFilemask );
+
+	bool					 positionLoad( string pFilename, byte *pTarget );
+	bool					 positionSave( string pFilename, size_t pSaveSize, byte *pData );
+	cD64					*positionDiskCreate();
 
 	vector<string>			 musicGet();
 };

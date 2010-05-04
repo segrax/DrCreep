@@ -31,7 +31,7 @@
 #include "screen.h"
 #include "creep.h"
 
-const word gWidth = 360, gHeight = 265;
+const word gWidth = 375, gHeight = 295;
 
 cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 
@@ -44,6 +44,8 @@ cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 	}
 
 	mFullScreen			= false;
+	mBitmapRedraw		= false;
+	mSpriteRedraw		= false;
 	mScreenRedraw		= false;
 	mSDLSurfaceScaled	= 0;
 	mWindow				= 0;
@@ -71,9 +73,9 @@ cScreen::~cScreen() {
 
 void cScreen::clear(  byte pColor = 0xFF ) {
 	
-	mCollisions.clear();
 	mSurface->Wipe( pColor );
-	mScreenRedraw = true;
+	mBitmapRedraw = true;
+	mSpriteRedraw = true;
 }
 
 void cScreen::scaleSet( byte pScale ) {
@@ -103,14 +105,20 @@ void cScreen::bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte
 	mBitmapColorRam = pColorRam;
 	mBitmapBackgroundColor = pBackgroundColor0;
 
-	screenRedrawSet();
+	bitmapRedrawSet();
 }
 
 void cScreen::bitmapRefresh() {
-	clear();
-	
-	mBitmap->load( mBitmapBuffer, mBitmapColorData, mBitmapColorRam, mBitmapBackgroundColor );
+	mSurface->Wipe();
+
+	if(mBitmapRedraw) {
+		clear();
+		mBitmap->load( mBitmapBuffer, mBitmapColorData, mBitmapColorRam, mBitmapBackgroundColor );
+		mBitmapRedraw = false;
+	}
+
 	blit( mBitmap->mSurface, 24, 50, false, false );
+	mScreenRedraw = true;
 }
 
 void cScreen::blit( cSprite *pSprite, byte pSpriteNo ) {
@@ -134,7 +142,7 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 
 				// Check for any collisions
 				if( dest->mPriority == ePriority_Foreground || dest->mSprite ) {
-					if(dest->mSprite) {
+					if(dest->mSprite && dest->mSprite2 != pSpriteNo) {
 						dest->mSprite2 = pSpriteNo; 
 						if(!col1) {
 							mCollisions.push_back( dest );
@@ -192,15 +200,17 @@ void cScreen::levelNameSet( string pName ) {
 }
 
 void cScreen::refresh() {
-	if( mScreenRedraw ) {
+
+	if( mBitmapRedraw || mSpriteRedraw) {
 		bitmapRefresh();
 		spriteDraw();
+	}
 
-		mScreenRedraw = false;
-
-		SDL_Surface *surface = scaleUp();
+	if( mScreenRedraw ) {
+		SDL_Surface *surface = scaleUp();	
 		mWindow->clear(0);
-		mWindow->blit( surface, 0, 0, 15, 30 );
+		mWindow->blit( surface, 0, 0, 0, 0 );	//15, 30
+		mScreenRedraw = false;
 	}
 }
 
@@ -212,6 +222,8 @@ void cScreen::spriteDisable() {
 void cScreen::spriteDraw() {
 	cSprite *sprite;
 
+	mCollisions.clear();
+
 	// Draw from sprite 7
 	for( char Y = 7; Y >= 0; --Y ) {
 		sprite = mSprites[Y];
@@ -219,10 +231,14 @@ void cScreen::spriteDraw() {
 		if(!sprite->_rEnabled)
 			continue;
 
-		sprite->streamLoad( 0 );
+		if( mSpriteRedraw )
+			sprite->streamLoad( 0 );
 
 		blit( sprite, Y + 1 );
 	}
+
+	mSpriteRedraw = false;
+	mScreenRedraw = true;
 }
 
 void cScreen::SDLSurfaceSet(){

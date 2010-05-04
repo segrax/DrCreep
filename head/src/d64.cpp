@@ -36,13 +36,33 @@ string stringRip(byte *pBuffer, byte pTerminator, size_t pLengthMax) {
 	return tmpString;
 }
 
-cD64::cD64( string pD64 ) {
+cD64::cD64( string pD64, bool pCreate, bool pDataSave ) {
 	mBufferSize = 0;
+	mCreated = false;
 
-	mBuffer = local_FileRead( pD64, mBufferSize );
+	mFilename = pD64;
+	mDataSave = pDataSave;
 
 	mTrackCount = 35;
 
+	mBuffer = local_FileRead( pD64, mBufferSize, pDataSave );
+
+	if( !mBuffer ) {
+		
+		mBuffer = new byte[ 0x2AB00 ];
+		mBufferSize = 0x2AB00;
+		memset( mBuffer, 0, 0x2AB00 );
+
+		if( local_FileCreate( pD64, pDataSave ) == false ) 
+			return;
+
+		directoryCreate();
+
+		diskWrite();
+		mCreated = true;
+	}
+
+	bamLoad();
 	directoryLoad();
 }
 
@@ -54,6 +74,281 @@ cD64::~cD64( ) {
 		delete *fileIT;
 
 	delete mBuffer;
+}
+
+void cD64::bamCreate() {
+	const char *diskname = "CREEP SAVE";
+	
+	byte *buffer = sectorPtr( 18, 0 );
+
+	// Track / Sector of Directory Entries
+	buffer[0x00] = 0x12;		// Track 18
+	buffer[0x01] = 0x01;		// Sector 1
+
+	// Dos Version Type
+	buffer[0x02] = 0x41;
+	
+	// Unused Areas
+	buffer[0xA4] = 0xA0;
+	buffer[0xA5] = 0x2A;
+	buffer[0xA6] = 0x2A;
+	buffer[0xA0] = buffer[0xA1] = 0xA0;
+	buffer[0xA7] = buffer[0xA8] = buffer[0xA9] = buffer[0xAA] = 0xA0;
+	
+	// Disk Name
+	memset( &buffer[0x90], 0xA0, 0x10 );
+	memcpy( &buffer[0x90], diskname, strlen( diskname ) );
+
+	// Disk ID
+	buffer[0xA2] = 0x00;	buffer[0xA3] = 0x00;
+
+	// Buffer points to start of BAM Data
+	buffer += 0x04;
+	
+	// Create a BAM of free tracks
+	for( size_t track = 1; track <= 35; ++track ) {
+		size_t sectors = trackRange( track );
+
+		buffer[0] = sectors;
+		++buffer;
+
+		for( size_t sector = 0; sector < sectors; ) {
+			byte final = 0;
+
+			for( size_t count = 0; count < 8; ++count, ++sector ) {
+				final >>= 1;
+				if(sector < sectors)
+					final |= 0x80;
+			}
+
+			*buffer++ = final;	
+		}
+	}
+
+	bamLoad();
+
+	bamSectorMark( 18, 0, false );
+	bamSectorMark( 18, 1, false );
+
+	bamSave();
+}
+	
+
+void cD64::bamLoad() {
+	byte *buffer = sectorPtr( 18, 0 );
+	
+	// Clear BAM
+	for( size_t T = 1; T <= mTrackCount; ++T ) {
+		mBamFree[T-1] = trackRange(T);
+
+		for( size_t S = 0; S <= 24; ++S ) {
+			
+			if(S < trackRange(T))
+				mBamTracks[T-1][S] = true;
+			else
+				mBamTracks[T-1][S] = false;
+		}
+	}
+
+	// Load the BAM
+	buffer += 0x04;
+
+	for( size_t T = 1; T <= mTrackCount; ++T ) {
+		// Free Sector Count
+		mBamFree[T-1] = *buffer++;
+			
+		for( size_t S = 0; S <= 23; ) {
+
+			byte data = *buffer++;
+
+			for( byte count = 0; count < 8; ++count, ++S ) {
+				if( data & 0x01 )
+					mBamTracks[T-1][S] = true;
+				else
+					mBamTracks[T-1][S] = false;
+
+				data >>= 1;
+			}
+		}
+	}
+
+}
+
+void cD64::bamSave() {
+	byte *buffer = sectorPtr( 18, 0 );
+
+	buffer += 4;
+
+	for( size_t track = 1; track <= 35; ++track ) {
+		size_t sectors = trackRange( track );
+
+		buffer[0] = mBamFree[track-1];
+		++buffer;
+
+		for( size_t sector = 0; sector < sectors; ) {
+			byte final = 0;
+
+			for( size_t count = 0; count < 8; ++count, ++sector ) {
+				final >>= 1;
+
+				if( mBamTracks[track-1][sector] == true )
+					final |= 0x80;
+			}
+
+			*buffer++ = final;	
+		}
+	}
+}
+
+void cD64::bamSectorMark( size_t pTrack, size_t pSector, bool pValue ) {
+	
+	// Check if the sector was marked in use already
+	if( mBamTracks[pTrack-1][pSector] == true ) {
+
+		// Marked Free
+		if( pValue == false )
+			--mBamFree[pTrack-1];
+
+	} else {
+		// Marked in use
+		if( pValue == true )
+			++mBamFree[pTrack-1];
+	}
+
+	mBamTracks[pTrack-1][pSector] = pValue;
+}
+
+bool cD64::bamSectorFree( size_t &pTrack, size_t &pSector ) {
+	if(pTrack == 0)
+		pTrack = 1;
+
+	bool done = false;
+	bool trackDone = false, sectorDone = false;
+
+	size_t startSector = pSector;
+	size_t startTrack = pTrack;
+
+	// must check all sectors in track before moving forward,
+	// check from StartSector in increments of 10
+	// once we reach end of sectors in track,
+	// back to 0
+	// do for all sectors in track
+	//
+	// 2 loops?
+	// one checks each from +10
+	// outside checks from 0 to max for track
+
+	for( size_t track = pTrack; track < mTrackCount; ++track ) {
+
+		for( size_t sector = pSector; sector < trackRange( track ); ) {
+
+			// Is this sector free
+			if( mBamTracks[track-1][sector] == true ) {
+				pTrack = track;
+				pSector = sector;
+				return true;
+			}
+
+			// Increase sector
+			sector += 10;
+
+			// Check its in range for the track
+			if( sector >= trackRange( track ) ) {
+				if( startSector > 0 ) {
+					sector = 0;
+					pSector = 0;
+					startSector = 0;
+					continue;
+				}
+
+				++pSector;
+				sector = pSector;
+
+				// Is the base sector now out of range?
+				if(pSector >= trackRange( track )) {
+					
+					pSector = 0;
+					break;
+				}	// If >= trackrange
+
+			}	// If >= trackrange
+
+		}	// For Sector
+
+		pSector = 0;
+	}	// For Track
+
+/*
+	for(;;) {
+		size_t sector = 0;
+		done = false;
+
+		for( sector = pSector; ; sector += 10) {
+
+			if( sector < trackRange( pTrack )) {
+				if( mBamTracks[pTrack-1][sector] == true ) {
+					pSector = sector;
+					return true;
+				}
+
+			} else {
+				sector = ++pSector;
+			}
+
+			if( pSector >= trackRange( pTrack ) ) {
+				pSector = 0;
+				sector = pSector;
+				done = true;
+			}
+
+			if( pSector == startSector && done )
+				break;
+		}
+		
+		++pTrack;
+		startSector = 0;
+		pSector = 0;
+
+		if(pTrack > mTrackCount) {
+			pTrack = 1;
+			trackDone = true;
+		}
+
+		if( pTrack == startTrack && trackDone )
+			break;
+	}*/
+
+	return false;
+}
+
+void cD64::chainLoad( sD64File *pFile ) {
+	byte  track = pFile->mTrack, sector = pFile->mSector;
+	byte *buffer = 0;
+	
+	pFile->mTSChain.clear();
+
+	for(; track > 0 && track < mTrackCount && sector < trackRange( track ) ;) {
+		pFile->mTSChain.push_back( sD64Chain( track, sector ) );
+		
+		buffer = sectorPtr( track, sector );
+
+		// Final sector of file
+		if( buffer[0] == 0 )
+			break;
+
+		track = buffer[0];
+		sector = buffer[1];
+	}
+}
+
+void cD64::directoryCreate() {
+	byte *buffer = sectorPtr(18, 1);
+
+	bamCreate();
+	
+	// Set first entries blank
+	//for( byte i = 0; i <= 7; ++i, buffer += 0x20 )
+	//	directoryEntrySet( i, buffer );
 }
 
 void cD64::directoryLoad() {
@@ -100,6 +395,84 @@ void cD64::directoryLoad() {
 		currentTrack = sectorBuffer[0];
 		currentSector = sectorBuffer[1];
 	}
+}
+
+bool cD64::directoryEntrySet( byte pEntryPos, byte *pBuffer ) {
+	if( pEntryPos > 0)
+		pBuffer[ 0x00 ] = pBuffer[ 0x01 ] = 0;
+	
+	// File Type
+	pBuffer[ 0x02 ] = 0;
+
+	// Filename
+	memset( &pBuffer[ 0x05 ], 0xA0, 0x0F );
+	return true;
+}
+
+bool cD64::directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer ) {
+	if( pFile->mName.size() > 0x0F )
+		return false;
+
+	if( pEntryPos > 0)
+		pBuffer[ 0x00 ] = pBuffer[ 0x01 ] = 0;
+	
+	// File Type
+	pBuffer[ 0x02 ] = pFile->mFileType;
+	
+	// Starting Track/Sector
+	pBuffer[ 0x03 ] = pFile->mTrack;
+	pBuffer[ 0x04 ] = pFile->mSector;
+
+	// Filename
+	memset( &pBuffer[ 0x05 ], 0xA0, 0x10 );
+	memcpy( &pBuffer[ 0x05 ], pFile->mName.c_str(), pFile->mName.size() );
+	
+	// Number of sectors used by file
+	word totalBlocks = (pFile->mBufferSize / 254);
+	if( pFile->mBufferSize % 254 )
+		++totalBlocks;
+
+	writeWord( &pBuffer[ 0x1E ], totalBlocks );
+	return true;
+}
+
+bool cD64::directoryAdd( sD64File *pFile ) {
+	
+	// Directory starts at Track 18, sector 1
+	size_t   currentTrack = 0x12, currentSector = 1;
+	byte	*sectorBuffer;
+
+	// Loop until the current Track/Sector is invalid
+	while( (currentTrack > 0 && currentTrack < mTrackCount) && (currentSector <= trackRange( currentTrack )) ) {
+		sectorBuffer = sectorPtr( currentTrack, currentSector );
+		byte *buffer = sectorBuffer;
+		
+		if(!buffer)
+			break;
+
+		for( byte i = 0; i <= 7; ++i, buffer += 0x20 ) {
+			 byte fileType = (*(buffer + 0x02) & 0x0F);
+
+			 // Deleted Entries
+			 if( fileType == 0x00 || fileType == 0x80 ) {
+				directoryEntrySet( i, pFile, buffer );
+				return true;
+			 }
+		}
+		// This entry table is full
+
+		// Is the next T/S set?
+		if( sectorBuffer[0] == 0 ) {
+			sectorBuffer[0] = 0x18;
+			sectorBuffer[1] = currentSector + 3;
+		}
+		
+		// Get the next Track/Sector in the chain
+		currentTrack = sectorBuffer[0];
+		currentSector = sectorBuffer[1];
+	};
+
+	return false;
 }
 
 bool cD64::fileLoad( sD64File *pFile ) {
@@ -161,6 +534,81 @@ bool cD64::fileLoad( sD64File *pFile ) {
 	return true;
 }
 
+bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAddress ) {
+	pBytes += 2;	// Load Address Bytes
+	
+	size_t bytesRemain = pBytes;
+
+	sD64File	File;
+	File.mName = pFilename;
+	File.mFileType = (eD64FileType) 0x82;		// PRG
+	File.mBufferSize = pBytes;
+	
+	byte	*buffer = 0, *bufferSrc = pData;
+	size_t	 track = 0, sector = 0, copySize = 0;
+
+	bool sectorFirst = true;
+
+	while( bytesRemain ) {
+		
+		// Get available T/S
+		if( bamSectorFree( track, sector ) == false )
+			return false;
+		
+		// Set the next T/S in the previous sector
+		if(buffer) {
+			buffer[0] = track;
+			buffer[1] = sector;
+
+		} else {
+			File.mTrack = track;
+			File.mSector = sector;
+		}
+
+		// Grab buffer to next sector
+		buffer = sectorPtr( track, sector );
+		
+		if( sectorFirst ) {
+			writeWord( &buffer[0x02], pLoadAddress );
+
+			// Copy filedata
+			if(bytesRemain < 0xFC )
+				copySize = bytesRemain;
+			else		
+				copySize = 0xFC;
+
+			sectorFirst = false;
+
+			memcpy( buffer + 4, bufferSrc, copySize );
+		} else {
+
+			// Copy filedata
+			if(bytesRemain < 0xFE )
+				copySize = bytesRemain;
+			else		
+				copySize = 0xFE;
+
+			memcpy( buffer + 2, bufferSrc, copySize );
+		}
+
+		bufferSrc += copySize;
+
+		// Mark the sector in use
+		bamSectorMark( track, sector, false );
+		
+		if(bytesRemain > 0)
+			bytesRemain -= copySize;
+	};
+	
+	buffer[0] = 0;
+	buffer[1] = copySize - 1;
+
+	directoryAdd( &File );
+
+	diskWrite();
+	return true;
+}
+
 byte *cD64::sectorPtr( size_t pTrack, size_t pSector ) {
 	size_t	currentTrack, currentRange;
 	dword	offset = 0;
@@ -196,6 +644,12 @@ byte *cD64::sectorPtr( size_t pTrack, size_t pSector ) {
 	}
 
 	return 0;
+}
+
+void cD64::diskWrite() {
+
+	bamSave();
+	local_FileSave( mFilename, mDataSave, mBuffer, mBufferSize );
 }
 
 sD64File *cD64::fileGet( string pFilename ) {

@@ -51,7 +51,8 @@ private:
 	bool		 mIntro;
 	byte		 mMenuMusicScore, mMenuScreenCount, mMenuScreenTimer;
 	byte		 mUnlimitedLives;
-	timeb		 mTimePrevious;
+	timeb		 mTimePrevious, mPlayer1Time, mPlayer2Time;
+	size_t		 mPlayer1Seconds, mPlayer2Seconds;
 
 	word		 mVoice, mVoiceTmp;
 	byte		 mVoiceNum;
@@ -164,7 +165,10 @@ public:
 		void	 gameEscapeCastle();
 		void	 gameHighScores();
 		void	 gameMenuDisplaySetup();
+
+		void	 gamePositionLoad();
 		void	 gamePositionSave();
+		void	 gamePositionFilenameGet( bool pLoading );
 
 		void	 graphicRoomColorsSet( byte pRoomColor );
 
@@ -177,7 +181,7 @@ public:
 
 		void	 mainLoop();							// Main Intro/Game Loop
 
-		void	 mapDisplay();							// Map Screen
+		bool	 mapDisplay();							// Map Screen
 		void	 mapRoomDraw();							// Draw the rooms on the map
 		
 		void     musicChange();
@@ -205,8 +209,8 @@ public:
 		void	 sub_1B9F();
 		void	 sub_21C8( char pA );
 		
-		void	 sub_2772();
-		byte	 sub_27A8();
+		void	 textPrintCharacter();
+		byte	 textGetKeyFromUser();
 		void	 sub_2973();
 		void	 sub_29AE();
 		void	 sub_29D0( byte pA, byte pY );

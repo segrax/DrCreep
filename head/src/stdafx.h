@@ -72,14 +72,21 @@ extern cCreep	  *gCreep;
 		return *wordBytes;
 	}
 
+	inline void writeWord( const void *buffer, word pValue ) {
+		word *wordBytes = (word *) buffer;
+		*wordBytes = pValue;
+	}
+
 	// Swap the bytes around in a word
 	inline word swapWord(  word buffer ) {
 		return buffer;
 	}
 #endif
 
-vector<string>	 directoryList(string pPath);
-byte			*local_FileRead( string pFile, size_t	&pFileSize );
+vector<string>	 directoryList(string pPath, bool pDataSave);
+byte			*local_FileRead( string pFile, size_t	&pFileSize, bool pDataSave );
+bool			 local_FileCreate( string pFile, bool pDataSave );
+bool			 local_FileSave( string pFile, bool pDataSave, byte *pBuffer, size_t pBufferSize );
 
 const byte byte_83F = 0x80;
 const byte byte_840 = 0x40;
