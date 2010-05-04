@@ -270,6 +270,7 @@ vector<string>	cCastleManager::filesFind( string pFilemask ) {
 
 		for( fileIT = files.begin(); fileIT != files.end(); ++fileIT ) {
 			
+			// If we dont have this music file, add it to the list of available music
 			if( find( musicFiles.begin(), musicFiles.end(), (*fileIT)->mName ) == musicFiles.end() )
 				musicFiles.push_back( (*fileIT)->mName );
 
@@ -283,7 +284,8 @@ cD64 *cCastleManager::positionDiskCreate() {
 	cD64		 *newDisk	= 0;
 	stringstream  filename;
 
-	for(size_t count = 0; count < 10; ++count) {
+	// FIXME: Temp for now, but who needs 100 save disks?
+	for(size_t count = 0; count < 100; ++count) {
 		filename.str("");
 		filename << "SAVES_";
 		filename << count;
@@ -312,6 +314,7 @@ bool cCastleManager::positionLoad( string pFilename, byte *pTarget ) {
 	for( diskIT = mDisksPositions.begin(); diskIT != mDisksPositions.end(); ++diskIT ) {
 		if( (file = (*diskIT)->fileGet( pFilename )) ) {
 			
+			// Copy the file from the d64 buffer, to the target memory buffer
 			memcpy( pTarget, file->mBuffer + 2, file->mBufferSize - 2);
 			return true;
 		}
@@ -326,17 +329,27 @@ bool cCastleManager::positionSave( string pFilename, size_t pSaveSize, byte *pDa
 
 	diskPosFind("*.d64");
 	
+	// Calculate number of sectors required for file we're saving
+	size_t size = pSaveSize + 2;
+	size_t sectors = (size / 254);
+	if(size%254)
+		++sectors;
+
+	// Search all available disks for enough available sectors 
 	for( diskIT = mDisksPositions.begin(); diskIT != mDisksPositions.end(); ++diskIT ) {
 		
-		if( (*diskIT)->sectorsFree() >= 17 )
+		if( (*diskIT)->sectorsFree() >= sectors)
 			break;
 	}
 
-	if( diskIT == mDisksPositions.end() )
+	// No Disk found? create a new save disk
+	if( diskIT == mDisksPositions.end() ) {
 		disk = positionDiskCreate();
-	else
+		mDisksPositions.push_back( disk );
+	} else
 		disk = *diskIT;
 
+	// Save the file to the disk
 	disk->fileSave( pFilename, pData, pSaveSize, 0x7800 );
 	return true;
 }
