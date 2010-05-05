@@ -1,13 +1,15 @@
 @charset "utf-8";
 body  {
-	font: 100% Verdana, Arial, Helvetica, sans-serif;
 	background: #666666;
 	margin: 0; /* it's good practice to zero the margin and padding of the body element to account for differing browser defaults */
 	padding: 0;
 	text-align: center; /* this centers the container in IE 5* browsers. The text is then set to the left aligned default in the #container selector */
 	color: #000000;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 100%;
+	font-weight: normal;
 }
-.twoColHybRtHdr #container { 
+.twoColHybRtHdr #container {
 	width: 80%;  /* this will create a container 80% of the browser width */
 	background: #FFFFFF;
 	margin: 0 auto; /* the auto margins (in conjunction with a width) center the page */
@@ -28,15 +30,21 @@ body  {
 2. Since em units are used for the sidebar value, be aware that its width will vary with different default text sizes.
 3. Space between the side of the div and the elements within it can be created by placing a left and right margin on those elements as seen in the ".twoColHybRtHdr #sidebar1 p" rule.
 */
-.twoColHybRtHdr #sidebar1 {
-	float: right; 
-	width: 12em; /* since this element is floated, a width must be given */
-	background: #EBEBEB; /* the background color will be displayed for the length of the content in the column, but no further */
-	padding: 15px 0; /* top and bottom padding create visual space within this div  */
+
+.twoColHybRtHdr #sidebar {
+	float: right;	
+	width: 12em;
+	height: auto;
 }
-.twoColHybRtHdr #sidebar1 h3, .twoColHybRtHdr #sidebar1 p {
-	margin-left: 10px; /* the left and right margin should be given to every element that will be placed in the side columns */
-	margin-right: 10px;
+
+.sidebarMain {
+	margin-top: 2em;
+	background-color:#eee;
+	border:1px dashed #999;
+	line-height:17px;
+	width: 11em; /* since this element is floated, a width must be given */
+	background: #EBEBEB; /* the background color will be displayed for the length of the content in the column, but no further */
+	text-align:center;
 }
 
 /* Tips for mainContent:
@@ -70,4 +78,11 @@ body  {
     height:0;
     font-size: 1px;
     line-height: 0px;
+}
+.about {
+	text-align:center;
+}
+.footertable {
+	text-align:center;
+	width:30%;
 }

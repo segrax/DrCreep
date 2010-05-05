@@ -9,29 +9,9 @@
 .NewsDates {
 	color: #004000;
 }
-#MainMenuTitle {
+.menuTitles {
 	color: #800080;
-}
-#mainTitle {
-	color: #0FF;
-}
-#mainTitle {
-	color: #8080FF;
-}
-#mainTitle {
-	color: #FF0;
-}
-#mainTitle {
-	color: #800080;
-}
-#mainTitle {
-	color: #008040;
-}
-#mainTitle {
-	color: #400080;
-}
-#mainTitle {
-	color: #80FF80;
+	font-weight:bold;
 }
 #mainTitle {
 	color: #408080;
@@ -46,30 +26,39 @@
   <div id="header">
     <h1 id="mainTitle">The Castles of Dr. Creep</h1>
   <!-- end #header --></div>
-  <div id="sidebar1">
+  <div id="sidebar">    
+     
+    <div id="sidebar1" ><div class="sidebarMain" >
   
-    <div align="center"><strong id="MainMenuTitle">Main Menu</strong><br /><br />
+    <div class="menuTitles">Main Menu</div><br />
       <h6>
-      <a href="http://creep.sourceforge.net/">Home</a></h6>
-      <h6>
-      <a href="http://sourceforge.net/projects/creep/">Project Page</a></h6>
-      <h6>
-      <a href="https://sourceforge.net/projects/creep/forums">Forums</a></h6>
-      <h6>
-      <a href="https://sourceforge.net/projects/creep/files/">Downloads</a></h6>
-      <h6>
-      <a href="http://creep.svn.sourceforge.net/viewvc/creep/head/src/">SVN</a></h6>
-    </div>
-    
+      <a href="http://creep.sourceforge.net/">Home</a><br />
+      <a href="http://sourceforge.net/projects/creep/">Project Page</a><br />
+      <a href="https://sourceforge.net/projects/creep/forums">Forums</a><br />
+      <a href="https://sourceforge.net/projects/creep/files/">Downloads</a><br />
+      </h6>
+  
+  </div></div>
+  
+  <div id="sidebar2"><div class="sidebarMain" >
+  <div class="menuTitles">Development</div>
+  <h6>
+  <a href="http://creep.svn.sourceforge.net/viewvc/creep/head/src/">SVN</a><br />
+  </h6>
+  </div></div>
+  
   </div>
+  
   <div id="mainContent">
-    <table width="" border="0">
+    <table border="0">
       <tr>
-        <td width="30%"><img src="/images/screenshots/o_alternation2.png" width="185" height="143" alt="Alternation2" /></td>
-        <td width="70%"><div align="center">Castles of Dr. Creep is a 1984 Commodore 64 game written by Ed Hobbs and published by Broderbund Software.</div></td>
+        <td ><img src="/images/screenshots/o_alternation2.png" width="185" height="143" alt="Alternation2" style="margin-top:15px" /></td>
+        <td ><div class="about">Castles of Dr. Creep is a 1984 Commodore 64 game written by Ed Hobbs and published by Broderbund Software.</div></td>
       </tr>
     </table>
     <p>&nbsp;</p>
+    <p><br />
+    </p>
     <p class="NewsDates"><strong>Wednesday, May 5, 2010  07:19</strong></p>
     <hr />
     SVN-162 Packages have been released and are available on the <a href="https://sourceforge.net/projects/creep/files/">Downloads</a> page.<br />
@@ -85,11 +74,44 @@
       </li>
 </ul>
      <hr />
+      	
+        <p>&nbsp;</p>
+        <p class="NewsDates"><strong>Thursday, Feb 11, 2010</strong></p>
+    <hr />
+    <p>SVN-125 Packages have been released.</p>
+    <p><br /> 
+      This is the first public release, the game is completable with minor issues occasionally causing lockups.<br />
+      <br />
+    </p>
 <!-- end #mainContent --></div>
 	<!-- This clearing element should immediately follow the #mainContent div in order to force the #container div to contain all child floats -->
 	<br class="clearfloat" />
 	<div id="footer">
-    <p>&nbsp;</p>
+    <table width="100%" border="0">
+      <tr>
+        <td>
+        <div>
+        		<a href="http://sourceforge.net/donate/index.php?group_id=304335"> <img src="http://images.sourceforge.net/images/project-support.jpg" alt="Support This Project" style="border:0;width:88px;height:32px;" /></a>
+        </div>
+        </td>
+        
+        <td><div class="footertable"><a href="http://validator.w3.org/check?uri=referer"><img style="border:0"
+        	src="http://www.w3.org/Icons/valid-xhtml11"
+        	alt="Valid XHTML 1.1" /></a></div>
+    </td>
+    
+        <td><div class="footertable"><a href="http://jigsaw.w3.org/css-validator/check/referer">
+        <img style="border:0;width:88px;height:31px"
+            src="http://jigsaw.w3.org/css-validator/images/vcss"
+            alt="Valid CSS!" /></a></div>
+</td>
+        <td><div class="footertable"></div></td>
+        <td><div class="footertable"></div></td>
+        <td><div class="footertable"></div></td>
+      </tr>
+    </table>
+   
+
   <!-- end #footer --></div>
 <!-- end #container --></div>
 </body>
