@@ -929,11 +929,22 @@ void cCreep::musicPtrsSet() {
 }
 
 // 1F29 : Play Music Buffer
-void cCreep::musicBufferFeed() {
+bool cCreep::musicBufferFeed() {
 	bool done = false;
+	
+	if( *memory( 0x20DC ) == 0 )
+		if( *memory( 0x20DD ) == 0 ) {
+			goto musicUpdate;
+			(*memory( 0x20DD ))--;
+		}
 
+	(*memory( 0x20DC ))--;
+	if( !(*memory( 0x20DC ) | *memory( 0x20DD )) )
+		return true;
+	
+musicUpdate:;
 	if(!mMusicBuffer)
-		return;
+		return false;
 
 	for(; !done ;) {
 		byte A = *mMusicBuffer;
@@ -989,11 +1000,11 @@ void cCreep::musicBufferFeed() {
 
 			case 2:
 				*memory( 0x20DC ) = *memory( 0x20CC );
-				return;
+				return true;
 
 			case 3:
 				*memory( 0x20DD ) = *memory( 0x20CC );
-				return;
+				return true;
 
 			case 4:
 				musicPtrsSet();
@@ -1058,6 +1069,7 @@ void cCreep::musicBufferFeed() {
 		*memory( 0x20DD ) = 0x02;
 	}
 
+	return true;
 }
 
 // C49 : Music Change
@@ -4861,9 +4873,11 @@ void cCreep::gamePositionSave() {
 	word saveSize = readWord( memory( 0x7800 ) );
 	
 	if( mCastleManager->positionSave( filename, saveSize, memory( 0x7800 ) ) == false) {
-		word_3E = 0x25AA;
+
+		word_3E = 0x25AA;	// IO ERROR
 		screenClear();
 		obj_stringPrint();
+
 		mScreen->refresh();
 
 		hw_IntSleep(0x23);

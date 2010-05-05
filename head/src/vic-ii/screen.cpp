@@ -130,12 +130,14 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 	bool		  col1 = false, col2 = false;
 	sScreenPiece *dest;
 	sScreenPiece *source = pSurface->screenPiecesGet();
+	size_t height = pSurface->heightGet();
+	size_t width = pSurface->widthGet();
 
 	mScreenRedraw = true;
-	for( word y = 0; y < pSurface->heightGet(); ++y, ++pDestY ) {
+	for( word y = 0; y < height; ++y, ++pDestY ) {
 		dest = mSurface->screenPieceGet( pDestX, (byte) pDestY);
 
-		for( word x = 0; x < pSurface->widthGet(); ++x ) {
+		for( word x = 0; x < width; ++x ) {
 			
 			// Transparent?
 			if( source->mPixel != 0xFF ) {

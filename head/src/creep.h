@@ -184,7 +184,7 @@ public:
 		void	 mapRoomDraw();							// Draw the rooms on the map
 		
 		void     musicChange();
-		void	 musicBufferFeed();
+		bool	 musicBufferFeed();
 		void	 musicPtrsSet();
 
 		void	 optionsMenu();							// In-Game Options Menu
