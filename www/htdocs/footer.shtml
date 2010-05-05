@@ -1,0 +1,28 @@
+  	<div id="footer">
+    <table width="100%" border="0">
+      <tr>
+        <td>
+        <div>
+        		<a href="http://sourceforge.net/donate/index.php?group_id=304335"> <img src="http://images.sourceforge.net/images/project-support.jpg" alt="Support This Project" style="border:0;width:88px;height:32px;" /></a>
+        </div>
+        </td>
+        
+        <td><div class="footertable"><a href="http://validator.w3.org/check?uri=referer"><img style="border:0"
+        	src="http://www.w3.org/Icons/valid-xhtml11"
+        	alt="Valid XHTML 1.1" /></a></div>
+    </td>
+    
+        <td><div class="footertable"><a href="http://jigsaw.w3.org/css-validator/check/referer">
+        <img style="border:0;width:88px;height:31px"
+            src="http://jigsaw.w3.org/css-validator/images/vcss"
+            alt="Valid CSS!" /></a></div>
+</td>
+        <td><div class="footertable"></div></td>
+        <td><div class="footertable"></div></td>
+        <td><div class="footertable"></div></td>
+      </tr>
+    </table>
+   
+
+  <!-- end #footer --></div>
+  
