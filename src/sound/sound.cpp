@@ -7,22 +7,27 @@ cSound *g_Sound;
 
 /* Prototype of our callback function */
 void my_audio_callback(void *userdata, Uint8 *stream, int len) {
-	int ticks = 1;
+	int ticks = 0;
 
 	for( int i = 0; i < len; ++i ) {
 		
 		if( ticks <= 0 ) {
-			ticks =* g_Sound->creepGet()->memory(0xDC05) * 380;
+			
+			ticks = ((*g_Sound->creepGet()->memory(0xDC05) << 8) + 0xFF);
 
-			g_Sound->creepGet()->musicBufferFeed();
+			ticks *= 312;
+
+			// Per Frame
+			// 0x4CC8 SID PAL
+			// 0x42C7 SID NTSC
+
+			if( g_Sound->creepGet()->musicBufferFeed() == false)
+				return;
 		}
-		
-		if(ticks==0)
-			return;
 
-		--ticks;
+		ticks-=2;
 
-		g_Sound->sidGet()->clock(10);
+		g_Sound->sidGet()->clock(8);
 		int ss = g_Sound->sidGet()->output(8);
 		*stream++ = (byte) ss;
 	}
