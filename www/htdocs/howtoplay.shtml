@@ -21,6 +21,7 @@
 }
 .sideText {
 	font-size: 80%;
+	text-align: right;
 }
 -->
 </style>
@@ -38,13 +39,13 @@
     <table width="100%" cellspacing="5" >
 	  <tr>
 	    <td class="sideText">Launch the game from the shortcut</td>
-	    <td><div align="right"><img src="/images/howtoplay/0. shortcut.jpg" alt="shortcut" width="92" height="94" /></div></td>
+	    <td><div><img src="/images/howtoplay/0. shortcut.jpg" alt="shortcut" width="92" height="94" /></div></td>
       </tr>
       
 	  <tr>
 	    <td class="sideText">Select which castle you want to play.<br/>
         Any castles found will be displayed.</td>
-	    <td><div align="right"><img src="/images/howtoplay/1. console.jpg" alt="" width="338" height="170" /></div></td>
+	    <td><div><img src="/images/howtoplay/1. console.jpg" alt="" width="338" height="170" /></div></td>
       </tr>
       
 	  <tr>
@@ -53,15 +54,15 @@
         Press Right Ctrl for a 1 player game.<br/>
         Press Numpad 0 for a 2 player game.<br/>
         Press F3 to display the Highscores</p></td>
-	    <td><div align="right"><img src="/images/howtoplay/2. intro0.jpg" width="382" height="314" alt="dr.creep intro" /></div></td>
+	    <td><div><img src="/images/howtoplay/2. intro0.jpg" width="382" height="314" alt="dr.creep intro" /></div></td>
 
       </tr>
       
 	  <tr>
-	    <td>
+	    <td class="sideText">
         <p class="Keys"><strong>Controls:</strong><br/>
         Press Enter to return to the intro</p></td>
-	    <td><div align="right"><img src="/images/howtoplay/3. highscores.jpg" width="383" height="313" alt="highscores" /></div></td>
+	    <td><div><img src="/images/howtoplay/3. highscores.jpg" width="383" height="313" alt="highscores" /></div></td>
       </tr>
 	  <tr>
 	    <td class="sideText">The map screen displays rooms which have been visited.
@@ -91,21 +92,20 @@
           Numpad 4: Run Left<br/>
         </p>
         <p class="Keys"><strong>Other:</strong> <br/>
-        Press Escape to kill players<br/>
-        Press F2 to Load A game</p></td>
-	    <td><img src="/images/howtoplay/5. InGame.jpg" alt="" width="383" height="313" /></td></td>
+        Press Escape to kill players</p></td>
+	    <td><img src="/images/howtoplay/5. InGame.jpg" alt="" width="383" height="313" /></td>
       </tr>
 	  <tr>
 	    <td class="sideText">Save a Game<br />
         <p class="Keys"><strong>Controls</strong><br/>
-        Press Escape (Restore) Twice to cancel<br/>
+        Press Escape (Restore) Twice to cancel</p><br/>
         </td>
 	    <td><img src="/images/howtoplay/6. Save.jpg" alt="" width="383" height="313" /></td>
       </tr>
 	  <tr>
 	    <td class="sideText">Load a Game<br />
         <p class="Keys"><strong>Controls</strong><br/>
-        Press Escape (Restore) Twice to cancel<br/></td>
+        Press Escape (Restore) Twice to cancel</p></td>
 	    <td><img src="/images/howtoplay/7. Restore.jpg" alt="" width="383" height="313" /></td>
       </tr>
   </table>
