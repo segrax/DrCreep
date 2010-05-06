@@ -78,16 +78,17 @@ private:
 	string				 mFilename;										// Name of current D64
 	bool				 mDataSave;										// Save to Saves folder?
 
+	void				 bamClear();									// Clear the internal BAM
 	void				 bamCreate();									// Create Track 18/0
-	void				 bamLoad();										// Find Free Tracks/Sectors
-	void				 bamSave();										// Save the mBamTracks data to the buffer
+	void				 bamLoadFromBuffer();							// Load Free Tracks/Sectors
+	void				 bamSaveToBuffer();								// Save the mBamTracks data to the buffer
 
 	void				 bamSectorMark( size_t pTrack, size_t pSector, bool pValue = true );
-	bool				 bamSectorFree( size_t &pTrack, size_t &pSector );	// Find a free track/sector 
+	bool				 bamTrackSectorFree( size_t &pTrack, size_t &pSector );
+	bool				 bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrack = 0x12 );	// Find a free track/sector 
 
 	void				 chainLoad( sD64File *pFile );					// Gather list of all tracks/sectors used by file
 
-	void				 directoryCreate();								// Create Track 18/1
 	void				 directoryLoad();								// Load the disk directory
 	bool				 directoryAdd( sD64File *pFile );				// Add file to directory
 	bool				 directoryEntrySet( byte pEntryPos, byte *pBuffer );
