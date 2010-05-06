@@ -1499,7 +1499,7 @@ void cCreep::obj_OverlapCheck( byte pX ) {
 
 		Y = byte_31F0 + 8;
 
-	} while(Y);
+	} while(Y != byte_31EF);
 }
 
 bool cCreep::obj_Actions_Collision( byte pX, byte pY ) {
