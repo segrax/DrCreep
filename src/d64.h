@@ -84,6 +84,7 @@ private:
 	void				 bamSaveToBuffer();								// Save the mBamTracks data to the buffer
 
 	void				 bamSectorMark( size_t pTrack, size_t pSector, bool pValue = true );
+
 	bool				 bamTrackSectorFree( size_t &pTrack, size_t &pSector );
 	bool				 bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrack = 0x12 );	// Find a free track/sector 
 
@@ -100,6 +101,13 @@ private:
 
 	inline size_t		 trackRange(size_t pTrack) {					// Number of sectors in 'pTrack'
 		return 21 - (pTrack > 17) * 2 - (pTrack > 24) - (pTrack > 30);
+	}
+
+	inline bool			 bamTrackSectorUse( size_t pTrack, size_t pSector ) {
+		if( pTrack == 0 || pTrack > mTrackCount || pSector > trackRange(pTrack) )
+			return false;
+
+		return mBamTracks[ pTrack - 1 ][ pSector ];
 	}
 
 public:

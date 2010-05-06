@@ -242,12 +242,12 @@ bool cD64::bamTrackSectorFree( size_t &pTrack, size_t &pSector ) {
 				continue;
 			}
 			
-			pSector = sector;
 			return false;
-
 		}	// If >= trackrange
 
 	}	// For Sector
+
+	return false;
 }
 
 // Find a free sector
@@ -257,6 +257,7 @@ bool cD64::bamTrackSectorFree( size_t &pTrack, size_t &pSector ) {
 bool cD64::bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrack ) {
 	bool first = false, moveDown = true;
 	size_t	moveSize = 0;
+	bool wrapped = false;
 
 	// No track specified, start near the directorytrack
 	if(pTrack == 0) {
@@ -322,18 +323,30 @@ bool cD64::bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrac
 		if( track == 0 ) {
 			track += (pDirectoryTrack + 1);
 			moveDown = false;
+			if(wrapped)
+				return false;
+
+			wrapped = true;
 		}
 		
 		// At last track on disk?
-		if( track >= mTrackCount ) {
+		if( track > mTrackCount ) {
 			track = (pDirectoryTrack - 1);
 			moveDown = true;
+			if(wrapped)
+				return false;
+
+			wrapped = true;
 		}
 
 		pSector = 0;
 	}	// For Track
 
-	return false;
+	// If all else fails, attempt to use a sector from the directory track
+	pTrack = 0x12;
+	pSector = 0x00;
+
+	return  bamTrackSectorFree( pTrack, pSector );
 }
 
 // Follow a file based on its first track/sector
@@ -460,14 +473,19 @@ bool cD64::directoryAdd( sD64File *pFile ) {
 		// Is the next T/S set?
 		if( sectorBuffer[0] == 0 ) {
 
-			// TODO: Handle this better
-			if( currentSector + 3 > trackRange( currentTrack ) )
-				return false;
+			while( bamTrackSectorUse( currentTrack, currentSector ) == false ) {
+				currentSector += 3;	
+				
+				// TODO: Handle this better
 
-			sectorBuffer[0] = 0x12;
-			sectorBuffer[1] = currentSector + 3;
+				if( currentSector > trackRange( currentTrack ) )
+					return false;
+			}
 
-			bamSectorMark( 0x12, sectorBuffer[1], false );
+			sectorBuffer[0] = currentTrack;
+			sectorBuffer[1] = currentSector;
+
+			bamSectorMark( currentTrack, currentSector, false );
 		}
 
 		for( byte i = 0; i <= 7; ++i, buffer += 0x20 ) {
