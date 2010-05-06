@@ -53,13 +53,13 @@ struct sD64File {
 
 	vector< sD64Chain >		mTSChain;	// Track/Sectors used by file
 
-	sD64File() {
+	sD64File() {						// Constructor
 		mBuffer = 0;
 		mBufferSize = 0;
 		mFileSize = 0;
 	}
 
-	~sD64File() {
+	~sD64File() {						// Destructor
 		delete mBuffer;
 	}
 };

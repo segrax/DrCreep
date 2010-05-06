@@ -513,8 +513,7 @@ void cD64::filesCleanup() {
 }
 
 bool cD64::fileLoad( sD64File *pFile ) {
-	size_t bytesCopied = 0;
-	size_t copySize = 254;
+	size_t bytesCopied = 0, copySize = 0xFE;
 	size_t currentTrack = pFile->mTrack, currentSector = pFile->mSector;
 	bool   noCopy = false;
 
@@ -522,29 +521,39 @@ bool cD64::fileLoad( sD64File *pFile ) {
 	delete pFile->mBuffer;
 	
 	// Prepare the buffer, (Each block is 254 bytes, the remaining two is used for the T/S chain)
-	pFile->mBuffer = new byte[ pFile->mFileSize * 254 ];
-	pFile->mBufferSize = pFile->mFileSize * 254;
-
+	pFile->mBufferSize = (pFile->mFileSize * copySize);
+	pFile->mBuffer = new byte[ pFile->mBufferSize ];
+	
 	// Temp buffer ptr
 	byte *destBuffer = pFile->mBuffer;
 
-	// Loop until invalid track/sector
-	while( bytesCopied < pFile->mBufferSize  ) {
+	// Loop until invalid track
+	while( currentTrack  ) {
 		
 		// Get ptr to current sector
 		byte *buffer = sectorPtr( currentTrack, currentSector );
 
-		if(!buffer)
-			return false;
+		if(!buffer) {
+
+			// Reached an invalid track/sector! Abort if not noCopy mode,
+			// Otherwise it will retry the entire read, and abort after reading up to this point
+			// Of the file
+			if( noCopy )
+				break;
 		
+			return false;
+		}
+
 		// T/S is broken, or the directory entry is wrong about size
 		if( bytesCopied >= pFile->mBufferSize )
 			noCopy = true;
 
 		// Last Sector of file? 
 		if( buffer[0] == 0 ) {
-			// Bytes used is stored in the T/S chain sector value
+			// Bytes used by the final sector stored in the T/S chain sector value
 			copySize = (buffer[1] - 1);
+
+			// Adjust bufer size to match the final file size
 			pFile->mBufferSize -= (0xFE - copySize);
 		}
 
@@ -561,11 +570,11 @@ bool cD64::fileLoad( sD64File *pFile ) {
 		currentSector = buffer[1];
 	}
 
-	// If it failed because of a broken T/S or wrong directory entry
-	// Do it again with the proper size
+	// Retry file read using the new buffer size
 	if(noCopy) {
 		pFile->mFileSize = (bytesCopied / 254) + 1;
 		
+		// Do the retry
 		return fileLoad( pFile );
 	}
 
@@ -574,17 +583,18 @@ bool cD64::fileLoad( sD64File *pFile ) {
 
 // Save a file as a PRG to the disk
 bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAddress ) {
-	pBytes += 2;	// Load Address Bytes
-	
-	size_t bytesRemain = pBytes;
-	
+	size_t		bytesRemain = pBytes + 2;		// Add the Load Address Bytes
 	sD64File	File;
+	
+	// Upper case only for C64 filenames
 	transform( pFilename.begin(), pFilename.end(), pFilename.begin(), toupper );
-
+	
+	// Set the file details
 	File.mName = pFilename;
 	File.mFileType = (eD64FileType) 0x82;		// PRG
 	File.mBufferSize = pBytes;
 	
+	// 
 	byte	*buffer = 0, *bufferSrc = pData;
 	size_t	 track = 0, sector = 0, copySize = 0;
 
@@ -609,6 +619,7 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 		// Grab buffer to next sector
 		buffer = sectorPtr( track, sector );
 		
+		// If its the first sector, we have to write the load address
 		if( sectorFirst ) {
 			writeWord( &buffer[0x02], pLoadAddress );
 
@@ -621,6 +632,7 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 			sectorFirst = false;
 
 			memcpy( buffer + 4, bufferSrc, copySize );
+
 		} else {
 
 			// Copy filedata
@@ -631,7 +643,8 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 
 			memcpy( buffer + 2, bufferSrc, copySize );
 		}
-
+		
+		// Move the source forward
 		bufferSrc += copySize;
 
 		// Mark the sector in use
