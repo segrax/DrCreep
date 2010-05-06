@@ -19,13 +19,14 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  *  ------------------------------------------
- *  D64 Handler
+ *  Commodore 64 Disk Image Handling
  *  ------------------------------------------
  */
 
 #include "stdafx.h"
 #include "d64.h"
 
+// Function to rip a string from a byte array
 string stringRip(byte *pBuffer, byte pTerminator, size_t pLengthMax) {
 	string tmpString;
 
@@ -36,6 +37,7 @@ string stringRip(byte *pBuffer, byte pTerminator, size_t pLengthMax) {
 	return tmpString;
 }
 
+// D64 Constructor
 cD64::cD64( string pD64, bool pCreate, bool pDataSave ) {
 	mBufferSize = 0;
 	mCreated = false;
@@ -56,16 +58,19 @@ cD64::cD64( string pD64, bool pCreate, bool pDataSave ) {
 		if( local_FileCreate( pD64, pDataSave ) == false ) 
 			return;
 
-		directoryCreate();
+		bamCreate();
 
 		diskWrite();
 		mCreated = true;
-	}
 
-	bamLoad();
+	} else
+		bamLoadFromBuffer();
+
+	
 	directoryLoad();
 }
 
+// D64 Destructor
 cD64::~cD64( ) {
 	vector< sD64File * >::iterator		fileIT;
 
@@ -76,12 +81,13 @@ cD64::~cD64( ) {
 	delete mBuffer;
 }
 
+// Create the BAM Track
 void cD64::bamCreate() {
 	const char *diskname = "CREEP SAVE";
 	
 	byte *buffer = sectorPtr( 18, 0 );
 
-	// Track / Sector of Directory Entries
+	// Track / Sector of First Directory Sector
 	buffer[0x00] = 0x12;		// Track 18
 	buffer[0x01] = 0x01;		// Sector 1
 
@@ -105,50 +111,39 @@ void cD64::bamCreate() {
 	// Buffer points to start of BAM Data
 	buffer += 0x04;
 	
-	// Create a BAM of free tracks
-	for( size_t track = 1; track <= 35; ++track ) {
-		size_t sectors = trackRange( track );
+	// Clear the BAM to empty disk state
+	bamClear();
 
-		buffer[0] = sectors;
-		++buffer;
-
-		for( size_t sector = 0; sector < sectors; ) {
-			byte final = 0;
-
-			for( size_t count = 0; count < 8; ++count, ++sector ) {
-				final >>= 1;
-				if(sector < sectors)
-					final |= 0x80;
-			}
-
-			*buffer++ = final;	
-		}
-	}
-
-	bamLoad();
-
+	// Mark both Track 18 sectors 0/1 as in use
 	bamSectorMark( 18, 0, false );
 	bamSectorMark( 18, 1, false );
 
-	bamSave();
+	// Save the new bam to the buffer
+	bamSaveToBuffer();
 }
-	
 
-void cD64::bamLoad() {
-	byte *buffer = sectorPtr( 18, 0 );
-	
-	// Clear BAM
+// Set BAM to empty disk state
+void cD64::bamClear() {
+
+	// Clear BAM memory 
 	for( size_t T = 1; T <= mTrackCount; ++T ) {
 		mBamFree[T-1] = trackRange(T);
 
-		for( size_t S = 0; S <= 24; ++S ) {
-			
+		for( size_t S = 0; S <= 0x17; ++S ) {
+
 			if(S < trackRange(T))
 				mBamTracks[T-1][S] = true;
 			else
 				mBamTracks[T-1][S] = false;
 		}
 	}
+}
+
+// Load the internal 'mBamTracks' flags from the buffer
+void cD64::bamLoadFromBuffer() {
+	byte *buffer = sectorPtr( 18, 0 );
+
+	bamClear();
 
 	// Load the BAM
 	buffer += 0x04;
@@ -157,10 +152,12 @@ void cD64::bamLoad() {
 		// Free Sector Count
 		mBamFree[T-1] = *buffer++;
 			
-		for( size_t S = 0; S <= 23; ) {
+		// Load each sector
+		for( size_t S = 0; S <= 0x17; ) {
 
 			byte data = *buffer++;
 
+			// Load the value for each sector in this byte
 			for( byte count = 0; count < 8; ++count, ++S ) {
 				if( data & 0x01 )
 					mBamTracks[T-1][S] = true;
@@ -174,12 +171,13 @@ void cD64::bamLoad() {
 
 }
 
-void cD64::bamSave() {
+// Save the BAM from the internal 'mBamTracks' to the buffer
+void cD64::bamSaveToBuffer() {
 	byte *buffer = sectorPtr( 18, 0 );
 
 	buffer += 4;
 
-	for( size_t track = 1; track <= 35; ++track ) {
+	for( size_t track = 1; track <= mTrackCount; ++track ) {
 		size_t sectors = trackRange( track );
 
 		buffer[0] = mBamFree[track-1];
@@ -200,6 +198,7 @@ void cD64::bamSave() {
 	}
 }
 
+// Mark a sector as being Used/Free in the internal 'mBamTracks'
 void cD64::bamSectorMark( size_t pTrack, size_t pSector, bool pValue ) {
 	
 	// Check if the sector was marked in use already
@@ -218,48 +217,118 @@ void cD64::bamSectorMark( size_t pTrack, size_t pSector, bool pValue ) {
 	mBamTracks[pTrack-1][pSector] = pValue;
 }
 
-bool cD64::bamSectorFree( size_t &pTrack, size_t &pSector ) {
-	if(pTrack == 0)
-		pTrack = 1;
+// Check a track for free sectors
+bool cD64::bamTrackSectorFree( size_t &pTrack, size_t &pSector ) {
+	size_t track = pTrack;
+	bool wrapped = false;
 
-	size_t startSector = pSector;
+	for( size_t sector = pSector; sector < trackRange( track ); ) {
+			
+		// Is this sector free
+		if( mBamTracks[track-1][sector] == true ) {
+			pTrack = track;
+			pSector = sector;
+			return true;
+		}
+	
+		++sector;
 
-	for( size_t track = pTrack; track < mTrackCount; ++track ) {
-
-		for( size_t sector = pSector; sector < trackRange( track ); ) {
-
-			// Is this sector free
-			if( mBamTracks[track-1][sector] == true ) {
-				pTrack = track;
-				pSector = sector;
-				return true;
+		// Check its in range for the track
+		if( sector >= trackRange( track ) ) {
+			if( wrapped == false ) {
+				wrapped = true;
+				sector = 0;
+				pSector = 0;
+				continue;
 			}
+			
+			pSector = sector;
+			return false;
 
-			// Increase sector
-			sector += 10;
+		}	// If >= trackrange
 
-			// Check its in range for the track
-			if( sector >= trackRange( track ) ) {
-				if( startSector > 0 ) {
-					sector = 0;
-					pSector = 0;
-					startSector = 0;
-					continue;
-				}
+	}	// For Sector
+}
 
-				++pSector;
-				sector = pSector;
+// Find a free sector
+// 
+// Starting from the directory track, attempt to find a free sector, moving the head in one direction
+//
+bool cD64::bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrack ) {
+	bool first = false, moveDown = true;
+	size_t	moveSize = 0;
 
-				// Is the base sector now out of range?
-				if(pSector >= trackRange( track )) {
-					
-					pSector = 0;
-					break;
-				}	// If >= trackrange
+	// No track specified, start near the directorytrack
+	if(pTrack == 0) {
+		pTrack = (pDirectoryTrack - 1);
+		first = true;
+	}
 
-			}	// If >= trackrange
+	// Get the distance between the directory track and the specified track
+	if( pTrack < pDirectoryTrack ) {
+		moveDown = true;
+		moveSize = pDirectoryTrack - pTrack;
+	} else {
+		moveDown = false;
+		moveSize = pTrack - pDirectoryTrack;
+	}
+	
+	// Increase sector by the drive increment
+	if(!first)
+		pSector += 10;
 
-		}	// For Sector
+	// Calculated sector has passed max for the track?
+	if( pSector >= trackRange( pTrack ) ) {
+		pSector = 0;
+	}
+
+	for( size_t track = pTrack; track > 0 && track <= mTrackCount; ) {
+		bool wrapped = false;
+		
+		// Test this track, starting at 'pSector'
+		if( bamTrackSectorFree( track, pSector ) == true ) {
+			pTrack = track;
+			return true;
+		}
+
+		// If we're trying to locate the first sector for a new 'file save'
+		// Move around based on the directory track
+		if(first) {
+			if(moveDown) {
+				moveDown = false;
+				moveSize += 1;
+				track += moveSize;
+			} else {
+				moveDown = true;
+				moveSize += 1;
+				track -= moveSize;
+			}
+			
+			if( track == 0 || track >= mTrackCount )
+				return false;
+
+			pSector = 0;
+			continue;
+		}
+
+		// Move the track down or up depending on current direction
+		if(moveDown) {
+			track -= 1;
+		} else {
+			track += 1;
+		}
+
+		// Passed first track on disk?
+		if( track == 0 ) {
+			track += (pDirectoryTrack + 1);
+			moveDown = false;
+		}
+		
+		// At last track on disk?
+		if( track >= mTrackCount ) {
+			track = (pDirectoryTrack - 1);
+			moveDown = true;
+		}
 
 		pSector = 0;
 	}	// For Track
@@ -267,13 +336,15 @@ bool cD64::bamSectorFree( size_t &pTrack, size_t &pSector ) {
 	return false;
 }
 
+// Follow a file based on its first track/sector
+// And create a list of track/sectors used by it
 void cD64::chainLoad( sD64File *pFile ) {
 	byte  track = pFile->mTrack, sector = pFile->mSector;
 	byte *buffer = 0;
 	
 	pFile->mTSChain.clear();
 
-	for(; track > 0 && track < mTrackCount && sector < trackRange( track ) ;) {
+	for(; track > 0 && track <= mTrackCount && sector < trackRange( track ) ;) {
 		pFile->mTSChain.push_back( sD64Chain( track, sector ) );
 		
 		buffer = sectorPtr( track, sector );
@@ -287,19 +358,13 @@ void cD64::chainLoad( sD64File *pFile ) {
 	}
 }
 
-void cD64::directoryCreate() {
-	byte *buffer = sectorPtr(18, 1);
-
-	bamCreate();
-}
-
 void cD64::directoryLoad() {
 	// Directory starts at Track 18, sector 1
 	size_t   currentTrack = 0x12, currentSector = 1;
 	byte	*sectorBuffer;
 
 	// Loop until the current Track/Sector is invalid
-	while( (currentTrack > 0 && currentTrack < mTrackCount) && (currentSector <= trackRange( currentTrack )) ) {
+	while( (currentTrack > 0 && currentTrack <= mTrackCount) && (currentSector <= trackRange( currentTrack )) ) {
 		sectorBuffer = sectorPtr( currentTrack, currentSector );
 		byte *buffer = sectorBuffer;
 		
@@ -385,12 +450,25 @@ bool cD64::directoryAdd( sD64File *pFile ) {
 	byte	*sectorBuffer;
 
 	// Loop until the current Track/Sector is invalid
-	while( (currentTrack > 0 && currentTrack < mTrackCount) && (currentSector <= trackRange( currentTrack )) ) {
+	while( (currentTrack > 0 && currentTrack <= mTrackCount) && (currentSector <= trackRange( currentTrack )) ) {
 		sectorBuffer = sectorPtr( currentTrack, currentSector );
 		byte *buffer = sectorBuffer;
 		
 		if(!buffer)
 			break;
+
+		// Is the next T/S set?
+		if( sectorBuffer[0] == 0 ) {
+
+			// TODO: Handle this better
+			if( currentSector + 3 > trackRange( currentTrack ) )
+				return false;
+
+			sectorBuffer[0] = 0x12;
+			sectorBuffer[1] = currentSector + 3;
+
+			bamSectorMark( 0x12, sectorBuffer[1], false );
+		}
 
 		for( byte i = 0; i <= 7; ++i, buffer += 0x20 ) {
 			 byte fileType = (*(buffer + 0x02) & 0x0F);
@@ -402,12 +480,6 @@ bool cD64::directoryAdd( sD64File *pFile ) {
 			 }
 		}
 		// This entry table is full
-
-		// Is the next T/S set?
-		if( sectorBuffer[0] == 0 ) {
-			sectorBuffer[0] = 0x18;
-			sectorBuffer[1] = currentSector + 3;
-		}
 		
 		// Get the next Track/Sector in the chain
 		currentTrack = sectorBuffer[0];
@@ -592,7 +664,7 @@ byte *cD64::sectorPtr( size_t pTrack, size_t pSector ) {
 
 void cD64::diskWrite() {
 
-	bamSave();
+	bamSaveToBuffer();
 	local_FileSave( mFilename, mDataSave, mBuffer, mBufferSize );
 }
 
