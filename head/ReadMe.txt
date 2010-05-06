@@ -107,3 +107,6 @@ Thanks:
 Ed Hobbs, for the original game
 Christian Bauer, for the excellent 'VIC-II' article (https://sh.scs-trc.net/vic/)
 Dag Lem, for 'reSid' the SID emulation library used
+Peter Schepers and the authors of the documents contained in his collection (http://ist.uwaterloo.ca/~schepers/formats.html)
+
+
