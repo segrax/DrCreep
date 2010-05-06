@@ -66,8 +66,8 @@ struct sD64File {
 
 class cD64 {
 private:
-	bool				 mBamTracks[35][24];							// Track/Sector Availability Map
-	byte				 mBamFree[35];									// Number of free sectors per track
+	bool				 mBamTracks[36][24];							// Track/Sector Availability Map
+	byte				 mBamFree[36];									// Number of free sectors per track
 
 	byte				*mBuffer;										// Disk image buffer
 	size_t				 mBufferSize, mTrackCount;
@@ -107,7 +107,7 @@ private:
 		if( pTrack == 0 || pTrack > mTrackCount || pSector > trackRange(pTrack) )
 			return false;
 
-		return mBamTracks[ pTrack - 1 ][ pSector ];
+		return mBamTracks[ pTrack ][ pSector ];
 	}
 
 public:
@@ -125,7 +125,7 @@ public:
 	inline size_t		 sectorsFree() {					// Number of free sectors on disk
 		size_t result = 0;
 
-		for(size_t i = 0; i < 35; ++i )
+		for(size_t i = 1; i <= mTrackCount; ++i )
 			result += mBamFree[i];
 		return result;
 	}
