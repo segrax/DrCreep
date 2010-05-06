@@ -212,7 +212,7 @@ void cCastleManager::diskPosFind( string pExtension ) {
 
 	for( diskIT = disks.begin(); diskIT != disks.end(); ++diskIT ) {
 		
-		mDisksPositions.push_back( new cD64( *diskIT, false, true ) );
+		mDisksPositions.push_back( new cD64( *diskIT, false, true, false ) );
 	}
 }
 
@@ -291,7 +291,7 @@ cD64 *cCastleManager::positionDiskCreate() {
 		filename << count;
 		filename << ".D64";
 
-		newDisk = new cD64( filename.str().c_str(), true, true );
+		newDisk = new cD64( filename.str().c_str(), true, true, false );
 		
 		if( newDisk->createdGet() == true )
 			break;

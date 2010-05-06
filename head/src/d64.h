@@ -73,6 +73,9 @@ private:
 	size_t						 mBufferSize, mTrackCount;
 	
 	bool						 mCreated;										// Was a file created
+	bool						 mRead;											// Disk is read only
+	bool						 mReady;
+	bool						 mLastOperationFailed;
 
 	vector< sD64File* >			 mFiles;										// Files in disk
 	string						 mFilename;										// Name of current D64
@@ -93,6 +96,7 @@ private:
 	void						 chainLoad( sD64File *pFile );											// Gather list of all tracks/sectors used by file
 
 	void						 directoryLoad();														// Load the disk directory
+	sD64File					*directoryEntryLoad( byte *pBuffer );									// Load an entry
 	bool						 directoryAdd( sD64File *pFile );										// Add file to directory
 	bool						 directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer );	// Set the directory entry in the buffer
 	
@@ -113,13 +117,13 @@ private:
 	}
 
 public:
-								 cD64( string pD64, bool pCreate = false, bool pDataSave = false);
+								 cD64( string pD64, bool pCreate = false, bool pDataSave = false, bool pReadOnly = true );
 								~cD64( );
 
 	vector< sD64File* >			 directoryGet( string pFind );		// Get a file list, with all files starting with 'pFind'
 	vector< sD64File* >			*directoryGet();					// Get the file list
 	
-	void						 diskWrite();						// Write the buffer to the D64
+	bool						 diskWrite();						// Write the buffer to the D64
 
 	sD64File					*fileGet( string pFilename );		// Get a file
 	bool						 fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAddress );// Save a file to the disk

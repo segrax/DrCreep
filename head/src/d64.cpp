@@ -38,42 +38,71 @@ string stringRip(byte *pBuffer, byte pTerminator, size_t pLengthMax) {
 }
 
 // D64 Constructor
-cD64::cD64( string pD64, bool pCreate, bool pDataSave ) {
+cD64::cD64( string pD64, bool pCreate, bool pDataSave, bool pReadOnly ) {
+	
+	// Prepare variables
 	mBufferSize = 0;
 	mCreated = false;
+	mReady = false;
+	mLastOperationFailed = false;
 
+	mRead = pReadOnly;
+
+	// Filename, Use datapath mode
 	mFilename = pD64;
 	mDataSave = pDataSave;
 
+	// Number of tracks
 	mTrackCount = 35;
 
+	// Read the file
 	mBuffer = local_FileRead( pD64, mBufferSize, pDataSave );
 
-	if( !mBuffer ) {
-		
+	// Loaded size is 0 and we're not in create mode?
+	if( !mBuffer && !pCreate )
+		return;
+
+	// Creating a file?
+	if( !mBufferSize ) {
+		mRead = false;
+
+		// Create a new 35 Trackdisk
 		mBuffer = new byte[ 0x2AB00 ];
 		mBufferSize = 0x2AB00;
 		memset( mBuffer, 0, 0x2AB00 );
-
+		
+		// Create it
 		if( local_FileCreate( pD64, pDataSave ) == false ) 
 			return;
 
+		// Build a BAM
 		bamCreate();
 
+		// Write out the new disk
 		diskWrite();
+
 		mCreated = true;
 
 	} else
+		// Load the BAM
 		bamLoadFromBuffer();
 
-	
+	// Read the disk directory
 	directoryLoad();
+
+	mReady = true;
 }
 
 // D64 Destructor
 cD64::~cD64( ) {
+	
+	// Write out disk changes
+	diskWrite();
+	
+	// Cleanup loaded files memory
 	filesCleanup();
 
+	// Delete the disk buffer
 	delete mBuffer;
 }
 
@@ -174,22 +203,28 @@ void cD64::bamSaveToBuffer() {
 
 	buffer += 4;
 
+	// Loop each track
 	for( size_t track = 1; track <= mTrackCount; ++track ) {
 		size_t sectors = trackRange( track );
 
+		// Set number of free sectors
 		buffer[0] = mBamFree[track];
 		++buffer;
 
+		// Loop each sector on this track
 		for( size_t sector = 0; sector < sectors; ) {
 			byte final = 0;
 
+			// Loop each sector 
 			for( size_t count = 0; count < 8; ++count, ++sector ) {
 				final >>= 1;
 
+				// Mark it free if its free
 				if( mBamTracks[track][sector] == true )
 					final |= 0x80;
 			}
 
+			// Save this byte of sector BAM
 			*buffer++ = final;	
 		}
 	}
@@ -219,6 +254,7 @@ bool cD64::bamTrackSectorFree( size_t &pTrack, size_t &pSector ) {
 	size_t track = pTrack;
 	bool wrapped = false;
 
+	// Loop each sector in this track
 	for( size_t sector = pSector; sector < trackRange( track ); ) {
 			
 		// Is this sector free
@@ -362,18 +398,50 @@ void cD64::chainLoad( sD64File *pFile ) {
 	
 	pFile->mTSChain.clear();
 
+	// Loop while its a valid track and sector
 	for(; track > 0 && track <= mTrackCount && sector < trackRange( track ) ;) {
+
+		// Save the T/S
 		pFile->mTSChain.push_back( sD64Chain( track, sector ) );
 		
+		// Read the next buffer
 		buffer = sectorPtr( track, sector );
 
 		// Final sector of file
 		if( buffer[0] == 0 )
 			break;
 
+		// Get the track / sector
 		track = buffer[0];
 		sector = buffer[1];
 	}
+}
+
+sD64File *cD64::directoryEntryLoad( byte *pBuffer ) {
+	sD64File *file = new sD64File();
+			
+	// Get the filetype
+	file->mFileType = (eD64FileType) (pBuffer[0x02] & 0x0F);
+
+	// Get the filename
+	file->mName = stringRip( pBuffer + 0x05, 0xA0, 16 );
+	if( file->mName.size() == 0 ) {
+		delete file;
+		return 0;
+	}
+	
+	// Get the starting Track/Sector
+	file->mTrack = pBuffer[0x03];
+	file->mSector = pBuffer[0x04];
+	
+	// Total number of blocks
+	file->mFileSize = readWord( &pBuffer[0x1E] );
+
+	// Load the file into a new buffer
+	if(file->mFileSize > 0)
+		fileLoad( file );
+		
+	return file;
 }
 
 void cD64::directoryLoad() {
@@ -381,6 +449,7 @@ void cD64::directoryLoad() {
 	size_t   currentTrack = 0x12, currentSector = 1;
 	byte	*sectorBuffer;
 
+	// Cleanup previous load
 	filesCleanup();
 
 	// Loop until the current Track/Sector is invalid
@@ -391,31 +460,13 @@ void cD64::directoryLoad() {
 		if(!buffer)
 			break;
 
+		// 8 Entries per sector, 0x20 bytes per entry
 		for( byte i = 0; i <= 7; ++i, buffer += 0x20 ) {
-			sD64File *file = new sD64File();
 			
-			// Get the filetype
-			file->mFileType = (eD64FileType) (*(buffer + 0x02) & 0x0F);
-
-			// Get the filename
-			file->mName = stringRip( buffer + 0x05, 0xA0, 16 );
-			if( file->mName.size() == 0 ) {
-				delete file;
-				continue;
-			}
+			sD64File *file = directoryEntryLoad( buffer );
 			
-			// Get the starting Track/Sector
-			file->mTrack = *(buffer + 0x03);
-			file->mSector = *(buffer + 0x04);
-			
-			// Total number of blocks
-			file->mFileSize = readWord( buffer + 0x1E );
-
-			// Load the file into a new buffer
-			if(file->mFileSize > 0)
-				fileLoad( file );
-				
-			mFiles.push_back( file );	
+			if(file)
+				mFiles.push_back( file );
 		}
 
 		// Get the next Track/Sector in the chain
@@ -428,6 +479,7 @@ bool cD64::directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer ) {
 	if( pFile->mName.size() > 0x0F )
 		return false;
 
+	// Position zero means the T/S will have been set, and we dont want to overwrite it
 	if( pEntryPos > 0)
 		pBuffer[ 0x00 ] = pBuffer[ 0x01 ] = 0;
 	
@@ -468,27 +520,33 @@ bool cD64::directoryAdd( sD64File *pFile ) {
 		// Is the next T/S set?
 		if( sectorBuffer[0] == 0 ) {
 
+			// Nope, so lets find the next available Track/Sector, and link it from this sector
 			while( bamTrackSectorUse( currentTrack, currentSector ) == false ) {
 				currentSector += 3;	
 				
-				// TODO: Handle this better
-
+				// TODO: Handle this fail better
 				if( currentSector > trackRange( currentTrack ) )
 					return false;
 			}
 
+			// Found one, lets set it
 			sectorBuffer[0] = currentTrack;
 			sectorBuffer[1] = currentSector;
 
+			// Mark it in use
 			bamSectorMark( currentTrack, currentSector, false );
 		}
 
+		// Loop for 8 Entries, at 0x20 bytes per entry
 		for( byte i = 0; i <= 7; ++i, buffer += 0x20 ) {
 			 byte fileType = (*(buffer + 0x02) & 0x0F);
 
 			 // Deleted Entries
 			 if( fileType == 0x00 || fileType == 0x80 ) {
+
+				 // Found free entry entry, overwrite it with the new file details
 				directoryEntrySet( i, pFile, buffer );
+
 				return true;
 			 }
 		}
@@ -499,6 +557,7 @@ bool cD64::directoryAdd( sD64File *pFile ) {
 		currentSector = sectorBuffer[1];
 	};
 
+	// No space remaining
 	return false;
 }
 
@@ -594,12 +653,13 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 	File.mFileType = (eD64FileType) 0x82;		// PRG
 	File.mBufferSize = pBytes;
 	
-	// 
+	//
 	byte	*buffer = 0, *bufferSrc = pData;
 	size_t	 track = 0, sector = 0, copySize = 0;
 
 	bool sectorFirst = true;
 
+	// Loop until there is no bytes left to save
 	while( bytesRemain ) {
 		
 		// Get available T/S
@@ -631,9 +691,11 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 
 			sectorFirst = false;
 
+			// Copy the source to the disk buffer
 			memcpy( buffer + 4, bufferSrc, copySize );
 
 		} else {
+			// Normal sector write
 
 			// Copy filedata
 			if(bytesRemain < 0xFE )
@@ -641,6 +703,7 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 			else		
 				copySize = 0xFE;
 
+			// Copy the source to the disk buffer
 			memcpy( buffer + 2, bufferSrc, copySize );
 		}
 		
@@ -654,13 +717,15 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 			bytesRemain -= copySize;
 	};
 	
+	// Set the Track to none (to mark end of chain), and the sector the the number of bytes used
 	buffer[0] = 0;
-	buffer[1] = copySize - 1;
+	buffer[1] = (copySize - 1);
 
-	directoryAdd( &File );
+	// Add entry to the directory
+	if( directoryAdd( &File ) == false )
+		return false;
 
-	diskWrite();
-	return true;
+	return diskWrite();
 }
 
 byte *cD64::sectorPtr( size_t pTrack, size_t pSector ) {
@@ -700,12 +765,16 @@ byte *cD64::sectorPtr( size_t pTrack, size_t pSector ) {
 	return 0;
 }
 
-void cD64::diskWrite() {
+bool cD64::diskWrite() {
+	
+	// Dont save if the disk was opened read only, or the last operation failed
+	if( mRead || mLastOperationFailed)
+		return false;
 
-	// Store the internal 'mBuffer
+	// Store the internal 'mBuffer'
 	bamSaveToBuffer();
 
-	local_FileSave( mFilename, mDataSave, mBuffer, mBufferSize );
+	return local_FileSave( mFilename, mDataSave, mBuffer, mBufferSize );
 }
 
 sD64File *cD64::fileGet( string pFilename ) {
