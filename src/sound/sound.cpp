@@ -22,10 +22,10 @@ void my_audio_callback(void *userdata, Uint8 *stream, int len) {
 			// 0x42C7 SID NTSC
 
 			if( g_Sound->creepGet()->musicBufferFeed() == false)
-				return;
+				continue;
 		}
 
-		ticks-=2;
+		ticks-=100;
 
 		g_Sound->sidGet()->clock(8);
 		int ss = g_Sound->sidGet()->output(8);
