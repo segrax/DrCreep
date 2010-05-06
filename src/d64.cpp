@@ -72,11 +72,7 @@ cD64::cD64( string pD64, bool pCreate, bool pDataSave ) {
 
 // D64 Destructor
 cD64::~cD64( ) {
-	vector< sD64File * >::iterator		fileIT;
-
-	// Cleanup files
-	for( fileIT = mFiles.begin(); fileIT != mFiles.end(); ++fileIT )
-		delete *fileIT;
+	filesCleanup();
 
 	delete mBuffer;
 }
@@ -385,6 +381,8 @@ void cD64::directoryLoad() {
 	size_t   currentTrack = 0x12, currentSector = 1;
 	byte	*sectorBuffer;
 
+	filesCleanup();
+
 	// Loop until the current Track/Sector is invalid
 	while( (currentTrack > 0 && currentTrack <= mTrackCount) && (currentSector <= trackRange( currentTrack )) ) {
 		sectorBuffer = sectorPtr( currentTrack, currentSector );
@@ -424,18 +422,6 @@ void cD64::directoryLoad() {
 		currentTrack = sectorBuffer[0];
 		currentSector = sectorBuffer[1];
 	}
-}
-
-bool cD64::directoryEntrySet( byte pEntryPos, byte *pBuffer ) {
-	if( pEntryPos > 0)
-		pBuffer[ 0x00 ] = pBuffer[ 0x01 ] = 0;
-	
-	// File Type
-	pBuffer[ 0x02 ] = 0;
-
-	// Filename
-	memset( &pBuffer[ 0x05 ], 0xA0, 0x0F );
-	return true;
 }
 
 bool cD64::directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer ) {
@@ -516,6 +502,16 @@ bool cD64::directoryAdd( sD64File *pFile ) {
 	return false;
 }
 
+void cD64::filesCleanup() {
+	vector< sD64File * >::iterator		fileIT;
+
+	// Cleanup files
+	for( fileIT = mFiles.begin(); fileIT != mFiles.end(); ++fileIT )
+		delete *fileIT;
+
+	mFiles.clear();
+}
+
 bool cD64::fileLoad( sD64File *pFile ) {
 	size_t bytesCopied = 0;
 	size_t copySize = 254;
@@ -533,7 +529,7 @@ bool cD64::fileLoad( sD64File *pFile ) {
 	byte *destBuffer = pFile->mBuffer;
 
 	// Loop until invalid track/sector
-	while( currentTrack > 0 && (currentSector <= trackRange( currentTrack )) ) {
+	while( bytesCopied < pFile->mBufferSize  ) {
 		
 		// Get ptr to current sector
 		byte *buffer = sectorPtr( currentTrack, currentSector );
@@ -549,6 +545,7 @@ bool cD64::fileLoad( sD64File *pFile ) {
 		if( buffer[0] == 0 ) {
 			// Bytes used is stored in the T/S chain sector value
 			copySize = (buffer[1] - 1);
+			pFile->mBufferSize -= (0xFE - copySize);
 		}
 
 		// Copy sector data, excluding the T/S Chain data

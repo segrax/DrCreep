@@ -66,44 +66,46 @@ struct sD64File {
 
 class cD64 {
 private:
-	bool				 mBamTracks[36][24];							// Track/Sector Availability Map
-	byte				 mBamFree[36];									// Number of free sectors per track
+	bool						 mBamTracks[36][24];							// Track/Sector Availability Map (first allocation is ignored
+	byte						 mBamFree[36];									// Number of free sectors per track
 
-	byte				*mBuffer;										// Disk image buffer
-	size_t				 mBufferSize, mTrackCount;
+	byte						*mBuffer;										// Disk image buffer
+	size_t						 mBufferSize, mTrackCount;
 	
-	bool				 mCreated;										// Was a file created
+	bool						 mCreated;										// Was a file created
 
-	vector< sD64File* >	 mFiles;										// Files in disk
-	string				 mFilename;										// Name of current D64
-	bool				 mDataSave;										// Save to Saves folder?
+	vector< sD64File* >			 mFiles;										// Files in disk
+	string						 mFilename;										// Name of current D64
+	bool						 mDataSave;										// Save to Saves folder?
 
-	void				 bamClear();									// Clear the internal BAM
-	void				 bamCreate();									// Create Track 18/0
-	void				 bamLoadFromBuffer();							// Load Free Tracks/Sectors
-	void				 bamSaveToBuffer();								// Save the mBamTracks data to the buffer
 
-	void				 bamSectorMark( size_t pTrack, size_t pSector, bool pValue = true );
 
-	bool				 bamTrackSectorFree( size_t &pTrack, size_t &pSector );
-	bool				 bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrack = 0x12 );	// Find a free track/sector 
+	void						 bamClear();									// Clear the internal BAM
+	void						 bamCreate();									// Create Track 18/0
+	void						 bamLoadFromBuffer();							// Load Free Tracks/Sectors
+	void						 bamSaveToBuffer();								// Save the mBamTracks data to the buffer
 
-	void				 chainLoad( sD64File *pFile );					// Gather list of all tracks/sectors used by file
+	void						 bamSectorMark( size_t pTrack, size_t pSector, bool pValue = true );				// Mark a sector used/free
 
-	void				 directoryLoad();								// Load the disk directory
-	bool				 directoryAdd( sD64File *pFile );				// Add file to directory
-	bool				 directoryEntrySet( byte pEntryPos, byte *pBuffer );
-	bool				 directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer );
+	bool						 bamTrackSectorFree( size_t &pTrack, size_t &pSector );								// Check for free sectors in a track
+	bool						 bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrack = 0x12 );	// Check for free sectors on the disk
+
+	void						 chainLoad( sD64File *pFile );											// Gather list of all tracks/sectors used by file
+
+	void						 directoryLoad();														// Load the disk directory
+	bool						 directoryAdd( sD64File *pFile );										// Add file to directory
+	bool						 directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer );	// Set the directory entry in the buffer
 	
-	bool				 fileLoad( sD64File *pFile );					// Load a file 
+	void						 filesCleanup();
+	bool						 fileLoad( sD64File *pFile );							// Load a file from the disk
 
-	byte				*sectorPtr( size_t pTrack, size_t pSector );	// Read a sector
+	byte						*sectorPtr( size_t pTrack, size_t pSector );			// Obtain pointer to 'pTrack'/'pSector' in the disk buffer
 
-	inline size_t		 trackRange(size_t pTrack) {					// Number of sectors in 'pTrack'
+	inline size_t				 trackRange(size_t pTrack) {							// Number of sectors in 'pTrack'
 		return 21 - (pTrack > 17) * 2 - (pTrack > 24) - (pTrack > 30);
 	}
 
-	inline bool			 bamTrackSectorUse( size_t pTrack, size_t pSector ) {
+	inline bool					 bamTrackSectorUse( size_t pTrack, size_t pSector ) {	// Is 'pTrack' / 'pSector' free?
 		if( pTrack == 0 || pTrack > mTrackCount || pSector > trackRange(pTrack) )
 			return false;
 
@@ -111,18 +113,18 @@ private:
 	}
 
 public:
-						 cD64( string pD64, bool pCreate = false, bool pDataSave = false);
-						~cD64( );
+								 cD64( string pD64, bool pCreate = false, bool pDataSave = false);
+								~cD64( );
 
-	vector< sD64File* >	 directoryGet( string pFind );		// Get a file list, with all files starting with 'pFind'
-	vector< sD64File* >	*directoryGet();					// Get the file list
+	vector< sD64File* >			 directoryGet( string pFind );		// Get a file list, with all files starting with 'pFind'
+	vector< sD64File* >			*directoryGet();					// Get the file list
 	
-	void				 diskWrite();						// Write the buffer to the D64
+	void						 diskWrite();						// Write the buffer to the D64
 
-	sD64File			*fileGet( string pFilename );		// Get a file
-	bool				 fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAddress );// Save a file to the disk
+	sD64File					*fileGet( string pFilename );		// Get a file
+	bool						 fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAddress );// Save a file to the disk
 
-	inline size_t		 sectorsFree() {					// Number of free sectors on disk
+	inline size_t				 sectorsFree() {					// Number of free sectors on disk
 		size_t result = 0;
 
 		for(size_t i = 1; i <= mTrackCount; ++i )
@@ -130,7 +132,7 @@ public:
 		return result;
 	}
 
-	inline bool			 createdGet() {						// Was file created
+	inline bool					 createdGet() {						// Was file created
 		return mCreated;
 	}
 };
