@@ -350,8 +350,7 @@ bool cCastleManager::positionSave( string pFilename, size_t pSaveSize, byte *pDa
 		disk = *diskIT;
 
 	// Save the file to the disk
-	disk->fileSave( pFilename, pData, pSaveSize, 0x7800 );
-	return true;
+	return disk->fileSave( pFilename, pData, pSaveSize, 0x7800 );
 }
 
 bool cCastleManager::scoresLoad( string pCastleName, byte *pData ) {
