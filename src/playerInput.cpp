@@ -68,35 +68,36 @@ void cPlayerInput::KeyboardCheck() {
 
 	if( mEvent.type == SDL_KEYUP ) {
 		mKeyPressed = 0;
+		return;
 	}
 
+	// Key Pressed
 	if( mEvent.type == SDL_KEYDOWN ) {
 
-		if( mEvent.key.keysym.sym == SDLK_F1 ) {
-			mRunStop = true;
-			return;
-		}
-	
-		if( mEvent.key.keysym.sym == SDLK_F2 ) {
-			mF2 = true;
-			return;
-		}
+		switch( mEvent.key.keysym.sym ) {
+			case SDLK_F1:
+				mRunStop = true;
+				break;
 
-		if( mEvent.key.keysym.sym == SDLK_F3 ) {
-			mF3 = true;
-			return;
-		}
-		if( mEvent.key.keysym.sym == SDLK_ESCAPE ) {
-			mRestore = true;
-			return;
-		}
+			case SDLK_F2:
+				mF2 = true;
+				break;
 
-		if( mEvent.key.keysym.sym == SDLK_F10 ) {
-			mCreep->screenGet()->fullscreenToggle();
-			return;
-		}
+			case SDLK_F3:
+				mF3 = true;
+				break;
 
-		mKeyPressed = mEvent.key.keysym.sym;
+			case SDLK_ESCAPE:
+				mRestore = true;
+				break;
+
+			case SDLK_F10:
+				mCreep->screenGet()->fullscreenToggle();
+				break;
+
+			default:
+				mKeyPressed = mEvent.key.keysym.sym;
+		}
 	}
 
 }

@@ -127,16 +127,21 @@ void cScreen::blit( cSprite *pSprite, byte pSpriteNo ) {
 }
 
 void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority, byte pSpriteNo) {
-	bool		  col1 = false, col2 = false;
-	sScreenPiece *dest;
-	sScreenPiece *source = pSurface->screenPiecesGet();
-	size_t height = pSurface->heightGet();
-	size_t width = pSurface->widthGet();
+	bool			 col1 = false, col2 = false;
+
+	sScreenPiece	*dest = 0;
+	sScreenPiece	*source = pSurface->screenPiecesGet();
+
+	size_t			 height = pSurface->heightGet();
+	size_t			 width = pSurface->widthGet();
 
 	mScreenRedraw = true;
+
+	// Loop height
 	for( word y = 0; y < height; ++y, ++pDestY ) {
 		dest = mSurface->screenPieceGet( pDestX, (byte) pDestY);
 
+		// Loop width
 		for( word x = 0; x < width; ++x ) {
 			
 			// Transparent?
@@ -144,6 +149,8 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 
 				// Check for any collisions
 				if( dest->mPriority == ePriority_Foreground || dest->mSprite ) {
+
+					// 
 					if(dest->mSprite && dest->mSprite2 != pSpriteNo) {
 						dest->mSprite2 = pSpriteNo; 
 						if(!col1) {
@@ -161,22 +168,19 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 
 				if( pSpriteNo && !dest->mSprite )
 					dest->mSprite = pSpriteNo;
+
 				else if( pSpriteNo != dest->mSprite )
 					dest->mSprite2 = pSpriteNo;
 
 				// Does this sprite have priority over the background?
 				if( !pPriority || (dest->mPriority == ePriority_Background && pPriority) ) {
-						dest->mPixel = source->mPixel;
-						dest->mPriority = source->mPriority;
+					dest->mPixel = source->mPixel;
+					dest->mPriority = source->mPriority;
 				}
-
-
-
 			}
 
 			++dest;
 			++source;
-			
 		}
 	}
 	
@@ -209,10 +213,11 @@ void cScreen::refresh() {
 	}
 
 	if( mScreenRedraw ) {
+		mScreenRedraw = false;
+		
 		SDL_Surface *surface = scaleUp();	
 		mWindow->clear(0);
 		mWindow->blit( surface, 0, 0, 0, 0 );	//15, 30
-		mScreenRedraw = false;
 	}
 }
 
