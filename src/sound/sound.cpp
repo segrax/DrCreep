@@ -5,33 +5,35 @@
 
 cSound *g_Sound;
 
-/* Prototype of our callback function */
+/* Audio stream callback */
 void my_audio_callback(void *userdata, Uint8 *stream, int len) {
-	int ticks = 0;
+	cSID	*sid = g_Sound->sidGet();
+	cCreep	*creep = g_Sound->creepGet();
 
-	for( int i = 0; i < len; ++i ) {
-		
-		if( ticks <= 0 ) {
-			
-			ticks = ((*g_Sound->creepGet()->memory(0xDC05) << 8) + 0xFF);
+	short	*buff = (short*)stream;
+	static	cycle_count cyclesLeft = 0;
 
-			ticks *= 312;
+	int		samplesLeft = len / 0x2;
+	static	int ticks = 0;
 
-			// Per Frame
-			// 0x4CC8 SID PAL
-			// 0x42C7 SID NTSC
+	while (samplesLeft > 0) {
 
-			if( g_Sound->creepGet()->musicBufferFeed() == false)
-				continue;
+		if(ticks<=0) {
+			ticks = (*creep->memory(0xDC05)) / 2;
+			creep->musicBufferFeed(); 
 		}
 
-		ticks-=100;
+  		if (cyclesLeft <= 0) {
+  			cyclesLeft = 0x42C7;	// NTSC
+			--ticks;
+  		}
 
-		g_Sound->sidGet()->clock(8);
-		int ss = g_Sound->sidGet()->output(8);
-		*stream++ = (byte) ss;
-	}
+  		// 
+  		int sampleCount = sid->clock(cyclesLeft, buff, samplesLeft);
 
+  		samplesLeft -= sampleCount;
+  		buff += sampleCount;
+  	}
 }
 
 cSound::cSound( cCreep *pCreep ) {
@@ -39,8 +41,8 @@ cSound::cSound( cCreep *pCreep ) {
 	mCreep = pCreep;
 
 	mSID = new cSID();
-  	//mSID->set_sampling_parameters(14318180.0, SAMPLE_FAST, 4 , -1, 0.97);
-	mSID->set_sampling_parameters(1000000, SAMPLE_FAST, 4 , -1, 0.97);
+  	mSID->set_sampling_parameters(1022727.1428571428, SAMPLE_FAST, 0x5622);
+	//mSID->set_sampling_parameters(1000000, SAMPLE_FAST, 0x5622 , -1, 0.97);
   	mSID->enable_filter(true);
   
   	mSID->reset();
@@ -86,7 +88,7 @@ void cSound::devicePrepare() {
 	desired->channels=0;
 
 	/* Large audio buffer reduces risk of dropouts but increases response time */
-	desired->samples=4096;
+	desired->samples=8192;
 
 	/* Our callback function */
 	desired->callback=my_audio_callback;
