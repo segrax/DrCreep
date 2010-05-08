@@ -33,13 +33,15 @@ cScreenSurface::cScreenSurface( size_t pWidth, size_t pHeight ) {
 	// Create the screen buffer
 	mScreenSize = (mWidth * mHeight);
 	mScreenPieces = new sScreenPiece[ mScreenSize ];
-		
+	mScreenBuffer = new dword[ mScreenSize ];
+
 	palettePrepare();
 	Wipe();
 }
 
 cScreenSurface::~cScreenSurface( ) {
 
+	delete mScreenBuffer;
 	delete mScreenPieces;
 }
 
@@ -72,9 +74,10 @@ void cScreenSurface::palettePrepare() {
 
 void cScreenSurface::Wipe( dword pColor ) {
 	sScreenPiece *piece = &mScreenPieces[ 0 ];
+	dword		 *buffer = screenBufferGet();
 
-	for( size_t count = 0; count < mScreenSize; ++count, ++piece ) {
-		piece->mPixel = pColor;
+	for( size_t count = 0; count < mScreenSize; ++count, ++piece, ++buffer ) {
+		*buffer = pColor;
 		piece->mPriority = ePriority_Background;
 		piece->mSprite = piece->mSprite2 = 0;
 	}
@@ -83,15 +86,17 @@ void cScreenSurface::Wipe( dword pColor ) {
 
 void cScreenSurface::pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePriority pPriority, size_t pCount ) {
 	sScreenPiece *piece = screenPieceGet(pX,pY);
+	dword	*buffer = screenBufferGet( pX, pY );
 
 	for( size_t count = 0; count < pCount; ++count ) {
 		if( pPaletteIndex > 15 )
-			piece->mPixel = 0xFF;
+			*buffer = 0xFF;
 		else
-			piece->mPixel = mPalette[ pPaletteIndex ];
+			*buffer = mPalette[ pPaletteIndex ];
 
 		piece->mPriority = pPriority;
 
+		++buffer;
 		++piece;
 	}
 }

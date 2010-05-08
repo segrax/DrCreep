@@ -147,6 +147,10 @@ public:
 					
 					return gfxPtr;
 				}
+			
+				inline byte *musicBufferGet() {
+					return mMusicBuffer;
+				}
 
 		inline cPlayerInput		*inputGet()		{ return mInput; }
 		inline cScreen			*screenGet()	{ return mScreen; }

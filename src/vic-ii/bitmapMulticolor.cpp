@@ -54,22 +54,26 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 
 				pixel = (data & 0xC0) >> 6;
 
-				if(pixel == 0 || pixel == 1)
-					priority = ePriority_Background;
-				else
-					priority = ePriority_Foreground;
+				switch( data & 0xC0 ) {
 
-				if(pixel == 0)
-					color = pBackgroundColor0;
+					case 0x00:
+						priority = ePriority_Background;
+						color = pBackgroundColor0;
+						break;
+					case 0x40:
+						priority = ePriority_Background;
+						color = (*pColorData & 0xF0) >> 4;
+						break;
+					case 0x80:
+						priority = ePriority_Foreground;
+						color = *pColorData & 0xF;
+						break;
+					case 0xC0: 
+						priority = ePriority_Foreground;
+						color = *pColorRam & 0x0F;
+						break;
 
-				else if(pixel == 1)
-					color = (*pColorData & 0xF0) >> 4;
-
-				else if(pixel == 2)
-					color = *pColorData & 0xF;
-
-				else if(pixel == 3)
-					color = *pColorRam & 0x0F;
+				}
 
 				mSurface->pixelDraw(drawX++, drawY, color, priority, 2);
 				data <<= 2;

@@ -30,19 +30,21 @@ enum ePriority {
 
 struct sScreenPiece {
 	ePriority	mPriority;
-	dword		mPixel;
+	//dword		mPixel;
 	byte		mSprite, mSprite2;
 
 	sScreenPiece() {
 		mPriority = ePriority_Background;
-		mPixel = 0xFF;
+//		mPixel = 0xFF;
 		mSprite = mSprite2 = 0;
 	}
 };
 
 class cScreenSurface {
 private:
-	sScreenPiece	*mScreenPieces;				// Screen buffer
+	dword			*mScreenBuffer;
+	sScreenPiece	*mScreenPieces;				// Screen Info
+
 	size_t			 mScreenSize;
 
 	size_t			 mWidth, mHeight;
@@ -61,6 +63,11 @@ public:
 
 	inline size_t		 heightGet() { return mHeight; }
 	inline size_t		 widthGet()  { return mWidth; }
+
+	inline dword *screenBufferGet() { return mScreenBuffer; }
+	inline dword *screenBufferGet( size_t pX, size_t pY ) {
+		return &mScreenBuffer[ ((pY * mWidth) + pX) ];
+	}
 
 	inline sScreenPiece *screenPiecesGet() { return mScreenPieces; }
 	inline sScreenPiece *screenPieceGet( size_t pX, size_t pY ) {
