@@ -130,7 +130,9 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 	bool			 col1 = false, col2 = false;
 
 	sScreenPiece	*dest = 0;
+	dword			*destBuffer = 0;
 	sScreenPiece	*source = pSurface->screenPiecesGet();
+	dword			*sourceBuffer = pSurface->screenBufferGet();
 
 	size_t			 height = pSurface->heightGet();
 	size_t			 width = pSurface->widthGet();
@@ -140,12 +142,13 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 	// Loop height
 	for( word y = 0; y < height; ++y, ++pDestY ) {
 		dest = mSurface->screenPieceGet( pDestX, (byte) pDestY);
+		destBuffer = mSurface->screenBufferGet( pDestX, (byte) pDestY );
 
 		// Loop width
 		for( word x = 0; x < width; ++x ) {
 			
 			// Transparent?
-			if( source->mPixel != 0xFF ) {
+			if( *sourceBuffer != 0xFF ) {
 
 				// Check for any collisions
 				if( dest->mPriority == ePriority_Foreground || dest->mSprite ) {
@@ -174,11 +177,14 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 
 				// Does this sprite have priority over the background?
 				if( !pPriority || (dest->mPriority == ePriority_Background && pPriority) ) {
-					dest->mPixel = source->mPixel;
+					*destBuffer = *sourceBuffer;
+
 					dest->mPriority = source->mPriority;
 				}
 			}
 
+			++sourceBuffer;
+			++destBuffer;
 			++dest;
 			++source;
 		}
@@ -248,32 +254,15 @@ void cScreen::spriteDraw() {
 	mScreenRedraw = true;
 }
 
-void cScreen::SDLSurfaceSet(){
-	dword			*pixel  = (dword*) mSDLSurface->pixels;
-	sScreenPiece	*source = mSurface->screenPiecesGet();
-
-	for( unsigned int y = 0; y < mSurface->heightGet(); y++ ) {
-		
-		for( unsigned int x = 0; x < mSurface->widthGet(); x++ ) {
-
-			*pixel++ = source->mPixel;
-			++source;
-
-		}
-	}
-
-}
-
 SDL_Surface	*cScreen::scaleUp( ) {
-	SDLSurfaceSet();
 
 	if( mScale < 2 || mScale > 4 )
-		return mSDLSurface;
+		return 0;
 
 	SDL_SetColorKey(mSDLSurfaceScaled, SDL_SRCCOLORKEY, SDL_MapRGB(mSDLSurfaceScaled->format, 0, 0, 0)	);
 
 	// Do the scale
-	scale(mScale, mSDLSurfaceScaled->pixels, mSDLSurfaceScaled->pitch, mSDLSurface->pixels, mSDLSurface->pitch, mSDLSurface->format->BytesPerPixel, mSDLSurface->w, mSDLSurface->h);
+	scale(mScale, mSDLSurfaceScaled->pixels, mSDLSurfaceScaled->pitch, mSurface->screenBufferGet(), mSDLSurface->pitch, mSDLSurface->format->BytesPerPixel, mSDLSurface->w, mSDLSurface->h);
 
 	return mSDLSurfaceScaled;
 }
