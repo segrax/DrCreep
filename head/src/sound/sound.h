@@ -7,17 +7,23 @@ private:
 	cCreep			*mCreep;
 
 	SDL_AudioSpec	*mAudioSpec;
+	int				 mVal;
+	int				 mCyclesRemaining;				// Number of cycles before frame update is complete
+	int				 mTicks;						// Number of ticks before CIA timer fires
 
-	void			 devicePrepare();
+	bool			 devicePrepare();
 
 public:
 
 	 cSound( cCreep *pCreep );
 	~cSound();
 
+	void			 audioBufferFill( short *pBuffer, int pBufferSize );
 	void			 sidWrite( byte pRegister, byte pValue );
 
-	cSID			*sidGet() { return mSID; }
-	cCreep			*creepGet() { return mCreep; }
+	void			 playback( bool pStart );
+	
+	inline cSID		*sidGet() { return mSID; }
+	inline cCreep	*creepGet() { return mCreep; }
 
 };

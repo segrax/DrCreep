@@ -1,2 +1,2 @@
-const char *SVNREV = "175";
-const char *SVNDATE = "2010/05/06 15:59:35";
+const char *SVNREV = "180";
+const char *SVNDATE = "2010/05/08 11:52:31";

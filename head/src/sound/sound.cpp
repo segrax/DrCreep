@@ -3,56 +3,41 @@
 #include "creep.h"
 #include "resid-0.16/sid.h"
 
-cSound *g_Sound;
+// Call back from Audio Device to fill audio output buffer
+void cSound_AudioCallback(void *userdata, Uint8 *stream, int len) {
+	cSound  *sound = (cSound*) userdata;
 
-/* Audio stream callback */
-void my_audio_callback(void *userdata, Uint8 *stream, int len) {
-	cSID	*sid = g_Sound->sidGet();
-	cCreep	*creep = g_Sound->creepGet();
-
-	short	*buff = (short*)stream;
-	static	cycle_count cyclesLeft = 0;
-
-	int		samplesLeft = len / 0x2;
-	static	int ticks = 0;
-
-	while (samplesLeft > 0) {
-
-		if(ticks<=0) {
-			ticks = (*creep->memory(0xDC05)) / 2;
-			creep->musicBufferFeed(); 
-		}
-
-  		if (cyclesLeft <= 0) {
-  			cyclesLeft = 0x42C7;	// NTSC
-			--ticks;
-  		}
-
-  		// 
-  		int sampleCount = sid->clock(cyclesLeft, buff, samplesLeft);
-
-  		samplesLeft -= sampleCount;
-  		buff += sampleCount;
-  	}
+	sound->audioBufferFill( (short*) stream, len );
 }
 
+// Constructor, prepare the SID
 cSound::cSound( cCreep *pCreep ) {
 
 	mCreep = pCreep;
 
+	mCyclesRemaining = 0;
+	mTicks = 0;
+
+	// Prepare the SID
 	mSID = new cSID();
-  	mSID->set_sampling_parameters(1022727.1428571428, SAMPLE_FAST, 0x5622);
-	//mSID->set_sampling_parameters(1000000, SAMPLE_FAST, 0x5622 , -1, 0.97);
-  	mSID->enable_filter(true);
+
+	// Set the sampling parameters, NTSC, at a rate of 44100Hz
+	mSID->set_sampling_parameters(1022727.1428571428, SAMPLE_FAST, 0xAC44);	// 44100
+
+	//
+  	mSID->enable_filter(false);
   
   	mSID->reset();
-  	// Synchronize the waveform generators (must occur after reset)
+
+  	// Synchronize the waveform generators
   	mSID->write( 4, 0x08);
   	mSID->write(11, 0x08);
   	mSID->write(18, 0x08);
   	mSID->write( 4, 0x00);
   	mSID->write(11, 0x00);
   	mSID->write(18, 0x00);
+
+	mVal = 0;
 
 	devicePrepare();
 }
@@ -62,49 +47,106 @@ cSound::~cSound() {
 	delete mAudioSpec;
 }
 
+void cSound::audioBufferFill( short *pBuffer, int pBufferSize ) {
+	byte *musicBuffer = mCreep->musicBufferGet();
+
+	if(musicBuffer == 0 && !mCyclesRemaining && !mTicks)
+		return;
+
+	// Convert buffer size in bytes, to the size in words (each sample is 1 word)
+	int samplesRemaining = (pBufferSize / 2);
+
+	// Loop for required number of samples to fill buffer
+	while (samplesRemaining > 0) {
+
+		// CIA Timer Fired?
+		if(mTicks <= 0) {
+
+			// No buffer to load?
+			if( musicBuffer == 0 ) {
+
+				// If theres no cycles remaining, the music/sound effect has finished
+				if( !mCyclesRemaining ) {
+					mTicks = 0;
+					mCyclesRemaining = 0;
+					playback( false );
+					return;
+				}
+				
+			} else
+				// Update the music buffer feed and update the SID
+				mCreep->musicBufferFeed();
+
+			musicBuffer = mCreep->musicBufferGet();
+
+			// Reload the CIA Timer
+			mTicks = (*mCreep->memory(0xDC05));
+		}
+
+		// Time for video frame update?
+  		if (mCyclesRemaining <= 0) {
+  			mCyclesRemaining = 0x42C7;	// NTSC
+			mTicks -= 5;
+  		}
+		
+  		// Clock the SID for 'samplesRemaining'
+  		int sampleCount = mSID->clock(mCyclesRemaining, pBuffer, samplesRemaining);
+
+		// Decrease number of samples remaining by the number of samples just calculated
+  		samplesRemaining -= sampleCount;
+
+		// Increase buffer by the number of samples just calculated
+  		pBuffer += sampleCount;
+  	}
+}
+
+// Write to the SID Registers
 void cSound::sidWrite( byte pRegister, byte pValue ) {
 	mSID->write( pRegister, pValue );
 }
 
-void cSound::devicePrepare() {
-	/* Open the audio device */
-	SDL_AudioSpec *desired, *obtained;
+// Prepare the local audio device
+bool cSound::devicePrepare() {
+	SDL_AudioSpec *desired;
 
-	g_Sound = this;
-
-	/* Allocate a desired SDL_AudioSpec */
 	desired = new SDL_AudioSpec();
+	mAudioSpec = new SDL_AudioSpec();
 
-	/* Allocate space for the obtained SDL_AudioSpec */
-	obtained = new SDL_AudioSpec();
-
-	/* 22050Hz - FM Radio quality */
+	// FM Quality, 16Bit Signed, Mono
 	desired->freq=22050;
-
-	/* 16-bit signed audio */
 	desired->format=AUDIO_S16LSB;
-
-	/* Mono */
 	desired->channels=0;
 
-	/* Large audio buffer reduces risk of dropouts but increases response time */
-	desired->samples=8192;
+	// 2048 Samples, at 2 bytes per sample
+	desired->samples=0x800;
 
-	/* Our callback function */
-	desired->callback=my_audio_callback;
+	// Function to call when the audio playback buffer is empty
+	desired->callback = cSound_AudioCallback;
 
-	desired->userdata=NULL;
+	// Pass a ptr to this class
+	desired->userdata = this;
 
-	/* Open the audio device */
-	if ( SDL_OpenAudio(desired, obtained) < 0 ){
-	  fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
-	  exit(-1);
-	}
+	// Open the audio device
+	mVal = SDL_OpenAudio(desired, mAudioSpec);
 
-	mAudioSpec = obtained;
-
-	/* desired spec is no longer needed */
 	delete desired;
 
-	SDL_PauseAudio(0);
+	if(mVal < 0 ) {
+		cout << "Audio Device Initialization failed: " << SDL_GetError();
+		cout << endl;
+		return false;
+	}
+
+	return true;
+}
+
+void cSound::playback( bool pStart ) {
+
+	if( pStart )
+		// Start
+		SDL_PauseAudio(0);
+	else
+		// Stop
+		SDL_PauseAudio(1);
+
 }
