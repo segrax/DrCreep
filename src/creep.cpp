@@ -266,7 +266,7 @@ void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
 		mUnlimitedLives = 0xFF;
 
 	mSound = new cSound( this );
-
+	
 	for(;;) {
 		
 		mMemory[0xBC00 + count] = byte_30;
@@ -900,18 +900,19 @@ bool cCreep::Intro() {
 	// 0CDD
 	byte_20DE = 0;
 	mIntro = 0;
-	
+	mMusicBuffer = 0;
+	mSound->playback( false );
+
 	char X = 0x0E;
 
-	for(;;) {
+	while(X >= 0) {
 		mMemory[ 0x20EF + X ] &= 0xFE;
 		mMemory[ 0xD404 + X ] = mMemory[ 0x20EF + X ];
 		mSound->sidWrite(0x04 + X, mMemory[ 0x20EF + X ]);
 
 		X -= 0x07;
-		if( X < 0 )
-			break;
 	}
+
 
 	return false;
 }
@@ -943,8 +944,6 @@ bool cCreep::musicBufferFeed() {
 		return true;
 	
 musicUpdate:;
-	if(!mMusicBuffer)
-		return false;
 
 	for(; !done ;) {
 		byte A = *mMusicBuffer;
@@ -1124,6 +1123,7 @@ void cCreep::musicChange() {
 	*memory( 0x20DE ) = 1;
 
 	*memory(0xDC05) = (0x14 << 2) | 3;
+	mSound->playback( true );
 }
 
 // 2233 : Intro Menu
@@ -4545,6 +4545,8 @@ void cCreep::sub_21C8( char pA ) {
 	mMemory[ 0xDC05 ] = (mMemory[ 0x2107 ] << 2 ) | 3;
 	mMemory[ 0xDC0D ] = 0x81;
 	mMemory[ 0xDC0E ] = 0x01;
+
+	mSound->playback(true);
 }
 
 void cCreep::obj_Walkway_Prepare() {
