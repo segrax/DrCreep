@@ -51,21 +51,6 @@ int	main( int argc, char *argv[] ) {
 	return 0;
 }
 
-#ifdef WIN32
-BOOL CtrlHandler( DWORD fdwCtrlType ) {
-	
-	switch( fdwCtrlType ) {
-
-		case CTRL_CLOSE_EVENT:
-		case CTRL_C_EVENT:
-			exit(0);
-
-	default:
-		return FALSE;
-	}
-}
-#endif
-
 string local_PathGenerate( string pFile, bool pDataSave ) {
 	stringstream	 filePathFinal;
 
@@ -140,6 +125,21 @@ byte *local_FileRead( string pFile, size_t	&pFileSize, bool pDataSave ) {
 	return fileBuffer;
 }
 
+#ifdef WIN32
+
+BOOL CtrlHandler( DWORD fdwCtrlType ) {
+	
+	switch( fdwCtrlType ) {
+
+		case CTRL_CLOSE_EVENT:
+		case CTRL_C_EVENT:
+			exit(0);
+
+	default:
+		return FALSE;
+	}
+}
+
 vector<string> directoryList(string pPath, bool pDataSave) {
     WIN32_FIND_DATA fdata;
     HANDLE dhandle;
@@ -200,3 +200,55 @@ vector<string> directoryList(string pPath, bool pDataSave) {
 	
 	return results;
 }
+
+// End Win32 Functions
+
+
+
+
+#else
+#include<dirent.h>
+
+bool CtrlHandler( DWORD fdwCtrlType ) {
+	
+}
+
+int file_select(struct direct   *entry) {
+	string name = entry->d_name;
+
+	transform( name.begin(), name.end(), name.begin(), toupper );
+
+	if( name.find( ".d64" ) == string::npos )
+		return false;
+	
+	return true;
+}
+
+vector<string> directoryList(string pPath, bool pDataSave) {
+	struct direct		**directFiles;
+	vector<string>		  results;
+
+	char path[2000];
+	_getcwd(path, 2000);
+
+	// Build the file path
+	stringstream finalPath;
+	finalPath << path << "\\";
+	if(!pDataSave)
+		finalPath << gDataPath;
+	else
+		finalPath << gSavePath;
+
+	finalPath << pPath;
+
+	int count = scandir(finalPath.str().c_str(), &directFiles, file_select, 0);
+	
+	for( int i = 0; i < count; ++i ) {
+
+		results.push_back( string( files[i]->d_name ) );
+	}
+	
+	return results;
+}
+
+#endif
