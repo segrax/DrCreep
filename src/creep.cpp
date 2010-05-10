@@ -160,7 +160,7 @@ void cCreep::titleDisplay() {
 	mScreen->bitmapLoad( buffer,  buffer + 0x1F40, buffer + 0x2328, 1 );
 	mScreen->refresh();
 
-	interruptWait(100);
+	hw_IntSleep(0x10);
 }
 
 void cCreep::run( int pArgCount, char *pArgs[] ) {
