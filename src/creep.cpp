@@ -233,28 +233,40 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 
 void cCreep::interruptWait( byte pCount) {
 	timeb tickNow;
-	
-	mInterruptCounter = pCount;
-	
-	// TODO: Proper time check 
-	
-	while(mInterruptCounter > 0 ) {
-		ftime(&tickNow);
+	ftime(&tickNow);
 
-		time_t diffSec = tickNow.time - mTimePrevious.time;
-		int diffMil = tickNow.millitm - mTimePrevious.millitm;
-		int calc = (30 - diffMil);
+	time_t diffSec = tickNow.time - mTimePrevious.time;
+	time_t diffMil = tickNow.millitm - mTimePrevious.millitm;
 
-		if(diffSec < 1) {
+	if(diffMil < 0)
+		diffMil = -diffMil;
 
-			if(calc > 0 )
-				Sleep( calc );
+	// Calculate time taken between calls to this function
+	double	sleep = 0;
+	//diffMil = 10;
+
+	if(diffSec <= 1) {
+		if(diffMil > 30)
+			sleep = 0;
+		else
+			sleep = 30 - diffMil;
+
+		mInterruptCounter = pCount;
+		
+		while(mInterruptCounter > 0 ) {
+			//
+			if(sleep) {
+				//if( mScreen->fpsGet() >= 25 ) {
+					Sleep( sleep );
+				//}
+			}
+
+			--mInterruptCounter;
+			
 		}
-
-
-		--mInterruptCounter;
-		mTimePrevious = tickNow;
 	}
+
+	ftime(&mTimePrevious);
 }
 
 //08C2

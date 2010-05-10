@@ -49,7 +49,8 @@ cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 	mSpriteRedraw		= false;
 	mScreenRedraw		= false;
 	mSDLSurfaceScaled	= 0;
-
+	mFPSTotal			= 0;
+	mFPSSeconds			= 0;
 	mFPS				= 0;
 	mWindow				= 0;
 	mWindowTitle		= pWindowTitle;
@@ -220,6 +221,18 @@ void cScreen::levelNameSet( string pName ) {
 
 void cScreen::refresh() {
 	static time_t timeFirst = time(0);
+	time_t calc = time(0) - timeFirst;
+
+	if( calc > 1 ) {
+		mFPSTotal += mFPS;
+		// Total elapsed time increase
+		mFPSSeconds += (unsigned int) calc;
+
+		timeFirst = time(0);
+		mFPS = 0;
+	}
+
+	++mFPS;
 
 	if( mBitmapRedraw || mSpriteRedraw) {
 		bitmapRefresh();
@@ -230,14 +243,6 @@ void cScreen::refresh() {
 		mScreenRedraw = false;
 		
 		SDL_Surface *surface = scaleUp();	
-				
-		/*if( (time(0) - timeFirst) > 1 ) {
-			timeFirst = time(0);
-			mFPS = 0;
-		}
-
-		if(++mFPS > 30)
-			Sleep( 10 );*/
 
 		mWindow->clear(0);
 		mWindow->blit( surface, 0, 0, 0, 0 );
