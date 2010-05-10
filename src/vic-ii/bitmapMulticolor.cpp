@@ -28,7 +28,7 @@
 #include "bitmapMulticolor.h"
 
 cBitmapMulticolor::cBitmapMulticolor() {
-	mSurface = new cScreenSurface( 321, 201 );
+	mSurface = new cScreenSurface( 320, 200 );
 }
 
 cBitmapMulticolor::~cBitmapMulticolor() {
@@ -37,9 +37,8 @@ cBitmapMulticolor::~cBitmapMulticolor() {
 
 void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 ) {
 	dword		color = 0;
-	byte		data;
-	byte		pixel;
 	ePriority	priority;
+	dword		data = 0;
 
 	// Draw 200 Rows
 	for( size_t Y = 0; Y < 200; Y += 8) {
@@ -50,36 +49,40 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 			data = *pBuffer++;
 
 			// Lets draw 8 bits
-			for( size_t drawX = X; drawX < (X + 8); ++drawX ) {
+			for( size_t drawX = X; drawX < (X + 8); drawX += 2 ) {
 
 				switch( data & 0xC0 ) {
 
-					case 0x00:
+					case 0x00:	// Background  (Register BackgroundColor 0)
 						priority = ePriority_Background;
 						color = pBackgroundColor0;
 						break;
-					case 0x40:
+
+					case 0x40:	// Background  (Color Data Upper 4 Bits)
 						priority = ePriority_Background;
 						color = (*pColorData & 0xF0) >> 4;
 						break;
-					case 0x80:
+
+					case 0x80:	// Foreground  (Color Data Lower 4 bits)
 						priority = ePriority_Foreground;
 						color = *pColorData & 0xF;
 						break;
-					case 0xC0: 
+
+					case 0xC0:	// Foreground  (Color Ram Lower 4 bits)
 						priority = ePriority_Foreground;
 						color = *pColorRam & 0x0F;
 						break;
 
 				}
 
-				mSurface->pixelDraw(drawX++, drawY, color, priority, 2);
+				mSurface->pixelDraw(drawX, drawY, color, priority, 2);
 				data <<= 2;
 			} // X
 
+			// Reached last row for current data?
 			if(++drawY == (Y + 8)) {
 				drawY = Y;
-				X += 0x8;
+				X += 0x08;
 
 				++pColorData;
 				++pColorRam;

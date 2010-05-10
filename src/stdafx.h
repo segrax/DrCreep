@@ -36,6 +36,9 @@
 #include <map>
 #include <sys/timeb.h>
 
+// Threads
+#include <pthread.h>
+
 using namespace std;
 
 #include <sdl.h>
@@ -47,6 +50,11 @@ class cCreep;
 extern const char *SVNREV;
 extern const char *SVNDATE;
 extern cCreep	  *gCreep;
+
+#ifndef _WIN32
+	#include "windows.h"
+    #define	 Sleep( a ) sleep( a / 1000 );
+#endif
 
 #define ENDIAN_SMALL
 
@@ -88,6 +96,7 @@ vector<string>	 directoryList(string pPath, bool pDataSave);
 byte			*local_FileRead( string pFile, size_t	&pFileSize, bool pDataSave );
 bool			 local_FileCreate( string pFile, bool pDataSave );
 bool			 local_FileSave( string pFile, bool pDataSave, byte *pBuffer, size_t pBufferSize );
+
 
 const byte byte_83F = 0x80;
 const byte byte_840 = 0x40;

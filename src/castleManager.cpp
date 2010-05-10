@@ -332,7 +332,7 @@ bool cCastleManager::positionSave( string pFilename, size_t pSaveSize, byte *pDa
 	// Calculate number of sectors required for file we're saving
 	size_t size = pSaveSize + 2;
 	size_t sectors = (size / 254);
-	if(size%254)
+	if(size % 254)
 		++sectors;
 
 	// Search all available disks for enough available sectors 

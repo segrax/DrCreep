@@ -36,19 +36,18 @@ cPlayerInput::cPlayerInput( cCreep *pCreep ) {
 	mRestore = false;
 	mF2 = false;
 	mF3 = false;
-
 }
 
 void cPlayerInput::inputCheck( bool pClearAll ) {
 
-	mF2 = false;
-	mF3 = false;
-	mRunStop = false;
-	mRestore = false;
-
 	if(pClearAll) {
 		mInput[0].clear();
 		mInput[1].clear();
+
+		mF2 = false;
+		mF3 = false;
+		mRunStop = false;
+		mRestore = false;
 	}
 
 	while( SDL_PollEvent(&mEvent) ) {
@@ -66,8 +65,31 @@ void cPlayerInput::inputCheck( bool pClearAll ) {
 
 void cPlayerInput::KeyboardCheck() {
 
+	// Key Released
 	if( mEvent.type == SDL_KEYUP ) {
-		mKeyPressed = 0;
+
+		switch( mEvent.key.keysym.sym ) {
+			case SDLK_F1:
+				mRunStop = false;
+				break;
+
+			case SDLK_F2:
+				mF2 = false;
+				break;
+
+			case SDLK_F3:
+				mF3 = false;
+				break;
+
+			case SDLK_ESCAPE:
+				mRestore = false;
+				break;
+
+			default:
+				mKeyPressed = 0;
+				break;
+		}
+
 		return;
 	}
 

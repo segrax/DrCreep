@@ -32,6 +32,7 @@ struct sScreenPiece;
 
 class cScreen {
 	byte					 *mBitmapBuffer, *mBitmapColorData, *mBitmapColorRam, mBitmapBackgroundColor;
+	dword					 mFPS;
 
 	cVideoWindow			*mWindow;
 	cBitmapMulticolor		*mBitmap;
@@ -87,4 +88,5 @@ public:
 	inline void				 bitmapRedrawSet() { mBitmapRedraw = true; }
 	inline void				 spriteRedrawSet() { mSpriteRedraw = true; }
 	inline void				 screenRedrawSet() { mScreenRedraw = true; }
+	inline dword			 fpsGet()			{ return mFPS; }
 };

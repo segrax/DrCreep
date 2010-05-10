@@ -40,6 +40,9 @@ class cCreep;
 
 class cPlayerInput {
 private:
+	pthread_mutex_t		 mLock;
+	pthread_t			*mMonitor;
+
 	SDL_Event			 mEvent;
 	sPlayerInput		 mInput[2];
 	cCreep				*mCreep;
@@ -57,17 +60,18 @@ public:
 	void		 inputCheck( bool pClearAll = false );
 	
 	sPlayerInput		*inputGet( byte pNumber ) { 
-
-		if( pNumber > 2 )
+		if( pNumber > 1 )
 			return 0;
 
-		return& mInput[ pNumber ];
+		return &mInput[ pNumber ];
 	}
 
-	inline byte  keyGet()	  { byte ret = mKeyPressed; mKeyPressed = 0; return ret; }
-	inline bool	 f2Get()	  { return mF2; }
-	inline bool	 f3Get()	  { return mF3; }
-	inline bool	 runStopGet() { return mRunStop; }
-	inline bool	 restoreGet() { return mRestore; }
-	inline bool	 fullscreenGet() { return mFullscreen; }
+#define retVal( C, X ) C ret = X; X = 0; return ret; 
+
+	inline byte  keyGet()		 { retVal( byte, mKeyPressed ) }
+	inline bool	 f2Get()		 { retVal( bool, mF2) }
+	inline bool	 f3Get()		 { retVal( bool, mF3) }
+	inline bool	 runStopGet()	 { retVal( bool, mRunStop) }
+	inline bool	 restoreGet()	 { retVal( bool, mRestore) }
+	inline bool	 fullscreenGet() { retVal( bool, mFullscreen ) }
 };

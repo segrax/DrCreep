@@ -28,10 +28,12 @@
 #include "creep.h"
 #include "..\rev.h"
 
+
 const char	 *gDataPath = "data\\";
 const char	 *gSavePath = "data\\save\\";
 
 cCreep		 *gCreep;
+
 
 int	main( int argc, char *argv[] ) {
 	
@@ -49,6 +51,7 @@ int	main( int argc, char *argv[] ) {
 	return 0;
 }
 
+#ifdef WIN32
 BOOL CtrlHandler( DWORD fdwCtrlType ) {
 	
 	switch( fdwCtrlType ) {
@@ -61,6 +64,8 @@ BOOL CtrlHandler( DWORD fdwCtrlType ) {
 		return FALSE;
 	}
 }
+#endif
+
 string local_PathGenerate( string pFile, bool pDataSave ) {
 	stringstream	 filePathFinal;
 

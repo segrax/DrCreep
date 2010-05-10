@@ -137,8 +137,8 @@ bool cSound::devicePrepare() {
 }
 
 void cSound::playback( bool pStart ) {
-
-	if( pStart ) {
+	
+	if( pStart && mVal >= 0 ) {
 		// Start
 		SDL_PauseAudio(0);
 		mFinalCount = 0;

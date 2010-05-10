@@ -176,6 +176,7 @@ public:
 
 		void	 graphicRoomColorsSet( byte pRoomColor );
 
+		void	 hw_Update();							// 
 		void	 hw_IntSleep( byte pA );				// hardware interrupt wait loop
 		void	 hw_SpritePrepare( byte &pX );			// prepare a sprite 
 
