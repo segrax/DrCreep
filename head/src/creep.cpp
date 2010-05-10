@@ -234,11 +234,10 @@ void cCreep::interruptWait( byte pCount) {
 	
 	mInterruptCounter = pCount;
 	
-	ftime(&tickNow);
 	// TODO: Proper time check 
 	
 	while(mInterruptCounter > 0 ) {
-		mInput->inputCheck();
+		ftime(&tickNow);
 
 		time_t diffSec = tickNow.time - mTimePrevious.time;
 		int diffMil = tickNow.millitm - mTimePrevious.millitm;
@@ -246,8 +245,9 @@ void cCreep::interruptWait( byte pCount) {
 		if(diffSec < 1) {
 
 			if((30 - diffMil) > 0 )
-				_sleep( 30 - diffMil );
+				Sleep( 30 - diffMil );
 		}
+
 
 		--mInterruptCounter;
 		mTimePrevious = tickNow;
@@ -465,10 +465,9 @@ void cCreep::textShow() {
 	
 	mStrLength = X;
 
-	mScreen->refresh();
-
 	// 26D0
 	for(;;) {
+		hw_Update();
 
 		if( mStrLength != mMemory[ 0x278C ] ) {
 			++mMemory[ 0x27A3 ];
@@ -477,7 +476,6 @@ void cCreep::textShow() {
 			mMemory[ 0x27A2 ] = mMemory[ 0x27A4 + X ];
 			mTextXPos = (mStrLength << 3) + mMemory[ 0x2788 ];
 			textPrintCharacter();
-			mScreen->refresh();
 		}
 
 		// 26F7
@@ -506,7 +504,6 @@ void cCreep::textShow() {
 				if( mStrLength != mMemory[ 0x278C ] ) {
 					mMemory[ 0x78A2 ] = 0x2D;
 					textPrintCharacter();
-					mScreen->refresh();
 				}
 				// 2744
 				if(mStrLength)
@@ -526,7 +523,6 @@ void cCreep::textShow() {
 
 				mMemory[ 0x27A2 ] = A;
 				textPrintCharacter();
-				mScreen->refresh();
 			}
 		}
 	}
@@ -543,8 +539,6 @@ void cCreep::textPrintCharacter() {
 // 27A8
 byte cCreep::textGetKeyFromUser() {
 	byte key = mInput->keyGet();
-
-	mInput->inputCheck( );
 	
 	if( key == 0 )
 		return 0x80;
@@ -862,7 +856,7 @@ bool cCreep::Intro() {
 				mInterruptCounter = 2;
 			}
 
-			mScreen->refresh();
+			hw_Update();
 
 			// C17
 			KeyboardJoystickMonitor( byte_D10 );
@@ -1189,8 +1183,6 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	
 	byte_5F58 = pA;
 	mRunStopPressed = false;
-	
-	mInput->inputCheck();
 
 	sPlayerInput *input = mInput->inputGet( pA );
 
@@ -1242,8 +1234,6 @@ void cCreep::events_Execute() {
 	// Check for any other 'background' actions to execute
 	img_Actions();
 	++byte_2E36;
-
-	mScreen->refresh();
 }
 
 // 29AE: 
@@ -2899,7 +2889,7 @@ sEFC:;
 
 			}
 
-			mScreen->refresh();
+			hw_Update();
 
 			// F4B
 			hw_IntSleep( 0x23 );
@@ -3132,11 +3122,13 @@ s10EB:;
 
 		interruptWait( 1 );
 
-		mScreen->refresh();
+		hw_Update();
 	}
 	// 11A5
 
 	for(;;) {
+		hw_Update();
+
 		KeyboardJoystickMonitor(0);
 		if( byte_5F57 )
 			continue;
@@ -3285,6 +3277,8 @@ void cCreep::roomMain() {
 	for(;;) {
 
 		events_Execute();
+		hw_Update();
+
 		if( byte_5F6A == 1 ) {
 			byte_2E02 = 0;
 			//sub_2C08;
@@ -3347,8 +3341,10 @@ s15B4:;
 	// 15C4
 	mMemory[ 0x15D7] = 0;
 
-	for( byte X = 0x1E; X; --X ) 
+	for( byte X = 0x1E; X; --X ) {
 		events_Execute();
+		hw_Update();
+	}
 }
 
 void cCreep::sub_6009( byte pA ) {
@@ -4166,6 +4162,11 @@ void cCreep::obj_MultiDraw() {
 	++word_3E;
 }
 
+void cCreep::hw_Update() {
+	mScreen->refresh();
+	mInput->inputCheck();
+}
+
 // 1935: Sleep for X amount of interrupts
 void cCreep::hw_IntSleep( byte pA ) {
 	byte byte_194F = pA;
@@ -4213,7 +4214,7 @@ void cCreep::gameEscapeCastle() {
 
 	mMemory[ 0x1AE5 ] = A;
 	mMemory[ 0x1AE4 ] = 0;
-	
+
 	// 19DF
 	for(;;) {
 		A = mMemory[ 0x1AE4 ];
@@ -4271,6 +4272,7 @@ void cCreep::gameEscapeCastle() {
 
 		hw_SpritePrepare( X );
 		sprite->_rEnabled = true;
+
 		if( mMemory[ 0x1AB2 ] )
 			A = mMemory[ 0x34D4 ];
 		else
@@ -4282,8 +4284,7 @@ void cCreep::gameEscapeCastle() {
 
 		// 1A95
 		interruptWait(2);
-		mScreen->refresh();
-		mInput->inputCheck();
+		hw_Update();
 	}
 
 	// 1AA7
@@ -4857,8 +4858,6 @@ void cCreep::gamePositionFilenameGet( bool pLoading ) {
 	*memory( 0x278A ) = 0x01;
 	*memory( 0x278B ) = 0x02;
 
-	mScreen->refresh();
-
 	textShow();
 }
 
@@ -4896,8 +4895,7 @@ void cCreep::gamePositionSave() {
 		screenClear();
 		obj_stringPrint();
 
-		mScreen->refresh();
-
+		hw_Update();
 		hw_IntSleep(0x23);
 	} else
 		sub_2973();

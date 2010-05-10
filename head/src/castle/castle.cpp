@@ -84,7 +84,7 @@ void cCastle::castleStart( size_t pPlayers ) {
 
 	draw();
 	
-	mCreep->screenGet()->refresh();
+	mCreep->hw_Update();
 }
 
 void cCastle::draw() {

@@ -30,8 +30,9 @@
 #include "bitmapMulticolor.h"
 #include "screen.h"
 #include "creep.h"
+#include <time.h>
 
-const word gWidth = 375, gHeight = 295;
+const word gWidth = 368, gHeight = 290;
 
 cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 
@@ -48,6 +49,8 @@ cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 	mSpriteRedraw		= false;
 	mScreenRedraw		= false;
 	mSDLSurfaceScaled	= 0;
+
+	mFPS				= 0;
 	mWindow				= 0;
 	mWindowTitle		= pWindowTitle;
 
@@ -81,21 +84,25 @@ void cScreen::clear(  byte pColor = 0xFF ) {
 void cScreen::scaleSet( byte pScale ) {
 	word width, height;
 
+	// Invalid scale level?
 	if(pScale > 4)
 		return;
 
+	// Cleanup previous resources
 	SDL_FreeSurface( mSDLSurfaceScaled );
 	delete mWindow;
 
+	// Set new scale level
 	mScale = pScale;
 
+	// Set new width/height
 	width = gWidth * mScale;
 	height = gHeight * mScale;
 
+	// Create window and a surface to scale to
 	mWindow = new cVideoWindow( width, height, 4, mFullScreen );
 	mSDLSurfaceScaled =	SDL_CreateRGBSurface(	SDL_SWSURFACE,	width, height,	 32, 0, 0, 0, 0);
 
-	levelNameSet("");
 }
 
 void cScreen::bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 ) {
@@ -212,6 +219,7 @@ void cScreen::levelNameSet( string pName ) {
 }
 
 void cScreen::refresh() {
+	static time_t timeFirst = time(0);
 
 	if( mBitmapRedraw || mSpriteRedraw) {
 		bitmapRefresh();
@@ -222,8 +230,17 @@ void cScreen::refresh() {
 		mScreenRedraw = false;
 		
 		SDL_Surface *surface = scaleUp();	
+				
+		if( (time(0) - timeFirst) > 1 ) {
+			timeFirst = time(0);
+			mFPS = 0;
+		}
+
+		if(++mFPS > 30)
+			Sleep( 10 );
+
 		mWindow->clear(0);
-		mWindow->blit( surface, 0, 0, 0, 0 );	//15, 30
+		mWindow->blit( surface, 0, 0, 0, 0 );
 	}
 }
 
