@@ -28,7 +28,7 @@
 #include "bitmapMulticolor.h"
 
 cBitmapMulticolor::cBitmapMulticolor() {
-	mSurface = new cScreenSurface( 375, 295 );
+	mSurface = new cScreenSurface( 321, 201 );
 }
 
 cBitmapMulticolor::~cBitmapMulticolor() {
@@ -51,8 +51,6 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 
 			// Lets draw 8 bits
 			for( size_t drawX = X; drawX < (X + 8); ++drawX ) {
-
-				pixel = (data & 0xC0) >> 6;
 
 				switch( data & 0xC0 ) {
 
