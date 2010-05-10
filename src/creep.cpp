@@ -830,8 +830,14 @@ bool cCreep::Intro() {
 			roomPrepare( );
 		}
 		
-		// 0BE1
-		if( byte_20DE != 1 )
+		// 0BE1 
+		if( byte_20DE != 1 ) {
+		
+			// Play music straight away when debug mode (music testing)
+#ifdef _DEBUG
+			if(!mMenuMusicScore)
+				mMenuMusicScore = 1;
+#endif
 			if( !mMenuScreenTimer )
 				if( mMenuMusicScore == 0 )
 					++mMenuMusicScore;
@@ -841,6 +847,7 @@ bool cCreep::Intro() {
 					byte_20DE = 1;
 					return true;
 				}
+		}
 
 		byte_D12 = 0xC8;
 
@@ -862,7 +869,7 @@ bool cCreep::Intro() {
 			if( byte_5F57 )
 				break;
 
-			// Change controller to check
+			// Change which player controller is checked
 			byte_D10 ^= 0x01;
 
 			// Display Highscores on F3
@@ -901,6 +908,8 @@ bool cCreep::Intro() {
 	byte_20DE = 0;
 	mIntro = 0;
 	mMusicBuffer = 0;
+
+	// Disable music playback
 	mSound->playback( false );
 
 	char X = 0x0E;
@@ -933,14 +942,15 @@ void cCreep::musicPtrsSet() {
 bool cCreep::musicBufferFeed() {
 	bool done = false;
 	
-	if( *memory( 0x20DC ) == 0 )
-		if( *memory( 0x20DD ) == 0 ) {
+	if( *memory( 0x20DC ) == 0 ) {
+		if( *memory( 0x20DD ) == 0 )
 			goto musicUpdate;
-			(*memory( 0x20DD ))--;
-		}
+		
+		(*memory( 0x20DD ))--;
+	}
 
 	(*memory( 0x20DC ))--;
-	if( !(*memory( 0x20DC ) | *memory( 0x20DD )) )
+	if( (*memory( 0x20DC ) | *memory( 0x20DD )) )
 		return true;
 	
 musicUpdate:;
@@ -1028,7 +1038,7 @@ musicUpdate:;
 				continue;
 
 			case 5:
-				break;
+				continue;
 
 			case 6:
 				X = *memory( 0x20CB ) & 3;
@@ -1062,10 +1072,14 @@ musicUpdate:;
 	if( !mIntro ) {
 		*memory( 0x2232 ) = 0xFF;
 		mMusicBuffer = 0;
-
+		
 	} else {
 		mMusicBuffer = mMusicBufferStart;
 		*memory( 0x20DD ) = 0x02;
+		
+		byte A = (*memory( 0x2102 ) & 0xF0);
+		*memory( 0x2102 ) = A;
+		mSound->sidWrite( 0x17, A );
 	}
 
 	return true;
@@ -1116,6 +1130,7 @@ void cCreep::musicChange() {
 
 	A = *memory( 0x2102 ) & 0xF0;
 	mSound->sidWrite( 0x17, A );
+
 	*memory( 0x2102 ) = A;
 	*memory( 0x20DC ) = 0;
 	*memory( 0x20DD ) = 0;
@@ -1123,6 +1138,7 @@ void cCreep::musicChange() {
 	*memory( 0x20DE ) = 1;
 
 	*memory(0xDC05) = (0x14 << 2) | 3;
+
 	mSound->playback( true );
 }
 

@@ -16,6 +16,7 @@ cSound::cSound( cCreep *pCreep ) {
 	mCreep = pCreep;
 
 	mCyclesRemaining = 0;
+	mFinalCount = 0;
 	mTicks = 0;
 
 	// Prepare the SID
@@ -25,7 +26,7 @@ cSound::cSound( cCreep *pCreep ) {
 	mSID->set_sampling_parameters(1022727.1428571428, SAMPLE_FAST, 0xAC44);	// 44100
 
 	//
-  	mSID->enable_filter(false);
+  	mSID->enable_filter(true);
   
   	mSID->reset();
 
@@ -50,9 +51,6 @@ cSound::~cSound() {
 void cSound::audioBufferFill( short *pBuffer, int pBufferSize ) {
 	byte *musicBuffer = mCreep->musicBufferGet();
 
-	if(musicBuffer == 0 && !mCyclesRemaining && !mTicks)
-		return;
-
 	// Convert buffer size in bytes, to the size in words (each sample is 1 word)
 	int samplesRemaining = (pBufferSize / 2);
 
@@ -60,37 +58,32 @@ void cSound::audioBufferFill( short *pBuffer, int pBufferSize ) {
 	while (samplesRemaining > 0) {
 
 		// CIA Timer Fired?
-		if(mTicks <= 0) {
+		//if(mTicks <= 0) {
 
-			// No buffer to load?
-			if( musicBuffer == 0 ) {
-
-				// If theres no cycles remaining, the music/sound effect has finished
-				if( !mCyclesRemaining ) {
-					mTicks = 0;
-					mCyclesRemaining = 0;
-					playback( false );
-					return;
-				}
-				
-			} else
+			// buffer to load?
+			if( musicBuffer ) {
 				// Update the music buffer feed and update the SID
 				mCreep->musicBufferFeed();
+			} else
+				if(!mCyclesRemaining)
+					++mFinalCount;
 
+			// Reload the new ptr
 			musicBuffer = mCreep->musicBufferGet();
 
 			// Reload the CIA Timer
-			mTicks = (*mCreep->memory(0xDC05));
-		}
+		//	mTicks = (*mCreep->memory(0xDC05));
+		//}
 
 		// Time for video frame update?
   		if (mCyclesRemaining <= 0) {
   			mCyclesRemaining = 0x42C7;	// NTSC
-			mTicks -= 5;
   		}
-		
-  		// Clock the SID for 'samplesRemaining'
+
+  		// Clock the SID for 'samplesRemaining', only will do all if there is enough cpu cycles remaining
   		int sampleCount = mSID->clock(mCyclesRemaining, pBuffer, samplesRemaining);
+		
+		//mTicks -= sampleCount;
 
 		// Decrease number of samples remaining by the number of samples just calculated
   		samplesRemaining -= sampleCount;
@@ -98,6 +91,9 @@ void cSound::audioBufferFill( short *pBuffer, int pBufferSize ) {
 		// Increase buffer by the number of samples just calculated
   		pBuffer += sampleCount;
   	}
+
+	if(mFinalCount==10)
+		playback(false);
 }
 
 // Write to the SID Registers
@@ -142,10 +138,11 @@ bool cSound::devicePrepare() {
 
 void cSound::playback( bool pStart ) {
 
-	if( pStart )
+	if( pStart ) {
 		// Start
 		SDL_PauseAudio(0);
-	else
+		mFinalCount = 0;
+	} else
 		// Stop
 		SDL_PauseAudio(1);
 
