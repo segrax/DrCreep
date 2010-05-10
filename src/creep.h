@@ -104,7 +104,7 @@ private:
 	byte		 byte_883, byte_884, byte_885, byte_886, byte_887, byte_888, byte_889, byte_88A, byte_88B, byte_88C, byte_88D, byte_88E, byte_882, byte_D10, byte_D12;
 	byte		 byte_839, mImageCount, byte_8C0, byte_8C1, byte_5CE2;
 	byte		 byte_B83, byte_603A, byte_5FD7;
-	byte		 byte_5FD5, byte_5FD6, byte_5FD8, byte_5F6A;
+	byte		 byte_5FD5, byte_5FD6, byte_5FD8;
 	
 	byte		 mGfxEdgeOfScreenX;
 	byte		 mTextXPos, mTextYPos, mTextColor, mTextFont, mTextFontt;
@@ -114,6 +114,8 @@ private:
 	byte		 mCount;
 	 
 	word		 word_30, word_32, word_34, word_3C, word_3E, word_40, word_42, word_44;
+
+	bool		 mMenuReturn;
 
 public:
 	byte		 mTxtX_0, mTxtY_0;

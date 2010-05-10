@@ -133,6 +133,8 @@ cCreep::cCreep() {
 	mMusicBufferStart = 0;
 	mMusicBufferSize = 0;
 
+	mMenuReturn = false;
+
 	ftime(&mTimePrevious);
 }
 
@@ -336,7 +338,7 @@ void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
 
 	} else {
 		// 0x953
-		//  JSR     sub_A42
+
 	}
 
 	mainLoop();
@@ -2738,6 +2740,7 @@ word cCreep::lvlPtrCalculate( byte pCount ) {
 // 0D71: 
 void cCreep::Game() {
 
+	mMenuReturn = false;
 	mPlayer1Seconds = 0;
 	mPlayer2Seconds = 0;
 
@@ -2815,6 +2818,9 @@ void cCreep::Game() {
 
 		// E7D
 		while( mapDisplay() );
+
+		if(mMenuReturn)
+			return;
 
 		roomMain();
 		screenClear();
@@ -3074,22 +3080,15 @@ s10EB:;
 			}
 		}
 
+		// 115A
+		KeyboardJoystickMonitor( X );
+
 		// 1146
 		if( byte_B83 == 1 ) {
 			byte_B83 = 0;
 			mMemory[ 0x11D0 ] = 0;
+			mMenuReturn = true;
 			return false;
-		}
-
-		// 115A
-		KeyboardJoystickMonitor( X );
-		if( byte_5F6A == 1 ) {
-			byte_2E02 = 1;
-			// 116A
-			// TODO: Figure this out, usually a BRK instruction is
-			// Executed inside the function
-			//sub_2C08();
-			return true;
 		}
 
 		// Check if run/stop was pressed
@@ -3110,6 +3109,7 @@ s10EB:;
 		}
 
 		// 117D
+		// Button Press Check
 		if( byte_5F57 )
 			mMemory[ 0x11CC + X ] = 1;
 
@@ -3278,12 +3278,6 @@ void cCreep::roomMain() {
 
 		events_Execute();
 		hw_Update();
-
-		if( byte_5F6A == 1 ) {
-			byte_2E02 = 0;
-			//sub_2C08;
-			// TODO: Figure out what this does
-		}
 
 		// Do pause?
 		if( mRunStopPressed == 1 ) {
