@@ -243,11 +243,12 @@ void cCreep::interruptWait( byte pCount) {
 
 		time_t diffSec = tickNow.time - mTimePrevious.time;
 		int diffMil = tickNow.millitm - mTimePrevious.millitm;
+		int calc = (30 - diffMil);
 
 		if(diffSec < 1) {
 
-			if((30 - diffMil) > 0 )
-				Sleep( 30 - diffMil );
+			if(calc > 0 )
+				Sleep( calc );
 		}
 
 
@@ -1223,8 +1224,6 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 void cCreep::events_Execute() {
 	// 2E1D
 	interruptWait( 2 );
-	
-	mInterruptCounter = 2;
 
 	// Get collisions from the hardware, and set them in the objects
 	obj_CollisionSet();

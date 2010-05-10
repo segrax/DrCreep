@@ -231,13 +231,13 @@ void cScreen::refresh() {
 		
 		SDL_Surface *surface = scaleUp();	
 				
-		if( (time(0) - timeFirst) > 1 ) {
+		/*if( (time(0) - timeFirst) > 1 ) {
 			timeFirst = time(0);
 			mFPS = 0;
 		}
 
 		if(++mFPS > 30)
-			Sleep( 10 );
+			Sleep( 10 );*/
 
 		mWindow->clear(0);
 		mWindow->blit( surface, 0, 0, 0, 0 );
