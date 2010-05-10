@@ -10,6 +10,7 @@ private:
 	int				 mVal;
 	int				 mCyclesRemaining;				// Number of cycles before frame update is complete
 	int				 mTicks;						// Number of ticks before CIA timer fires
+	int				 mFinalCount;
 
 	bool			 devicePrepare();
 
@@ -25,5 +26,5 @@ public:
 	
 	inline cSID		*sidGet() { return mSID; }
 	inline cCreep	*creepGet() { return mCreep; }
-
+	inline void		 finalCountZero() { 	mFinalCount = 0; }
 };
