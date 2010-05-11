@@ -209,8 +209,9 @@ vector<string> directoryList(string pPath, bool pDataSave) {
 #else
 #include<dirent.h>
 
-bool CtrlHandler( DWORD fdwCtrlType ) {
+bool CtrlHandler( dword fdwCtrlType ) {
 	
+	return true;
 }
 
 int file_select(struct direct   *entry) {
