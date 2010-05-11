@@ -86,7 +86,7 @@ void cCastleManager::castlesFind() {
 	localCleanup();
 
 	// Find any d64 images in data
-	disksFind( "*.d64" );
+	disksFind( ".d64" );
 
 	// Load castles from Disk images, and from data\castles folder
 	diskLoadCastles();
@@ -195,7 +195,7 @@ byte *cCastleManager::diskLoadFile( string pFilename, size_t &pBufferSize ) {
 }
 
 void cCastleManager::disksFind( string pExtension ) {
-	vector<string> disks = directoryList( pExtension, false );
+	vector<string> disks = directoryList( "", pExtension, false );
 	vector<string>::iterator diskIT;
 
 	for( diskIT = disks.begin(); diskIT != disks.end(); ++diskIT ) {
@@ -205,7 +205,7 @@ void cCastleManager::disksFind( string pExtension ) {
 }
 
 void cCastleManager::diskPosFind( string pExtension ) {
-	vector<string> disks = directoryList( pExtension, true );
+	vector<string> disks = directoryList( "", pExtension, true );
 	vector<string>::iterator diskIT;
 	
 	diskPosCleanup();
@@ -217,7 +217,7 @@ void cCastleManager::diskPosFind( string pExtension ) {
 }
 
 void cCastleManager::localLoadCastles() {
-	vector<string>			 files = directoryList( "castles\\Z*", false);
+	vector<string>			 files = directoryList( "castles", "Z", false);
 	vector<string>::iterator fileIT;
 
 	for( fileIT = files.begin(); fileIT != files.end(); ++fileIT ) {
@@ -304,7 +304,7 @@ cD64 *cCastleManager::positionDiskCreate() {
 }
 
 bool cCastleManager::positionLoad( string pFilename, byte *pTarget ) {
-	diskPosFind("*.d64");
+	diskPosFind(".d64");
 	// Search all open disks  for filename
 
 	vector< cD64* >::iterator		 diskIT;
@@ -327,7 +327,7 @@ bool cCastleManager::positionSave( string pFilename, size_t pSaveSize, byte *pDa
 	vector< cD64* >::iterator		 diskIT;
 	cD64							*disk = 0;
 
-	diskPosFind("*.d64");
+	diskPosFind(".d64");
 	
 	// Calculate number of sectors required for file we're saving
 	size_t size = pSaveSize + 2;

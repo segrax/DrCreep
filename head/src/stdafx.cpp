@@ -140,7 +140,7 @@ bool CtrlHandler( dword fdwCtrlType ) {
 	}
 }
 
-vector<string> directoryList(string pPath, bool pDataSave) {
+vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
     WIN32_FIND_DATA fdata;
     HANDLE dhandle;
 	vector<string> results;
@@ -156,7 +156,10 @@ vector<string> directoryList(string pPath, bool pDataSave) {
 	else
 		finalPath << gSavePath;
 
-	finalPath << pPath;
+	if(pPath.size())
+		finalPath << pPath;
+
+	finalPath << "\\*" << pExtension;
 
 	int size = MultiByteToWideChar( 0,0, finalPath.str().c_str(), finalPath.str().length(), 0, 0);
 	WCHAR    *pathFin = new WCHAR[ size + 1];
@@ -228,7 +231,7 @@ int file_select(const struct dirent *entry) {
 	return true;
 }
 
-vector<string> directoryList(string pPath, bool pDataSave) {
+vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 	struct dirent		**directFiles;
 	vector<string>		  results;
 
@@ -237,15 +240,21 @@ vector<string> directoryList(string pPath, bool pDataSave) {
 
 	// Build the file path
 	stringstream finalPath;
+
 	finalPath << path << "/";
+
 	if(!pDataSave)
 		finalPath << gDataPath;
 	else
 		finalPath << gSavePath;
 
-	findType = pPath;
+	if(pPath.size())
+		finalPath << pPath;
+
+	findType = pExtension;
 		
-        transform( findType.begin(), findType.end(), findType.begin(), ::toupper);
+    transform( findType.begin(), findType.end(), findType.begin(), ::toupper);
+
 
 	int count = scandir(finalPath.str().c_str(), &directFiles, file_select, 0);
 	
