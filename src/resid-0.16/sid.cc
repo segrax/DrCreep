@@ -20,6 +20,7 @@
 #include "sid.h"
 #include <math.h>
 
+// Moved here by segra to compile with g++
 const int cSID::FIR_N = 125;
 const int cSID::FIR_RES_INTERPOLATE = 285;
 const int cSID::FIR_RES_FAST = 51473;
