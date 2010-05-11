@@ -119,9 +119,9 @@ protected:
   // respectively.
   static const int FIR_N;
   static const int FIR_RES_INTERPOLATE;
-  static const int FIR_RES_FAST = 51473;
-  static const int FIR_SHIFT = 15;
-  static const int RINGSIZE = 16384;
+  static const int FIR_RES_FAST;
+  static const int FIR_SHIFT;
+  static const int RINGSIZE;
 
   // Fixpoint constants (16.16 bits).
   static const int FIXP_SHIFT = 16;
