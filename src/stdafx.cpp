@@ -127,7 +127,7 @@ byte *local_FileRead( string pFile, size_t	&pFileSize, bool pDataSave ) {
 
 #ifdef WIN32
 
-BOOL CtrlHandler( DWORD fdwCtrlType ) {
+bool CtrlHandler( dword fdwCtrlType ) {
 	
 	switch( fdwCtrlType ) {
 
