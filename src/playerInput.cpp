@@ -167,6 +167,9 @@ void cPlayerInput::KeyboardInputSet1( sPlayerInput *pInput ) {
 				pInput->mUp = false;
 
 			break;
+
+		default:
+			break;
 	}
 }
 
@@ -210,6 +213,9 @@ void cPlayerInput::KeyboardInputSet2( sPlayerInput *pInput ) {
 			else
 				pInput->mUp = false;
 
+			break;
+
+		default:
 			break;
 	}
 }
