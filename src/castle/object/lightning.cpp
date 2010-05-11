@@ -21,12 +21,12 @@ void cCastle_Object_Lightning::prepare() {
 	byte byte_44E6;
 	
 	cCastle_Image *image = 0;
-	cCastle_Object_Image *objectImage = 0;
+	//cCastle_Object_Image *objectImage = 0;
 	
 	byte gfxPosX = *(mObjectBuffer + 1);
 	byte gfxPosY = *(mObjectBuffer + 2);
 
-	byte *objectMap = mRoom->objectMapGet( ( gfxPosX >> 2 ) - 4, ( gfxPosY >> 3 ) );
+	//byte *objectMap = mRoom->objectMapGet( ( gfxPosX >> 2 ) - 4, ( gfxPosY >> 3 ) );
 	
 	image = imageCreate();
 	

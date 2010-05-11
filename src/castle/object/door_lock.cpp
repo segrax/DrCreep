@@ -20,9 +20,6 @@ void cCastle_Object_Door_Lock::graphicUpdate() {
 
 void cCastle_Object_Door_Lock::prepare() {
 	cCastle_Image *image = 0;
-	
-	byte gfxPosX = *(mObjectBuffer + 3);
-	byte gfxPosY = *(mObjectBuffer + 4);
 
 	image = imageCreate();
 	image->mBF00.mField_0 = 7;
