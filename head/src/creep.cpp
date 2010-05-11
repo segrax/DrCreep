@@ -6246,7 +6246,6 @@ s53B3:;
 
 // 47A7: In Front Mummy Release
 void cCreep::obj_Mummy_Infront( byte pX, byte pY ) {
-	byte byte_486F = pX;
 	byte byte_4870 = pY;
 	
 	if( mMemory[ 0xBD00 + pX ] )
@@ -6838,7 +6837,6 @@ void cCreep::obj_Forcefield_Timer_InFront( byte pX, byte pY ) {
 
 // 4990: In front of key
 void cCreep::obj_Key_Infront( byte pX, byte pY ) {
-	byte byte_4A67 = pY;
 
 	if( mMemory[ 0xBD00 + pX ] )
 		return;
@@ -7065,7 +7063,6 @@ void cCreep::obj_RayGun_Control_Update( byte pA ) {
 
 // 505C: 
 void cCreep::obj_Teleport_unk( byte pA, byte pX ) {
-	byte byte_50D1 = pA;
 
 	byte A =  (pA << 4) | 0x0A;
 
