@@ -14,8 +14,8 @@ sid:
 	
 creep : main
 	mv *.o obj/
-	$(LD) -o creep.o obj/*.o
-
+	$(LD) -o run/creep obj/*.o
+        
 
 graphics : 
 	$(CC) src/graphics/screenSurface.cpp src/graphics/window.cpp
