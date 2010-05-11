@@ -214,7 +214,7 @@ bool CtrlHandler( dword fdwCtrlType ) {
 	return true;
 }
 
-int file_select(struct direct   *entry) {
+int file_select(struct dirent   *entry) {
 	string name = entry->d_name;
 
 	transform( name.begin(), name.end(), name.begin(), toupper );
@@ -226,7 +226,7 @@ int file_select(struct direct   *entry) {
 }
 
 vector<string> directoryList(string pPath, bool pDataSave) {
-	struct direct		**directFiles;
+	struct dirent		**directFiles;
 	vector<string>		  results;
 
 	char path[2000];
