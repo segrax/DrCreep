@@ -22,6 +22,9 @@
 
 const int cSID::FIR_N = 125;
 const int cSID::FIR_RES_INTERPOLATE = 285;
+const int cSID::FIR_RES_FAST = 51473;
+const int cSID::FIR_SHIFT = 15;
+const int cSID::RINGSIZE = 16384;
 
 // ----------------------------------------------------------------------------
 // Constructor.
