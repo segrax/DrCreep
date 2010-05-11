@@ -49,7 +49,6 @@ extern const char *SVNDATE;
 extern cCreep	  *gCreep;
 
 #ifndef _WIN32
-	#include "windows.h"
     #define	 Sleep( a ) sleep( a / 1000 );
 #endif
 
