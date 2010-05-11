@@ -1762,7 +1762,7 @@ void cCreep::sprite_FlashOnOff( byte pX ) {
 		// 2FA3
 		A ^= byte_883;
 		mMemory[ 0xBD04 + pX ] = A;
-		byte Y = mMemory[ 0xBD00 + pX ] << 3;
+		Y = mMemory[ 0xBD00 + pX ] << 3;
 		
 		A = mMemory[ 0x896 + Y ];
 		if(!(A & byte_88E))
