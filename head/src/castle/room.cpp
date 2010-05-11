@@ -30,6 +30,7 @@
 #include "object/object.h"
 #include "object/objects.h"
 #include "image.h"
+#include <typeinfo>
 
 cCastle_Room::cCastle_Room( cCastle *pCastle, byte *pRoomDirPtr  ) {
 
