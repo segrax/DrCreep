@@ -244,22 +244,22 @@ void cCreep::interruptWait( byte pCount) {
 		diffMil = -diffMil;
 
 	// Calculate time taken between calls to this function
-	double	sleep = 0;
+	double	sleepTime = 0;
 	//diffMil = 10;
 
 	if(diffSec <= 1) {
 		if(diffMil > 30)
-			sleep = 0;
+			sleepTime = 0;
 		else
-			sleep = 30 - diffMil;
+			sleepTime = 30 - diffMil;
 
 		mInterruptCounter = pCount;
 		
 		while(mInterruptCounter > 0 ) {
 			//
-			if(sleep) {
+			if(sleepTime) {
 				//if( mScreen->fpsGet() >= 25 ) {
-					Sleep( sleep );
+					Sleep( sleepTime );
 				//}
 			}
 
@@ -1746,7 +1746,8 @@ void cCreep::obj_CheckCollisions( byte pX ) {
 //2F8A
 void cCreep::sprite_FlashOnOff( byte pX ) {
 	byte A = mMemory[ 0xBD04 + pX ];
-	
+	byte Y = 0;
+
 	mScreen->spriteRedrawSet();
 	cSprite *sprite = mScreen->spriteGet( pX >> 5 );
 
@@ -1775,7 +1776,7 @@ void cCreep::sprite_FlashOnOff( byte pX ) {
 
 s2FC4:;
 	mMemory[ 0xBD08 + pX ] = 8;
-	byte Y = pX >> 5;
+	Y = pX >> 5;
 
 	// Sprite multicolor mode
 	mMemory[ 0xD01C ] = (mMemory[ 0x2F82 + Y ] ^ 0xFF) & mMemory[ 0xD01C ];
