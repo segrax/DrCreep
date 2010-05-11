@@ -103,7 +103,6 @@ void cScreen::scaleSet( byte pScale ) {
 	// Create window and a surface to scale to
 	mWindow = new cVideoWindow( width, height, 4, mFullScreen );
 	mSDLSurfaceScaled =	SDL_CreateRGBSurface(	SDL_SWSURFACE,	width, height,	 32, 0, 0, 0, 0);
-
 }
 
 void cScreen::bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 ) {
