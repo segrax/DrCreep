@@ -40,9 +40,6 @@ class cCreep;
 
 class cPlayerInput {
 private:
-	pthread_mutex_t		 mLock;
-	pthread_t			*mMonitor;
-
 	SDL_Event			 mEvent;
 	sPlayerInput		 mInput[2];
 	cCreep				*mCreep;
