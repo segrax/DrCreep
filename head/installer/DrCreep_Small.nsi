@@ -85,7 +85,8 @@ Section "Copy Files" drcreepInst
   File "..\run\SDL.dll"
 
   SetOutPath "$INSTDIR\data"
-  File "..\run\data\*"
+  File "..\run\data\char.rom"
+  File "..\run\data\place_dr_creep_disk_images_here"
 
   SetOutPath "$INSTDIR\data\castles"
   File "..\run\data\castles\*"
