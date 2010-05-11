@@ -29,8 +29,8 @@
 #include "../rev.h"
 
 
-const char	 *gDataPath = "data\\";
-const char	 *gSavePath = "data\\save\\";
+const char	 *gDataPath = "data/";
+const char	 *gSavePath = "data/save/";
 
 cCreep		 *gCreep;
 
@@ -214,12 +214,15 @@ bool CtrlHandler( dword fdwCtrlType ) {
 	return true;
 }
 
+string findType;
+
 int file_select(const struct dirent *entry) {
 	string name = entry->d_name;
 
 	transform( name.begin(), name.end(), name.begin(), ::toupper );
-
-	if( name.find( ".d64" ) == string::npos )
+   	
+	cout << name << endl;
+	if( name.find( findType ) == string::npos )
 		return false;
 	
 	return true;
@@ -234,13 +237,15 @@ vector<string> directoryList(string pPath, bool pDataSave) {
 
 	// Build the file path
 	stringstream finalPath;
-	finalPath << path << "\\";
+	finalPath << path << "/";
 	if(!pDataSave)
 		finalPath << gDataPath;
 	else
 		finalPath << gSavePath;
 
-	finalPath << pPath;
+	findType = pPath;
+		
+        transform( findType.begin(), findType.end(), findType.begin(), ::toupper);
 
 	int count = scandir(finalPath.str().c_str(), &directFiles, file_select, 0);
 	
