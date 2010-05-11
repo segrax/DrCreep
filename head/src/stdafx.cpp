@@ -217,7 +217,7 @@ bool CtrlHandler( dword fdwCtrlType ) {
 int file_select(struct dirent   *entry) {
 	string name = entry->d_name;
 
-	transform( name.begin(), name.end(), name.begin(), toupper );
+	transform( name.begin(), name.end(), name.begin(), ::toupper );
 
 	if( name.find( ".d64" ) == string::npos )
 		return false;
@@ -230,7 +230,7 @@ vector<string> directoryList(string pPath, bool pDataSave) {
 	vector<string>		  results;
 
 	char path[2000];
-	_getcwd(path, 2000);
+	getcwd(path, 2000);
 
 	// Build the file path
 	stringstream finalPath;
