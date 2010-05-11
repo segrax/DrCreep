@@ -36,12 +36,9 @@
 #include <map>
 #include <sys/timeb.h>
 
-// Threads
-#include <pthread.h>
-
 using namespace std;
 
-#include <sdl.h>
+#include <SDL.h>
 #include "types.h"
 #include "graphics/scale/scalebit.h"
 
