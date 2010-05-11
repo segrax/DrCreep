@@ -124,8 +124,8 @@ protected:
   static const int RINGSIZE;
 
   // Fixpoint constants (16.16 bits).
-  static const int FIXP_SHIFT = 16;
-  static const int FIXP_MASK = 0xffff;
+  static const int FIXP_SHIFT;
+  static const int FIXP_MASK;
 
   // Sampling variables.
   sampling_method sampling;
