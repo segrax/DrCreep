@@ -57,7 +57,7 @@ public:
 		mCastleManager = pCastleManager;
 
 		mName = pFilename.substr(1);
-		std::transform(mName.begin(), mName.end(), mName.begin(), tolower);
+		std::transform(mName.begin(), mName.end(), mName.begin(), ::tolower);
 		mName[0] = toupper( mName[0] );
 	}
 

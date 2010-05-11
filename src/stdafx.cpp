@@ -246,7 +246,7 @@ vector<string> directoryList(string pPath, bool pDataSave) {
 	
 	for( int i = 0; i < count; ++i ) {
 
-		results.push_back( string( files[i]->d_name ) );
+		results.push_back( string( directFiles[i]->d_name ) );
 	}
 	
 	return results;
