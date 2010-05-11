@@ -88,7 +88,7 @@ extern cCreep	  *gCreep;
 #endif
 
 bool CtrlHandler( dword fdwCtrlType );
-vector<string>	 directoryList(string pPath, bool pDataSave);
+vector<string>	 directoryList(string pPath, string pExtension, bool pDataSave);
 byte			*local_FileRead( string pFile, size_t	&pFileSize, bool pDataSave );
 bool			 local_FileCreate( string pFile, bool pDataSave );
 bool			 local_FileSave( string pFile, bool pDataSave, byte *pBuffer, size_t pBufferSize );
