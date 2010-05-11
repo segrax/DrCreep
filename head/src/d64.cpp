@@ -646,7 +646,7 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 	sD64File	File;
 	
 	// Upper case only for C64 filenames
-	transform( pFilename.begin(), pFilename.end(), pFilename.begin(), toupper );
+	transform( pFilename.begin(), pFilename.end(), pFilename.begin(), ::toupper );
 	
 	// Set the file details
 	File.mName = pFilename;
@@ -781,7 +781,7 @@ sD64File *cD64::fileGet( string pFilename ) {
 	vector< sD64File* >::iterator fileIT;
 	
 	// Upper case names only
-	transform( pFilename.begin(), pFilename.end(), pFilename.begin(), toupper );
+	transform( pFilename.begin(), pFilename.end(), pFilename.begin(), ::toupper );
 
 	// Loop thro all files on disk for specific filename
 	for( fileIT = mFiles.begin(); fileIT != mFiles.end(); ++fileIT ) {

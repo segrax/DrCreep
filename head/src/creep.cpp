@@ -215,8 +215,10 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 #endif
 	// Hide the console unless its requested by user
 	if( !consoleShow ) {
+#ifdef WIN32
 		HWND hWnd = GetConsoleWindow();
 		ShowWindow( hWnd, SW_HIDE );
+#endif
 	}
 
 	// Set the default screen scale
@@ -847,7 +849,7 @@ bool cCreep::Intro() {
 			if(!mMenuMusicScore)
 				mMenuMusicScore = 1;
 #endif
-			if( !mMenuScreenTimer )
+			if( !mMenuScreenTimer ) {
 				if( mMenuMusicScore == 0 )
 					++mMenuMusicScore;
 				else {
@@ -856,6 +858,7 @@ bool cCreep::Intro() {
 					byte_20DE = 1;
 					return true;
 				}
+			}
 		}
 
 		byte_D12 = 0xC8;
@@ -1350,6 +1353,7 @@ void cCreep::obj_CollisionSet() {
 // 2E79: Execute any objects with actions / collisions, enable their sprites
 void cCreep::obj_Actions( ) {
 	byte X = 0, A;
+	byte w30 = 0;
 
 	for(;;) {
 		A = mMemory[ 0xBD04 + X ];
@@ -1418,7 +1422,7 @@ s2ED5:
 				word_30 = mMemory[ 0xBD01 + X ];
 				word_30 <<= 1;
 
-				byte w30 = (word_30 & 0xFF00) >> 8;
+				w30 = (word_30 & 0xFF00) >> 8;
 
 				// Sprite X
 				mMemory[ 0x10 + Y ] = (word_30 - 8);
@@ -5229,6 +5233,10 @@ void cCreep::obj_Mummy_Img_Execute( byte pX ) {
 
 // 4B1A: 
 void cCreep::obj_RayGun_Img_Execute( byte pX ) {
+	byte gfxPosX = 0;
+	byte gfxPosY = 0;
+	byte Y = 0;
+
 	if( byte_2E36 & 3 )
 		return;
 
@@ -5312,8 +5320,8 @@ s4BD9:;
 		}	
 	}
 	// 4BF4
-	byte gfxPosX = mMemory[ 0xBF01 + pX ];
-	byte gfxPosY = mMemory[ word_40 + 4 ];
+	gfxPosX = mMemory[ 0xBF01 + pX ];
+	gfxPosY = mMemory[ word_40 + 4 ];
 
 	A = mMemory[ word_40 ];
 	if( A & byte_4D67 )
@@ -5322,7 +5330,7 @@ s4BD9:;
 		A = 0;
 
 	byte_4D5E = A;
-	byte Y = mMemory[ word_40 + 4 ] & 3;
+	Y = mMemory[ word_40 + 4 ] & 3;
 	Y |= byte_4D5E;
 
 	// Draw the ray gun

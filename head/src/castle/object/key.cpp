@@ -19,9 +19,6 @@ void cCastle_Object_Key::graphicUpdate() {
 
 void cCastle_Object_Key::prepare() {
 	cCastle_Image *image = 0;
-	
-	byte gfxPosX = *(mObjectBuffer + 1);
-	byte gfxPosY = *(mObjectBuffer + 2);
 
 	image = imageCreate();
 	
