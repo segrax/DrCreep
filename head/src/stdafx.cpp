@@ -26,7 +26,7 @@
 #include <direct.h>
 #include "stdafx.h"
 #include "creep.h"
-#include "..\rev.h"
+#include "../rev.h"
 
 
 const char	 *gDataPath = "data\\";
