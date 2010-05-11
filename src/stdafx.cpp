@@ -214,7 +214,7 @@ bool CtrlHandler( dword fdwCtrlType ) {
 	return true;
 }
 
-int file_select(struct dirent   *entry) {
+int file_select(const struct dirent *entry) {
 	string name = entry->d_name;
 
 	transform( name.begin(), name.end(), name.begin(), ::toupper );
