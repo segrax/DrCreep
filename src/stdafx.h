@@ -49,7 +49,8 @@ extern const char *SVNDATE;
 extern cCreep	  *gCreep;
 
 #ifndef _WIN32
-    #define	 Sleep( a ) sleep( a / 1000 );
+#include <unistd.h>
+    #define	 Sleep( a ) usleep( a * 1000 );
 #endif
 
 #define ENDIAN_SMALL
