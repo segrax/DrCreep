@@ -224,7 +224,6 @@ int file_select(const struct dirent *entry) {
 
 	transform( name.begin(), name.end(), name.begin(), ::toupper );
    	
-	cout << name << endl;
 	if( name.find( findType ) == string::npos )
 		return false;
 	
