@@ -35,14 +35,22 @@
         <td ><div class="about1">
           <p>Castles of Dr. Creep is a 1984 Commodore 64 game written by Ed Hobbs and published by Broderbund Software.</p>
           <p>This project is an open source rewrite, allowing you to play the game using an image (D64) of the original disk.<br/><br/>
-          Presently only Windows is supported.</p>
+          Presently it can compile and play on both Windows and Linux (Ubuntu specifically has been tested).</p>
         </div></td>
       </tr>
     </table>
     <p>&nbsp;</p>
+    
+    <p class="NewsDates"><strong>Wednesday, May 12, 2010  15:00</strong></p>
+    <hr />
+    <p>SVN-219 Windows Packages have been released for download, and the SVN will also compile on Linux (Ive only tested on Ubuntu).</p>
+    <p>
+      Sound and performance have also been improved, along with some minor bug fixes. <br />
+    </p>
+<hr />
     <p><br />
     </p>
-    <p class="NewsDates"><strong>Wednesday, May 5, 2010  15:36</strong></p>
+<p class="NewsDates"><strong>Wednesday, May 5, 2010  15:36</strong></p>
     <hr />
     SVN-168 Packages have been released and are available on the <a href="https://sourceforge.net/projects/creep/files/">Downloads</a> page.<br />
     <br />

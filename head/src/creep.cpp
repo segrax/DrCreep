@@ -2741,17 +2741,12 @@ void cCreep::obj_Forcefield_Execute( byte pX ) {
 }
 
 // 5FD9
-word cCreep::lvlPtrCalculate( byte pCount ) {
-	word_42 = pCount;
-	
-	word_42 <<= 1;
-	word_42 <<= 1;
-	word_42 <<= 1;
+void cCreep::lvlPtrCalculate( byte pCount ) {
+
+	word_42 = pCount << 3;
 	word_42 += 0x7900;
 	if( mIntro )
 		word_42 += 0x2000;
-
-	return word_42;
 }
 
 // 0D71: 

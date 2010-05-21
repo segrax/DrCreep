@@ -32,17 +32,22 @@ enum eD64FileType {
 	eD64FileType_UNK
 };
 
-struct sD64Chain {
-	size_t mTrack, mSector;
+struct sD64File;
 
-	sD64Chain( size_t pTrack, size_t pSector ) {
+struct sD64Chain {
+	size_t		 mTrack, mSector;
+	sD64File		*mFile;
+
+	sD64Chain( size_t pTrack, size_t pSector, sD64File *pFile ) {
 		mTrack = pTrack;
 		mSector = pSector;
+		mFile = pFile;
 	}
 };
 
 
 struct sD64File {
+	bool	  mChainBroken;				// File Chain Broken
 	string	  mName;					// Name of the file
 	size_t	  mTrack, mSector;			// Starting T/S of file
 	size_t	  mFileSize;				// Number of blocks used by file
@@ -54,6 +59,11 @@ struct sD64File {
 	vector< sD64Chain >		mTSChain;	// Track/Sectors used by file
 
 	sD64File() {						// Constructor
+		mChainBroken = false;
+
+		mTrack = 0;
+		mSector = 0;
+
 		mBuffer = 0;
 		mBufferSize = 0;
 		mFileSize = 0;
@@ -69,6 +79,8 @@ private:
 	bool						 mBamTracks[36][24];							// Track/Sector Availability Map (first allocation is ignored
 	byte						 mBamFree[36];									// Number of free sectors per track
 
+	sD64File					*mBamRealTracks[36][24];						// Information about disk loaded based on files loaded
+
 	byte						*mBuffer;										// Disk image buffer
 	size_t						 mBufferSize, mTrackCount;
 	
@@ -76,6 +88,8 @@ private:
 	bool						 mRead;											// Disk is read only
 	bool						 mReady;
 	bool						 mLastOperationFailed;
+
+	vector< sD64Chain >			 mCrossLinked;									// Files which are cross linked
 
 	vector< sD64File* >			 mFiles;										// Files in disk
 	string						 mFilename;										// Name of current D64
@@ -93,7 +107,7 @@ private:
 	bool						 bamTrackSectorFree( size_t &pTrack, size_t &pSector );								// Check for free sectors in a track
 	bool						 bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrack = 0x12 );	// Check for free sectors on the disk
 
-	void						 chainLoad( sD64File *pFile );											// Gather list of all tracks/sectors used by file
+	bool						 bamTest( );															// Test the BAM against the real one
 
 	void						 directoryLoad();														// Load the disk directory
 	sD64File					*directoryEntryLoad( byte *pBuffer );									// Load an entry
@@ -123,6 +137,7 @@ public:
 	vector< sD64File* >			 directoryGet( string pFind );		// Get a file list, with all files starting with 'pFind'
 	vector< sD64File* >			*directoryGet();					// Get the file list
 	
+	bool						 diskTest();						// Check a disk for errors
 	bool						 diskWrite();						// Write the buffer to the D64
 
 	sD64File					*fileGet( string pFilename );		// Get a file
