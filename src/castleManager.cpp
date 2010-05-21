@@ -94,7 +94,10 @@ void cCastleManager::castlesFind() {
 
 	// Ensure atleast one disk was found
 	if( mDisks.size() == 0 ) {
-		cout << "No Disk Image found in data directory\n";
+		cout << "No Disk Images found in data directory\nPress Enter";
+		string a;
+		getline( cin, a );
+
 		exit(1);
 	}
 

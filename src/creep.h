@@ -160,7 +160,7 @@ public:
 		void	 start( size_t pStartLevel, bool pUnlimited );			// Game Entry Point
 		void	 run( int pArgCount, char *pArgs[] );					// Executed from main()
 
-		word	 lvlPtrCalculate( byte pCount );
+		void	 lvlPtrCalculate( byte pCount );
 
 		void	 Game();
 		void	 roomMain();

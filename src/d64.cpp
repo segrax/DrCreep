@@ -39,7 +39,7 @@ string stringRip(byte *pBuffer, byte pTerminator, size_t pLengthMax) {
 
 // D64 Constructor
 cD64::cD64( string pD64, bool pCreate, bool pDataSave, bool pReadOnly ) {
-	
+
 	// Prepare variables
 	mBufferSize = 0;
 	mCreated = false;
@@ -54,6 +54,8 @@ cD64::cD64( string pD64, bool pCreate, bool pDataSave, bool pReadOnly ) {
 
 	// Number of tracks
 	mTrackCount = 35;
+
+	bamClear();
 
 	// Read the file
 	mBuffer = local_FileRead( pD64, mBufferSize, pDataSave );
@@ -91,6 +93,8 @@ cD64::cD64( string pD64, bool pCreate, bool pDataSave, bool pReadOnly ) {
 	directoryLoad();
 
 	mReady = true;
+
+	diskTest();
 }
 
 // D64 Destructor
@@ -104,6 +108,28 @@ cD64::~cD64( ) {
 
 	// Delete the disk buffer
 	delete mBuffer;
+}
+
+// Check the BAM against the loaded information
+bool cD64::bamTest( ) {
+
+	for( size_t track = 1; track <= mTrackCount; ++track )
+
+		// Check each sector of the track
+		for( size_t sector = 0; sector < trackRange( track ); ++sector ) {
+		
+			if( mBamTracks[track][sector] )
+				if( !mBamRealTracks[track][sector] )
+					continue;
+
+			if( !mBamTracks[track][sector] )
+				if( mBamRealTracks[track][sector] )
+					continue;
+
+			return false;
+		}
+
+	return true;
 }
 
 // Create the BAM Track
@@ -152,15 +178,18 @@ void cD64::bamClear() {
 	size_t range = 0;
 
 	// Clear BAM memory 
-	for( size_t T = 1; T <= mTrackCount; ++T ) {
+	for( size_t T = 0; T <= mTrackCount; ++T ) {
 		mBamFree[T] = range = trackRange(T);
 
 		for( size_t S = 0; S <= 0x17; ++S ) {
+			mBamRealTracks[T][S] = 0;
 
-			if(S < range)
+			if(S < range) {
+				
 				mBamTracks[T][S] = true;
-			else
-				mBamTracks[T][S] = false;
+			} else {
+				mBamTracks[T][S] = false; 
+			}
 		}
 	}
 }
@@ -390,31 +419,23 @@ bool cD64::bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrac
 	return bamTrackSectorFree( pTrack, pSector );
 }
 
-// Follow a file based on its first track/sector
-// And create a list of track/sectors used by it
-void cD64::chainLoad( sD64File *pFile ) {
-	byte  track = pFile->mTrack, sector = pFile->mSector;
-	byte *buffer = 0;
-	
-	pFile->mTSChain.clear();
+bool cD64::diskTest() {
+	vector< sD64Chain >::iterator			 linkIT;
+	if(!bamTest()) {
 
-	// Loop while its a valid track and sector
-	for(; track > 0 && track <= mTrackCount && sector < trackRange( track ) ;) {
+		// Bam Disk test failed
 
-		// Save the T/S
-		pFile->mTSChain.push_back( sD64Chain( track, sector ) );
-		
-		// Read the next buffer
-		buffer = sectorPtr( track, sector );
-
-		// Final sector of file
-		if( buffer[0] == 0 )
-			break;
-
-		// Get the track / sector
-		track = buffer[0];
-		sector = buffer[1];
+		// Repair it based on loaded files
+		//bamRebuild();
 	}
+	
+	// TODO 
+	// Check for cross linked files
+	for( linkIT = mCrossLinked.begin(); linkIT != mCrossLinked.end(); ++linkIT ) {
+		
+	}
+
+	return true;
 }
 
 sD64File *cD64::directoryEntryLoad( byte *pBuffer ) {
@@ -586,6 +607,9 @@ bool cD64::fileLoad( sD64File *pFile ) {
 	// Temp buffer ptr
 	byte *destBuffer = pFile->mBuffer;
 
+	// Clear any previous chain information
+	pFile->mTSChain.clear();
+
 	// Loop until invalid track
 	while( currentTrack  ) {
 		
@@ -600,8 +624,21 @@ bool cD64::fileLoad( sD64File *pFile ) {
 			if( noCopy )
 				break;
 		
+			pFile->mChainBroken = true;
+
 			return false;
 		}
+	
+		// Track/Sector already in use?
+		if(mBamRealTracks[currentTrack][currentSector]) {
+
+			// Add to the crosslinked list
+			mCrossLinked.push_back( sD64Chain( currentTrack, currentSector, pFile ) );
+
+		} else
+			mBamRealTracks[currentTrack][currentSector] = pFile;
+
+		pFile->mTSChain.push_back( sD64Chain( currentTrack, currentSector, pFile ) );
 
 		// T/S is broken, or the directory entry is wrong about size
 		if( bytesCopied >= pFile->mBufferSize )
