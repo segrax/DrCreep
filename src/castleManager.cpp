@@ -94,7 +94,7 @@ void cCastleManager::castlesFind() {
 
 	// Ensure atleast one disk was found
 	if( mDisks.size() == 0 ) {
-		cout << "No Disk Images found in data directory\nPress Enter";
+		cout << "No Commodore 64 Disk Images found in data directory\nPress Enter to exit";
 		string a;
 		getline( cin, a );
 
