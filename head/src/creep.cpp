@@ -252,7 +252,7 @@ void cCreep::interruptWait( byte pCount) {
 		if(diffMil > 30)
 			sleepTime = 0;
 		else
-			sleepTime = 30 - diffMil;
+			sleepTime = 30 - (double) diffMil;
 
 		mInterruptCounter = pCount;
 		
@@ -260,7 +260,7 @@ void cCreep::interruptWait( byte pCount) {
 			//
 			if(sleepTime) {
 				//if( mScreen->fpsGet() >= 25 ) {
-					Sleep( sleepTime );
+					Sleep( (dword) sleepTime );
 				//}
 			}
 
