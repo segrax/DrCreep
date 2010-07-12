@@ -126,7 +126,7 @@ cCreep::cCreep() {
 	byte_574F = 0x01;	
 	byte_574C = 0x80;
 
-	byte_5F57 = 0xA0;
+	mJoyButtonState = 0xA0;
 
 	mMusicCurrent = "MUSIC0";
 	mMusicBuffer = 0;
@@ -382,8 +382,7 @@ void cCreep::gameMenuDisplaySetup() {
 	//0x759C
 	for(;;) {
 		byte Y = 0;
-
-		byte A = mMemory[ byte_3E + Y ];
+		word A = mMemory[ byte_3E ];
 		if(A == 0xFF)
 			break;
 
@@ -403,21 +402,18 @@ void cCreep::gameMenuDisplaySetup() {
 
 		// 75C0
 		byte X = mMemory[ byte_3E + 1 ];
+		byte_30 = mMemory[ 0x5CE6 + X ];
 		
-		A = mMemory[ 0x5CE6 + X ];
+		//
+		A = mMemory[ 0x5D06 + X ] + 4;
+		byte_30 = (A << 8) + (byte_30 & 0xFF);
 
-		byte_30 = A | (byte_30 & 0xFF00);
-		
-		A = mMemory[ 0x5D06 + X ];
-		A += 4;
-		byte_30 = (A << 8) | (byte_30 & 0xFF);
-
-		A = (byte_30 & 0xFF);
-
-		A += mMemory[ byte_3E ];
-		byte_30 = (A) | (byte_30 & 0xFF00);
+		//
+		A = (byte_30 & 0xFF) + mMemory[ byte_3E ];
+		byte_30 = A + (byte_30 & 0xFF00);
 		
 		//0x75E1
+		Y = 0;
 		byte_3E += 3;
 		
 		for(;;) {
@@ -448,11 +444,14 @@ void cCreep::gameMenuDisplaySetup() {
 	Y -= 2;
 
 	mMemory[ byte_30 + Y ] = 0x3E;
+
 	A = mMemory[ 0x5CE6 + 7 ];
-	byte_30 = (A & 0xFF) | (byte_30 & 0xFF00);
+	byte_30 = A & 0xFF;
+
+	x = 7;
 
 	// 762F
-	byte_30 = ((4 + mMemory[ 0x5D06 + x ]) << 8) | (byte_30 & 0xFF);
+	byte_30 = ((4 + mMemory[ 0x5D06 + 7 ]) << 8) | (byte_30 & 0xFF);
 	
 	for( byte Y = 0x17; Y < 0x1A; ++Y ) {
 		A = mMemory[ byte_30 + Y ] | 0x80;
@@ -845,11 +844,6 @@ bool cCreep::Intro() {
 		// 0BE1 
 		if( byte_20DE != 1 ) {
 		
-			// Play music straight away when debug mode (music testing)
-#ifdef _DEBUG
-			if(!mMenuMusicScore)
-				mMenuMusicScore = 1;
-#endif
 			if( !mMenuScreenTimer ) {
 				if( mMenuMusicScore == 0 )
 					++mMenuMusicScore;
@@ -879,7 +873,7 @@ bool cCreep::Intro() {
 
 			// C17
 			KeyboardJoystickMonitor( byte_D10 );
-			if( byte_5F57 )
+			if( mJoyButtonState )
 				break;
 
 			// Change which player controller is checked
@@ -902,7 +896,7 @@ bool cCreep::Intro() {
 			if( mRunStopPressed == 1 ) {
 				optionsMenu();
 				if( byte_24FD == 1 ) {
-					byte_5F57 = 1;
+					mJoyButtonState = 1;
 					break;
 				}
 
@@ -913,7 +907,7 @@ bool cCreep::Intro() {
 				break;
 		}
 
-		if( byte_5F57 )
+		if( mJoyButtonState )
 			break;
 	}
 	
@@ -1158,29 +1152,33 @@ void cCreep::musicChange() {
 // 2233 : Intro Menu
 void cCreep::optionsMenu() {
 	// TODO:
-	return;
 
 	for(;; ) {
 		mScreen->spriteDisable();
 
 		word_30 = 0xD800;
-		for(byte Y = 0;;) {
 
-			byte A = 1;
-			
-			for( ;Y != 0; ++Y ) 
-				mMemory[ word_30 + Y ] = A;
+		//2257
+		for(word Y = 0;;Y=0) {
+
+			for( ;Y != 0x100; ++Y ) 
+				mMemory[ word_30 + Y ] = 1;
 
 			word_30 += 0x100;
 			if( word_30 >= 0xDC00 )
 				break;
 		}
-		
+	
+		mScreen->drawStandardText( memory( 0x400 ), 0x1000, memory( 0xD800 ));
+		mScreen->refresh();
+
+		return;
+
 		// 226E
 		for(;;) {
 			
 			KeyboardJoystickMonitor(0);
-			if( !byte_5F57 ) {
+			if( !mJoyButtonState ) {
 				
 				if( byte_5F56 & 0xFB )
 					continue;
@@ -1188,7 +1186,9 @@ void cCreep::optionsMenu() {
 				// 227F
 				
 			} else {
+				// Button Press
 				// 22E5
+				
 			}
 
 
@@ -1234,7 +1234,7 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 
 	X &= 0x0F;
 	byte_5F56 = mMemory[ 0x5F59 + X ];
-	byte_5F57 = A;
+	mJoyButtonState = A;
 }
 
 void cCreep::events_Execute() {
@@ -2035,7 +2035,7 @@ s32DB:;
 	}
 	// 338E
 	KeyboardJoystickMonitor( mMemory[ 0xBD1C + pX ] );
-	mMemory[ 0xBD1D + pX ] = byte_5F57;
+	mMemory[ 0xBD1D + pX ] = mJoyButtonState;
 	mMemory[ 0xBD1E + pX ] = byte_5F56;
 	
 	byte Y = byte_5F56;
@@ -3122,7 +3122,7 @@ s10EB:;
 
 		// 117D
 		// Button Press Check
-		if( byte_5F57 )
+		if( mJoyButtonState )
 			mMemory[ 0x11CC + X ] = 1;
 
 		if( mMemory[ 0x11CC ] == 1 )
@@ -3142,11 +3142,11 @@ s10EB:;
 		hw_Update();
 
 		KeyboardJoystickMonitor(0);
-		if( byte_5F57 )
+		if( mJoyButtonState )
 			continue;
 
 		KeyboardJoystickMonitor(1);
-		if( byte_5F57 )
+		if( mJoyButtonState )
 			continue;
 		
 		break;
