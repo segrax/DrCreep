@@ -48,6 +48,7 @@ cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 	mBitmapRedraw		= false;
 	mSpriteRedraw		= false;
 	mScreenRedraw		= false;
+	mTextRedraw			= false;
 	mSDLSurfaceScaled	= 0;
 	mFPSTotal			= 0;
 	mFPSSeconds			= 0;
@@ -233,9 +234,14 @@ void cScreen::refresh() {
 
 	++mFPS;
 
-	if( mBitmapRedraw || mSpriteRedraw) {
+	if(( mBitmapRedraw || mSpriteRedraw) && !mTextRedraw) {
 		bitmapRefresh();
 		spriteDraw();
+	}
+	
+	if( mTextRedraw ) {
+		mScreenRedraw = true;
+		mTextRedraw = false;
 	}
 
 	if( mScreenRedraw ) {
@@ -286,4 +292,44 @@ SDL_Surface	*cScreen::scaleUp( ) {
 	scale(mScale, mSDLSurfaceScaled->pixels, mSDLSurfaceScaled->pitch, mSurface->screenBufferGet(), mSDLSurface->pitch, mSDLSurface->format->BytesPerPixel, mSDLSurface->w, mSDLSurface->h);
 
 	return mSDLSurfaceScaled;
+}
+
+void cScreen::drawStandardText(byte *pTextData, word pTextChar, byte *pColorData) {
+	dword	data;
+	
+	mTextRedraw = true;
+	
+	mSurface->Wipe();
+
+	for( unsigned int y = 0; y < 200; y += 8 ) {
+
+		for( unsigned int X = 0; X < 320; X += 8 ) {
+
+			// Read char pointer from screen text pointer
+			data = *pTextData << 3;
+			++pTextData;
+
+			// Get memory address in char rom
+			word _vidChar = pTextChar + data;
+
+			// Lets draw a character
+			for( size_t charY = 0 ; charY < 8; ++charY ) {
+
+				// Read char row
+				data = mCreep->charRom( 0xD000 + (_vidChar + charY & 0x0FFF) );
+
+				// Lets draw 8 bits
+				for( size_t bit = 0, charX = X; bit < 8; bit++, charX++ ) {
+					if( data & 0x80 )
+						mSurface->pixelDraw( charX, (y + charY), *pColorData, ePriority_Background );
+
+					data <<= 1;
+				}
+				
+			}
+
+			++pColorData;
+		}
+	}
+
 }

@@ -45,7 +45,7 @@ class cScreen {
 	vector< sScreenPiece* >  mCollisions;
 	cSprite					*mSprites[8];
 
-	bool					 mFullScreen,		mBitmapRedraw, mSpriteRedraw, mScreenRedraw;
+	bool					 mFullScreen,		mBitmapRedraw, mSpriteRedraw, mScreenRedraw, mTextRedraw;
 	size_t					 mScale;
 	string					 mWindowTitle;
 
@@ -63,6 +63,8 @@ public:
 	void					 bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 );
 
 	void					 clear( byte pColor );
+
+	void					 drawStandardText(byte *pTextData, word pTextChar, byte *pColorData);
 
 	void					 scaleSet( byte pScale );
 

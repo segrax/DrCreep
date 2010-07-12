@@ -98,7 +98,7 @@ private:
 	
 	word		 word_564B;													// Conveyor
 	byte		 byte_5642, byte_5643, byte_5644, byte_5645, byte_5646;		// Conveyor
-	byte		 byte_5647, byte_5648, byte_5F58, byte_5F57, byte_5F56;
+	byte		 byte_5647, byte_5648, byte_5F58, mJoyButtonState, byte_5F56;
 	byte		 byte_3FD4;
 
 	byte		 byte_883, byte_884, byte_885, byte_886, byte_887, byte_888, byte_889, byte_88A, byte_88B, byte_88C, byte_88D, byte_88E, byte_882, byte_D10, byte_D12;
