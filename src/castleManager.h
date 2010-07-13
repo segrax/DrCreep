@@ -48,11 +48,12 @@ class cCastleInfo {
 protected:
 	cCastleManager	*mCastleManager;
 	string			 mName;
-	size_t			 mBufferSize;
-
+	size_t			 mBufferSize,		mCastleNumber;
+	
 public:
 
 	cCastleInfo( cCastleManager *pCastleManager, string pFilename ) {
+		mCastleNumber = 0;
 		mBufferSize = 0;
 		mCastleManager = pCastleManager;
 
@@ -66,6 +67,8 @@ public:
 	virtual byte	 *bufferGet() = 0;
 	
 	inline cCastleManager *managerGet() { return mCastleManager; }
+	inline void				castleNumberSet( size_t pNumber ) { mCastleNumber = pNumber; }
+	inline size_t			castleNumberGet() { return mCastleNumber; }
 };
 
 class cCastleInfoD64 : public cCastleInfo {

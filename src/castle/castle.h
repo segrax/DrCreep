@@ -61,8 +61,10 @@ public:
 
 	inline cCreep		*creepGet() { return mCreep; }
 	inline string		 nameGet() { return mName; }		// Name of the castle
+	inline cCastleInfo	*infoGet() { return mCastleInfo; }
 	inline byte			*roomPtrGet( size_t pAddress ) {	// Get pointer to room
 		return (mBuffer + (pAddress - 0x7800));
 	}
+
 
 };
