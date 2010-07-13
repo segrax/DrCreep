@@ -3587,7 +3587,7 @@ void cCreep::stringDraw() {
 	word_30 += 0x7300;
 
 	for( signed char Y = 5; Y >= 0; --Y)
-		mMemory[ word_30 + Y] = mTextColor << 4;
+		mMemory[ word_30 + Y] = (mTextColor << 4);
 	
 	//2AFE
 	for(;;) {
@@ -3615,7 +3615,7 @@ void cCreep::stringDraw() {
 			Y = mMemory[ 0x2BF0 + X ] & 0xF;
 			tmp += (mMemory[ 0x2BF8 + Y] << 8);
 			
-			*(word*)(&mMemory[ word_30 ]) = tmp;
+			writeWord(&mMemory[ word_30 ], tmp );
 
 			byte A;
 
