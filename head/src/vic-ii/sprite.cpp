@@ -29,7 +29,7 @@
 
 cSprite::cSprite( ) {
 
-	_X = _Y = _color = 0;
+	mX = mY = _color = 0;
 
 	_multiColor0 = 0x0A;
 	_multiColor1 = 0x0D;
