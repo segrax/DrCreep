@@ -134,4 +134,5 @@ public:
 	bool					 scoresSave( string pCastleName, size_t pSaveSize, byte *pData );
 
 	vector<string>			 musicGet();
+
 };

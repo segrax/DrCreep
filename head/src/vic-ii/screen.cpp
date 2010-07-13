@@ -324,7 +324,7 @@ void cScreen::drawStandardText(byte *pTextData, word pTextChar, byte *pColorData
 				// Lets draw 8 bits
 				for( size_t bit = 0, charX = X; bit < 8; bit++, charX++ ) {
 					if( data & 0x80 )
-						mSurface->pixelDraw( charX, (y + charY), *pColorData, ePriority_Background );
+						mSurface->pixelDraw( charX + 25, (y + charY) + 50, *pColorData, ePriority_Background );
 
 					data <<= 1;
 				}
