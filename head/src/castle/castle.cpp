@@ -75,6 +75,9 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 	}
 
 	//loadHeader();
+
+	// Update the selected castle on the menu
+	mCreep->menuUpdate( mCastleInfo->castleNumberGet() );
 }
 
 cCastle::~cCastle() {

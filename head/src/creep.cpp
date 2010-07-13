@@ -460,12 +460,12 @@ void cCreep::gameMenuDisplaySetup() {
 	byte_30 = A & 0xFF;
 
 	// 762F
-	byte_30 = ((4 + mMemory[ 0x5D06 + 7 ]) << 8) | (byte_30 & 0xFF);
+	byte_30 = ((4 + mMemory[ 0x5D06 + x ]) << 8) | (byte_30 & 0xFF);
 	
 	for( byte Y = 0x17; Y < 0x1A; ++Y ) {
-		A = mMemory[ byte_30 + Y ] | 0x80;
-		mMemory[ byte_30 + Y] = A;
+		mMemory[ byte_30 + Y ] |= 0x80;
 	}
+
 	mMemory[ 0x775F ] = 0x0C;
 	mMemory[ 0x775E ] = 0x03;
 
@@ -1284,18 +1284,81 @@ void cCreep::optionsMenu() {
 
 				mMemory[ word_30 + Y ] = 0x3E;
 				
-				// Decode the background as text
-				mScreen->drawStandardText( memory( 0x400 ), 0x1000, memory( 0xD800 ));
-
 			} else {
 				// Button Press
 				// 22E5
-				
+				byte X = mFileListingNamePtr;
+
+				byte A = mMemory[ 0xBA02 + X ];
+				if( !A ) {
+					//  22ED
+					mUnlimitedLives ^= 0xFF;
+
+					byte Y = mMemory[ 0xBA01 + X ];
+					word_30 = mMemory[ 0x5CE6 + Y ];
+					word_30 |= (mMemory[ 0x5D06 + Y ] + 4) << 8;
+
+					A = mMemory[ 0xBA00 + X ];
+					A += 0x11;
+					Y = A;
+					for(X = 0; X < 6; ++X) {
+						if( X != 2 ) {
+							mMemory[word_30 + Y] ^= 0x80;
+						}
+						++Y;
+					}
+
+				} else {
+					//  2326
+					if( A == 2 ) {
+						X = mFileListingNamePtr;
+
+						break;
+					}
+					
+				}
+
 			}
 
-			
+			// Decode the background as text
+			mScreen->drawStandardText( memory( 0x400 ), 0x1000, memory( 0xD800 ));
 		}
 	}
+}
+
+void cCreep::menuUpdate( size_t pCastleNumber ) {
+	char Y = mMemory[ 0xBA01 + pCastleNumber ];
+
+	word_30 = mMemory[ 0x5CE6 + Y ];
+	word_30 |= ((mMemory[ 0x5D06 + Y ] | 4) << 8);
+
+	word_30 += mMemory[ 0xBA00 + pCastleNumber ];
+
+	mMemory[ 0x24A6 ] = pCastleNumber;
+
+	// 2466
+
+	byte X = mMemory[ 0x2399 ];
+	
+	Y = mMemory[ 0xBA01 + X ];
+	word_32 = mMemory[ 0x5CE6 + Y ];
+	word_32 |= ((mMemory[0x5D06 + Y ] | 4) << 8);
+
+	word_32 += mMemory[ 0xBA00 + X ];
+
+	// 2484
+	Y = 0x0F;
+	X = mMemory[ 0x24A6 ];
+
+	for( Y = 0x0F; Y >= 0; --Y ) {
+		if( mMemory[ 0x2399 ] != 0xFF ) {
+			mMemory[ word_32 ] &= 0x7F;
+		} else {
+			mMemory[ word_30 ] |= 0x80;
+		}
+	}
+
+	mMemory[ 0x2399 ] = X;
 }
 
 // 5EFC

@@ -190,6 +190,7 @@ public:
 		bool	 mapDisplay();							// Map Screen
 		void	 mapRoomDraw();							// Draw the rooms on the map
 		
+		void	 menuUpdate( size_t pCastleNumber );
 		void     musicChange();
 		bool	 musicBufferFeed();
 		void	 musicPtrsSet();
