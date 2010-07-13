@@ -89,6 +89,9 @@ void cPlayerInput::wiiInputCheck() {
 void cPlayerInput::wiiInputSet ( sPlayerInput *pInput, dword pChannel ) {
 	u32 held = WPAD_ButtonsHeld(pChannel); 
 	
+	if( held & WPAD_BUTTON_HOME )
+		exit();
+
 	//case SDLK_F1:
 	if( held & WPAD_BUTTON_PLUS )
 		mRunStop = true;
