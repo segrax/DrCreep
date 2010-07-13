@@ -122,14 +122,14 @@ void cPlayerInput::wiiInputSet ( sPlayerInput *pInput, dword pChannel ) {
 		pInput->mButton = false;
 
 	if( held & WPAD_BUTTON_LEFT )
-		pInput->mUp = true;
-	else
-		pInput->mUp = false;
-
-	if( held & WPAD_BUTTON_RIGHT )
 		pInput->mDown = true;
 	else
 		pInput->mDown = false;
+
+	if( held & WPAD_BUTTON_RIGHT )
+		pInput->mUp = true;
+	else
+		pInput->mUp = false;
 
 	if( held & WPAD_BUTTON_UP )
 		pInput->mLeft = true;
