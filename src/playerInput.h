@@ -51,8 +51,15 @@ private:
 	void		 KeyboardInputSet1( sPlayerInput *pInput );
 	void		 KeyboardInputSet2( sPlayerInput *pInput );
 
+#ifdef _WII	
+	void		 wiiInputCheck();
+	void		 wiiInputSet ( sPlayerInput *pInput, dword pChannel  );
+
+#endif
+
 public:
 				 cPlayerInput( cCreep *pCreep );
+				~cPlayerInput();
 
 	void		 inputCheck( bool pClearAll = false );
 	

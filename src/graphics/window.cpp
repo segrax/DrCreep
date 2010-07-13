@@ -39,10 +39,16 @@ cVideoWindow::cVideoWindow( size_t pWidth, size_t pHeight, size_t pBytesPixel, b
 	SDL_Init ( SDL_INIT_VIDEO ); 
 	atexit ( SDL_Quit ) ;
 
+#ifdef _WII
+	_surface = SDL_SetVideoMode(640, 480, pBytesPixel * 8, flags );
+#else
 	_surface = SDL_SetVideoMode ( pWidth , pHeight , pBytesPixel * 8 , flags ) ;
-	
-	if(!_surface)
+#endif
+
+	if(!_surface) {
+		cout << "Surface failed" << endl;
 		return;
+	}
 }
 
 cVideoWindow::~cVideoWindow() {

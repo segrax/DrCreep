@@ -32,6 +32,12 @@
 #include "castle/object/object.h"
 #include "castle/object/player.h"
 
+#ifdef _WII
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+#endif
+
 cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 	mCastleInfo = pCastleInfo;
 	mCreep = pCreep;
@@ -43,7 +49,14 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 	// Set the window title screen
 	gCreep->screenGet()->levelNameSet( mName );
 
+	//byte	*ptr = gCreep->memory(0x9800);
+	//byte	*ptrSrc = mBuffer;
+	//dword	 size = pCastleInfo->bufferSizeGet() - 2;
+
 	// Copy it into the memory region
+	//for( dword i = 0; i < size ; ++i )
+	//	*ptr++ = *ptrSrc++;
+
 	memcpy( gCreep->memory(0x9800), mBuffer, pCastleInfo->bufferSizeGet() - 2 );
 
 	// Load the highscores for this castle
@@ -55,7 +68,7 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 		writeWord( gCreep->memory(0xB800), 0x007A );
 		
 		// Entries
-		for( char Y = 0x77; Y >= 0; --Y )
+		for( signed char Y = 0x77; Y >= 0; --Y )
 			*gCreep->memory( 0xB802 + Y ) = 0xFF;
 
 		gCreep->sub_2973();

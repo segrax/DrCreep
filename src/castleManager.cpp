@@ -28,6 +28,12 @@
 #include "castle/castle.h"
 #include "castleManager.h"
 
+#ifdef _WII
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+#endif
+
 cCastleInfoD64::cCastleInfoD64( cCastleManager *pCastleManager, cD64 *pD64, sD64File *pFile ) : cCastleInfo( pCastleManager, pFile->mName ) {
 	mD64 = pD64;
 	mFile = pFile;
@@ -190,7 +196,6 @@ byte *cCastleManager::diskLoadFile( string pFilename, size_t &pBufferSize ) {
 			continue;
 
 		pBufferSize = files[0]->mBufferSize;
-
 		return files[0]->mBuffer;
 	}
 
@@ -202,7 +207,6 @@ void cCastleManager::disksFind( string pExtension ) {
 	vector<string>::iterator diskIT;
 
 	for( diskIT = disks.begin(); diskIT != disks.end(); ++diskIT ) {
-		
 		mDisks.push_back( new cD64( *diskIT ) );
 	}
 }
@@ -311,7 +315,6 @@ bool cCastleManager::positionLoad( string pFilename, byte *pTarget ) {
 	// Search all open disks  for filename
 
 	vector< cD64* >::iterator		 diskIT;
-	cD64							*disk = 0;
 	sD64File *file = 0;
 
 	for( diskIT = mDisksPositions.begin(); diskIT != mDisksPositions.end(); ++diskIT ) {

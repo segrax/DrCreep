@@ -38,7 +38,14 @@
 
 using namespace std;
 
+#ifdef _WII
+#include <SDL/SDL.h>
+#include <wiiuse/wpad.h>
+#include "wiiuse/wiiuse.h"
+#else
 #include <SDL.h>
+#endif
+
 #include "types.h"
 #include "graphics/scale/scalebit.h"
 
@@ -53,7 +60,13 @@ extern cCreep	  *gCreep;
     #define	 Sleep( a ) usleep( a * 1000 );
 #endif
 
-#define ENDIAN_SMALL
+#ifdef _WII
+	#define ENDIAN_BIG
+	int ftime(timeb *nul);
+	void wiiButtonWait();
+#else
+	#define ENDIAN_SMALL
+#endif
 
 // Endian functions
 #ifdef ENDIAN_BIG
@@ -61,7 +74,14 @@ extern cCreep	  *gCreep;
 	// Read a word from the buffer
 	inline word	readWord( const void *buffer ) {
 		const byte *wordByte = (const byte *) buffer;
-		return (wordByte[0] << 8) + wordByte[1];
+
+		return (wordByte[1] << 8) | wordByte[0];
+	}
+
+	inline void writeWord( const void *buffer, word pValue ) {
+		word *wordBytes = (word *) buffer;
+		wordBytes[0] = pValue >> 8;
+		wordBytes[1] = pValue << 8;
 	}
 
 	// Swap the bytes around in a word

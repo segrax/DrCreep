@@ -17,7 +17,7 @@ void cCastle_Object_Door_Button::graphicUpdate() {
 	
 	byte color = mColor;
 	
-	for( char Y = 8; Y >= 0; --Y )
+	for( signed char Y = 8; Y >= 0; --Y )
 		*(mRoom->castleGet()->creepGet()->gameData( 0x63D2 + Y ) ) = color;
 
 	// color
