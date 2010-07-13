@@ -328,7 +328,7 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 
 int ftime(timeb *nul) {
 	static long long i = 0;
-	nul->time = i;
+	nul->time = 0;
 	nul->millitm = i;
 	return i++;
 }
