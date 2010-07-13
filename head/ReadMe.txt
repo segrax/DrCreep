@@ -19,8 +19,7 @@ Required To Play:
 
 Whats Missing:
 --------------
- *original options menu   (however all options on the menu are available in other forms)
-
+  Nothing!
 
 Whats Broken:
 -------------
