@@ -14,7 +14,7 @@ cCastle_Object_Door_Lock::cCastle_Object_Door_Lock( cCastle_Room *pRoom, byte *&
 void cCastle_Object_Door_Lock::graphicUpdate() {
 	byte *gfxPtr = mRoom->castleGet()->creepGet()->gameData( 0x6C53 );
 
-	for( char Y = 8; Y >= 0; --Y )
+	for( signed char Y = 8; Y >= 0; --Y )
 		*(gfxPtr + Y) = mColor;
 }
 

@@ -15,7 +15,7 @@ void cCastle_Object_Forcefield::graphicUpdate() {
 	
 	mRoom->castleGet()->creepGet()->graphicRoomColorsSet( mRoom->colorGet() );
 
-	for( char Y = 7; Y >= 0; --Y )
+	for( signed char Y = 7; Y >= 0; --Y )
 		*mRoom->castleGet()->creepGet()->gameData( 0x6889 + Y ) = 0x55;
 }
 

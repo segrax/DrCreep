@@ -49,8 +49,8 @@ struct sD64Chain {
 struct sD64File {
 	bool	  mChainBroken;				// File Chain Broken
 	string	  mName;					// Name of the file
-	size_t	  mTrack, mSector;			// Starting T/S of file
-	size_t	  mFileSize;				// Number of blocks used by file
+	word	  mTrack, mSector;			// Starting T/S of file
+	word	  mFileSize;				// Number of blocks used by file
 	eD64FileType mFileType;				// Type of file
 
 	byte	*mBuffer;					// Copy of file

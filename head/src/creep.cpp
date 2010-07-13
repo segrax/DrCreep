@@ -38,6 +38,13 @@
 #include <io.h>
 #endif
 
+#ifdef _WII
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+	#include <sys/timeb.h>
+#endif
+
 cCreep::cCreep() {
 	size_t romSize;
 
@@ -62,7 +69,7 @@ cCreep::cCreep() {
 
 	// Load the C64 Character Rom
 	m64CharRom = local_FileRead( "char.rom", romSize, false );
-	
+
 	mGameData = mCastleManager->fileLoad( "OBJECT", romSize ) + 2;
 	romSize -= 2;
 
@@ -156,10 +163,8 @@ void cCreep::titleDisplay() {
 
 	// Skip load address
 	buffer += 0x02;	
-	
 	mScreen->bitmapLoad( buffer,  buffer + 0x1F40, buffer + 0x2328, 1 );
 	mScreen->refresh();
-
 	hw_IntSleep(0x10);
 }
 
@@ -201,6 +206,7 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 
 		string lvl;
 		cout << "\nPlease select a Castle: ";
+
 		cin >> lvl;
 
 		playLevel = atoi( lvl.c_str() );
@@ -222,7 +228,11 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	}
 
 	// Set the default screen scale
+#ifdef _WII
+	mScreen->scaleSet( 1 );
+#else
 	mScreen->scaleSet( 2 );
+#endif
 	mScreen->levelNameSet("");
 
 	// Display the title screen
@@ -284,7 +294,7 @@ void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
 		mUnlimitedLives = 0xFF;
 
 	mSound = new cSound( this );
-	
+
 	for(;;) {
 		
 		mMemory[0xBC00 + count] = byte_30;
@@ -366,7 +376,7 @@ void cCreep::gameMenuDisplaySetup() {
 
 	byte_30 = 0x400;
 
-	for( char X = 3; X >= 0; --X ) {
+	for( signed char X = 3; X >= 0; --X ) {
 		for( word Y = 0; Y <= 0xFF; ++Y )
 			mMemory[ byte_30 + Y ] = 0x20;
 
@@ -457,6 +467,8 @@ void cCreep::gameMenuDisplaySetup() {
 		A = mMemory[ byte_30 + Y ] | 0x80;
 		mMemory[ byte_30 + Y] = A;
 	}
+
+	// Now do available castle names
 
 	sub_2973();
 }
@@ -596,14 +608,14 @@ void cCreep::sub_95F() {
 void cCreep::mainLoop() {
 
 	mScreen->bitmapLoad( &mMemory[ 0xE000 ], &mMemory[ 0xCC00 ], &mMemory[ 0xD800 ], 0 );
-
+	
 	//mCastle->castleStart( 2 );
 
 	while(!mQuit) {
 		
 		if( Intro() == true )
 			continue;
-
+			
 		Game();
 	}
 
@@ -718,7 +730,7 @@ void cCreep::graphicRoomColorsSet( byte pRoomColor ) {
 
 	//1487
 
-	for( char Y = 7; Y >= 0; --Y ) {
+	for( signed char Y = 7; Y >= 0; --Y ) {
 		*memory( 0x6FB2 + Y ) = pRoomColor;
 		*memory( 0x6FF5 + Y ) = pRoomColor;
 		*memory( 0x7038 + Y ) = pRoomColor;
@@ -840,7 +852,7 @@ bool cCreep::Intro() {
 			screenClear();
 			roomPrepare( );
 		}
-		
+
 		// 0BE1 
 		if( byte_20DE != 1 ) {
 		
@@ -910,7 +922,7 @@ bool cCreep::Intro() {
 		if( mJoyButtonState )
 			break;
 	}
-	
+
 	// 0CDD
 	byte_20DE = 0;
 	mIntro = 0;
@@ -919,7 +931,7 @@ bool cCreep::Intro() {
 	// Disable music playback
 	mSound->playback( false );
 
-	char X = 0x0E;
+	signed char X = 0x0E;
 
 	while(X >= 0) {
 		mMemory[ 0x20EF + X ] &= 0xFE;
@@ -928,7 +940,6 @@ bool cCreep::Intro() {
 
 		X -= 0x07;
 	}
-
 
 	return false;
 }
@@ -970,7 +981,7 @@ musicUpdate:;
 
 		X = *memory( 0x20D2 + A );
 
-		for( char Y = X - 1; Y >= 0; --Y )
+		for( signed char Y = X - 1; Y >= 0; --Y )
 			*memory( 0x20CB + Y ) = *(mMusicBuffer + Y);
 
 		// 1F60
@@ -1025,7 +1036,7 @@ musicUpdate:;
 			case 4:
 				musicPtrsSet();
 				
-				for( char Y = 2; Y < 7; ++Y ) {
+				for( signed char Y = 2; Y < 7; ++Y ) {
 					if( Y != 4 ) {
 						// 1FDD
 						byte A = *memory( 0x20CA + Y );
@@ -1127,7 +1138,7 @@ void cCreep::musicChange() {
 	byte A = 0;
 
 	//0C9A
-	for( char X = 0x0E; X >= 0; X -= 7 ) {
+	for( signed char X = 0x0E; X >= 0; X -= 7 ) {
 		A = *memory( 0x20EF + X );
 
 		A &= 0xFE;
@@ -1156,9 +1167,9 @@ void cCreep::optionsMenu() {
 	for(;; ) {
 		mScreen->spriteDisable();
 
-		word_30 = 0xD800;
-
 		//2257
+		// Set the color of all text positions to WHITE
+		word_30 = 0xD800;
 		for(word Y = 0;;Y=0) {
 
 			for( ;Y != 0x100; ++Y ) 
@@ -1168,7 +1179,8 @@ void cCreep::optionsMenu() {
 			if( word_30 >= 0xDC00 )
 				break;
 		}
-	
+		
+		// Decode the background as text
 		mScreen->drawStandardText( memory( 0x400 ), 0x1000, memory( 0xD800 ));
 		mScreen->refresh();
 
@@ -1427,7 +1439,7 @@ s2ED5:
 
 				// Sprite X
 				mMemory[ 0x10 + Y ] = (word_30 - 8);
-				sprite->_X = (word_30 - 8);
+				sprite->mX = (word_30 - 8);
 
 				if((word_30 >= 0x100) && ((word_30 - 8) < 0x100))
 					--w30;
@@ -1454,7 +1466,7 @@ s2F51:;
 						sprite->_rEnabled = false;
 					} else {
 						// 2F5B
-						sprite->_Y = ((char) mMemory[ 0xBD02 + X ]) + 0x32;
+						sprite->mY = ((char) mMemory[ 0xBD02 + X ]) + 0x32;
 						mMemory[ 0x18 + Y ] = mMemory[ 0xBD02 + X ] + 0x32;
 						A = mMemory[ 0x21 ] | mMemory[ 0x2F82 + Y ];
 
@@ -2326,7 +2338,7 @@ s3B6E:
 			byte_3F11 = 0x00;
 			byte_3F12 = 0xFF;
 			
-			for( char Y = 3; Y >= 0; --Y ) {
+			for( signed char Y = 3; Y >= 0; --Y ) {
 				A = mMemory[ 0x3F0C + Y ];
 				if( (byte) A >= (byte) byte_3F10 )
 					continue;
@@ -2775,7 +2787,7 @@ void cCreep::Game() {
 		mMemory[ 0x7812 ] = byte_D10;
 
 		// Clear Stored CIA Timers
-		for( char Y = 7; Y >= 0; --Y )
+		for( signed char Y = 7; Y >= 0; --Y )
 			mMemory[ 0x7855 + Y ] = 0;
 
 		mMemory[ 0x785D ] = mMemory[ 0x785E ] = 0;
@@ -2857,7 +2869,7 @@ void cCreep::Game() {
 							byte A = X << 2;
 							
 							word_30 = 0x7855 + A;
-							for( char Y = 3; Y >= 0; --Y )
+							for( signed char Y = 3; Y >= 0; --Y )
 								mMemory[ 0x1CF9 + Y ] = mMemory[ word_30 + Y ];
 							
 							mMemory[ 0x1CFD ] = X;
@@ -2971,7 +2983,7 @@ bool cCreep::mapDisplay() {
 
 			// Sprite X
 			mMemory[ 0x10 + Y ] = A;
-			sprite->_X = posX ;
+			sprite->mX = posX ;
 
 			if( cf ) {
 				A = mMemory[ 0x2F82 + Y ] | mMemory[ 0x20 ];
@@ -2988,7 +3000,7 @@ bool cCreep::mapDisplay() {
 			A += 0x32;
 
 			// Sprite Y
-			sprite->_Y = A;
+			sprite->mY = A;
 			mMemory[ 0x18 + mMemory[ 0x11D8 ] ] = A;
 			mMemory[ 0xBD03 + X ] = mMemory[ 0x11E2 + mMemory[0x11D9] ];
 			
@@ -3307,7 +3319,7 @@ void cCreep::roomMain() {
 		// 156B
 		if( byte_B83 == 1 ) {
 			byte_B83 = 0;
-			char X = 1;
+			signed char X = 1;
 			for(;;) {
 				if( mMemory[ 0x780D + X ] == 0 ) {
 					mMemory[ 0x780D + X ] = 2;
@@ -3344,6 +3356,7 @@ s15B4:;
 		break;
 	}
 
+	// Leaving Room
 	// 15C4
 	mMemory[ 0x15D7] = 0;
 
@@ -3383,7 +3396,7 @@ void cCreep::stringDraw() {
 	word_30 = ((mMemory[0x73E8] << 1) + 0xEA);
 	word_30 += 0x7300;
 
-	for( char Y = 5; Y >= 0; --Y)
+	for( signed char Y = 5; Y >= 0; --Y)
 		mMemory[ word_30 + Y] = mTextColor << 4;
 	
 	//2AFE
@@ -3396,7 +3409,7 @@ void cCreep::stringDraw() {
 		word_30 += (mMemory[ 0x2BE9 + X ] << 8);
 
 		// Copy from Char ROM
-		for( char count = 7; count >= 0; --count )
+		for( signed char count = 7; count >= 0; --count )
 			mMemory[ 0x2BF0 + count ] = charRom( word_30 + count);
 
 		word_30 = 0x73EA;
@@ -3446,7 +3459,7 @@ void cCreep::stringDraw() {
 
 		screenDraw( 2, 0x95, gfxPosX, gfxPosY, 0x94 );
 
-		if( ((char) mMemory[ word_3E ]) < 0 )
+		if( ((signed char) mMemory[ word_3E ]) < 0 )
 			break;
 
 		++word_3E;
@@ -4144,7 +4157,7 @@ void cCreep::obj_Image_Draw() {
 // 160A: Draw multiples of an object
 void cCreep::obj_MultiDraw() {
 	byte gfxCurrentID, gfxPosX, gfxPosY;
-	char gfxRepeat;
+	signed char gfxRepeat;
 
 	while( (gfxRepeat = mMemory[ word_3E ]) != 0 ) {
 
@@ -4271,10 +4284,10 @@ void cCreep::gameEscapeCastle() {
 
 		// 1A4B
 		mMemory[ 0x10 + Y ] = ((mMemory[ 0xBD01 + X ] - 0x10) << 1) + 0x18;
-		sprite->_X = ((mMemory[ 0xBD01 + X ] - 0x10) << 1) + 0x18;
+		sprite->mX = ((mMemory[ 0xBD01 + X ] - 0x10) << 1) + 0x18;
 		
 		// 1A72
-		sprite->_Y = mMemory[ 0xBD02 + X ] + 0x32;
+		sprite->mY = mMemory[ 0xBD02 + X ] + 0x32;
 
 		hw_SpritePrepare( X );
 		sprite->_rEnabled = true;
@@ -4407,7 +4420,7 @@ s1BE7:;
 	word_30 = A + ((mMemory[ 0x5D06 + Y ] | 4) << 8);
 	mMemory[ 0x28D6 ] = 0x59;
 
-	for( char Y = 0x0E; Y >= 0; --Y ) {
+	for( signed char Y = 0x0E; Y >= 0; --Y ) {
 		A = mMemory[ word_30 + Y ];
 
 		if( (A & 0x7F) < 0x20 )
@@ -5524,7 +5537,7 @@ void cCreep::obj_Door_Lock_Prepare() {
 		byte A = (mMemory[ word_3E ] << 4);
 		A |= mMemory[ word_3E ];
 
-		for( char Y = 8; Y >= 0; --Y )
+		for( signed char Y = 8; Y >= 0; --Y )
 			mMemory[ 0x6C53 + Y ] = A;
 
 		mMemory[ 0xBE00 + X ] = *level( word_3E );
@@ -5721,7 +5734,7 @@ void cCreep::obj_Door_Button_Prepare() {
 		mMemory[ 0xBE00 + X ] = mMemory[ word_3E+2 ];
 		
 		byte A = 0;
-		char Y = 0;
+		unsigned char Y = 0;
 
 		for(;;) {
 			if( mMemory[ 0xBF00 + Y ] == 0 ) {
@@ -5735,10 +5748,10 @@ void cCreep::obj_Door_Button_Prepare() {
 			Y += 8;
 		}
 
-		Y = 8;
-		while( Y >= 0 ) {
-			mMemory[ 0x63D2 + Y ] = A;
-			--Y;
+		signed char Y2 = 8;
+		while( Y2 >= 0 ) {
+			mMemory[ 0x63D2 + Y2 ] = A;
+			--Y2;
 		}
 
 		A >>= 4;
@@ -5951,7 +5964,7 @@ void cCreep::obj_Forcefield_Prepare() {
 		gfxPosX += 4;
 		gfxPosY += 8;
 
-		for( char Y = 7; Y >= 0; --Y ) 
+		for( signed char Y = 7; Y >= 0; --Y ) 
 			mMemory[ 0x6889 + Y ] = 0x55;
 
 		// Draw inside of timer
@@ -5999,7 +6012,7 @@ void cCreep::obj_Mummy_Prepare( ) {
 
 		mMemory[ 0xBE00 + X ] = byte_498D;
 		mMemory[ 0xBE02 + X ] = 0x66;
-		for( char Y = 5; Y >= 0; --Y )
+		for( signed char Y = 5; Y >= 0; --Y )
 			mMemory[ 0x68F0 + Y ] = 0x66;
 
 		img_Update( gfxCurrentID, gfxPosX, gfxPosY, 0, X );
@@ -6323,7 +6336,7 @@ void cCreep::obj_Frankie_Load() {
 		// 56C4
 		byte_574B = A;
 		
-		for( char Y = 4; Y >= 0; Y -= 2 ) {
+		for( signed char Y = 4; Y >= 0; Y -= 2 ) {
 			mMemory[ word_3C + Y ] &= byte_574B;
 		}
 		byte X;

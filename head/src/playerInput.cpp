@@ -28,6 +28,8 @@
 #include "creep.h"
 #include "vic-ii/screen.h"
 
+#define MAX_WIIMOTES				4
+
 cPlayerInput::cPlayerInput( cCreep *pCreep ) {
 	mCreep = pCreep;
 
@@ -36,8 +38,12 @@ cPlayerInput::cPlayerInput( cCreep *pCreep ) {
 	mRestore = false;
 	mF2 = false;
 	mF3 = false;
+
 }
 
+cPlayerInput::~cPlayerInput() {
+
+}
 void cPlayerInput::inputCheck( bool pClearAll ) {
 
 	if(pClearAll) {
@@ -55,13 +61,62 @@ void cPlayerInput::inputCheck( bool pClearAll ) {
 		if( mEvent.type == SDL_QUIT )
 			exit(0);
 
+#ifndef _WII
 		KeyboardCheck();
 		KeyboardInputSet1( &mInput[ 0 ] );
 		KeyboardInputSet2( &mInput[ 1 ] );
+#endif
 	}
+
+#ifdef _WII
+	wiiInputCheck();
+
+	wiiInputSet( &mInput[ 0 ], WPAD_CHAN_0 );
+	wiiInputSet( &mInput[ 1 ], WPAD_CHAN_1 );
+#endif
 
 	return;
 }
+
+#ifdef _WII
+
+void cPlayerInput::wiiInputCheck() {
+
+	WPAD_ScanPads();
+
+}
+
+void cPlayerInput::wiiInputSet ( sPlayerInput *pInput, dword pChannel ) {
+	u32 held = WPAD_ButtonsHeld(pChannel); 
+	
+	if( held & WPAD_BUTTON_2 )
+		pInput->mButton = true;
+	else
+		pInput->mButton = false;
+
+	if( held & WPAD_BUTTON_LEFT )
+		pInput->mUp = true;
+	else
+		pInput->mUp = false;
+
+	if( held & WPAD_BUTTON_RIGHT )
+		pInput->mDown = true;
+	else
+		pInput->mDown = false;
+
+	if( held & WPAD_BUTTON_UP )
+		pInput->mLeft = true;
+	else
+		pInput->mLeft = false;
+
+	if( held & WPAD_BUTTON_DOWN )
+		pInput->mRight = true;
+	else
+		pInput->mRight = false;
+}
+
+
+#endif
 
 void cPlayerInput::KeyboardCheck() {
 

@@ -13,7 +13,7 @@ cCastle_Object_Mummy::cCastle_Object_Mummy( cCastle_Room *pRoom, byte *&pObjectB
 
 void cCastle_Object_Mummy::graphicUpdate() {
 	
-	for( char Y = 5; Y >= 0; --Y )
+	for( signed char Y = 5; Y >= 0; --Y )
 		*mRoom->castleGet()->creepGet()->gameData( 0x68F0 + Y ) = 0x66;
 }
 
