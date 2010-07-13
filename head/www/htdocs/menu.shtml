@@ -20,10 +20,17 @@
   </div></div>
   
    <div id="sidebar3"><div class="sidebarMain" >
+  <div class="menuTitles">Links</div>
+  <h6>
+  <a href="http://baetzler.de/c64/games/creep/">Dr. Creep Revisted</a><br />
+  <a href="http://moon.descentforum.net/creep/">Dr. Creep Real Estate</a><br />
+  </h6>
+  </div></div>
+
+   <div id="sidebar4"><div class="sidebarMain" >
   <div class="menuTitles">Development</div>
   <h6>
   <a href="http://creep.svn.sourceforge.net/viewvc/creep/head/src/">SVN</a><br />
   </h6>
   </div></div>
   </div>
- 
