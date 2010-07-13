@@ -124,14 +124,13 @@ void cScreen::bitmapRefresh() {
 		mBitmap->load( mBitmapBuffer, mBitmapColorData, mBitmapColorRam, mBitmapBackgroundColor );
 		mBitmapRedraw = false;
 	}
-
 	blit( mBitmap->mSurface, 24, 50, false, false );
 	mScreenRedraw = true;
 }
 
 void cScreen::blit( cSprite *pSprite, byte pSpriteNo ) {
 	
-	blit( pSprite->_surface, pSprite->_X, pSprite->_Y, pSprite->_rPriority, pSpriteNo );
+	blit( pSprite->_surface, pSprite->mX, pSprite->mY, pSprite->_rPriority, pSpriteNo );
 }
 
 void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority, byte pSpriteNo) {
@@ -197,7 +196,6 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 			++source;
 		}
 	}
-	
 }
 
 cSprite *cScreen::spriteGet( byte pCount ) {
@@ -222,7 +220,7 @@ void cScreen::levelNameSet( string pName ) {
 void cScreen::refresh() {
 	static time_t timeFirst = time(0);
 	time_t calc = time(0) - timeFirst;
-
+	
 	if( calc > 1 ) {
 		mFPSTotal += mFPS;
 		// Total elapsed time increase
@@ -233,12 +231,11 @@ void cScreen::refresh() {
 	}
 
 	++mFPS;
-
 	if(( mBitmapRedraw || mSpriteRedraw) && !mTextRedraw) {
 		bitmapRefresh();
 		spriteDraw();
 	}
-	
+
 	if( mTextRedraw ) {
 		mScreenRedraw = true;
 		mTextRedraw = false;
@@ -246,26 +243,28 @@ void cScreen::refresh() {
 
 	if( mScreenRedraw ) {
 		mScreenRedraw = false;
-		
-		SDL_Surface *surface = scaleUp();	
 
+		SDL_Surface *surface = scaleUp();	
 		mWindow->clear(0);
-		mWindow->blit( surface, 0, 0, 0, 0 );
+		if(surface)
+			mWindow->blit( surface, 0, 0, 0, 0 );
+		else
+			mWindow->blit( mSDLSurface , 0, 0, 0, 0 );
 	}
+
 }
 
 void cScreen::spriteDisable() {
-	for( char Y = 7; Y >= 0; --Y )
+	for( signed char Y = 7; Y >= 0; --Y )
 		mSprites[Y]->_rEnabled = false;
 }
 
 void cScreen::spriteDraw() {
 	cSprite *sprite;
-
 	mCollisions.clear();
 
 	// Draw from sprite 7
-	for( char Y = 7; Y >= 0; --Y ) {
+	for( signed char Y = 7; Y >= 0; --Y ) {
 		sprite = mSprites[Y];
 
 		if(!sprite->_rEnabled)
@@ -283,8 +282,12 @@ void cScreen::spriteDraw() {
 
 SDL_Surface	*cScreen::scaleUp( ) {
 
-	if( mScale < 2 || mScale > 4 )
-		return 0;
+	if( mScale < 2 || mScale > 4 ) {
+
+		memcpy( mSDLSurface->pixels, mSurface->screenBufferGet(), mSDLSurface->pitch * mSDLSurface->h );
+
+		return mSDLSurface;
+	}
 
 	SDL_SetColorKey(mSDLSurfaceScaled, SDL_SRCCOLORKEY, SDL_MapRGB(mSDLSurfaceScaled->format, 0, 0, 0)	);
 

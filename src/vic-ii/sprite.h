@@ -34,7 +34,7 @@ public:
 
 	cScreenSurface			*_surface;
 
-	word					 _X,		_Y;
+	word					 mX,		mY;
 	byte					 _color,		_multiColor0,	_multiColor1;
 
 	void					 drawMulti( byte *pBuffer );
