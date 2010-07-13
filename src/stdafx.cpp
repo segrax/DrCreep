@@ -296,12 +296,15 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 
 #ifdef _WII
 
+<<<<<<< .mine
+=======
 vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 	vector<string> ret;
 	transform( pExtension.begin(), pExtension.end(), pExtension.begin(), ::toupper);
 	
 	string path = local_PathGenerate( pPath, pDataSave );
 
+>>>>>>> .r231
 	DIR* pdir = opendir(path.c_str());
 	if (pdir != NULL) {
 		

@@ -38,12 +38,21 @@
 
 using namespace std;
 
+<<<<<<< .mine
+#ifndef _WII
+	#include <SDL.h>
+#else
+	#include <SDL/SDL.h>
+#endif
+
+=======
 #ifdef _WII
 #include <SDL/SDL.h>
 #include <wiiuse/wpad.h>
 #include "wiiuse/wiiuse.h"
 #else
 #include <SDL.h>
+>>>>>>> .r231
 #endif
 
 #include "types.h"
