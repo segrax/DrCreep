@@ -415,7 +415,6 @@ cCastle *cCastleManager::castleLoad( size_t pNumber ) {
 
 	delete mCastle;
 	mCastle = new cCastle( gCreep, mCastles[ pNumber ] );
-
-	mCastle->infoGet()->castleNumberSet( pNumber );
+	
 	return mCastle;
 }

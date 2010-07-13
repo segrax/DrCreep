@@ -49,14 +49,7 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 	// Set the window title screen
 	gCreep->screenGet()->levelNameSet( mName );
 
-	//byte	*ptr = gCreep->memory(0x9800);
-	//byte	*ptrSrc = mBuffer;
-	//dword	 size = pCastleInfo->bufferSizeGet() - 2;
-
-	// Copy it into the memory region
-	//for( dword i = 0; i < size ; ++i )
-	//	*ptr++ = *ptrSrc++;
-
+	// Copy the castle into game memory
 	memcpy( gCreep->memory(0x9800), mBuffer, pCastleInfo->bufferSizeGet() - 2 );
 
 	// Load the highscores for this castle
@@ -75,9 +68,6 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 	}
 
 	//loadHeader();
-
-	// Update the selected castle on the menu
-	mCreep->menuUpdate( mCastleInfo->castleNumberGet() );
 }
 
 cCastle::~cCastle() {
