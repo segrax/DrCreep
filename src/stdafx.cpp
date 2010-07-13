@@ -330,7 +330,7 @@ int ftime(timeb *nul) {
 	static long long i = 0;
 	nul->time = 0;
 	nul->millitm = i;
-	return i+=35;
+	return i+=28;
 }
 
 #else
