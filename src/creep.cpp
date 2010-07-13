@@ -455,10 +455,9 @@ void cCreep::gameMenuDisplaySetup() {
 
 	mMemory[ byte_30 + Y ] = 0x3E;
 
-	A = mMemory[ 0x5CE6 + 7 ];
-	byte_30 = A & 0xFF;
-
 	x = 7;
+	A = mMemory[ 0x5CE6 + x ];
+	byte_30 = A & 0xFF;
 
 	// 762F
 	byte_30 = ((4 + mMemory[ 0x5D06 + 7 ]) << 8) | (byte_30 & 0xFF);
@@ -467,9 +466,55 @@ void cCreep::gameMenuDisplaySetup() {
 		A = mMemory[ byte_30 + Y ] | 0x80;
 		mMemory[ byte_30 + Y] = A;
 	}
+	mMemory[ 0x775F ] = 0x0C;
+	mMemory[ 0x775E ] = 0x03;
 
 	// Now do available castle names
+	for(int curCastle = 0; curCastle < 0x18; ++curCastle) {
+		word X = mFileListingNamePtr;
+		cCastleInfo *castle = mCastleManager->castleInfoGet( curCastle );
 
+		if( !castle )
+			break;
+
+		mMemory[ 0xBA00 + X ] = mMemory[ 0x775E ];
+		mMemory[ 0xBA01 + X ] = mMemory[ 0x775F ];
+
+		mMemory[ 0xBA02 + X ] = 2;
+
+		X = mMemory[ 0x775F ];
+		word_32 = mMemory[ 0x5CE6 + X ];
+		//
+		A = mMemory[ 0x5D06 + X ] + 4;
+		word_32 = (A << 8) + (word_32 & 0xFF);
+
+
+		X = mMemory[ 0x775E ];
+		X -= 0;
+		
+		X += word_32 & 0xFF;
+		
+		word_32 = X + (word_32 & 0xFF00);
+		
+		for( int counter = 0; counter < castle->nameGet().length(); ++counter, ++word_32 )
+			mMemory[ word_32 ] = toupper(castle->nameGet()[ counter ]) & 0x3F;
+
+		mFileListingNamePtr += 4;
+
+		if(mMemory[ 0x775E ] == 3)
+			mMemory[ 0x775E ] = 0x16;
+		else {
+			mMemory[ 0x775E ] = 3;
+			++mMemory[ 0x775F ];
+
+			if(mMemory[ 0x775F ] >= 0x18)
+				break;
+		}
+	}
+	
+	mMemory[ 0x239A ] = mFileListingNamePtr - 4;
+
+	mFileListingNamePtr = 0x08;
 	sub_2973();
 }
 
@@ -1182,28 +1227,73 @@ void cCreep::optionsMenu() {
 		
 		// Decode the background as text
 		mScreen->drawStandardText( memory( 0x400 ), 0x1000, memory( 0xD800 ));
-		mScreen->refresh();
-
-		return;
 
 		// 226E
 		for(;;) {
-			
+					
+			hw_Update();
+			hw_IntSleep(1);
 			KeyboardJoystickMonitor(0);
 			if( !mJoyButtonState ) {
 				
 				if( byte_5F56 & 0xFB )
 					continue;
 				
-				// 227F
+				// 22F7
+				// 
+				byte X = mFileListingNamePtr;
+				byte Y = mMemory[ 0xBA01 + X ];
 				
+				word_30 = mMemory[ 0x5CE6 + Y ];
+				word_30 += (mMemory[ 0x5D06 + Y ] + 4) << 8;
+				
+				Y = mMemory[ 0xBA00 + X ] - 2;
+				
+				mMemory[ word_30 + Y ] = 0x20;
+
+				byte A = byte_5F56;
+				if(A) {
+					A = mFileListingNamePtr;
+
+					if( mFileListingNamePtr == mMemory[ 0x239A ] )
+						A = 0;
+					else
+						A += 4;
+
+				} else {
+					// 22B5
+					A = mFileListingNamePtr;
+					if( A )
+						A -= 4;
+					else
+						A = mMemory[ 0x239A ];
+
+				}
+
+				// 22C3
+				mFileListingNamePtr = A;
+				X = A;
+
+				Y = mMemory[ 0xBA01 + X ];
+				A = mMemory[ 0x5CE6 + Y ];
+
+				word_30 = A;
+				word_30 |= ((mMemory[ 0x5D06 + Y ] + 4) << 8);
+				
+				Y = (mMemory[ 0xBA00 + X ] - 2);
+
+				mMemory[ word_30 + Y ] = 0x3E;
+				
+				// Decode the background as text
+				mScreen->drawStandardText( memory( 0x400 ), 0x1000, memory( 0xD800 ));
+
 			} else {
 				// Button Press
 				// 22E5
 				
 			}
 
-
+			
 		}
 	}
 }
