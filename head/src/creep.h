@@ -162,6 +162,7 @@ public:
 
 		void	 lvlPtrCalculate( byte pCount );
 
+		bool	 ChangeLevel( size_t pMenuItem );
 		void	 Game();
 		void	 roomMain();
 

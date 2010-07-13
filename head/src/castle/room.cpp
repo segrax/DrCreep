@@ -156,7 +156,6 @@ void cCastle_Room::obj_Door_Load( byte *&pObjectBuffer ) {
 }
 
 void cCastle_Room::obj_Walkway_Load( byte *&pObjectBuffer ) {
-	byte					*buffer = pObjectBuffer;
 	cCastle_Object_Walkway	*object = 0;
 
 	while( (*pObjectBuffer)) {
@@ -171,7 +170,6 @@ void cCastle_Room::obj_Walkway_Load( byte *&pObjectBuffer ) {
 }
 
 void cCastle_Room::obj_SlidingPole_Load( byte *&pObjectBuffer ) {
-	byte						*buffer = pObjectBuffer;
 	cCastle_Object_SlidingPole	*object = 0;
 
 	while( (*pObjectBuffer)) {
@@ -186,7 +184,6 @@ void cCastle_Room::obj_SlidingPole_Load( byte *&pObjectBuffer ) {
 }
 
 void cCastle_Room::obj_Ladder_Load( byte *&pObjectBuffer ) {
-	byte						*buffer = pObjectBuffer;
 	cCastle_Object_Ladder	*object = 0;
 
 	while( (*pObjectBuffer)) {

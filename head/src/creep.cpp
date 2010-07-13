@@ -133,6 +133,7 @@ cCreep::cCreep() {
 	byte_574F = 0x01;	
 	byte_574C = 0x80;
 
+	mCastle = 0;
 	mJoyButtonState = 0xA0;
 
 	mMusicCurrent = "MUSIC0";
@@ -358,8 +359,8 @@ void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
 			if( word_30 >= 0x7800 )
 				break;
 		}
-
-		if( (mCastle = mCastleManager->castleLoad( pStartLevel )) == 0)
+		
+		if( !ChangeLevel( 0x10 + (pStartLevel * 4) ) )
 			return;
 
 	} else {
@@ -496,7 +497,7 @@ void cCreep::gameMenuDisplaySetup() {
 		
 		word_32 = X + (word_32 & 0xFF00);
 		
-		for( int counter = 0; counter < castle->nameGet().length(); ++counter, ++word_32 )
+		for( size_t counter = 0; counter < castle->nameGet().length(); ++counter, ++word_32 )
 			mMemory[ word_32 ] = toupper(castle->nameGet()[ counter ]) & 0x3F;
 
 		mFileListingNamePtr += 4;
@@ -1207,7 +1208,6 @@ void cCreep::musicChange() {
 
 // 2233 : Intro Menu
 void cCreep::optionsMenu() {
-	// TODO:
 
 	for(;; ) {
 		mScreen->spriteDisable();
@@ -1312,14 +1312,39 @@ void cCreep::optionsMenu() {
 					//  2326
 					if( A == 2 ) {
 						X = mFileListingNamePtr;
-
-						break;
+						ChangeLevel(X);
+					} else if( A == 3 ) {
+						gamePositionLoad();
+						
+						if( mMemory[ 0x24FD ] != 1 )
+							continue;
 					}
 					
-				}
+					if( A == 4 ) {
+						if( mMemory[ 0x2399 ] == 0xFF )
+							continue;
 
-			}
+						sub_95F();
+						gameHighScores();
 
+						// Draw 'Press Enter to exit'
+						word_3E = 0x239C;
+						obj_stringPrint();
+
+						mMemory[ 0x278C ] = 0;
+						textShow();
+						
+						break;
+					} else {
+						//inputWait();
+						sub_95F();
+						return;
+					}
+
+				}	// Menu Item Pressed
+
+			}// Button Pressed
+			
 			// Decode the background as text
 			mScreen->drawStandardText( memory( 0x400 ), 0x1000, memory( 0xD800 ));
 		}
@@ -1327,18 +1352,21 @@ void cCreep::optionsMenu() {
 }
 
 void cCreep::menuUpdate( size_t pCastleNumber ) {
-	char Y = mMemory[ 0xBA01 + pCastleNumber ];
+	byte X = pCastleNumber;
+	if(mMemory[ 0x2399 ] == X)
+		return;
 
+	byte Y = mMemory[ 0xBA01 + X ];
 	word_30 = mMemory[ 0x5CE6 + Y ];
 	word_30 |= ((mMemory[ 0x5D06 + Y ] | 4) << 8);
 
-	word_30 += mMemory[ 0xBA00 + pCastleNumber ];
+	word_30 += mMemory[ 0xBA00 + X ];
 
-	mMemory[ 0x24A6 ] = pCastleNumber;
+	mMemory[ 0x24A6 ] = X;
 
 	// 2466
 
-	byte X = mMemory[ 0x2399 ];
+	X = mMemory[ 0x2399 ];
 	
 	Y = mMemory[ 0xBA01 + X ];
 	word_32 = mMemory[ 0x5CE6 + Y ];
@@ -1347,15 +1375,14 @@ void cCreep::menuUpdate( size_t pCastleNumber ) {
 	word_32 += mMemory[ 0xBA00 + X ];
 
 	// 2484
-	Y = 0x0F;
 	X = mMemory[ 0x24A6 ];
 
-	for( Y = 0x0F; Y >= 0; --Y ) {
-		if( mMemory[ 0x2399 ] != 0xFF ) {
-			mMemory[ word_32 ] &= 0x7F;
-		} else {
-			mMemory[ word_30 ] |= 0x80;
-		}
+	for( char Y = 0x0F; Y >= 0; --Y ) {
+
+		if( mMemory[ 0x2399 ] != 0xFF )
+			mMemory[ word_32 + Y] &= 0x7F;
+			
+		mMemory[ word_30 + Y] |= 0x80;
 	}
 
 	mMemory[ 0x2399 ] = X;
@@ -2912,6 +2939,16 @@ void cCreep::lvlPtrCalculate( byte pCount ) {
 	word_42 += 0x7900;
 	if( mIntro )
 		word_42 += 0x2000;
+}
+
+bool cCreep::ChangeLevel( size_t pMenuItem ) {
+	size_t castleNumber = (pMenuItem - 0x10);
+	castleNumber /= 4;
+
+	if( (mCastle = mCastleManager->castleLoad( castleNumber )) == 0)
+			return false;
+
+	menuUpdate(pMenuItem); 
 }
 
 // 0D71: 
@@ -4599,22 +4636,20 @@ s1BE7:;
 void cCreep::gameHighScores( ) {
 	screenClear();
 
-	mMemory[ 0x2399 ] = mCastle->nameGet().size() - 1;
-	mMemory[ 0xBA01 + 0x10 ] = mCastle->nameGet().size() - 1;
-	mMemory[ 0xBA10 ] = 0x03;
+	byte X = (mCastle->infoGet()->castleNumberGet() * 4) + 0x10;
+	mMemory[ 0x2399 ] = X;
 
-	byte X = mMemory[ 0x2399 ];
 	byte Y = mMemory[ 0xBA01 + X ];
 	byte A = mMemory[ 0x5CE6 + Y ];
 
-	word_30 = A + mMemory[ 0xBA00 + X ] + ((mMemory[ 0x5D06 + Y] | 0x04) << 8);
+	word_30 = (A + mMemory[ 0xBA00 + X ]) + ((mMemory[ 0x5D06 + Y] | 0x04) << 8);
 
-	mMemory[ 0xBA03 + X ] = mCastle->nameGet().size() - 1;
+	mMemory[ 0xBA03 + X ] = mCastle->nameGet().size() + 1;
 
-	Y =  mCastle->nameGet().size() - 1;
+	Y =  mMemory[ 0xBA03 + X ] - 2;
 
 	// 1D67
-	//mMemory[ 0xB87A + Y ] = mMemory[ word_30 + Y ];
+	mMemory[ 0xB87A + Y ] = mMemory[ word_30 + Y ];
 
 	// Convert name
 	for( ; (char) Y >= 0; --Y )
