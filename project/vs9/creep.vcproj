@@ -271,72 +271,24 @@
 				Name="scale"
 				>
 				<File
-					RelativePath="..\..\src\graphics\scale\scale2x.c"
+					RelativePath="..\..\src\graphics\scale\scale2x.cpp"
 					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							CompileAs="2"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\graphics\scale\scale2x.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\graphics\scale\scale3x.c"
+					RelativePath="..\..\src\graphics\scale\scale3x.cpp"
 					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							CompileAs="2"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\graphics\scale\scale3x.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\graphics\scale\scalebit.c"
+					RelativePath="..\..\src\graphics\scale\scalebit.cpp"
 					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							CompileAs="2"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							CompileAs="2"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\graphics\scale\scalebit.h"
@@ -507,7 +459,7 @@
 				Name="sid"
 				>
 				<File
-					RelativePath="..\..\src\resid-0.16\envelope.cc"
+					RelativePath="..\..\src\resid-0.16\envelope.cpp"
 					>
 				</File>
 				<File
@@ -522,7 +474,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\extfilt.cc"
+					RelativePath="..\..\src\resid-0.16\extfilt.cpp"
 					>
 				</File>
 				<File
@@ -537,7 +489,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\filter.cc"
+					RelativePath="..\..\src\resid-0.16\filter.cpp"
 					>
 				</File>
 				<File
@@ -552,7 +504,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\pot.cc"
+					RelativePath="..\..\src\resid-0.16\pot.cpp"
 					>
 				</File>
 				<File
@@ -567,7 +519,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\sid.cc"
+					RelativePath="..\..\src\resid-0.16\sid.cpp"
 					>
 				</File>
 				<File
@@ -604,11 +556,11 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\version.cc"
+					RelativePath="..\..\src\resid-0.16\version.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\voice.cc"
+					RelativePath="..\..\src\resid-0.16\voice.cpp"
 					>
 				</File>
 				<File
@@ -623,7 +575,7 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\wave.cc"
+					RelativePath="..\..\src\resid-0.16\wave.cpp"
 					>
 				</File>
 				<File
@@ -638,35 +590,35 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\wave6581__ST.cc"
+					RelativePath="..\..\src\resid-0.16\wave6581__ST.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\wave6581_P_T.cc"
+					RelativePath="..\..\src\resid-0.16\wave6581_P_T.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\wave6581_PS_.cc"
+					RelativePath="..\..\src\resid-0.16\wave6581_PS_.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\wave6581_PST.cc"
+					RelativePath="..\..\src\resid-0.16\wave6581_PST.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\wave8580__ST.cc"
+					RelativePath="..\..\src\resid-0.16\wave8580__ST.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\wave8580_P_T.cc"
+					RelativePath="..\..\src\resid-0.16\wave8580_P_T.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\wave8580_PS_.cc"
+					RelativePath="..\..\src\resid-0.16\wave8580_PS_.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\resid-0.16\wave8580_PST.cc"
+					RelativePath="..\..\src\resid-0.16\wave8580_PST.cpp"
 					>
 				</File>
 			</Filter>
