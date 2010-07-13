@@ -100,7 +100,7 @@ cD64::cD64( string pD64, bool pCreate, bool pDataSave, bool pReadOnly ) {
 
 	mReady = true;
 
-	diskTest();
+	//diskTest();
 }
 
 // D64 Destructor
