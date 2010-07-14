@@ -327,7 +327,7 @@ void cCastle_Room::obj_Load() {
 	
 	while(func) {
 
-		func = readWord( roomPtr );
+		func = readLEWord( roomPtr );
 		roomPtr  += 2;
 
 		switch( func ) {
@@ -446,7 +446,7 @@ void cCastle_Room::screenDraw(  word pDecodeMode, word pGfxID, byte pGfxPosX, by
 		word_38 <<= 1;
 		word_38 += 0x603B;
 
-		word_30 = readWord( mCastle->creepGet()->gameData( word_38 ) );
+		word_30 = readLEWord( mCastle->creepGet()->gameData( word_38 ) );
 		
 		mTxtWidth = *mCastle->creepGet()->gameData( word_30 );
 		mTxtHeight = *mCastle->creepGet()->gameData( word_30 + 1);
@@ -486,7 +486,7 @@ void cCastle_Room::screenDraw(  word pDecodeMode, word pGfxID, byte pGfxPosX, by
 		byte_38 = pGfxID << 1;
 		byte_38 += 0x603B;
 		
-		word_32 = readWord( mCastle->creepGet()->gameData( byte_38 ));
+		word_32 = readLEWord( mCastle->creepGet()->gameData( byte_38 ));
 		
 		mGfxWidth = *mCastle->creepGet()->gameData( word_32 );
 		mGfxHeight = *mCastle->creepGet()->gameData( word_32 + 1 );
