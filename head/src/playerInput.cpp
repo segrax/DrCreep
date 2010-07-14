@@ -86,6 +86,8 @@ void cPlayerInput::wiiInputCheck() {
 
 	u32 held = WPAD_ButtonsHeld(0); 
 	
+	held +=  WPAD_ButtonsHeld(1);
+
 	if( held & WPAD_BUTTON_HOME )
 		exit(0);
 
