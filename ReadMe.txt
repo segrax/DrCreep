@@ -39,6 +39,16 @@ Save Game Support:
 
 Wii Version:
 ------------
+
+ Required:
+ ---------
+ 
+ SD Card with folder '/apps/drcreep/data' containing your Dr.Creep D64 and CHAR.ROM
+ 
+
+
+ Controls:
+ ---------
  Hold WiiMote on its side,
 
   In-Game:
