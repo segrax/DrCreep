@@ -35,7 +35,7 @@ void cCastle_Image::update( byte pID, byte pPosX, byte pPosY ) {
 	
 	word  gfxAddress  = (0x603B + (pID << 1));
 	byte *gfxTablePtr = mObject->roomGet()->castleGet()->creepGet()->gameData( gfxAddress );
-	byte *gfxPtr = mObject->roomGet()->castleGet()->creepGet()->gameData( readWord( gfxTablePtr ));
+	byte *gfxPtr = mObject->roomGet()->castleGet()->creepGet()->gameData( *((word*) gfxTablePtr ));
 
 	mBF00.mWidth	= *gfxPtr;
 	mBF00.mHeight	= *(gfxPtr + 1);

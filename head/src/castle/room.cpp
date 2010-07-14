@@ -47,7 +47,7 @@ cCastle_Room::cCastle_Room( cCastle *pCastle, byte *pRoomDirPtr  ) {
 	mMapWidth		=  (mMapWidthHeight & 7);
 	mMapHeight		= ((mMapWidthHeight) >> 3) & 7;
 
-	mRoomPtr		= mCastle->roomPtrGet( readWord( pRoomDirPtr + 6 ) );
+	mRoomPtr		= mCastle->roomPtrGet( *((word*) pRoomDirPtr + 6 ) );
 	
 	for( size_t i = 0; i < 0x800; ++i )
 		mObjectMap[i] = 0;
