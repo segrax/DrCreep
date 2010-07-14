@@ -62,7 +62,7 @@ void wiiButtonWait() {
 	}
 }
 void wiiStart() {
-		// Initialise the video system
+	// Initialise the video system
 	VIDEO_Init();
 	
 	// This function initialises the attached controllers
@@ -97,8 +97,8 @@ void wiiStart() {
 	SDL_ShowCursor(SDL_DISABLE);
 
 	if(!fatInitDefault()) {
-		cout << "fatInitDefault failed\n";
-		return;
+		cout << "fatInitDefault() failed\n";
+		exit(1);
 	}
 
 
@@ -330,7 +330,7 @@ int ftime(timeb *nul) {
 	static long long i = 0;
 	nul->time = 0;
 	nul->millitm = i;
-	return i+=15;
+	return i+=21;
 }
 
 #else

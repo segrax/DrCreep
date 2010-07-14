@@ -177,6 +177,8 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	bool	playLevelSet = false;
 	bool	unlimited = false;
 
+#ifndef _WII
+
 	// Output console message
 	cout << "The Castles of Dr. Creep (SVN:" << SVNREV << " " << SVNDATE << ")" << endl << endl;
 	cout << "http://creep.sourceforge.net/" << endl << endl ;
@@ -193,16 +195,14 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 			unlimited = true;
 		}
 
-		if( arg == "-l" ) {
-			playLevel = atoi( pArgs[ ++count ] );
+		if( arg == "-l" )
 			playLevelSet = true;
-		}
 
 		++count;
 	}
 
-	// If the level wasn't set on command line, request it from the user
-	if(!playLevelSet) {
+	// Level selection was requested
+	if(playLevelSet) {
 		mCastleManager->castleListDisplay();
 
 		string lvl;
@@ -216,6 +216,7 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	// Level numbers begin at 1 in the list, but 0 in the actual game
 	if(playLevel)
 		--playLevel;
+#endif
 
 #ifdef _DEBUG
 	consoleShow = true;
@@ -229,11 +230,7 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	}
 
 	// Set the default screen scale
-#ifdef _WII
-	mScreen->scaleSet( 1 );
-#else
 	mScreen->scaleSet( 2 );
-#endif
 	mScreen->levelNameSet("");
 
 	// Display the title screen
@@ -3125,6 +3122,9 @@ bool cCreep::mapDisplay() {
 	byte gfxPosX, gfxPosY;
 
 	screenClear();
+	
+	Sleep(300);
+	mInput->inputCheck( true );
 
 	mMemory[ 0xD028 ] = mMemory[ 0xD027 ] = 0;
 	mMemory[ 0x11D7 ] = 0;

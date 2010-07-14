@@ -32,7 +32,7 @@
 #include "creep.h"
 #include <time.h>
 
-const word gWidth = 368, gHeight = 290;
+const word gWidth = 384, gHeight = 272;
 
 cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 
@@ -55,6 +55,8 @@ cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 	mFPS				= 0;
 	mWindow				= 0;
 	mWindowTitle		= pWindowTitle;
+
+	mDrawDestX = mDrawDestY = mDrawSrcX = mDrawSrcY = 0;
 
 	mSurface	= new cScreenSurface( gWidth, gHeight );
 	mBitmap		= new cBitmapMulticolor();
@@ -96,6 +98,16 @@ void cScreen::scaleSet( byte pScale ) {
 
 	// Set new scale level
 	mScale = pScale;
+	
+#ifndef _WII
+	mDrawDestX = 8 * mScale;
+	mDrawSrcY = 15 * mScale;
+#else
+	mDrawDestX = 0;
+	mDrawDestY = 0;
+	mDrawSrcX = 24 * mScale;
+	mDrawSrcY = 20 * mScale;
+#endif
 
 	// Set new width/height
 	width = gWidth * mScale;
@@ -246,10 +258,11 @@ void cScreen::refresh() {
 
 		SDL_Surface *surface = scaleUp();	
 		mWindow->clear(0);
-		if(surface)
-			mWindow->blit( surface, 0, 0, 0, 0 );
-		else
-			mWindow->blit( mSDLSurface , 0, 0, 0, 0 );
+
+		if(!surface)
+			surface = mSDLSurface;
+
+		mWindow->blit( surface, mDrawDestX, mDrawDestY, mDrawSrcX, mDrawSrcY );
 	}
 
 }
@@ -324,7 +337,7 @@ void cScreen::drawStandardText(byte *pTextData, word pTextChar, byte *pColorData
 				// Lets draw 8 bits
 				for( size_t bit = 0, charX = X; bit < 8; bit++, charX++ ) {
 					if( data & 0x80 )
-						mSurface->pixelDraw( charX + 25, (y + charY) + 50, *pColorData, ePriority_Background );
+						mSurface->pixelDraw( charX + 24, (y + charY) + 50, *pColorData, ePriority_Background );
 
 					data <<= 1;
 				}

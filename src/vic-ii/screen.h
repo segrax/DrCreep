@@ -32,7 +32,7 @@ struct sScreenPiece;
 
 class cScreen {
 	byte					 *mBitmapBuffer, *mBitmapColorData, *mBitmapColorRam, mBitmapBackgroundColor;
-	dword					 mFPS, mFPSTotal, mFPSSeconds;
+	dword					  mFPS, mFPSTotal, mFPSSeconds;
 
 	cVideoWindow			*mWindow;
 	cBitmapMulticolor		*mBitmap;
@@ -46,7 +46,7 @@ class cScreen {
 	cSprite					*mSprites[8];
 
 	bool					 mFullScreen,		mBitmapRedraw, mSpriteRedraw, mScreenRedraw, mTextRedraw;
-	size_t					 mScale;
+	size_t					 mScale, mDrawDestX, mDrawDestY, mDrawSrcX, mDrawSrcY;
 	string					 mWindowTitle;
 
 	void					 bitmapRefresh();
