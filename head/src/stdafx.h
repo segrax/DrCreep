@@ -80,7 +80,7 @@ extern cCreep	  *gCreep;
 	inline word	readLEWord( const void *buffer ) {
 		const byte *wordByte = (const byte *) buffer;
 
-		return (wordByte[0] << 8) + wordByte[1];
+		return (wordByte[1] << 8) | wordByte[0];
 	}
 
 	inline void writeLEWord( const void *buffer, word pValue ) {
