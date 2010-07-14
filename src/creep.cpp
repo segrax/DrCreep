@@ -735,7 +735,7 @@ void cCreep::roomLoad() {
 
 	//14AC
 	// Ptr to start of room data
-	word_3E = readWord( &mMemory[word_42 + 6] );
+	word_3E = *((word*) &mMemory[word_42 + 6] );
 
 	if(mIntro)
 		word_3E += 0x2000;
@@ -795,7 +795,7 @@ void cCreep::roomPrepare( ) {
 
 	while(func) {
 
-		func = readWord( &mMemory[ word_3E ]);
+		func = *((word*) &mMemory[ word_3E ]);
 		word_3E  += 2;
 
 		switch( func ) {
@@ -1719,7 +1719,7 @@ void cCreep::obj_OverlapCheck( byte pX ) {
 }
 
 bool cCreep::obj_Actions_Collision( byte pX, byte pY ) {
-	word func = readWord( &mMemory[ 0x893 + pY ]);
+	word func = *((word*) &mMemory[ 0x893 + pY ]);
 	
 	pY = byte_31F0;
 
@@ -1758,7 +1758,7 @@ bool cCreep::obj_Actions_Collision( byte pX, byte pY ) {
 }
 
 bool cCreep::obj_Actions_InFront( byte pX, byte pY ) {
-	word func = readWord( &mMemory[ 0x844 + pY ] );
+	word func = *((word*) &mMemory[ 0x844 + pY ] );
 	
 	pY = byte_31F0;
 
@@ -1832,7 +1832,7 @@ void cCreep::obj_Actions_Hit( byte pX, byte pY ) {
 	mMemory[ 0x311C ] = pY;
 	
 	byte Y = mMemory[ 0xBD00 + pX ] << 3;
-	word func = readWord( &mMemory[ 0x891 + Y ] );
+	word func = *((word*) &mMemory[ 0x891 + Y ] );
 
 	switch( func ) {
 		case 0:
@@ -2008,7 +2008,7 @@ s2FE9:;
 void cCreep::obj_Actions_Execute( byte pX ) {
 	//2ED5
 	byte Y =  mMemory[ 0xBD00 + pX ] << 3;
-	word func = readWord( &mMemory[ 0x88F + Y ]);
+	word func = *((word*) &mMemory[ 0x88F + Y ]);
 	
 	switch(func) {
 
@@ -2073,8 +2073,8 @@ void cCreep::obj_Player_Execute( byte pX ) {
 		}
 
 		// Ptr to CIA Timer
-		word_30 = readWord( &mMemory[ 0x34E7 + Y ] );
-		word_32 = readWord( &mMemory[ 0x34EB + Y ] );
+		word_30 = *((word*) &mMemory[ 0x34E7 + Y ] );
+		word_32 = *((word*) &mMemory[ 0x34EB + Y ] );
 
 		// Do conversions, as the time was originally stored using only 1-10 digits
 		int t = (secondsO % 60);
@@ -2118,8 +2118,8 @@ void cCreep::obj_Player_Execute( byte pX ) {
 			ftime(&mPlayer2Time);
 
 		// Get Ptr to CIA Timer and store area
-		word_32 = readWord( &mMemory[ 0x34E7 + Y ] );
-		word_30 = readWord( &mMemory[ 0x34EB + Y ] );
+		word_32 = *((word*) &mMemory[ 0x34E7 + Y ] );
+		word_30 = *((word*) &mMemory[ 0x34EB + Y ] );
 
 		// Restore CIA Timer
 		//for( Y = 3; Y >= 0; --Y ) 
@@ -2755,7 +2755,7 @@ void cCreep::img_Actions() {
 		if(A & byte_840) {
 			byte Y = mMemory[ 0xBF00 + X ] << 2;
 		
-			word func = readWord( &mMemory[ 0x842 + Y ] );
+			word func = *((word*) &mMemory[ 0x842 + Y ] );
 		
 			switch( func ) {
 				case 0:
@@ -2967,7 +2967,7 @@ void cCreep::Game() {
 		word_30 = 0x9800;
 		word_32 = 0x7800;
 
-		word_34 = readWord( &mMemory[ 0x9800 ] );
+		word_34 = *((word*) &mMemory[ 0x9800 ] );
 
 		// 
 		memcpy( &mMemory[ word_32 ], &mMemory[ word_30 ], word_34 );
@@ -3559,7 +3559,7 @@ s15B4:;
 void cCreep::sub_6009( byte pA ) {
 	byte_603A = pA;
 
-	word_40 = readWord( &mMemory[ word_42 + 4] );
+	word_40 = *((word*) &mMemory[ word_42 + 4] );
 	
 	byte A2 = mMemory[ word_40 ];
 	
@@ -3743,7 +3743,7 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 		byte_38 = pGfxID << 1;
 		byte_38 += 0x603B;
 		
-		word_32 = readWord( &mMemory[ byte_38 ] );
+		word_32 = *((word*) &mMemory[ byte_38 ] );
 		
 		mGfxWidth = mMemory[ word_32 ];
 		mGfxHeight = mMemory[ word_32 + 1 ];
@@ -4392,7 +4392,7 @@ void cCreep::gameEscapeCastle() {
 	screenClear();
 	mMemory[ 0x0B72 ] = 6;
 	if( mMemory[ 0x7802 ] & 0x80 ) {
-		word_3E = readWord( &mMemory[ 0x785F ] );
+		word_3E = *((word*) &mMemory[ 0x785F ] );
 		roomPrepare();
 	}
 
@@ -4572,7 +4572,7 @@ s1BE7:;
 		mMemory[ word_30 + Y ] = mMemory[ 0x1CF9 + Y ];
 	
 	// 1C4D
-	word_30 = readWord( &mMemory[ 0x1D03 ] );
+	word_30 = *((word*) mMemory[ 0x1D03 ] );
 	mMemory[ word_30 ] = 0;
 	gameHighScores();
 
@@ -4589,7 +4589,7 @@ s1BE7:;
 	mMemory[ 0x278B ] = 1;
 
 	textShow();
-	word_30 = readWord( &mMemory[ 0x1D03 ] );
+	word_30 = *((word*) &mMemory[ 0x1D03 ] );
 
 	for(Y = 0; Y < 3; ++Y) {
 		if( Y >= 3 )
@@ -4627,7 +4627,7 @@ s1BE7:;
 	//1CE3 20 20 29                    JSR     InterruptDisableAndReInit
 
 	// Save highscores
-	mCastleManager->scoresSave( mCastle->nameGet(), readWord( memory( 0xB800 ) ), memory( 0xB800 ) );
+	mCastleManager->scoresSave( mCastle->nameGet(), *((word*) memory( 0xB800 ) ), memory( 0xB800 ) );
 
 	sub_2973();
 }
@@ -4748,14 +4748,14 @@ void cCreep::sub_21C8( char pA ) {
 	byte_2232 = byte_2231;
 
 	byte Y = byte_2232 << 1;
-	word_44 = readWord( &mMemory[ 0x7572 + Y ] );
+	word_44 = *((word*) &mMemory[ 0x7572 + Y ] );
 
 	mSound->sidWrite( 0x04, 0 );
 	mSound->sidWrite( 0x0B, 0 );
 	mSound->sidWrite( 0x12, 0 );
 	mSound->sidWrite( 0x17, 0 );
 
-	mMusicBuffer = memory( readWord(memory( 0x7572 + Y )) );
+	mMusicBuffer = memory( *((word*) memory( 0x7572 + Y )) );
 
 	mSound->sidWrite( 0x18, 0x0F );
 
@@ -4928,7 +4928,7 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 
 	word_38 += 0x603B;
 	
-	word_30 = readWord( &mMemory[ word_38 ] );
+	word_30 = *((word*) &mMemory[ word_38 ] );
 	
 	mMemory[ 0xBD09 + pX ] = mMemory[ word_30 + 2 ];
 	
@@ -5094,7 +5094,7 @@ void cCreep::gamePositionSave() {
 	string filename = string( (char*) &mMemory[ 0x278E ], mStrLength );
 	// Save from 0x7800
 
-	word saveSize = readWord( memory( 0x7800 ) );
+	word saveSize = *((word*) memory( 0x7800 ) );
 	
 	if( mCastleManager->positionSave( filename, saveSize, memory( 0x7800 ) ) == false) {
 
@@ -5331,7 +5331,7 @@ void cCreep::obj_Door_InFront( byte pX, byte pY ) {
 	}
 
 	//40DD
-	word word_41D6 = readWord( &mMemory[ word_40 + 3 ] );
+	word word_41D6 = *((word*) &mMemory[ word_40 + 3 ] );
 	lvlPtrCalculate( (word_41D6 & 0xFF) );
 	
 	mMemory[ word_42 ] |= byte_8C0;
@@ -7181,7 +7181,7 @@ void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 		return;
 
 	// 4EC5
-	word_40 = readWord( &mMemory[ 0xBE00 + pY ] );
+	word_40 = *((word*) &mMemory[ 0xBE00 + pY ] );
 	if(! (mMemory[ 0xBD1D + pX ]) ) {
 		// 4ED4
 		if( (mMemory[ 0xBD1E + pX ]) )
@@ -7266,7 +7266,7 @@ void cCreep::obj_Teleport_unk( byte pA, byte pX ) {
 	mMemory[ 0x6E70 ] = mMemory[ 0x6E71 ] = mMemory[ 0x6E72 ] = A;
 	mMemory[ 0x6E73 ] = mMemory[ 0x6E74 ] = mMemory[ 0x6E75 ] = 0x0F;
 
-	word_40 = readWord( &mMemory[ 0xBE00 + pX ] );
+	word_40 = *((word*) &mMemory[ 0xBE00 + pX ] );
 
 	byte gfxPosX = mMemory[ word_40 ] + 4;
 	byte gfxPosY = mMemory[ word_40 + 1 ] ;
