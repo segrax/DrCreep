@@ -37,13 +37,18 @@ Save Game Support:
 
 
 
+Wii Version:
+------------
+ Hold WiiMote on its side,
 
-Command Line Parameters:
-------------------------
+  In-Game:
+    DPAD 	= Movement
+    Button 2 	= Fire Button
+    Button A 	= Self Kill
 
- -u    : Unlimited Lives
- -c    : Display Console
- -l xx : Start Castle number 'xx'
+  Intro:	
+    Button Plus = Option Menu
+    Button 1 	= HighScores
 
 
 
@@ -58,7 +63,8 @@ Controls:
 
  Intro:
  ------
- 
+
+  F1 = Options
   F3 = Display Highscores
 
 
@@ -91,7 +97,6 @@ Controls:
      Numpad Arrows = Left/Right/Up/Down
 
 
-
 Playing:
 --------
 
@@ -99,6 +104,14 @@ Playing:
 
   To start a 1 player game, press the Player1 Button
   To start a 2 player game, press the Player2 Button
+
+
+Command Line Parameters:
+------------------------
+
+ -u    : Unlimited Lives
+ -c    : Display Console
+ -l xx : Start Castle number 'xx'
 
 
 Thanks:
