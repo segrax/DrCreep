@@ -3649,7 +3649,7 @@ void cCreep::stringDraw() {
 
 		screenDraw( 2, 0x95, gfxPosX, gfxPosY, 0x94 );
 
-		if( ((signed char) mMemory[ word_3E ]) < 0 )
+		if( ((char) mMemory[ word_3E ]) < 0 )
 			break;
 
 		++word_3E;

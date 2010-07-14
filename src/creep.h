@@ -145,8 +145,8 @@ public:
 				inline byte *gfxPtr( word pID ) {
 					word  gfxAddress  = (0x603B + (pID << 1));
 					byte *gfxTablePtr = gameData( gfxAddress );
-					byte *gfxPtr = gameData( *((word*) gfxTablePtr ));
-					
+					byte *gfxPtr = gameData( readLEWord( gfxTablePtr ));
+						
 					return gfxPtr;
 				}
 			
