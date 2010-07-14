@@ -3615,7 +3615,7 @@ void cCreep::stringDraw() {
 			Y = mMemory[ 0x2BF0 + X ] & 0xF;
 			tmp += (mMemory[ 0x2BF8 + Y] << 8);
 			
-			writeWord(&mMemory[ word_30 ], tmp);
+			writeLEWord(&mMemory[ word_30 ], tmp);
 
 			byte A;
 
