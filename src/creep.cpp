@@ -987,6 +987,7 @@ bool cCreep::Intro() {
 		X -= 0x07;
 	}
 
+	mInput->inputCheck(true);
 	return false;
 }
 
@@ -3499,6 +3500,7 @@ void cCreep::roomMain() {
 			for(;;) {
 				interruptWait( 3 );
 
+				hw_Update();
 				KeyboardJoystickMonitor( 0 );						
 			
 				if( mRunStopPressed == 1 )
