@@ -70,15 +70,20 @@ extern cCreep	  *gCreep;
 
 // Endian functions
 #ifdef ENDIAN_BIG
-
 	// Read a word from the buffer
-	inline word	readWord( const void *buffer ) {
-		const byte *wordByte = (const byte *) buffer;
-
-		return (wordByte[1] << 8) | wordByte[0];
+	inline word readWord( const void *buffer ) {
+		const word *wordBytes = (const word *) buffer;
+		return *wordBytes;
 	}
 
-	inline void writeWord( const void *buffer, word pValue ) {
+	// Read a word from the buffer
+	inline word	readLEWord( const void *buffer ) {
+		const byte *wordByte = (const byte *) buffer;
+
+		return (wordByte[0] << 8) + wordByte[1];
+	}
+
+	inline void writeLEWord( const void *buffer, word pValue ) {
 		word *wordBytes = (word *) buffer;
 		wordBytes[0] = (pValue & 0xFF00) >> 8;
 		wordBytes[1] = (pValue & 0x00FF);
@@ -90,14 +95,19 @@ extern cCreep	  *gCreep;
 		return (wordByte[0] << 8) + wordByte[1];
 	}
 #else
-
 	// Read a word from the buffer
 	inline word readWord( const void *buffer ) {
 		const word *wordBytes = (const word *) buffer;
 		return *wordBytes;
 	}
 
-	inline void writeWord( const void *buffer, word pValue ) {
+	// Read a word from the buffer
+	inline word readLEWord( const void *buffer ) {
+		const word *wordBytes = (const word *) buffer;
+		return *wordBytes;
+	}
+
+	inline void writeLEWord( const void *buffer, word pValue ) {
 		word *wordBytes = (word *) buffer;
 		*wordBytes = pValue;
 	}

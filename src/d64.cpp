@@ -462,7 +462,7 @@ sD64File *cD64::directoryEntryLoad( byte *pBuffer ) {
 	file->mSector = pBuffer[0x04];
 	
 	// Total number of blocks
-	file->mFileSize = readWord( &pBuffer[0x1E] );
+	file->mFileSize = readLEWord( &pBuffer[0x1E] );
 
 	// Load the file into a new buffer
 	if(file->mFileSize > 0)
@@ -526,7 +526,7 @@ bool cD64::directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer ) {
 	if( pFile->mBufferSize % 254 )
 		++totalBlocks;
 
-	writeWord( &pBuffer[ 0x1E ], totalBlocks );
+	writeLEWord( &pBuffer[ 0x1E ], totalBlocks );
 	return true;
 }
 
@@ -724,7 +724,7 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 		
 		// If its the first sector, we have to write the load address
 		if( sectorFirst ) {
-			writeWord( &buffer[0x02], pLoadAddress );
+			writeLEWord( &buffer[0x02], pLoadAddress );
 
 			// Copy filedata
 			if(bytesRemain < 0xFC )
