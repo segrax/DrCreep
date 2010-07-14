@@ -40,14 +40,22 @@
       </tr>
     </table>
     <p>&nbsp;</p>
-     <p class="NewsDates"><strong>Wednesday, July 14, 2010  13:43</strong></p>
     <hr />
-    <p>SVN-2.</p>
-    <p>
-      Wii Version available!
-      Options Menu is now implemented <br />
-      
-    </p>
+     <p class="NewsDates"><strong>Thursday, 15 July, 2010  8:23</strong></p>
+    <hr />
+    <p>SVN-270 Windows and Nintendo Wii Packages are now available for download 
+    <ul>
+<li> Wii WAD/Dol Version now available! (sound is buggy)</li>
+      <li>Options Menu is now implemented    </li>
+    </ul>
+    <p>Level selection is now done via the options menu, by pressing F1 during the intro (this does however limit the number of castles accessible)</p>
+    <p>&nbsp; </p>
+    <p><strong>Wii Instructions: </strong></p>
+    <p>Depending on how you intend to launch the game, you need to Download atleast 'wii_SD_drcreep-270.zip'. </p>
+    <p>If you want to install it as a channel, you will also require 'Castles of Dr. Creep - REEP.wad'</p>
+    <p>wii_SD_drcreep is extracted to your SD Card (you also need to copy the D64 into the data folder, same as the other versions).</p>
+    <p>&nbsp;</p>
+    
 <hr />
     <p class="NewsDates"><strong>Wednesday, May 12, 2010  15:00</strong></p>
     <hr />
