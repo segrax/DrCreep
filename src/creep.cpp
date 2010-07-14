@@ -3817,7 +3817,7 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 		videoPtr1 = mMemory[0x5D06 + A];
 		
 		if( gfxDestY > 0x80 ) {
-			char a = 0 - videoPtr0;
+			signed char a = 0 - videoPtr0;
 			videoPtr0 = a;
 			
 			a = 0 - videoPtr1;
