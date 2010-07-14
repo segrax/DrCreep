@@ -998,8 +998,8 @@ void cCreep::musicPtrsSet() {
 
 	X <<= 1;
 
-	mVoice = *((word*) memory( 0x20DF + X));
-	mVoiceTmp = *((word*) memory( 0x20E5 + X));
+	mVoice = readLEWord( memory( 0x20DF + X));
+	mVoiceTmp = readLEWord( memory( 0x20E5 + X));
 }
 
 // 1F29 : Play Music Buffer
@@ -3615,7 +3615,7 @@ void cCreep::stringDraw() {
 			Y = mMemory[ 0x2BF0 + X ] & 0xF;
 			tmp += (mMemory[ 0x2BF8 + Y] << 8);
 			
-			*((word*)&mMemory[ word_30 ]) = tmp;
+			writeLEWord(&mMemory[ word_30 ], tmp);
 
 			byte A;
 
@@ -4292,7 +4292,7 @@ s13CD:;
 }
 
 void cCreep::obj_Image_Draw() {
-	*((word*) &mMemory[ 0x6067 ]) = word_3E;
+	writeLEWord(&mMemory[ 0x6067 ], word_3E);
 	
 	byte gfxDecodeMode = 0, gfxCurrentID = 0x16;
 
@@ -4549,7 +4549,7 @@ s1BE7:;
 	
 	mMemory[ 0x278A ] = mMemory[ 0x1E85 + X ];
 
-	*((word*) (&mMemory[ 0x1D03 ])) = word_30 - 2;
+	writeLEWord(&mMemory[ 0x1D03 ], (word_30 - 2));
 	
 	for(;;) {
 		--mMemory[ 0x1CFE ];
