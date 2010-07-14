@@ -84,7 +84,7 @@ extern cCreep	  *gCreep;
 	}
 
 	inline void writeLEWord( const void *buffer, word pValue ) {
-		word *wordBytes = (word *) buffer;
+		byte *wordBytes = (byte *) buffer;
 		wordBytes[0] = (pValue & 0xFF00) >> 8;
 		wordBytes[1] = (pValue & 0x00FF);
 	}
