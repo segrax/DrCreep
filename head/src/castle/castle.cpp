@@ -58,7 +58,7 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 		// No highscores found, write a blank table
 
 		// Size of table
-		writeWord( gCreep->memory(0xB800), 0x007A );
+		writeLEWord( gCreep->memory(0xB800), 0x007A );
 		
 		// Entries
 		for( signed char Y = 0x77; Y >= 0; --Y )
