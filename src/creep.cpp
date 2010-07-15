@@ -164,6 +164,7 @@ void cCreep::titleDisplay() {
 
 	// Skip load address
 	buffer += 0x02;	
+
 	mScreen->bitmapLoad( buffer,  buffer + 0x1F40, buffer + 0x2328, 1 );
 	mScreen->refresh();
 	hw_IntSleep(0x10);
