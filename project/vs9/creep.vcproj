@@ -220,6 +220,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\debug.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\debug.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\playerInput.cpp"
 				>
 			</File>
