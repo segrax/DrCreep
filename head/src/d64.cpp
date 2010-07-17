@@ -430,15 +430,17 @@ bool cD64::diskTest() {
 	if(!bamTest()) {
 
 		// Bam Disk test failed
-
+		cout << "Disk has bad BAM" << endl;
 		// Repair it based on loaded files
 		//bamRebuild();
+
 	}
 	
 	// TODO 
 	// Check for cross linked files
 	for( linkIT = mCrossLinked.begin(); linkIT != mCrossLinked.end(); ++linkIT ) {
 		
+
 	}
 
 	return true;
