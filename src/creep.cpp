@@ -33,6 +33,8 @@
 #include "creep.h"
 #include "sound/sound.h"
 
+#include "debug.h"
+
 #ifdef WIN32
 #include <fcntl.h>
 #include <io.h>
@@ -62,15 +64,24 @@ cCreep::cCreep() {
 	for( size_t x = 0; x < mMemorySize; ++x )
 		mMemory[x] = 0;
 
+	mDebug = new cDebug();
 	mCastleManager = new cCastleManager();
 	mInput = new cPlayerInput( this );
 	mScreen = new cScreen( this, windowTitle.str() );
 	mSound = 0;
 
 	// Load the C64 Character Rom
-	m64CharRom = local_FileRead( "char.rom", romSize, false );
+	if( (m64CharRom = local_FileRead( "char.rom", romSize, false )) == 0 ) {
+		mDebug->error("File \"char.rom\" not found");
+		exit(1);
+	}
 
-	mGameData = mCastleManager->fileLoad( "OBJECT", romSize ) + 2;
+	if( (mGameData = mCastleManager->fileLoad( "OBJECT", romSize )) == 0 ) {
+		mDebug->error("File \"OBJECT\" not found");
+		exit(1);
+	} else
+		mGameData += 2;
+
 	romSize -= 2;
 
 	if(romSize)
@@ -154,13 +165,17 @@ cCreep::~cCreep() {
 	delete mSound;
 	delete mScreen;
 	delete mInput;
+	delete mDebug;
 }
 
 void cCreep::titleDisplay() {
 	size_t size;
 	byte *buffer = mCastleManager->fileLoad( "PIC A TITLE", size );
-	if(!buffer)
+	if(!buffer) {
+		mDebug->error("File \"PIC A TITLE\" not found");
+		
 		return;
+	}
 
 	// Skip load address
 	buffer += 0x02;	

@@ -28,6 +28,7 @@ class cCastleManager;
 class cScreen;
 class cPlayerInput;
 class cSound;
+class cDebug;
 
 class cCreep {
 
@@ -36,6 +37,7 @@ private:
 	byte			*mMemory,			*mGameData,		*mLevel,		*m64CharRom;
 	size_t			 mMemorySize;
 
+	cDebug			*mDebug;
 	cCastle			*mCastle;
 	cCastleManager	*mCastleManager;
 	cScreen			*mScreen;

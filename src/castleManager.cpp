@@ -398,6 +398,10 @@ byte *cCastleManager::fileLoad( string pFilename, size_t &pBufferSize ) {
 		sFileLocal *file = fileFind( pFilename );
 		if(!file) {
 			buffer = local_FileRead( pFilename, size, false );
+
+			if(!buffer)
+				return 0;
+
 			mFiles.push_back( file = new sFileLocal( pFilename, buffer, size ));
 		}
 
