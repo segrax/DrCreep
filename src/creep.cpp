@@ -273,23 +273,17 @@ void cCreep::interruptWait( byte pCount) {
 	//diffMil = 10;
 
 	if(diffSec <= 1) {
-		if(diffMil > 30)
+		if(diffMil > 24)
 			sleepTime = 0;
 		else
-			sleepTime = 30 - (double) diffMil;
+			sleepTime = 24 - (double) diffMil;
 
 		mInterruptCounter = pCount;
 		
 		while(mInterruptCounter > 0 ) {
-			//
-			if(sleepTime) {
-				//if( mScreen->fpsGet() >= 25 ) {
-					Sleep( (dword) sleepTime );
-				//}
-			}
+			Sleep( (dword) sleepTime );
 
 			--mInterruptCounter;
-			
 		}
 	}
 
