@@ -157,7 +157,7 @@ void cSprite::streamLoad( byte *pBuffer ) {
 		return;
 	}
 
-	_surface->Wipe(0xFF);
+	_surface->Wipe(0);
 
 	if( _rMultiColored )
 		drawMulti( pBuffer );

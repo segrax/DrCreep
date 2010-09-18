@@ -52,7 +52,7 @@
 			destRect.h = source->h;
 			destRect.w = source->w;
 
-			SDL_SetColorKey( source, SDL_SRCCOLORKEY, 0xFF);
+			SDL_SetColorKey( source, SDL_SRCCOLORKEY, 0);
 			SDL_BlitSurface( source, &srcRect, _surface, &destRect);
 
 			SDL_UpdateRect(  _surface, 0,0,0,0);

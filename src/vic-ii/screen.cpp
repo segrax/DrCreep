@@ -78,7 +78,7 @@ cScreen::~cScreen() {
 	SDL_FreeSurface( mSDLSurfaceScaled );
 }
 
-void cScreen::clear(  byte pColor = 0xFF ) {
+void cScreen::clear(  byte pColor = 0 ) {
 	
 	mSurface->Wipe( pColor );
 	mBitmapRedraw = true;
@@ -167,7 +167,7 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 		for( word x = 0; x < width; ++x ) {
 			
 			// Transparent?
-			if( *sourceBuffer != 0xFF ) {
+			if( *sourceBuffer != 0 ) {
 
 				// Check for any collisions
 				if( dest->mPriority == ePriority_Foreground || dest->mSprite ) {
