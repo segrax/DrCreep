@@ -58,7 +58,7 @@ public:
 					~cScreenSurface( );
 
 	void			 pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePriority pPriority, size_t pCount = 1 );
-	void			 Wipe( dword pColor = 0xFF ) ;
+	void			 Wipe( dword pColor = 0 ) ;
 
 
 	inline size_t		 heightGet() { return mHeight; }

@@ -90,7 +90,7 @@ void cScreenSurface::pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePrio
 
 	for( size_t count = 0; count < pCount; ++count ) {
 		if( pPaletteIndex > 15 )
-			*buffer = 0xFF;
+			*buffer = 0;
 		else
 			*buffer = mPalette[ pPaletteIndex ];
 
