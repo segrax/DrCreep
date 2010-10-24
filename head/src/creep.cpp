@@ -291,7 +291,7 @@ void cCreep::interruptWait( byte pCount) {
 }
 
 //08C2
-void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
+void cCreep::start( int pStartLevel, bool pUnlimited ) {
 	byte	byte_30, byte_31, count;
 
 	byte_30 = 0x40;
@@ -367,8 +367,9 @@ void cCreep::start( size_t pStartLevel, bool pUnlimited ) {
 				break;
 		}
 		
-		if( !ChangeLevel( 0x10 + (pStartLevel * 4) ) )
-			return;
+		if( pStartLevel > -1 )
+			if( !ChangeLevel( 0x10 + (pStartLevel * 4) ) )
+				return;
 
 	} else {
 		// 0x953
@@ -664,11 +665,12 @@ void cCreep::mainLoop() {
 	
 	//mCastle->castleStart( 2 );
 
+	// Main Intro/Game Loop
 	while(!mQuit) {
-		
+	
 		if( Intro() == true )
 			continue;
-			
+		
 		Game();
 	}
 

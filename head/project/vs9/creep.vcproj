@@ -187,6 +187,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\src\builder.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\builder.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\castleManager.cpp"
 				>
 			</File>
@@ -342,126 +350,6 @@
 					RelativePath="..\..\src\castle\castle.h"
 					>
 				</File>
-				<File
-					RelativePath="..\..\src\castle\image.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\castle\image.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\castle\room.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\castle\room.h"
-					>
-				</File>
-				<Filter
-					Name="object"
-					>
-					<File
-						RelativePath="..\..\src\castle\object\door.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\door.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\door_lock.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\door_lock.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\doorButton.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\doorButton.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\forcefield.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\forcefield.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\key.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\key.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\ladder.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\ladder.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\lightning.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\lightning.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\mummy.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\mummy.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\object.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\object.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\objects.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\player.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\player.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\slidingpole.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\slidingpole.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\walkway.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\castle\object\walkway.h"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="sid"
