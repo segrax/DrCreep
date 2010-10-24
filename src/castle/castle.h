@@ -35,19 +35,7 @@ private:
 	cCreep						*mCreep;
 
 	string						 mName;
-	map< size_t, cCastle_Room* > mRooms;					// Rooms in the castle
-
-	cCastle_Room				*mStartRoom[2];
-	cCastle_Object_Door			*mStartDoor[2];
-	cCastle_Object_Player		*mPlayer[2];	
 	
-	
-	void						 loadHeader();
-
-
-	inline byte					*roomDirPtrGet( size_t pRoomNumber ) {
-		return (mBuffer + 0x100) + (pRoomNumber << 3);
-	}
 
 public:
 						 cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo );
@@ -55,10 +43,6 @@ public:
 
 	byte				*bufferGet( size_t &pBufferSize );
 	
-	void				 castleStart( size_t pPlayers );
-	void				 draw();
-	cCastle_Room		*roomGet( size_t pRoomNumber );
-
 	inline cCreep		*creepGet() { return mCreep; }
 	inline string		 nameGet() { return mName; }		// Name of the castle
 	inline cCastleInfo	*infoGet() { return mCastleInfo; }

@@ -25,6 +25,7 @@
 
 #include "stdafx.h"
 #include "creep.h"
+#include "builder.hpp"
 #include "../rev.h"
 
 const char	 *gDataPath = "data/";
@@ -117,7 +118,8 @@ int	main( int argc, char *argv[] ) {
 	wiiStart();
 #endif
 
-	gCreep = new cCreep();
+	//gCreep = new cCreep();
+	gCreep = new cBuilder();
 	gCreep->run( argc, argv );
 
 	delete gCreep;

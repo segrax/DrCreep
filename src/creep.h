@@ -32,7 +32,7 @@ class cDebug;
 
 class cCreep {
 
-private:
+protected:
 
 	byte			*mMemory,			*mGameData,		*mLevel,		*m64CharRom;
 	size_t			 mMemorySize;
@@ -159,7 +159,7 @@ public:
 		inline cPlayerInput		*inputGet()		{ return mInput; }
 		inline cScreen			*screenGet()	{ return mScreen; }
 
-		void	 start( size_t pStartLevel, bool pUnlimited );			// Game Entry Point
+		void	 start( int pStartLevel, bool pUnlimited );			// Game Entry Point
 		void	 run( int pArgCount, char *pArgs[] );					// Executed from main()
 
 		void	 lvlPtrCalculate( byte pCount );
@@ -188,7 +188,7 @@ public:
 		bool	 Intro();								// Intro Loop
 		void	 interruptWait( byte pCount );			// Wait 'pCount' amount of VIC-II interrupt executions
 
-		void	 mainLoop();							// Main Intro/Game Loop
+		virtual void	 mainLoop();							// Main Intro/Game Loop
 
 		bool	 mapDisplay();							// Map Screen
 		void	 mapRoomDraw();							// Draw the rooms on the map
