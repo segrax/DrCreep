@@ -5657,6 +5657,7 @@ void cCreep::obj_RayGun_Prepare() {
 		else
 			gfxCurrentID = 0x60;
 
+		// Length
 		byte_4D5E = mMemory[ word_3E + 3 ];
 		for(;;) {
 			if(!byte_4D5E)

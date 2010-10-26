@@ -7,9 +7,6 @@ public:
 public:
 	cObjectLock( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectLock;
-		mDrags = false;
-		mLength = 0;
-		mParts = true;
 		mLockColor = 1;
 		mDoorNumber = 0;
 	}

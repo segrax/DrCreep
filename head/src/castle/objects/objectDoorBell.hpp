@@ -7,7 +7,6 @@ public:
 public:
 	cObjectDoorBell( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectDoorBell;
-		mDrags = false;
 		mDoorID = 0;
 	}
 

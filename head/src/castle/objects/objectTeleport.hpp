@@ -8,9 +8,7 @@ public:
 public:
 	cObjectTeleport( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectTeleport;
-		mDrags = false;
-		mLength = 1;
-		mParts = true;
+		mPartCount = 2;
 		mTarget = 0;
 	}
 

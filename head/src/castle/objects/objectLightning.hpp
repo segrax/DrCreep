@@ -9,13 +9,15 @@ public:
 public:
 	cObjectLightning( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectLightning;
-		mMachineState = false;
-		mDragDirection = eDirectionDown;
-		mDrags = true;
-		mLength = 0;
-		mParts = true;
-		mMachine = 0;
+		
+		mParts[0].mDragDirection = eDirectionDown;
+		mParts[0].mDrags = true;
+		mParts[0].mLength = 0;
 
+		mPartCount = 2;
+
+		mMachine = 0;
+		mMachineState = false;
 		mSwitchState = false;
 	}
 
@@ -32,7 +34,7 @@ public:
 
 		size_t strSize = cObject::objectSave( pBuffer );
 		
-		*(*pBuffer)++ = mLength;
+		*(*pBuffer)++ = mParts[0].mLength;
 
 		*(*pBuffer)++ = 0x00; *(*pBuffer)++ = 0x00;
 		*(*pBuffer)++ = 0x00; *(*pBuffer)++ = 0x00;

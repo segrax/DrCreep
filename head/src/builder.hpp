@@ -35,7 +35,7 @@ public:
 class cBuilder : public cCreep {
 
 private:
-	word					 mCursorX,		mCursorY;
+	byte					 mCursorX,		mCursorY;
 	eRoomObjects			 mSelectedObject;
 
 	cRoom					*mCurrentRoom;

@@ -6,9 +6,7 @@ public:
 public:
 	cObjectMummy( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectMummy;
-		mDrags = false;
-		mLength = 0;
-		mParts = true;
+		mPartCount = 2;
 	}
 
 	size_t		objectLoad( byte **pBuffer ) {
