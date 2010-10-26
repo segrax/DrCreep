@@ -43,7 +43,6 @@ private:
 	cObject					*mCurrentObject;
 
 	bool					 mDragMode;			// Object being placed is being dragged
-	bool					 mDragComplete;
 	eDirection				 mDragDirection;	// Direction which object drags
 	word					 mDragLength;
 
