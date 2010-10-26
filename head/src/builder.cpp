@@ -97,7 +97,7 @@ size_t cRoom::saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMar
 	if( objects.size() == 0 )
 		return 0;
 
-	// Write PoleID
+	// Write ObjectID
 	writeLEWord( *pBuffer, (word) pObjectType );
 	*pBuffer += 2;
 
@@ -109,8 +109,6 @@ size_t cRoom::saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMar
 
 	return size;
 }
-
-
 
 cBuilder::cBuilder() {
 	mCursorX = 0x10;
@@ -480,6 +478,9 @@ void cBuilder::castleSave( ) {
 	map< size_t, cRoom *>::iterator  roomIT;
 
 	byte *buffer =  &mMemory[ 0x7800 ];
+
+	for( word addr = 0x7800; addr < 0x8200; ++addr )
+		mMemory[ addr ] = 0;
 
 	*(buffer + 2) = 0x80;
 	*(buffer + 3) = mStart_Room_Player1;
