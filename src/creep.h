@@ -30,6 +30,37 @@ class cPlayerInput;
 class cSound;
 class cDebug;
 
+enum eRoomObjects {
+	eObjectDoor			= 0x0803,
+	eObjectWalkway		= 0x0806,
+	eObjectSlidingPole	= 0x0809,
+	eObjectLadder		= 0x080C,
+	eObjectDoorBell		= 0x080F,
+	eObjectLightning	= 0x0812,
+	eObjectForcefield	= 0x0815,
+	eObjectMummy		= 0x0818,
+	eObjectKey			= 0x081B,
+	eObjectLock			= 0x081E,
+	eObjectRayGun		= 0x0824,
+	eObjectTeleport		= 0x0827,
+	eObjectTrapDoor		= 0x082A,
+	eObjectConveyor		= 0x082D,
+	eObjectFrankenstein = 0x0830,
+	eObjectStringPrint	= 0x0833,
+	eObjectImageDraw	= 0x0836,
+	eObjectMultiDraw	= 0x0821,
+
+	eObjectsFinished	= 0x0000,
+};
+
+enum eDirection {
+	eDirectionTop	 = 0,
+	eDirectionRight	 = 1,
+	eDirectionDown	 = 2,
+	eDirectionLeft	 = 3,
+	eDirectionNone	 = 4
+};
+
 class cCreep {
 
 protected:

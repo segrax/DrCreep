@@ -706,6 +706,11 @@ void cCreep::screenClear() {
 			break;
 	}
 
+	word_30 = 0xC000;
+
+	while( word_30 < 0xC800) {
+		mMemory[word_30++] = 0;
+	}
 	mImageCount = 0;
 	mScreen->screenRedrawSet();
 	mScreen->bitmapRedrawSet();
@@ -808,63 +813,80 @@ void cCreep::roomPrepare( ) {
 		word_3E  += 2;
 
 		switch( func ) {
-			case 0:			// Finished
+			case eObjectsFinished:			// Finished
 				return;
 
-			case 0x0803:	// Doors
+			case eObjectDoor:				// Doors
 				obj_Door_Prepare( );
 				break;
-			case 0x0806:	// Walkway
+
+			case eObjectWalkway:			// Walkway
 				obj_Walkway_Prepare( );
 				break;
-			case 0x0809:	// Sliding Pole
+
+			case eObjectSlidingPole:		// Sliding Pole
 				obj_SlidingPole_Prepare( );
 				break;
-			case 0x080C:	// Ladder
+
+			case eObjectLadder:				// Ladder
 				obj_Ladder_Prepare( );
 				break;
-			case 0x080F:	// Doorbell
+
+			case eObjectDoorBell:			// Doorbell
 				obj_Door_Button_Prepare( );
 				break;
-			case 0x0812:	// Lightning Machine
+
+			case eObjectLightning:			// Lightning Machine
 				obj_Lightning_Prepare( );
 				break;
-			case 0x0815:	// Forcefield
+
+			case eObjectForcefield:			// Forcefield
 				obj_Forcefield_Prepare( );
 				break;
-			case 0x0818:	// Mummy
+
+			case eObjectMummy:				// Mummy
 				obj_Mummy_Prepare( );
 				break;
-			case 0x081B:	// Key
+
+			case eObjectKey:				// Key
 				obj_Key_Load( );
 				break;
-			case 0x081E:	// Lock
+
+			case eObjectLock:				// Lock
 				obj_Door_Lock_Prepare( );
 				break;
-			case 0x0824:	// Ray Gun
+
+			case eObjectRayGun:				// Ray Gun
 				obj_RayGun_Prepare( );
 				break;
-			case 0x0827:	// Teleport
+
+			case eObjectTeleport:			// Teleport
 				obj_Teleport_Prepare( );
 				break;
-			case 0x082A:	// Trap Door
+
+			case eObjectTrapDoor:			// Trap Door
 				obj_TrapDoor_Prepare( );
 				break;
-			case 0x082D:	// Conveyor
+
+			case eObjectConveyor:			// Conveyor
 				obj_Conveyor_Prepare( );
 				break;
-			case 0x0830:	// Frankenstein
+
+			case eObjectFrankenstein:		// Frankenstein
 				obj_Frankie_Load( );
 				break;
-			case 0x0833:	// String Print
+
+			case eObjectStringPrint:		// String Print
 			case 0x2A6D:
 				obj_stringPrint();
 				break;
-			case 0x0836:
+
+			case eObjectImageDraw:
 				obj_Image_Draw();
 				break;
-			case 0x0821:
-			case 0x160A:	// Intro
+
+			case eObjectMultiDraw:
+			case 0x160A:				// Intro
 				obj_MultiDraw( );
 				break;
 
