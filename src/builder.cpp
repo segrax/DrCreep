@@ -17,6 +17,11 @@
 #include "castle/objects/objectLightning.hpp"
 #include "castle/objects/objectForcefield.hpp"
 #include "castle/objects/objectMummy.hpp"
+#include "castle/objects/objectKey.hpp"
+#include "castle/objects/objectLock.hpp"
+#include "castle/objects/objectRayGun.hpp"
+#include "castle/objects/objectTeleport.hpp"
+#include "castle/objects/objectTrapDoor.hpp"
 #include "debug.h"
 
 size_t cRoom::roomSaveObjects( byte **pBuffer ) {
@@ -30,6 +35,11 @@ size_t cRoom::roomSaveObjects( byte **pBuffer ) {
 	size += saveObject( pBuffer, eObjectLightning, 0x20 );
 	size += saveObject( pBuffer, eObjectForcefield, 0x00 );
 	size += saveObject( pBuffer, eObjectMummy, 0x00 );
+	size += saveObject( pBuffer, eObjectKey, 0x00 );
+	size += saveObject( pBuffer, eObjectLock, 0x00 );
+	size += saveObject( pBuffer, eObjectRayGun, 0x80 );
+	size += saveObject( pBuffer, eObjectTeleport, 0x00 );
+	size += saveObject( pBuffer, eObjectTrapDoor, 0x80 );
 
 	return size;
 }
@@ -662,28 +672,40 @@ cObject *cBuilder::obj_Mummy_Create( byte pPosX, byte pPosY ) {
 }
 
 cObject *cBuilder::obj_Key_Create( byte pPosX, byte pPosY ) {
+	cObjectKey *object = new cObjectKey( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_Door_Lock_Create( byte pPosX, byte pPosY ) {
+	cObjectLock *object = new cObjectLock( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_RayGun_Create( byte pPosX, byte pPosY ) {
+	cObjectRayGun *object = new cObjectRayGun( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_Teleport_Create( byte pPosX, byte pPosY ) {
+	vector< cObject*> objects = mCurrentRoom->objectFind( eObjectTeleport );
+	cObjectTeleport *object = 0;
 
-	return 0;
+	// Already got a teleport on this screen?
+	if(objects.size() == 0 ) {
+		object = new cObjectTeleport( mCurrentRoom, pPosX, pPosY );
+	} else
+		object = (cObjectTeleport*) objects[0];
+
+	return object;
 }
 
 cObject *cBuilder::obj_TrapDoor_Create( byte pPosX, byte pPosY ) {
+	cObjectTrapDoor *object = new cObjectTrapDoor( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_Conveyor_Create( byte pPosX, byte pPosY ) {
