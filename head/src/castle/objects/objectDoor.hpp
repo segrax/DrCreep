@@ -11,7 +11,7 @@ public:
 	cObjectDoor( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectDoor;
 
-		mDirection = eDirectionTop;
+		mDirection = eDirectionNone;
 		mLinkRoom = 0;
 		mLinkDoor = 0;
 		mMapX = mMapY = 0;

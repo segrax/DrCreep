@@ -54,7 +54,7 @@ enum eRoomObjects {
 };
 
 enum eDirection {
-	eDirectionTop	 = 0,
+	eDirectionUp	 = 0,
 	eDirectionRight	 = 1,
 	eDirectionDown	 = 2,
 	eDirectionLeft	 = 3,

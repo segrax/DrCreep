@@ -28,9 +28,8 @@ public:
 	size_t			 roomSaveObjects( byte **pBuffer );
 	size_t			 roomSave( byte **pBuffer );
 
-	size_t			 saveDoors( byte **pBuffer );
-	size_t			 saveWalkways( byte **pBuffer );
-
+	size_t			 saveCount( byte **pBuffer, eRoomObjects pObjectType );
+	size_t			 saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker = 0x00 );
 };
 
 class cBuilder : public cCreep {
