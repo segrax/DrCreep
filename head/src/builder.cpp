@@ -15,6 +15,8 @@
 #include "castle/objects/objectLadder.hpp"
 #include "castle/objects/objectDoorBell.hpp"
 #include "castle/objects/objectLightning.hpp"
+#include "castle/objects/objectForcefield.hpp"
+#include "castle/objects/objectMummy.hpp"
 #include "debug.h"
 
 size_t cRoom::roomSaveObjects( byte **pBuffer ) {
@@ -26,6 +28,8 @@ size_t cRoom::roomSaveObjects( byte **pBuffer ) {
 	size += saveObject( pBuffer, eObjectLadder, 0x00 );
 	size += saveCount( pBuffer, eObjectDoorBell );
 	size += saveObject( pBuffer, eObjectLightning, 0x20 );
+	size += saveObject( pBuffer, eObjectForcefield, 0x00 );
+	size += saveObject( pBuffer, eObjectMummy, 0x00 );
 
 	return size;
 }
@@ -447,7 +451,11 @@ void cBuilder::parseInput() {
 
 		} else {
 			mDragMode = false;
-			mCurrentObject = 0;
+			if( mCurrentObject->mParts && mCurrentObject->mPart < 1) {
+				mCurrentObject->mPart++;
+					
+			} else
+				mCurrentObject = 0;
 		}
 
 		update = true;
@@ -641,13 +649,15 @@ cObject *cBuilder::obj_Lightning_Create( byte pPosX, byte pPosY ) {
 }
 
 cObject *cBuilder::obj_Forcefield_Create( byte pPosX, byte pPosY ) {
+	cObjectForcefield *object = new cObjectForcefield( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_Mummy_Create( byte pPosX, byte pPosY ) {
+	cObjectMummy *object = new cObjectMummy( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_Key_Create( byte pPosX, byte pPosY ) {
