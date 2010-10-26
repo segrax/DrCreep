@@ -177,6 +177,82 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
+		<Configuration
+			Name="builder|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				CommandLine="cd ..\..&#x0D;&#x0A;rev.cmd&#x0D;&#x0A;"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				InlineFunctionExpansion="0"
+				AdditionalIncludeDirectories="..\..\\src"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;BUILDER"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="opengl32.lib glu32.lib sdl.lib sdlmain.lib"
+				OutputFile="..\..\run\builder_d.exe"
+				LinkIncremental="2"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -350,6 +426,74 @@
 					RelativePath="..\..\src\castle\castle.h"
 					>
 				</File>
+				<Filter
+					Name="objects"
+					>
+					<File
+						RelativePath="..\..\src\castle\objects\object.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectConveyor.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectDoor.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectDoorBell.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectForcefield.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectFrankenstein.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectKey.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectLadder.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectLightning.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectLock.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectMummy.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectRayGun.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectSlidingPole.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectTeleport.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectTrapDoor.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\castle\objects\objectWalkway.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="sid"
@@ -363,6 +507,13 @@
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="builder|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -383,6 +534,13 @@
 							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="builder|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\resid-0.16\filter.cpp"
@@ -393,6 +551,13 @@
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="builder|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -413,6 +578,13 @@
 							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="builder|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\resid-0.16\sid.cpp"
@@ -423,6 +595,13 @@
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="builder|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -439,12 +618,26 @@
 							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="builder|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\resid-0.16\spline.h"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="builder|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -469,6 +662,13 @@
 							Name="VCCLCompilerTool"
 						/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="builder|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\resid-0.16\wave.cpp"
@@ -479,6 +679,13 @@
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="builder|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"

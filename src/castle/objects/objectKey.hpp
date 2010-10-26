@@ -15,11 +15,11 @@ public:
 		return 0;
 	}
 
-	size_t		objectSave( byte **pBuffer ) {	
+	size_t		objectSave( byte **pBuffer , size_t pPart ) {	
 		*(*pBuffer)++ = mKeyColor;
 		*(*pBuffer)++ = mKeyColor + 0x50;
 
-		size_t strSize = cObject::objectSave( pBuffer );
+		size_t strSize = cObject::objectSave( pBuffer, pPart );
 
 		return (strSize + 2);
 	}

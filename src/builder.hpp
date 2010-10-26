@@ -9,7 +9,12 @@ public:
 
 	vector< cObject* >	mObjects;
 	
-	void			 objectAdd( cObject *pObject ) { if(pObject) mObjects.push_back( pObject ); }
+	void			 objectAdd( cObject *pObject ) { 
+		if(pObject) 
+			if( find( mObjects.begin(), mObjects.end(), pObject ) == mObjects.end() )
+				mObjects.push_back( pObject ); 
+	}
+
 	void			 objectDelete( cObject *pObject ) {
 		vector<cObject* >::iterator objIT = find( mObjects.begin(), mObjects.end(), pObject );
 		if( objIT == mObjects.end() )

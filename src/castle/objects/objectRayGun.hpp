@@ -33,14 +33,14 @@ public:
 		return 0;
 	}
 
-	size_t		objectSave( byte **pBuffer ) {	
+	size_t		objectSave( byte **pBuffer , size_t pPart ) {	
 		*(*pBuffer)++ = mDirection;
-		size_t strSize = cObject::objectSave( pBuffer );
+		size_t strSize = cObject::objectSave( pBuffer, 0 );
 		
 		*(*pBuffer)++ = mParts[0].mLength;
 		*(*pBuffer)++ = mParts[2].mY;
 
-		strSize += cObject::objectSave2( pBuffer );
+		strSize += cObject::objectSave( pBuffer, 1 );
 
 		return (strSize + 3);
 	}

@@ -18,10 +18,10 @@ public:
 		return 0;
 	}
 
-	size_t		objectSave( byte **pBuffer ) {	
+	size_t		objectSave( byte **pBuffer , size_t pPart ) {	
 		*(*pBuffer)++ = (byte) mParts[0].mLength;
 			
-		size_t strSize = cObject::objectSave( pBuffer );
+		size_t strSize = cObject::objectSave( pBuffer, 0 );
 
 		return (strSize + 1);
 	}
