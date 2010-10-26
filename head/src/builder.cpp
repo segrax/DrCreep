@@ -10,6 +10,7 @@
 #include "castle/objects/object.hpp"
 #include "builder.hpp"
 #include "castle/objects/objectDoor.hpp"
+#include "castle/objects/objectWalkway.hpp"
 
 #include "debug.h"
 
@@ -76,8 +77,26 @@ size_t cRoom::saveDoors( byte **pBuffer ) {
 }
 
 size_t cRoom::saveWalkways( byte **pBuffer ) {
+	vector< cObject* >	objects = objectFind( eObjectWalkway );
+	vector< cObject* >::iterator	objectIT;
 
-	return 0;
+	size_t	size = 3;
+
+	// No doors to save?
+	if( objects.size() == 0 )
+		return 0;
+
+	// Write WalkwayID
+	writeLEWord( *pBuffer, (word) eObjectWalkway );
+	*pBuffer += 2;
+
+	// Write each Walkways
+	for( objectIT = objects.begin(); objectIT != objects.end(); ++objectIT ) 
+		size += (*objectIT)->objectSave( pBuffer );
+
+	*(*pBuffer)++ = 0x00;
+
+	return size;
 }
 
 cBuilder::cBuilder() {
@@ -90,7 +109,6 @@ cBuilder::cBuilder() {
 	mDragLength = 0;
 	mDragMode = false;
 	mDragDirection = eDirectionTop;
-	mDragComplete = false;
 
 	mSelectedObject = eObjectsFinished;
 
@@ -306,13 +324,22 @@ void cBuilder::selectedObjectChange( bool pChangeUp ) {
 }
 
 void cBuilder::cursorObjectUpdate() {
-	
+	size_t length = 1, posX = mCursorX, posY = mCursorY;
+
 	if( mCurrentObject ) {
+		length = mCurrentObject->mLength;
+		if(mDragMode) {
+			posX = mCurrentObject->mPositionX;
+			posY = mCurrentObject->mPositionY;
+		}
+
 		mCurrentRoom->objectDelete( mCurrentObject );
 		delete mCurrentObject;
 	}
 
-	mCurrentObject = objectCreate( mSelectedObject, mCursorX, mCursorY );
+	mCurrentObject = objectCreate( mSelectedObject, posX, posY );
+	if(mCurrentObject)
+		mCurrentObject->mLength = length;
 	castleSave();
 	roomLoad();
 }
@@ -333,9 +360,8 @@ void cBuilder::parseInput() {
 					mCurrentObject->mLength--;
 					break;
 			}
-		}
-			
-		mCursorX -= 4;
+		} else
+			mCursorX -= 4;
 		update = true;
 	}
 
@@ -351,9 +377,8 @@ void cBuilder::parseInput() {
 					mCurrentObject->mLength++;
 					break;
 			}
-		} 
-		
-		mCursorX += 4;
+		} else
+			mCursorX += 4;
 		update = true;
 	}
 
@@ -372,13 +397,16 @@ void cBuilder::parseInput() {
 			if( mDragMode == false ) 
 				mDragMode = true;
 			else {
-				mDragComplete = true;
 				mDragMode = false;
 				mCurrentObject = 0;
 			}
 
-		} else
+		} else {
+			mDragMode = false;
 			mCurrentObject = 0;
+		}
+
+		update = true;
 	}
 
 	if(update) 
@@ -539,8 +567,9 @@ cObject *cBuilder::obj_Door_Create( byte pPosX, byte pPosY ) {
 }
 
 cObject *cBuilder::obj_Walkway_Create( byte pPosX, byte pPosY ) {
+	cObjectWalkway *object = new cObjectWalkway( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_SlidingPole_Create( byte pPosX, byte pPosY ) {
