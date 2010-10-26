@@ -8,9 +8,7 @@ public:
 public:
 	cObjectConveyor( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectConveyor;
-		mDrags = false;
-		mLength = 1;
-		mParts = true;
+		mPartCount = 2;
 		mState = 0;
 	}
 

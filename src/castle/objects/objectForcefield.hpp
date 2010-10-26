@@ -6,9 +6,7 @@ public:
 public:
 	cObjectForcefield( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectForcefield;
-		mDrags = false;
-		mLength = 0;
-		mParts = true;
+		mPartCount = 2;
 	}
 
 	size_t		objectLoad( byte **pBuffer ) {

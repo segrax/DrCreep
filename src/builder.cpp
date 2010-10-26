@@ -194,163 +194,16 @@ void cBuilder::mainLoop() {
 				selectedObjectChange( false );
 				break;
 		}
-
+		
+		// Force draw of sprites
+		obj_Actions();
 		hw_Update();
-
 	}
 
-}
-void cBuilder::selectedObjectChange( bool pChangeUp ) {
-
-	switch( mSelectedObject ) {
-			case eObjectsFinished:			// Finished
-				if( pChangeUp )
-					mSelectedObject = eObjectMultiDraw;
-				else
-					mSelectedObject = eObjectDoor;
-				break;
-
-			case eObjectDoor:			
-				if( pChangeUp )
-					mSelectedObject = eObjectsFinished;
-				else
-					mSelectedObject = eObjectWalkway;
-				break;
-
-			case eObjectWalkway:
-				if( pChangeUp )
-					mSelectedObject = eObjectDoor;
-				else
-					mSelectedObject = eObjectSlidingPole;
-				break;
-
-			case eObjectSlidingPole:
-				if( pChangeUp )
-					mSelectedObject = eObjectWalkway;
-				else
-					mSelectedObject = eObjectLadder;
-				break;
-
-			case eObjectLadder:
-				if( pChangeUp )
-					mSelectedObject = eObjectSlidingPole;
-				else
-					mSelectedObject = eObjectDoorBell;
-				break;
-
-			case eObjectDoorBell:	
-				if( pChangeUp )
-					mSelectedObject = eObjectLadder;
-				else
-					mSelectedObject = eObjectLightning;
-				break;
-
-			case eObjectLightning:
-				if( pChangeUp )
-					mSelectedObject = eObjectDoorBell;
-				else
-					mSelectedObject = eObjectForcefield;
-				break;
-
-			case eObjectForcefield:	
-				if( pChangeUp )
-					mSelectedObject = eObjectLightning;
-				else
-					mSelectedObject = eObjectMummy;
-				break;
-
-			case eObjectMummy:	
-				if( pChangeUp )
-					mSelectedObject = eObjectForcefield;
-				else
-					mSelectedObject = eObjectKey;
-				break;
-
-			case eObjectKey:	
-				if( pChangeUp )
-					mSelectedObject = eObjectMummy;
-				else
-					mSelectedObject = eObjectLock;
-				break;
-
-			case eObjectLock:
-				if( pChangeUp )
-					mSelectedObject = eObjectKey;
-				else
-					mSelectedObject = eObjectRayGun;
-				break;
-
-			case eObjectRayGun:		
-				if( pChangeUp )
-					mSelectedObject = eObjectLock;
-				else
-					mSelectedObject = eObjectTeleport;
-				break;
-
-			case eObjectTeleport:	
-				if( pChangeUp )
-					mSelectedObject = eObjectRayGun;
-				else
-					mSelectedObject = eObjectTrapDoor;
-				break;
-
-			case eObjectTrapDoor:	
-				if( pChangeUp )
-					mSelectedObject = eObjectTeleport;
-				else
-					mSelectedObject = eObjectConveyor;
-				break;
-
-			case eObjectConveyor:
-				if( pChangeUp )
-					mSelectedObject = eObjectTrapDoor;
-				else
-					mSelectedObject = eObjectFrankenstein;
-				break;
-
-			case eObjectFrankenstein:
-				if( pChangeUp )
-					mSelectedObject = eObjectConveyor;
-				else
-					mSelectedObject = eObjectStringPrint;
-				break;
-
-			case eObjectStringPrint:		// String Print
-			case 0x2A6D:
-				if( pChangeUp )
-					mSelectedObject = eObjectFrankenstein;
-				else
-					mSelectedObject = eObjectImageDraw;
-				break;
-
-			case eObjectImageDraw:
-				if( pChangeUp )
-					mSelectedObject = eObjectStringPrint;
-				else
-					mSelectedObject = eObjectMultiDraw;
-				break;
-
-			case eObjectMultiDraw:
-			case 0x160A:				// Intro
-				if( pChangeUp )
-					mSelectedObject = eObjectImageDraw;
-				else
-					mSelectedObject = eObjectsFinished;
-				break;
-
-			default:
-				cout << "selectedObjectChange: 0x";
-				cout << std::hex << mSelectedObject << "\n";
-
-				break;
-	}
-
-	cursorObjectUpdate();
 }
 
 void cBuilder::cursorObjectUpdate() {
-	size_t length = 1, posX = mCursorX, posY = mCursorY;
-
+	// Cursor object has changed?
 	if( mCurrentObject && mCurrentObject->objectTypeGet() != mSelectedObject ) {
 
 		mCurrentRoom->objectDelete( mCurrentObject );
@@ -358,39 +211,43 @@ void cBuilder::cursorObjectUpdate() {
 		mCurrentObject = 0;
 	}
 
-	if(!mCurrentObject)
-		mCurrentObject = objectCreate( mSelectedObject, posX, posY );
+	if( !mCurrentObject )
+		mCurrentObject = objectCreate( mSelectedObject, mCursorX, mCursorY );
 
-	if(mCurrentObject) {
-		if(mCurrentObject->mPart == 0 ) {
-			mCurrentObject->mPositionX = posX;
-			mCurrentObject->mPositionY = posY;
-		}
+	if( mCurrentObject )
+		mCurrentObject->partSetPosition( mCursorX, mCursorY );
 
-		if(mCurrentObject->mPart == 1 ) {
-			mCurrentObject->mPosition2X = posX;
-			mCurrentObject->mPosition2Y = posY;
-		}
-	}
+	if( mCurrentObject && mCurrentObject->isPlaced() )
+		mCurrentObject = 0;
 
 	castleSave();
 	roomLoad();
+
+	// Force draw of sprites
+	obj_Actions();
+	img_Actions();
 }
 
 void cBuilder::parseInput() {
 	bool			 update = false;
 	sPlayerInput	*input = mInput->inputGet(0);
+
+	sObjectPart		*part = 0;
 	
+	// Get the current selected 'part' of the object
+	if(mCurrentObject)
+		part = mCurrentObject->partGet();
+
+
 	if(input->mLeft) {
+		if( part && mDragMode ) {
 
-		if( mCurrentObject && mDragMode ) {
-
-			switch( mCurrentObject->mDragDirection ) {
+			switch( part->mDragDirection ) {
 				case eDirectionLeft:
-					mCurrentObject->mLength++;
+					part->mLength++;
 					break;
 				case eDirectionRight:
-					mCurrentObject->mLength--;
+					part->mLength--;
 					break;
 			}
 		} else
@@ -400,14 +257,14 @@ void cBuilder::parseInput() {
 
 	if(input->mRight) {
 
-		if( mCurrentObject && mDragMode ) {
+		if( part && mDragMode ) {
 
-			switch( mCurrentObject->mDragDirection ) {
+			switch( part->mDragDirection ) {
 				case eDirectionLeft:
-					mCurrentObject->mLength--;
+					part->mLength--;
 					break;
 				case eDirectionRight:
-					mCurrentObject->mLength++;
+					part->mLength++;
 					break;
 			}
 		} else
@@ -416,14 +273,14 @@ void cBuilder::parseInput() {
 	}
 
 	if(input->mDown) {
-		if( mCurrentObject && mDragMode ) {
+		if( part && mDragMode ) {
 
-			switch( mCurrentObject->mDragDirection ) {
+			switch( part->mDragDirection ) {
 				case eDirectionDown:
-					mCurrentObject->mLength++;
+					part->mLength++;
 					break;
 				case eDirectionUp:
-					mCurrentObject->mLength--;
+					part->mLength--;
 					break;
 			}
 		} else
@@ -432,14 +289,14 @@ void cBuilder::parseInput() {
 	}
 
 	if(input->mUp) {
-		if( mCurrentObject && mDragMode ) {
+		if( part && mDragMode ) {
 
-			switch( mCurrentObject->mDragDirection ) {
+			switch( part->mDragDirection ) {
 				case eDirectionDown:
-					mCurrentObject->mLength--;
+					part->mLength--;
 					break;
 				case eDirectionUp:
-					mCurrentObject->mLength++;
+					part->mLength++;
 					break;
 			}
 		} else
@@ -448,28 +305,20 @@ void cBuilder::parseInput() {
 	}
 
 	if(input->mButton) {
-		if( mCurrentObject && mCurrentObject->mDrags == true && mCurrentObject->mPart < 1 ) {
+		if( part && part->mDrags == true ) {
 			if( mDragMode == false ) 
 				mDragMode = true;
 			else {
 				mDragMode = false;
-
-				if( mCurrentObject->mParts ) {
-					mCurrentObject->mPart++;
-					
-				} else
-					mCurrentObject = 0;
+				mCurrentObject->partPlace();
 			}
 
 		} else {
 			mDragMode = false;
-			if( mCurrentObject->mParts && mCurrentObject->mPart < 1) {
-				mCurrentObject->mPart++;
-					
-			} else
-				mCurrentObject = 0;
+			mCurrentObject->partPlace();
 		}
 
+		
 		update = true;
 	}
 
@@ -737,4 +586,152 @@ cObject *cBuilder::obj_Image_Create( byte pPosX, byte pPosY ) {
 cObject *cBuilder::obj_Multi_Create( byte pPosX, byte pPosY ) {
 
 	return 0;
+}
+
+void cBuilder::selectedObjectChange( bool pChangeUp ) {
+
+	switch( mSelectedObject ) {
+			case eObjectsFinished:			// Finished
+				if( pChangeUp )
+					mSelectedObject = eObjectMultiDraw;
+				else
+					mSelectedObject = eObjectDoor;
+				break;
+
+			case eObjectDoor:			
+				if( pChangeUp )
+					mSelectedObject = eObjectsFinished;
+				else
+					mSelectedObject = eObjectWalkway;
+				break;
+
+			case eObjectWalkway:
+				if( pChangeUp )
+					mSelectedObject = eObjectDoor;
+				else
+					mSelectedObject = eObjectSlidingPole;
+				break;
+
+			case eObjectSlidingPole:
+				if( pChangeUp )
+					mSelectedObject = eObjectWalkway;
+				else
+					mSelectedObject = eObjectLadder;
+				break;
+
+			case eObjectLadder:
+				if( pChangeUp )
+					mSelectedObject = eObjectSlidingPole;
+				else
+					mSelectedObject = eObjectDoorBell;
+				break;
+
+			case eObjectDoorBell:	
+				if( pChangeUp )
+					mSelectedObject = eObjectLadder;
+				else
+					mSelectedObject = eObjectLightning;
+				break;
+
+			case eObjectLightning:
+				if( pChangeUp )
+					mSelectedObject = eObjectDoorBell;
+				else
+					mSelectedObject = eObjectForcefield;
+				break;
+
+			case eObjectForcefield:	
+				if( pChangeUp )
+					mSelectedObject = eObjectLightning;
+				else
+					mSelectedObject = eObjectMummy;
+				break;
+
+			case eObjectMummy:	
+				if( pChangeUp )
+					mSelectedObject = eObjectForcefield;
+				else
+					mSelectedObject = eObjectKey;
+				break;
+
+			case eObjectKey:	
+				if( pChangeUp )
+					mSelectedObject = eObjectMummy;
+				else
+					mSelectedObject = eObjectLock;
+				break;
+
+			case eObjectLock:
+				if( pChangeUp )
+					mSelectedObject = eObjectKey;
+				else
+					mSelectedObject = eObjectRayGun;
+				break;
+
+			case eObjectRayGun:		
+				if( pChangeUp )
+					mSelectedObject = eObjectLock;
+				else
+					mSelectedObject = eObjectTeleport;
+				break;
+
+			case eObjectTeleport:	
+				if( pChangeUp )
+					mSelectedObject = eObjectRayGun;
+				else
+					mSelectedObject = eObjectTrapDoor;
+				break;
+
+			case eObjectTrapDoor:	
+				if( pChangeUp )
+					mSelectedObject = eObjectTeleport;
+				else
+					mSelectedObject = eObjectConveyor;
+				break;
+
+			case eObjectConveyor:
+				if( pChangeUp )
+					mSelectedObject = eObjectTrapDoor;
+				else
+					mSelectedObject = eObjectFrankenstein;
+				break;
+
+			case eObjectFrankenstein:
+				if( pChangeUp )
+					mSelectedObject = eObjectConveyor;
+				else
+					mSelectedObject = eObjectStringPrint;
+				break;
+
+			case eObjectStringPrint:		// String Print
+			case 0x2A6D:
+				if( pChangeUp )
+					mSelectedObject = eObjectFrankenstein;
+				else
+					mSelectedObject = eObjectImageDraw;
+				break;
+
+			case eObjectImageDraw:
+				if( pChangeUp )
+					mSelectedObject = eObjectStringPrint;
+				else
+					mSelectedObject = eObjectMultiDraw;
+				break;
+
+			case eObjectMultiDraw:
+			case 0x160A:				// Intro
+				if( pChangeUp )
+					mSelectedObject = eObjectImageDraw;
+				else
+					mSelectedObject = eObjectsFinished;
+				break;
+
+			default:
+				cout << "selectedObjectChange: 0x";
+				cout << std::hex << mSelectedObject << "\n";
+
+				break;
+	}
+
+	cursorObjectUpdate();
 }

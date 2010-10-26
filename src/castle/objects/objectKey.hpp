@@ -7,9 +7,6 @@ public:
 public:
 	cObjectKey( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectKey;
-		mDrags = false;
-		mLength = 0;
-		mParts = false;
 		mKeyColor = 1;
 	}
 

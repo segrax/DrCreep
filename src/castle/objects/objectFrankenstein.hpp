@@ -8,9 +8,6 @@ public:
 public:
 	cObjectFrankenstein( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectFrankenstein;
-		mDrags = false;
-		mLength = 1;
-		mParts = false;
 		mState = 0;
 	}
 
