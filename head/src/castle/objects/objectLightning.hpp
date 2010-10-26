@@ -26,13 +26,13 @@ public:
 		return 0;
 	}
 
-	size_t		objectSave( byte **pBuffer ) {	
+	size_t		objectSave( byte **pBuffer , size_t pPart ) {	
 		if( mMachineState == true )
 			*(*pBuffer)++ = 0x40;
 		else
 			*(*pBuffer)++ = 0x00;
 
-		size_t strSize = cObject::objectSave( pBuffer );
+		size_t strSize = cObject::objectSave( pBuffer, 0 );
 		
 		*(*pBuffer)++ = mParts[0].mLength;
 
@@ -44,7 +44,7 @@ public:
 		else
 			*(*pBuffer)++ = 0xC0;
 
-		strSize += objectSave2( pBuffer );
+		strSize += cObject::objectSave( pBuffer, 1 );
 		*(*pBuffer)++ = 0x00;
 
 		*(*pBuffer)++ = mMachine;

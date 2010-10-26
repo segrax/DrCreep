@@ -119,8 +119,11 @@ int	main( int argc, char *argv[] ) {
 	wiiStart();
 #endif
 
-	//gCreep = new cCreep();
+#ifndef BUILDER
+	gCreep = new cCreep();
+#else
 	gCreep = new cBuilder();
+#endif
 	gCreep->run( argc, argv );
 
 	delete gCreep;

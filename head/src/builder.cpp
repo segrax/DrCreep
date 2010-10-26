@@ -96,7 +96,7 @@ size_t cRoom::saveCount( byte **pBuffer, eRoomObjects pObjectType ) {
 
 	// Write each door
 	for( objectIT = objects.begin(); objectIT != objects.end(); ++objectIT ) 
-		size += (*objectIT)->objectSave( pBuffer );
+		size += (*objectIT)->objectSave( pBuffer, 0 );
 
 	return size;
 }
@@ -117,7 +117,7 @@ size_t cRoom::saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMar
 
 	// Write each Pole
 	for( objectIT = objects.begin(); objectIT != objects.end(); ++objectIT ) 
-		size += (*objectIT)->objectSave( pBuffer );
+		size += (*objectIT)->objectSave( pBuffer, 0 );
 
 	*(*pBuffer)++ = pEndMarker;
 
@@ -196,6 +196,9 @@ void cBuilder::mainLoop() {
 		}
 		
 		// Force draw of sprites
+
+		//interruptWait( 2 );
+		// TODO: Call this less often
 		obj_Actions();
 		hw_Update();
 	}
@@ -206,8 +209,14 @@ void cBuilder::cursorObjectUpdate() {
 	// Cursor object has changed?
 	if( mCurrentObject && mCurrentObject->objectTypeGet() != mSelectedObject ) {
 
-		mCurrentRoom->objectDelete( mCurrentObject );
-		delete mCurrentObject;
+		// Dont delete if its placed
+		if( mCurrentObject->partGet(0)->mPlaced == false ) {
+			mCurrentRoom->objectDelete( mCurrentObject );
+			delete mCurrentObject;
+		} else
+			if( mCurrentObject->partGet()->mPlaced == false )
+				mCurrentObject->partDel();
+
 		mCurrentObject = 0;
 	}
 
@@ -310,12 +319,14 @@ void cBuilder::parseInput() {
 				mDragMode = true;
 			else {
 				mDragMode = false;
-				mCurrentObject->partPlace();
+				if(mCurrentObject)
+					mCurrentObject->partPlace();
 			}
 
 		} else {
 			mDragMode = false;
-			mCurrentObject->partPlace();
+			if(mCurrentObject)
+				mCurrentObject->partPlace();
 		}
 
 		
@@ -549,8 +560,14 @@ cObject *cBuilder::obj_Teleport_Create( byte pPosX, byte pPosY ) {
 	// Already got a teleport on this screen?
 	if(objects.size() == 0 ) {
 		object = new cObjectTeleport( mCurrentRoom, pPosX, pPosY );
-	} else
+	} else {
 		object = (cObjectTeleport*) objects[0];
+
+		if(object->partGet()->mPlaced) {
+			object->partAdd();
+			object->mPartAdd();
+		}
+	}
 
 	return object;
 }

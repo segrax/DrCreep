@@ -6,10 +6,12 @@ struct sObjectPart {
 	bool		mDrags;					// object will be dragged when being placed
 	eDirection	mDragDirection;
 	size_t		mLength;
+	bool		mPlaced;
 
 	sObjectPart() { mX = mY = 0; 
 				  mSet = false;
 				  mDrags = false;
+				  mPlaced = false;
 				  mLength = 0;
 				  mDragDirection = eDirectionNone;
 				}
@@ -18,7 +20,7 @@ struct sObjectPart {
 class cObject {
 protected:
 	eRoomObjects	 mObjectID;
-	sObjectPart		 mParts[3];
+	sObjectPart		 mParts[16];
 	
 	cRoom			*mRoom;
 	
@@ -29,6 +31,7 @@ protected:
 		mParts[pPart].mSet = true;
 	}
 
+	bool			 mPartsAdd;
 	bool			 mPlaced;
 	byte			 mPart,		mPartCount;
 
@@ -36,18 +39,24 @@ public:
 
 	inline bool  isPlaced()			{ return mPlaced; }
 
+	void		 mPartAdd()			{ ++mPart; }
 	sObjectPart	*partGet()			{ return &mParts[ mPart ]; }
-	eDirection	 dragDirectionGet()	{ return mParts[ mPart ].mDragDirection; }
-	
+	sObjectPart	*partGet( size_t pPart )			{ return &mParts[ pPart ]; }
 	void partSetPosition( byte pPosX, byte pPosY ) {
 		partSetPosition( pPosX, pPosY, mPart );
 	}
 
-	void partPlace() {
+	virtual void partPlace() {
+		mParts[mPart].mPlaced = true;
+
 		++mPart;
 
 		if(mPart >= mPartCount)
 			mPlaced = true;
+	}
+
+	virtual void partDel() {
+		return;
 	}
 
 	cObject( cRoom *pRoom, byte pPosX, byte pPosY ) {
@@ -58,6 +67,7 @@ public:
 		mPlaced = false;
 		mPart = 0;
 		mPartCount = 1;
+		mPartsAdd = false;
 
 		mObjectID = eObjectsFinished;
 
@@ -65,16 +75,16 @@ public:
 	}
 	
 	eRoomObjects	objectTypeGet() { return mObjectID; }
-	virtual size_t	objectLoad( byte **pBuffer ) = 0;	// Load object from room stream
-	virtual size_t	objectSave( byte **pBuffer ) {	// Save object to room stream
-		*(*pBuffer)++ = mParts[0].mX;
-		*(*pBuffer)++ = mParts[0].mY;
-
-		return 2;
+	virtual void	partAdd() {
+		mPlaced = false;
+		++mPartCount;
+		return;
 	}
-	virtual size_t	objectSave2( byte **pBuffer ) {	// Save object to room stream
-		*(*pBuffer)++ = mParts[1].mX;
-		*(*pBuffer)++ = mParts[1].mY;
+
+	virtual size_t	objectLoad( byte **pBuffer ) = 0;	// Load object from room stream
+	virtual size_t	objectSave( byte **pBuffer, size_t pPart ) {	// Save object to room stream
+		*(*pBuffer)++ = mParts[pPart].mX;
+		*(*pBuffer)++ = mParts[pPart].mY;
 
 		return 2;
 	}

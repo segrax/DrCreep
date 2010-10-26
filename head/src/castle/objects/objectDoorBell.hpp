@@ -15,8 +15,8 @@ public:
 		return 0;
 	}
 
-	size_t		objectSave( byte **pBuffer ) {	
-		size_t strSize = cObject::objectSave( pBuffer );
+	size_t		objectSave( byte **pBuffer , size_t pPart ) {	
+		size_t strSize = cObject::objectSave( pBuffer, pPart );
 
 		*(*pBuffer)++ = mDoorID;
 		return (strSize + 1);

@@ -16,12 +16,12 @@ public:
 		return 0;
 	}
 
-	size_t		objectSave( byte **pBuffer ) {	
+	size_t		objectSave( byte **pBuffer , size_t pPart ) {	
 		*(*pBuffer)++ = mLockColor;
 		*(*pBuffer)++ = mLockColor + 0x57;
 		*(*pBuffer)++ = mDoorNumber;
 
-		size_t strSize = cObject::objectSave( pBuffer );
+		size_t strSize = cObject::objectSave( pBuffer, pPart );
 
 		return (strSize + 2);
 	}
