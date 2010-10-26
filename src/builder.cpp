@@ -11,14 +11,21 @@
 #include "builder.hpp"
 #include "castle/objects/objectDoor.hpp"
 #include "castle/objects/objectWalkway.hpp"
-
+#include "castle/objects/objectSlidingPole.hpp"
+#include "castle/objects/objectLadder.hpp"
+#include "castle/objects/objectDoorBell.hpp"
+#include "castle/objects/objectLightning.hpp"
 #include "debug.h"
 
 size_t cRoom::roomSaveObjects( byte **pBuffer ) {
 	size_t size = 0;
 
-	size = saveDoors( pBuffer );
-	size += saveWalkways( pBuffer );
+	size = saveCount( pBuffer, eObjectDoor );
+	size += saveObject( pBuffer, eObjectWalkway, 0x00 );
+	size += saveObject( pBuffer, eObjectSlidingPole, 0x00 );
+	size += saveObject( pBuffer, eObjectLadder, 0x00 );
+	size += saveCount( pBuffer, eObjectDoorBell );
+	size += saveObject( pBuffer, eObjectLightning, 0x20 );
 
 	return size;
 }
@@ -48,25 +55,25 @@ vector< cObject* > cRoom::objectFind( eRoomObjects pType ) {
 
 		if( (*objectIT)->objectTypeGet() == pType )
 			objects.push_back( *objectIT );
-	}
+	}	
 
 	return objects;
 }
 
-size_t cRoom::saveDoors( byte **pBuffer ) {
-	vector< cObject* >	objects = objectFind( eObjectDoor );
+size_t cRoom::saveCount( byte **pBuffer, eRoomObjects pObjectType ) {
+	vector< cObject* >	objects = objectFind( pObjectType );
 	vector< cObject* >::iterator	objectIT;
 	size_t	size = 3;
 
-	// No doors to save?
+	// No objects to save?
 	if( objects.size() == 0 )
 		return 0;
 
-	// Write Door ID
-	writeLEWord( *pBuffer, (word) eObjectDoor );
+	// Write ID
+	writeLEWord( *pBuffer, (word) pObjectType );
 	*pBuffer += 2;
 
-	// Number of doors
+	// Number of objects
 	*(*pBuffer)++ = objects.size();
 
 	// Write each door
@@ -76,28 +83,30 @@ size_t cRoom::saveDoors( byte **pBuffer ) {
 	return size;
 }
 
-size_t cRoom::saveWalkways( byte **pBuffer ) {
-	vector< cObject* >	objects = objectFind( eObjectWalkway );
+size_t cRoom::saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker ) {
+	vector< cObject* >	objects = objectFind( pObjectType );
 	vector< cObject* >::iterator	objectIT;
 
 	size_t	size = 3;
 
-	// No doors to save?
+	// No poles to save?
 	if( objects.size() == 0 )
 		return 0;
 
-	// Write WalkwayID
-	writeLEWord( *pBuffer, (word) eObjectWalkway );
+	// Write PoleID
+	writeLEWord( *pBuffer, (word) pObjectType );
 	*pBuffer += 2;
 
-	// Write each Walkways
+	// Write each Pole
 	for( objectIT = objects.begin(); objectIT != objects.end(); ++objectIT ) 
 		size += (*objectIT)->objectSave( pBuffer );
 
-	*(*pBuffer)++ = 0x00;
+	*(*pBuffer)++ = pEndMarker;
 
 	return size;
 }
+
+
 
 cBuilder::cBuilder() {
 	mCursorX = 0x10;
@@ -108,7 +117,7 @@ cBuilder::cBuilder() {
 
 	mDragLength = 0;
 	mDragMode = false;
-	mDragDirection = eDirectionTop;
+	mDragDirection = eDirectionUp;
 
 	mSelectedObject = eObjectsFinished;
 
@@ -326,20 +335,28 @@ void cBuilder::selectedObjectChange( bool pChangeUp ) {
 void cBuilder::cursorObjectUpdate() {
 	size_t length = 1, posX = mCursorX, posY = mCursorY;
 
-	if( mCurrentObject ) {
-		length = mCurrentObject->mLength;
-		if(mDragMode) {
-			posX = mCurrentObject->mPositionX;
-			posY = mCurrentObject->mPositionY;
-		}
+	if( mCurrentObject && mCurrentObject->objectTypeGet() != mSelectedObject ) {
 
 		mCurrentRoom->objectDelete( mCurrentObject );
 		delete mCurrentObject;
+		mCurrentObject = 0;
 	}
 
-	mCurrentObject = objectCreate( mSelectedObject, posX, posY );
-	if(mCurrentObject)
-		mCurrentObject->mLength = length;
+	if(!mCurrentObject)
+		mCurrentObject = objectCreate( mSelectedObject, posX, posY );
+
+	if(mCurrentObject) {
+		if(mCurrentObject->mPart == 0 ) {
+			mCurrentObject->mPositionX = posX;
+			mCurrentObject->mPositionY = posY;
+		}
+
+		if(mCurrentObject->mPart == 1 ) {
+			mCurrentObject->mPosition2X = posX;
+			mCurrentObject->mPosition2Y = posY;
+		}
+	}
+
 	castleSave();
 	roomLoad();
 }
@@ -383,22 +400,49 @@ void cBuilder::parseInput() {
 	}
 
 	if(input->mDown) {
-		mCursorY += 8;
+		if( mCurrentObject && mDragMode ) {
+
+			switch( mCurrentObject->mDragDirection ) {
+				case eDirectionDown:
+					mCurrentObject->mLength++;
+					break;
+				case eDirectionUp:
+					mCurrentObject->mLength--;
+					break;
+			}
+		} else
+			mCursorY += 8;
 		update = true;
 	}
 
 	if(input->mUp) {
-		mCursorY -= 8;
+		if( mCurrentObject && mDragMode ) {
+
+			switch( mCurrentObject->mDragDirection ) {
+				case eDirectionDown:
+					mCurrentObject->mLength--;
+					break;
+				case eDirectionUp:
+					mCurrentObject->mLength++;
+					break;
+			}
+		} else
+			mCursorY -= 8;
 		update = true;
 	}
 
 	if(input->mButton) {
-		if( mCurrentObject && mCurrentObject->mDrags == true ) {
+		if( mCurrentObject && mCurrentObject->mDrags == true && mCurrentObject->mPart < 1 ) {
 			if( mDragMode == false ) 
 				mDragMode = true;
 			else {
 				mDragMode = false;
-				mCurrentObject = 0;
+
+				if( mCurrentObject->mParts ) {
+					mCurrentObject->mPart++;
+					
+				} else
+					mCurrentObject = 0;
 			}
 
 		} else {
@@ -573,23 +617,27 @@ cObject *cBuilder::obj_Walkway_Create( byte pPosX, byte pPosY ) {
 }
 
 cObject *cBuilder::obj_SlidingPole_Create( byte pPosX, byte pPosY ) {
-	
-	return 0;
+	cObjectSlidingPole	*object = new cObjectSlidingPole( mCurrentRoom, pPosX, pPosY );
+
+	return object;
 }
 
 cObject *cBuilder::obj_Ladder_Create( byte pPosX, byte pPosY ) {
+	cObjectLadder *object = new cObjectLadder( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_Door_Button_Create( byte pPosX, byte pPosY ) {
+	cObjectDoorBell *object = new cObjectDoorBell( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_Lightning_Create( byte pPosX, byte pPosY ) {
+	cObjectLightning *object = new cObjectLightning( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_Forcefield_Create( byte pPosX, byte pPosY ) {
