@@ -1,48 +1,84 @@
 
-enum eRoomObjects {
-	eObjectDoor			= 0x0803,
-	eObjectWalkway		= 0x0806,
-	eObjectSlidingPole	= 0x0809,
-	eObjectLadder		= 0x080C,
-	eObjectDoorBell		= 0x080F,
-	eObjectLightning	= 0x0812,
-	eObjectForcefield	= 0x0815,
-	eObjectMummy		= 0x0818,
-	eObjectKey			= 0x081B,
-	eObjectLock			= 0x081E,
-	eObjectRayGun		= 0x0824,
-	eObjectTeleport		= 0x0827,
-	eObjectTrapDoor		= 0x082A,
-	eObjectConveyor		= 0x082D,
-	eObjectFrankenstein = 0x0830,
-	eObjectStringPrint	= 0x0833,
-	eObjectImageDraw	= 0x0821,
+class cRoom {
+public:
+	byte			 mNumber;
+	byte			 mColor;
+	byte		 	 mMapX, mMapY;
+	byte			 mMapWidth, mMapHeight;
+	byte			*mRoomDirPtr;
 
-	eObjectsFinished	= 0x0000,
-};
+	vector< cObject* >	mObjects;
+	
+	void			 objectAdd( cObject *pObject ) { if(pObject) mObjects.push_back( pObject ); }
+	void			 objectDelete( cObject *pObject ) {
+		vector<cObject* >::iterator objIT = find( mObjects.begin(), mObjects.end(), pObject );
+		if( objIT == mObjects.end() )
+			return;
 
-struct sRoomObject {
-	eRoomObjects	mObjectID;
-	byte			mPosX, mPosY;
-};
+		mObjects.erase( objIT );
+	}
 
-struct sRoom {
-	byte			mNumber;
-	byte			mColor;
-	byte			mMapX, mMapY;
-	byte			mMapWidth, mMapHeight;
+					 cRoom( byte pNumber ) {
+						 mNumber = pNumber;
+						 mRoomDirPtr = 0;
+					 }
 
-	vector< sRoomObject* >	mObjects;
+	vector< cObject* > objectFind( eRoomObjects pType );
+
+	size_t			 roomSaveObjects( byte **pBuffer );
+	size_t			 roomSave( byte **pBuffer );
+
+	size_t			 saveDoors( byte **pBuffer );
+	size_t			 saveWalkways( byte **pBuffer );
+
 };
 
 class cBuilder : public cCreep {
 
 private:
-	word			 mCursorX,		mCursorY;
-	sRoom			*mCurrentRoom;
-	sRoomObject		*mCurrentObject;
+	word					 mCursorX,		mCursorY;
+	eRoomObjects			 mSelectedObject;
 
-	map< size_t, sRoom *>	mRooms;
+	cRoom					*mCurrentRoom;
+	cObject					*mCurrentObject;
+
+	bool					 mDragMode;			// Object being placed is being dragged
+	bool					 mDragComplete;
+	eDirection				 mDragDirection;	// Direction which object drags
+	word					 mDragLength;
+
+	byte					 mStart_Door_Player1, mStart_Door_Player2;
+	byte					 mStart_Room_Player1, mStart_Room_Player2;
+	byte					 mLives_Player1, mLives_Player2;
+
+	map< size_t, cRoom *>	 mRooms;
+
+private:
+
+	void		 castleCreate();
+
+	cObject		*obj_Door_Create( byte pPosX, byte pPosY );
+	cObject		*obj_Walkway_Create( byte pPosX, byte pPosY );
+	cObject		*obj_SlidingPole_Create( byte pPosX, byte pPosY );
+	cObject		*obj_Ladder_Create( byte pPosX, byte pPosY );
+	cObject		*obj_Door_Button_Create( byte pPosX, byte pPosY );
+	cObject		*obj_Lightning_Create( byte pPosX, byte pPosY );
+	cObject		*obj_Forcefield_Create( byte pPosX, byte pPosY );
+	cObject		*obj_Mummy_Create( byte pPosX, byte pPosY );
+	cObject		*obj_Key_Create( byte pPosX, byte pPosY );
+	cObject		*obj_Door_Lock_Create( byte pPosX, byte pPosY );
+	cObject		*obj_RayGun_Create( byte pPosX, byte pPosY );
+	cObject		*obj_Teleport_Create( byte pPosX, byte pPosY );
+	cObject		*obj_TrapDoor_Create( byte pPosX, byte pPosY );
+	cObject		*obj_Conveyor_Create( byte pPosX, byte pPosY );
+	cObject		*obj_Frankie_Create( byte pPosX, byte pPosY );
+	cObject		*obj_string_Create( byte pPosX, byte pPosY );
+	cObject		*obj_Image_Create( byte pPosX, byte pPosY );
+	cObject		*obj_Multi_Create( byte pPosX, byte pPosY );
+
+	void		 parseInput();
+	void		 selectedObjectChange( bool pChangeUp );
+	void		 cursorObjectUpdate();
 
 public:
 					 cBuilder();
@@ -50,5 +86,8 @@ public:
 
 	void			 mainLoop();
 
-	sRoom			*roomCreate( size_t pNumber );
+	cObject			*objectCreate( eRoomObjects pObject, byte pPosX, byte pPosY );
+	cRoom			*roomCreate( size_t pNumber );
+
+	void			 castleSave( );
 };

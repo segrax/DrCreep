@@ -28,9 +28,6 @@
 #include "castleManager.h"
 #include "creep.h"
 #include "vic-ii/screen.h"
-#include "room.h"
-#include "castle/object/object.h"
-#include "castle/object/player.h"
 
 #ifdef _WII
 	#include <stdio.h>

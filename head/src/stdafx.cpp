@@ -25,6 +25,7 @@
 
 #include "stdafx.h"
 #include "creep.h"
+#include "castle/objects/object.hpp"
 #include "builder.hpp"
 #include "../rev.h"
 
