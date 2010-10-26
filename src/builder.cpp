@@ -22,6 +22,8 @@
 #include "castle/objects/objectRayGun.hpp"
 #include "castle/objects/objectTeleport.hpp"
 #include "castle/objects/objectTrapDoor.hpp"
+#include "castle/objects/objectConveyor.hpp"
+#include "castle/objects/objectFrankenstein.hpp"
 #include "debug.h"
 
 size_t cRoom::roomSaveObjects( byte **pBuffer ) {
@@ -40,6 +42,8 @@ size_t cRoom::roomSaveObjects( byte **pBuffer ) {
 	size += saveObject( pBuffer, eObjectRayGun, 0x80 );
 	size += saveObject( pBuffer, eObjectTeleport, 0x00 );
 	size += saveObject( pBuffer, eObjectTrapDoor, 0x80 );
+	size += saveObject( pBuffer, eObjectConveyor, 0x80 );
+	size += saveObject( pBuffer, eObjectFrankenstein, 0x80 );
 
 	return size;
 }
@@ -709,13 +713,15 @@ cObject *cBuilder::obj_TrapDoor_Create( byte pPosX, byte pPosY ) {
 }
 
 cObject *cBuilder::obj_Conveyor_Create( byte pPosX, byte pPosY ) {
+	cObjectConveyor *object = new cObjectConveyor( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_Frankie_Create( byte pPosX, byte pPosY ) {
+	cObjectFrankenstein *object = new cObjectFrankenstein( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_string_Create( byte pPosX, byte pPosY ) {
