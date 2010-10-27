@@ -24,6 +24,7 @@
 #include "castle/objects/objectTrapDoor.hpp"
 #include "castle/objects/objectConveyor.hpp"
 #include "castle/objects/objectFrankenstein.hpp"
+#include "castle/objects/objectText.hpp"
 #include "debug.h"
 
 size_t cRoom::roomSaveObjects( byte **pBuffer ) {
@@ -44,7 +45,7 @@ size_t cRoom::roomSaveObjects( byte **pBuffer ) {
 	size += saveObject( pBuffer, eObjectTrapDoor, 0x80 );
 	size += saveObject( pBuffer, eObjectConveyor, 0x80 );
 	size += saveObject( pBuffer, eObjectFrankenstein, 0x80 );
-
+	size += saveObject( pBuffer, eObjectText, 0x00 );
 	return size;
 }
 
@@ -131,9 +132,9 @@ cBuilder::cBuilder() {
 	mCurrentObject = 0;
 	mCurrentRoom = 0;
 
-	mDragLength = 0;
+	mMessage = 0;
+
 	mDragMode = false;
-	mDragDirection = eDirectionUp;
 
 	mSelectedObject = eObjectsFinished;
 
@@ -143,7 +144,7 @@ cBuilder::cBuilder() {
 }
 
 cBuilder::~cBuilder() {
-	
+	delete mMessage;
 }
 
 void cBuilder::castleCreate() {
@@ -159,6 +160,24 @@ void cBuilder::castleCreate() {
 	mStart_Room_Player1 = mStart_Room_Player2 = 0;
 	mStart_Door_Player1 = mStart_Door_Player2 = 0;
 	mLives_Player1 = mLives_Player2 = 3;
+}
+
+void cBuilder::stringPrint( string pMessage ) {
+
+	if( pMessage.size() == 0 ) {
+		mCurrentRoom->objectDelete( mMessage );
+
+		delete mMessage;
+		mMessage = 0;
+		castlePrepare();
+		return;
+	}
+
+	if(!mMessage)
+		mMessage = (cObjectText*) objectCreate( eObjectText, 0x10, 0xB8 );
+
+	mMessage->mString = pMessage;
+	castlePrepare();
 }
 
 void cBuilder::mainLoop() {
@@ -182,8 +201,7 @@ void cBuilder::mainLoop() {
 	while(!mQuit) {
 		byte key = tolower( mInput->keyGet() );
 		
-		parseInput();
-		
+		// Check keyboard input
 		switch(key) {
 
 			case 'q':
@@ -194,10 +212,13 @@ void cBuilder::mainLoop() {
 				selectedObjectChange( false );
 				break;
 		}
-		
+
+		// Check 'joystick' input
+		parseInput();
+
 		// Force draw of sprites
 
-		//interruptWait( 2 );
+		interruptWait( 1 );
 		// TODO: Call this less often
 		obj_Actions();
 		hw_Update();
@@ -222,13 +243,16 @@ void cBuilder::cursorObjectUpdate() {
 
 	if( !mCurrentObject )
 		mCurrentObject = objectCreate( mSelectedObject, mCursorX, mCursorY );
-
-	if( mCurrentObject )
+	else
 		mCurrentObject->partSetPosition( mCursorX, mCursorY );
 
 	if( mCurrentObject && mCurrentObject->isPlaced() )
 		mCurrentObject = 0;
 
+	castlePrepare();
+}
+
+void cBuilder::castlePrepare() {
 	castleSave();
 	roomLoad();
 
@@ -314,6 +338,8 @@ void cBuilder::parseInput() {
 	}
 
 	if(input->mButton) {
+		mInput->inputCheck( true );
+
 		if( part && part->mDrags == true ) {
 			if( mDragMode == false ) 
 				mDragMode = true;
@@ -460,7 +486,7 @@ cObject *cBuilder::objectCreate( eRoomObjects pObject, byte pPosX, byte pPosY ) 
 				obj = obj_Frankie_Create( pPosX, pPosY );
 				break;
 
-			case eObjectStringPrint:		// String Print
+			case eObjectText:		// String Print
 			case 0x2A6D:
 				obj = obj_string_Create( pPosX, pPosY );
 				break;
@@ -591,8 +617,9 @@ cObject *cBuilder::obj_Frankie_Create( byte pPosX, byte pPosY ) {
 }
 
 cObject *cBuilder::obj_string_Create( byte pPosX, byte pPosY ) {
+	cObjectText *object = new cObjectText( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_Image_Create( byte pPosX, byte pPosY ) {
@@ -717,10 +744,10 @@ void cBuilder::selectedObjectChange( bool pChangeUp ) {
 				if( pChangeUp )
 					mSelectedObject = eObjectConveyor;
 				else
-					mSelectedObject = eObjectStringPrint;
+					mSelectedObject = eObjectText;
 				break;
 
-			case eObjectStringPrint:		// String Print
+			case eObjectText:		// String Print
 			case 0x2A6D:
 				if( pChangeUp )
 					mSelectedObject = eObjectFrankenstein;
@@ -730,7 +757,7 @@ void cBuilder::selectedObjectChange( bool pChangeUp ) {
 
 			case eObjectImageDraw:
 				if( pChangeUp )
-					mSelectedObject = eObjectStringPrint;
+					mSelectedObject = eObjectText;
 				else
 					mSelectedObject = eObjectMultiDraw;
 				break;
