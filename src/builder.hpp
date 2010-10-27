@@ -1,5 +1,15 @@
 class cObjectText;
 
+struct sString {
+	byte mPosX, mPosY;
+	byte mColor;
+	string mString;
+
+	sString( byte pPosX, byte pPosY, byte pColor, string pString ) {
+		mPosX = pPosX; mPosY = pPosY; mColor = pColor; mString = pString;
+	}
+};
+
 class cRoom {
 public:
 	byte			 mNumber;
@@ -85,8 +95,9 @@ private:
 	void		 selectedObjectChange( bool pChangeUp );
 	void		 cursorObjectUpdate();
 	
-	void		 stringPrint( string pMessage );
+	vector< sString >	mStrings;
 
+	void			 objectStringPrint( string pMessage, byte pPosX, byte pPosY, byte pColor );
 public:
 					 cBuilder();
 					~cBuilder();
@@ -97,4 +108,8 @@ public:
 	cRoom			*roomCreate( size_t pNumber );
 
 	void			 castleSave( );
+
+	void			 objectStringsClear();
+	void			 objectStringsAdd( string pMessage, byte pPosX, byte pPosY, byte pColor );
+	void			 objectStringsPrint();
 };

@@ -162,9 +162,21 @@ void cBuilder::castleCreate() {
 	mLives_Player1 = mLives_Player2 = 3;
 }
 
-void cBuilder::stringPrint( string pMessage ) {
+void cBuilder::objectStringsClear() {
 
-	if( pMessage.size() == 0 ) {
+}
+
+void cBuilder::objectStringsAdd( string pMessage, byte pPosX, byte pPosY, byte pColor ) {
+
+}
+
+void cBuilder::objectStringsPrint() {
+
+}
+
+void cBuilder::objectStringPrint( string pMessage, byte pPosX, byte pPosY, byte pColor ) {
+
+	/*if( pMessage.size() == 0 ) {
 		mCurrentRoom->objectDelete( mMessage );
 
 		delete mMessage;
@@ -177,7 +189,23 @@ void cBuilder::stringPrint( string pMessage ) {
 		mMessage = (cObjectText*) objectCreate( eObjectText, 0x10, 0xB8 );
 
 	mMessage->mString = pMessage;
-	castlePrepare();
+	castlePrepare();*/
+	memcpy( &mMemory[ 0x8004 ], pMessage.c_str(), pMessage.size() );
+
+	mMemory[ 0x8000 ] = pPosX;
+	mMemory[ 0x8001 ] = pPosY;
+	mMemory[ 0x8002 ] = pColor;
+	mMemory[ 0x8003 ] = 0x21;
+
+	mMemory[ 0x8003 + pMessage.size() ] |= 0x80;
+
+	word_3E = 0x8000;
+	obj_stringPrint();
+
+	obj_Actions();
+	img_Actions();
+
+	hw_Update();
 }
 
 void cBuilder::mainLoop() {
@@ -190,6 +218,7 @@ void cBuilder::mainLoop() {
 	castleCreate();
 	mCurrentRoom = roomCreate(0);
 
+	objectStringAdd("TEST");
 	castleSave();
 
 	// Set player1 start room
@@ -204,13 +233,15 @@ void cBuilder::mainLoop() {
 		// Check keyboard input
 		switch(key) {
 
-			case 'q':
+			case 'q':	// Change Selected Object 'Up'
 				selectedObjectChange( true );
 				break;
 
-			case 'a':
+			case 'a':	// Change Selected Object 'Down'
 				selectedObjectChange( false );
 				break;
+
+			//case '
 		}
 
 		// Check 'joystick' input
