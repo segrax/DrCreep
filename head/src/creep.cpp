@@ -683,7 +683,6 @@ void cCreep::screenClear() {
 	byte Y = 0xF9;
 	
 	mScreen->clear(0);
-	mInput->inputCheck( true );
 
 	// Disable all sprites
 	mScreen->spriteDisable();
@@ -876,7 +875,7 @@ void cCreep::roomPrepare( ) {
 				obj_Frankie_Load( );
 				break;
 
-			case eObjectStringPrint:		// String Print
+			case eObjectText:		// String Print
 			case 0x2A6D:
 				obj_stringPrint();
 				break;
@@ -2981,6 +2980,8 @@ bool cCreep::ChangeLevel( size_t pMenuItem ) {
 			return false;
 
 	menuUpdate(pMenuItem); 
+
+	return true;
 }
 
 // 0D71: 
@@ -3505,6 +3506,7 @@ void cCreep::obj_Player_Add( ) {
 void cCreep::roomMain() {
 
 	roomLoad();
+	mInput->inputCheck( true );
 
 	byte X = 0;
 

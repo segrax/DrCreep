@@ -1,3 +1,4 @@
+class cObjectText;
 
 class cRoom {
 public:
@@ -46,9 +47,7 @@ private:
 	cRoom					*mCurrentRoom;
 	cObject					*mCurrentObject;
 
-	bool					 mDragMode;			// Object being placed is being dragged
-	eDirection				 mDragDirection;	// Direction which object drags
-	word					 mDragLength;
+	bool					 mDragMode;
 
 	byte					 mStart_Door_Player1, mStart_Door_Player2;
 	byte					 mStart_Room_Player1, mStart_Room_Player2;
@@ -56,9 +55,12 @@ private:
 
 	map< size_t, cRoom *>	 mRooms;
 
+	cObjectText				*mMessage;
+
 private:
 
 	void		 castleCreate();
+	void		 castlePrepare();
 
 	cObject		*obj_Door_Create( byte pPosX, byte pPosY );
 	cObject		*obj_Walkway_Create( byte pPosX, byte pPosY );
@@ -82,6 +84,8 @@ private:
 	void		 parseInput();
 	void		 selectedObjectChange( bool pChangeUp );
 	void		 cursorObjectUpdate();
+	
+	void		 stringPrint( string pMessage );
 
 public:
 					 cBuilder();

@@ -24,15 +24,17 @@
  */
 class cRoom;
 
-class cObjectLock : public cObject {
+class cObjectText : public cObject {
 public:
-	byte	mLockColor, mDoorNumber;
+	byte	mTextColor,	mStyle;
+	string	mString;
 
 public:
-	cObjectLock( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
-		mObjectID = eObjectLock;
-		mLockColor = 1;
-		mDoorNumber = 0;
+	cObjectText( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
+		mObjectID = eObjectText;
+		mTextColor = 2;
+		mStyle = 0x22;		// single Height
+		mString = "text";
 	}
 
 	size_t		objectLoad( byte **pBuffer ) {
@@ -41,11 +43,18 @@ public:
 	}
 
 	size_t		objectSave( byte **pBuffer , size_t pPart ) {	
-		*(*pBuffer)++ = mLockColor;
-		*(*pBuffer)++ = mLockColor + 0x57;
-		*(*pBuffer)++ = mDoorNumber;
+		size_t strSize = cObject::objectSave( pBuffer, 0 );
+		
+		*(*pBuffer)++ = mTextColor;
+		*(*pBuffer)++ = mStyle;
+		
+		for( string::iterator stringIT = mString.begin(); stringIT != mString.end(); ++stringIT, ++strSize )
+			*(*pBuffer)++ = toupper( (*stringIT));
 
-		size_t strSize = cObject::objectSave( pBuffer, pPart );
+		// Set bit7 of last character
+		(*pBuffer)--;
+		*(*pBuffer) |= 0x80;
+		(*pBuffer)++;
 
 		return (strSize + 2);
 	}
