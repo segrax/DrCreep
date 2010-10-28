@@ -437,7 +437,7 @@ void cCreep::gameMenuDisplaySetup() {
 		
 		for(;;) {
 			A = mMemory[ byte_3E + Y] & 0x3F;
-			mMemory[ byte_30 + Y ] = A;
+			mMemory[ byte_30 + Y ] = (byte) A;
 			A = mMemory[ byte_3E + Y];
 
 			if( A & 0x80 )
