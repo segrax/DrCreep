@@ -44,6 +44,7 @@ public:
 	size_t			 roomSaveObjects( byte **pBuffer );
 	size_t			 roomSave( byte **pBuffer );
 
+private:
 	size_t			 saveCount( byte **pBuffer, eRoomObjects pObjectType );
 	size_t			 saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker = 0x00 );
 };
@@ -64,52 +65,52 @@ private:
 	byte					 mLives_Player1, mLives_Player2;
 
 	map< size_t, cRoom *>	 mRooms;
-
-	cObjectText				*mMessage;
+	vector< sString >		 mStrings;
 
 private:
 
-	void		 castleCreate();
-	void		 castlePrepare();
+	void					 castleCreate();
+	void					 castlePrepare();
+	void					 castleSave( );
 
-	cObject		*obj_Door_Create( byte pPosX, byte pPosY );
-	cObject		*obj_Walkway_Create( byte pPosX, byte pPosY );
-	cObject		*obj_SlidingPole_Create( byte pPosX, byte pPosY );
-	cObject		*obj_Ladder_Create( byte pPosX, byte pPosY );
-	cObject		*obj_Door_Button_Create( byte pPosX, byte pPosY );
-	cObject		*obj_Lightning_Create( byte pPosX, byte pPosY );
-	cObject		*obj_Forcefield_Create( byte pPosX, byte pPosY );
-	cObject		*obj_Mummy_Create( byte pPosX, byte pPosY );
-	cObject		*obj_Key_Create( byte pPosX, byte pPosY );
-	cObject		*obj_Door_Lock_Create( byte pPosX, byte pPosY );
-	cObject		*obj_RayGun_Create( byte pPosX, byte pPosY );
-	cObject		*obj_Teleport_Create( byte pPosX, byte pPosY );
-	cObject		*obj_TrapDoor_Create( byte pPosX, byte pPosY );
-	cObject		*obj_Conveyor_Create( byte pPosX, byte pPosY );
-	cObject		*obj_Frankie_Create( byte pPosX, byte pPosY );
-	cObject		*obj_string_Create( byte pPosX, byte pPosY );
-	cObject		*obj_Image_Create( byte pPosX, byte pPosY );
-	cObject		*obj_Multi_Create( byte pPosX, byte pPosY );
+	void					 cursorObjectUpdate();
 
-	void		 parseInput();
-	void		 selectedObjectChange( bool pChangeUp );
-	void		 cursorObjectUpdate();
-	
-	vector< sString >	mStrings;
 
-	void			 objectStringPrint( string pMessage, byte pPosX, byte pPosY, byte pColor );
+	cObject					*obj_Door_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Walkway_Create( byte pPosX, byte pPosY );
+	cObject					*obj_SlidingPole_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Ladder_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Door_Button_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Lightning_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Forcefield_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Mummy_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Key_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Door_Lock_Create( byte pPosX, byte pPosY );
+	cObject					*obj_RayGun_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Teleport_Create( byte pPosX, byte pPosY );
+	cObject					*obj_TrapDoor_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Conveyor_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Frankie_Create( byte pPosX, byte pPosY );
+	cObject					*obj_string_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Image_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Multi_Create( byte pPosX, byte pPosY );
+
+	void					 parseInput();
+	void					 selectedObjectChange( bool pChangeUp );
+
+	void					 objectStringsClear();
+	void					 objectStringPrint( sString pString );
+	void					 objectStringsPrint();
+
 public:
-					 cBuilder();
-					~cBuilder();
+							 cBuilder();
+							~cBuilder();
 
-	void			 mainLoop();
+	void					 mainLoop();
 
-	cObject			*objectCreate( eRoomObjects pObject, byte pPosX, byte pPosY );
-	cRoom			*roomCreate( size_t pNumber );
+	cObject					*objectCreate( eRoomObjects pObject, byte pPosX, byte pPosY );
+	cRoom					*roomCreate( size_t pNumber );
 
-	void			 castleSave( );
-
-	void			 objectStringsClear();
-	void			 objectStringsAdd( string pMessage, byte pPosX, byte pPosY, byte pColor );
-	void			 objectStringsPrint();
+	void					 objectStringAdd( string pMessage, byte pPosX, byte pPosY, byte pColor );
+	void					 messagePrint( string pMessage );
 };

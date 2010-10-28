@@ -38,6 +38,12 @@ protected:
 		if( pPart == 0 )
 			mParts[2].mY = pPosY;
 
+		mParts[0].mCursorWidth = 3;
+		mParts[0].mCursorHeight = 1;
+
+		mParts[1].mCursorWidth = 2;
+		mParts[1].mCursorHeight = 3;
+
 	}
 public:
 	cObjectRayGun( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {

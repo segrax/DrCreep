@@ -31,6 +31,13 @@ public:
 	cObjectForcefield( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectForcefield;
 		mPartCount = 2;
+		
+		mParts[0].mCursorWidth = 3;
+		mParts[0].mCursorHeight = 3;
+
+		mParts[1].mCursorWidth = 2;
+		mParts[1].mCursorHeight = 4;
+
 	}
 
 	size_t		objectLoad( byte **pBuffer ) {

@@ -32,6 +32,9 @@ public:
 	cObjectDoorBell( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectDoorBell;
 		mDoorID = 0;
+
+		mParts[0].mCursorWidth = 3;
+		mParts[0].mCursorHeight = 3;
 	}
 
 	size_t		objectLoad( byte **pBuffer ) {

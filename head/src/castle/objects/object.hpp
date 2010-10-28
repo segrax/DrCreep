@@ -31,6 +31,7 @@ struct sObjectPart {
 	eDirection	mDragDirection;
 	size_t		mLength;
 	bool		mPlaced;
+	byte		mCursorWidth, mCursorHeight;
 
 	sObjectPart() { mX = mY = 0; 
 				  mSet = false;
@@ -38,6 +39,7 @@ struct sObjectPart {
 				  mPlaced = false;
 				  mLength = 0;
 				  mDragDirection = eDirectionNone;
+				  mCursorWidth = mCursorHeight = 1;
 				}
 };
 

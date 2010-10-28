@@ -33,6 +33,9 @@ public:
 		mObjectID = eObjectTrapDoor;
 		mPartCount = 2;
 		mState = 0;
+
+		mParts[1].mCursorWidth = 1;
+		mParts[1].mCursorHeight = 2;
 	}
 
 	size_t		objectLoad( byte **pBuffer ) {

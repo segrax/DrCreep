@@ -34,6 +34,12 @@ public:
 		mObjectID = eObjectTeleport;
 		mPartCount = 2;
 		mTarget = 1;
+
+		mParts[0].mCursorWidth = 4;
+		mParts[0].mCursorHeight = 4;
+
+		mParts[1].mCursorWidth = 2;
+		mParts[1].mCursorHeight = 2;
 	}
 
 	void	partAdd() {

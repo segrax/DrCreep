@@ -33,6 +33,12 @@ public:
 		mObjectID = eObjectConveyor;
 		mPartCount = 2;
 		mState = 0;
+
+		mParts[0].mCursorWidth = 8;
+		mParts[0].mCursorHeight = 1;
+
+		mParts[1].mCursorWidth = 3;
+		mParts[1].mCursorHeight = 1;
 	}
 
 	size_t		objectLoad( byte **pBuffer ) {

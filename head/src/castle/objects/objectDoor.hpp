@@ -40,7 +40,8 @@ public:
 		mLinkDoor = 0;
 		mMapX = mMapY = 0;
 		mCastleExitDoor = 0;
-
+		mParts[0].mCursorWidth = 5;
+		mParts[0].mCursorHeight = 4;
 	}
 
 	size_t		objectLoad( byte **pBuffer ) {
