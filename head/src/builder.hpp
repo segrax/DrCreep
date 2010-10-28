@@ -34,6 +34,13 @@ public:
 		mObjects.erase( objIT );
 	}
 
+	cObject			*objectGet( size_t pNumber ) {
+		if( pNumber >= mObjects.size() )
+			return 0;
+
+		return mObjects[pNumber];
+	}
+
 					 cRoom( byte pNumber ) {
 						 mNumber = pNumber;
 						 mRoomDirPtr = 0;
@@ -54,6 +61,7 @@ class cBuilder : public cCreep {
 private:
 	byte					 mCursorX,		mCursorY;
 	eRoomObjects			 mSelectedObject;
+	size_t					 mRoomSelectedObject;
 
 	cRoom					*mCurrentRoom;
 	cObject					*mCurrentObject;
@@ -74,7 +82,7 @@ private:
 	void					 castleSave( );
 
 	void					 cursorObjectUpdate();
-
+	void					 cursorUpdate();
 
 	cObject					*obj_Door_Create( byte pPosX, byte pPosY );
 	cObject					*obj_Walkway_Create( byte pPosX, byte pPosY );
@@ -97,6 +105,8 @@ private:
 
 	void					 parseInput();
 	void					 selectedObjectChange( bool pChangeUp );
+	void					 selectedObjectDelete();
+	void					 selectPlacedObject( bool pChangeUp );
 
 	void					 objectStringsClear();
 	void					 objectStringPrint( sString pString );

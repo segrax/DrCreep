@@ -129,6 +129,7 @@ cBuilder::cBuilder() {
 	mCursorX = 0x10;
 	mCursorY = 0;
 
+	mRoomSelectedObject = 0;
 	mCurrentObject = 0;
 	mCurrentRoom = 0;
 
@@ -224,15 +225,32 @@ void cBuilder::mainLoop() {
 		// Check keyboard input
 		switch(key) {
 
-			case 'q':	// Change Selected Object 'Up'
+			case 'q':	// Change Selected Placement Object 'Up'
 				selectedObjectChange( true );
 				break;
 
-			case 'a':	// Change Selected Object 'Down'
+			case 'a':	// Change Selected Placement Object 'Down'
 				selectedObjectChange( false );
 				break;
 
-			//case '
+			case '[':	// Select a placed object
+				selectPlacedObject( false );
+				break;
+
+			case ']':	// Select a placed object
+				selectPlacedObject( true );
+				break;
+
+			case 0x7F:	// Delete Key
+				selectedObjectDelete();
+				break;
+
+			default:
+				//if(key) {
+				//	cout << "0x";
+				//	cout << hex << (int) key << endl;
+				//}
+				break;
 		}
 
 		// Check 'joystick' input
@@ -274,8 +292,13 @@ void cBuilder::cursorObjectUpdate() {
 	else
 		mCurrentObject->partSetPosition( mCursorX, mCursorY );
 
-	if( mCurrentObject && mCurrentObject->isPlaced() )
+	if( mCurrentObject && mCurrentObject->isPlaced() && !mCurrentObject->isSelected())
 		mCurrentObject = 0;
+
+	cursorUpdate();
+}
+
+void cBuilder::cursorUpdate() {
 
 	// Set cursor position
 	mScreen->cursorSet( mCursorX, mCursorY );
@@ -669,6 +692,51 @@ cObject *cBuilder::obj_Image_Create( byte pPosX, byte pPosY ) {
 cObject *cBuilder::obj_Multi_Create( byte pPosX, byte pPosY ) {
 
 	return 0;
+}
+
+void cBuilder::selectedObjectDelete() {
+	if( mCurrentObject) {
+		mCurrentRoom->objectDelete( mCurrentObject );
+		delete mCurrentObject;
+		mCurrentObject = 0;
+	}
+
+	cursorUpdate();
+}
+
+void cBuilder::selectPlacedObject( bool pChangeUp ) {
+
+	// If the cursor currently has an unplaced object on it,
+	// Delete it
+	if( mCurrentObject && mCurrentObject->isPlaced() == false ) {
+		mCurrentRoom->objectDelete( mCurrentObject );
+		delete mCurrentObject; 
+		mCurrentObject = 0;
+
+	} else if( mCurrentObject )
+		mCurrentObject->isSelected(false);
+	
+	if( pChangeUp )
+		++mRoomSelectedObject;
+	else
+		--mRoomSelectedObject;
+
+	// Get the next object
+	mCurrentObject = mCurrentRoom->objectGet( mRoomSelectedObject );
+	if( mCurrentObject == 0 ) {
+		mRoomSelectedObject = 0;
+		mCurrentObject = mCurrentRoom->objectGet( mRoomSelectedObject );
+	}
+	
+	// Update the cursor
+	if(mCurrentObject) {
+		mCurrentObject->partSet(0);
+		mCursorX = mCurrentObject->partGet(0)->mX;
+		mCursorY = mCurrentObject->partGet(0)->mY;
+
+		mCurrentObject->isSelected( true );
+	}
+	cursorUpdate();
 }
 
 void cBuilder::selectedObjectChange( bool pChangeUp ) {

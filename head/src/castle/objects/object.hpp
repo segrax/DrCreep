@@ -61,11 +61,16 @@ protected:
 	bool			 mPlaced;
 	byte			 mPart,		mPartCount;
 
+	bool			 mSelected;
+
 public:
 
 	inline bool  isPlaced()			{ return mPlaced; }
 
 	void		 mPartAdd()			{ ++mPart; }
+
+	void		 partSet( size_t pVal ) { mPart = pVal; }
+
 	sObjectPart	*partGet()			{ return &mParts[ mPart ]; }
 	sObjectPart	*partGet( size_t pPart )			{ return &mParts[ pPart ]; }
 	void partSetPosition( byte pPosX, byte pPosY ) {
@@ -73,6 +78,7 @@ public:
 	}
 
 	virtual void partPlace() {
+		mSelected = false;
 		mParts[mPart].mPlaced = true;
 
 		++mPart;
@@ -98,8 +104,12 @@ public:
 		mObjectID = eObjectsFinished;
 
 		mRoom = pRoom;
+		mSelected = false;
 	}
-	
+
+	inline bool		isSelected() { return mSelected; }
+	inline void		isSelected(bool pValue) { mSelected = pValue; }
+
 	eRoomObjects	objectTypeGet() { return mObjectID; }
 	virtual void	partAdd() {
 		mPlaced = false;
