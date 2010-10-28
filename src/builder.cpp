@@ -287,11 +287,14 @@ void cBuilder::cursorObjectUpdate() {
 		mCurrentObject = 0;
 	}
 
+	// No Current object? create a new one
 	if( !mCurrentObject )
 		mCurrentObject = objectCreate( mSelectedObject, mCursorX, mCursorY );
 	else
 		mCurrentObject->partSetPosition( mCursorX, mCursorY );
 
+	// If the object is placed, and not selected by the user
+	// Clear the current object
 	if( mCurrentObject && mCurrentObject->isPlaced() && !mCurrentObject->isSelected())
 		mCurrentObject = 0;
 
@@ -695,6 +698,8 @@ cObject *cBuilder::obj_Multi_Create( byte pPosX, byte pPosY ) {
 }
 
 void cBuilder::selectedObjectDelete() {
+
+	// Delete a selected object from the room
 	if( mCurrentObject) {
 		mCurrentRoom->objectDelete( mCurrentObject );
 		delete mCurrentObject;
@@ -715,10 +720,14 @@ void cBuilder::selectPlacedObject( bool pChangeUp ) {
 		mCurrentObject = 0;
 	} 
 
+	// Check if a selected object has parts, and rotate through them
 	if( mCurrentObject ) {
+
+		// Change up a part
 		if( mCurrentObject->mPartGet() < mCurrentObject->mPartCountGet() && pChangeUp )
 			mCurrentObject->partSet( mCurrentObject->mPartGet() + 1 );
 		
+		// Change down a part
 		else if( mCurrentObject->mPartGet() > 0 && !pChangeUp )
 			mCurrentObject->partSet( mCurrentObject->mPartGet() - 1 );
 
@@ -732,6 +741,7 @@ void cBuilder::selectPlacedObject( bool pChangeUp ) {
 	} else
 		changeObject = true;
 
+	// Change to a new room object
 	if( changeObject ) {
 
 		if(mCurrentObject)
@@ -759,6 +769,7 @@ void cBuilder::selectPlacedObject( bool pChangeUp ) {
 
 		mCurrentObject->isSelected( true );
 	}
+
 	cursorUpdate();
 }
 
