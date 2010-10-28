@@ -274,7 +274,7 @@ void cBuilder::messagePrint( string pMessage ) {
 void cBuilder::cursorObjectUpdate() {
 
 	// Cursor object has changed?
-	if( mCurrentObject && mCurrentObject->objectTypeGet() != mSelectedObject ) {
+	if( mCurrentObject && !mCurrentObject->isSelected() && mCurrentObject->objectTypeGet() != mSelectedObject ) {
 
 		// Dont delete if its placed
 		if( mCurrentObject->partGet(0)->mPlaced == false ) {
@@ -319,6 +319,7 @@ void cBuilder::castlePrepare() {
 	castleSave();
 	roomLoad();
 
+	// Print any strings
 	objectStringsPrint();
 
 	// Force draw of sprites
@@ -327,15 +328,13 @@ void cBuilder::castlePrepare() {
 }
 
 void cBuilder::parseInput() {
-	bool			 update = false;
-	sPlayerInput	*input = mInput->inputGet(0);
-
 	sObjectPart		*part = 0;
+	sPlayerInput	*input = mInput->inputGet(0);
+	bool			 update = false;
 	
 	// Get the current selected 'part' of the object
 	if(mCurrentObject)
 		part = mCurrentObject->partGet();
-
 
 	if(input->mLeft) {
 		if( part && mDragMode ) {
@@ -651,6 +650,7 @@ cObject *cBuilder::obj_Teleport_Create( byte pPosX, byte pPosY ) {
 	// Already got a teleport on this screen?
 	if(objects.size() == 0 ) {
 		object = new cObjectTeleport( mCurrentRoom, pPosX, pPosY );
+
 	} else {
 		object = (cObjectTeleport*) objects[0];
 
@@ -730,7 +730,7 @@ void cBuilder::selectPlacedObject( bool pChangeUp ) {
 		// Change down a part
 		else if( mCurrentObject->mPartGet() > 0 && !pChangeUp )
 			mCurrentObject->partSet( mCurrentObject->mPartGet() - 1 );
-
+			
 		else
 			changeObject = true;
 
