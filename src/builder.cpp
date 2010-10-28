@@ -132,8 +132,6 @@ cBuilder::cBuilder() {
 	mCurrentObject = 0;
 	mCurrentRoom = 0;
 
-	mMessage = 0;
-
 	mDragMode = false;
 
 	mSelectedObject = eObjectsFinished;
@@ -144,7 +142,7 @@ cBuilder::cBuilder() {
 }
 
 cBuilder::~cBuilder() {
-	delete mMessage;
+	
 }
 
 void cBuilder::castleCreate() {
@@ -163,41 +161,32 @@ void cBuilder::castleCreate() {
 }
 
 void cBuilder::objectStringsClear() {
-
-}
-
-void cBuilder::objectStringsAdd( string pMessage, byte pPosX, byte pPosY, byte pColor ) {
-
+	mStrings.clear();
 }
 
 void cBuilder::objectStringsPrint() {
+	vector< sString >::iterator		stringIT;
 
+	for( stringIT = mStrings.begin(); stringIT != mStrings.end(); ++stringIT ) {
+		objectStringPrint( (*stringIT) );
+	}
 }
 
-void cBuilder::objectStringPrint( string pMessage, byte pPosX, byte pPosY, byte pColor ) {
+void cBuilder::objectStringAdd( string pMessage, byte pPosX, byte pPosY, byte pColor ) {
+	mStrings.push_back( sString( pPosX, pPosY, pColor, pMessage ) );
 
-	/*if( pMessage.size() == 0 ) {
-		mCurrentRoom->objectDelete( mMessage );
+	objectStringsPrint();
+}
 
-		delete mMessage;
-		mMessage = 0;
-		castlePrepare();
-		return;
-	}
+void cBuilder::objectStringPrint( sString pString ) {
+	memcpy( &mMemory[ 0x8004 ], pString.mString.c_str(), pString.mString.size() );
 
-	if(!mMessage)
-		mMessage = (cObjectText*) objectCreate( eObjectText, 0x10, 0xB8 );
-
-	mMessage->mString = pMessage;
-	castlePrepare();*/
-	memcpy( &mMemory[ 0x8004 ], pMessage.c_str(), pMessage.size() );
-
-	mMemory[ 0x8000 ] = pPosX;
-	mMemory[ 0x8001 ] = pPosY;
-	mMemory[ 0x8002 ] = pColor;
+	mMemory[ 0x8000 ] = pString.mPosX;
+	mMemory[ 0x8001 ] = pString.mPosY;
+	mMemory[ 0x8002 ] = pString.mColor;
 	mMemory[ 0x8003 ] = 0x21;
 
-	mMemory[ 0x8003 + pMessage.size() ] |= 0x80;
+	mMemory[ 0x8003 +  pString.mString.size() ] |= 0x80;
 
 	word_3E = 0x8000;
 	obj_stringPrint();
@@ -213,19 +202,21 @@ void cBuilder::mainLoop() {
 	mIntro = false;
 
 	mScreen->bitmapLoad( &mMemory[ 0xE000 ], &mMemory[ 0xCC00 ], &mMemory[ 0xD800 ], 0 );
+	mScreen->cursorSet( mCursorX, mCursorY );
 
 	// TODO: Check if we load a castle instead of make a new one
 	castleCreate();
 	mCurrentRoom = roomCreate(0);
-
-	objectStringAdd("TEST");
 	castleSave();
+	
+	mScreen->cursorEnabled(true);
 
 	// Set player1 start room
 	mMemory[ 0x7809 ] = mMemory[ 0x7803 ];
 	mMemory[ 0x780B ] = mMemory[ 0x7805 ];
 
 	roomLoad();
+	objectStringsPrint();
 
 	while(!mQuit) {
 		byte key = tolower( mInput->keyGet() );
@@ -248,16 +239,22 @@ void cBuilder::mainLoop() {
 		parseInput();
 
 		// Force draw of sprites
-
 		interruptWait( 1 );
-		// TODO: Call this less often
 		obj_Actions();
+
+		// Redraw screen
 		hw_Update();
 	}
 
 }
 
+void cBuilder::messagePrint( string pMessage ) {
+
+	objectStringAdd(pMessage, 0x10, 0xC0, 2);
+}
+
 void cBuilder::cursorObjectUpdate() {
+
 	// Cursor object has changed?
 	if( mCurrentObject && mCurrentObject->objectTypeGet() != mSelectedObject ) {
 
@@ -280,12 +277,23 @@ void cBuilder::cursorObjectUpdate() {
 	if( mCurrentObject && mCurrentObject->isPlaced() )
 		mCurrentObject = 0;
 
+	// Set cursor position
+	mScreen->cursorSet( mCursorX, mCursorY );
+
+	// Set cursor size
+	if(mCurrentObject && mCurrentObject->partGet() )
+		mScreen->cursorSize( mCurrentObject->partGet()->mCursorWidth, mCurrentObject->partGet()->mCursorHeight );
+	else
+		mScreen->cursorSize( 1, 1 );
+
 	castlePrepare();
 }
 
 void cBuilder::castlePrepare() {
 	castleSave();
 	roomLoad();
+
+	objectStringsPrint();
 
 	// Force draw of sprites
 	obj_Actions();

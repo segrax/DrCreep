@@ -41,7 +41,8 @@ class cScreen {
 
 	SDL_Surface				*mSDLSurface;
 	SDL_Surface				*mSDLSurfaceScaled;
-	
+	SDL_Surface				*mSDLCursorSurface;
+
 	vector< sScreenPiece* >  mCollisions;
 	cSprite					*mSprites[8];
 
@@ -49,9 +50,13 @@ class cScreen {
 	size_t					 mScale, mDrawDestX, mDrawDestY, mDrawSrcX, mDrawSrcY;
 	string					 mWindowTitle;
 
+	bool					 mCursorOn;
+	word					 mCursorX, mCursorY, mCursorWidth, mCursorHeight;
+
 	void					 bitmapRefresh();
 	void					 blit( cSprite *pSprite, byte pSpriteNo );
 	void					 blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority, byte pSpriteNo);
+	
 	SDL_Surface				*scaleUp();
 	void					 SDLSurfaceSet();
 
@@ -63,6 +68,10 @@ public:
 	void					 bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 );
 
 	void					 clear( byte pColor );
+
+	void					 cursorEnabled( bool pOn = true );
+	void					 cursorSize( size_t pWidth, size_t pHeight );
+	void					 cursorSet( word pPosX, word pPosY );
 
 	void					 drawStandardText(byte *pTextData, word pTextChar, byte *pColorData);
 

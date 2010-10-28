@@ -663,8 +663,6 @@ void cCreep::mainLoop() {
 
 	mScreen->bitmapLoad( &mMemory[ 0xE000 ], &mMemory[ 0xCC00 ], &mMemory[ 0xD800 ], 0 );
 	
-	//mCastle->castleStart( 2 );
-
 	// Main Intro/Game Loop
 	while(!mQuit) {
 	

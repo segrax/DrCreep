@@ -33,6 +33,9 @@ public:
 	cObjectFrankenstein( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectFrankenstein;
 		mState = 0;
+
+		mParts[0].mCursorWidth = 2;
+		mParts[0].mCursorHeight = 4;
 	}
 
 	size_t		objectLoad( byte **pBuffer ) {

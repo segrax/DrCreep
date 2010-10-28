@@ -37,7 +37,11 @@ public:
 		mParts[0].mDragDirection = eDirectionDown;
 		mParts[0].mDrags = true;
 		mParts[0].mLength = 0;
+		mParts[0].mCursorWidth = 3;
+		mParts[0].mCursorHeight = 3;
 
+		mParts[1].mCursorWidth = 3;
+		mParts[1].mCursorHeight = 3;
 		mPartCount = 2;
 
 		mMachine = 0;

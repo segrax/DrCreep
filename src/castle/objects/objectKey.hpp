@@ -32,6 +32,9 @@ public:
 	cObjectKey( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectKey;
 		mKeyColor = 1;
+
+		mParts[0].mCursorWidth = 2;
+		mParts[0].mCursorHeight = 3;
 	}
 
 	size_t		objectLoad( byte **pBuffer ) {

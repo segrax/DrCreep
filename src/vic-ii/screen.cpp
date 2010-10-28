@@ -56,6 +56,10 @@ cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 	mWindow				= 0;
 	mWindowTitle		= pWindowTitle;
 
+	mCursorOn						= false;
+	mCursorWidth = mCursorHeight	= 1;
+	mCursorX = mCursorY				= 0;
+
 	mDrawDestX = mDrawDestY = mDrawSrcX = mDrawSrcY = 0;
 
 	mSurface	= new cScreenSurface( gWidth, gHeight );
@@ -63,6 +67,7 @@ cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 
 	// Create the SDL surfaces 
 	mSDLSurface = SDL_CreateRGBSurface(	SDL_SWSURFACE,	gWidth,	gHeight,	 32, 0, 0, 0, 0);
+	mSDLCursorSurface = 0;
 }
 
 cScreen::~cScreen() {
@@ -76,6 +81,7 @@ cScreen::~cScreen() {
 	
 	SDL_FreeSurface( mSDLSurface );
 	SDL_FreeSurface( mSDLSurfaceScaled );
+	SDL_FreeSurface( mSDLCursorSurface );
 }
 
 void cScreen::clear(  byte pColor = 0 ) {
@@ -83,6 +89,43 @@ void cScreen::clear(  byte pColor = 0 ) {
 	mSurface->Wipe( pColor );
 	mBitmapRedraw = true;
 	mSpriteRedraw = true;
+}
+
+void cScreen::cursorEnabled( bool pOn ) {
+	size_t width = (8 * mScale) * mCursorWidth;
+	size_t height = (8 * mScale) * mCursorHeight;
+	
+	mCursorOn = pOn;
+
+	SDL_FreeSurface( mSDLCursorSurface );
+	mSDLCursorSurface = SDL_CreateRGBSurface(	SDL_SWSURFACE,	width,	height,	 32, 0, 0, 0,255 );
+	SDL_SetColorKey(mSDLCursorSurface, SDL_SRCCOLORKEY, SDL_MapRGB(mSDLSurfaceScaled->format, 0, 0, 0)	);
+
+	// Draw the red for the border
+	SDL_Rect	rect;
+	rect.x = rect.y = 0;
+	rect.w = width;
+	rect.h = height;
+	SDL_FillRect (mSDLCursorSurface, &rect, SDL_MapRGB(mSDLSurface->format, 255, 0, 0)); 
+
+	// Make the middle transparent
+	rect.x = rect.y = 2;
+	rect.w -= (2 * mScale);
+	rect.h -= (2 * mScale);
+	SDL_FillRect (mSDLCursorSurface, &rect, SDL_MapRGB(mSDLSurface->format, 0, 0, 0)); 
+}
+
+void cScreen::cursorSize( size_t pWidth, size_t pHeight ) {
+	mCursorWidth = pWidth;
+	mCursorHeight = pHeight;
+
+	// Refresh the cursor surface
+	cursorEnabled( mCursorOn );
+}
+
+void cScreen::cursorSet( word pPosX, word pPosY ) {
+	mCursorX = pPosX;
+	mCursorY = pPosY;
 }
 
 void cScreen::scaleSet( byte pScale ) {
@@ -230,19 +273,7 @@ void cScreen::levelNameSet( string pName ) {
 }
 
 void cScreen::refresh() {
-	static time_t timeFirst = time(0);
-	time_t calc = time(0) - timeFirst;
-	
-	if( calc > 1 ) {
-		mFPSTotal += mFPS;
-		// Total elapsed time increase
-		mFPSSeconds += (unsigned int) calc;
 
-		timeFirst = time(0);
-		mFPS = 0;
-	}
-
-	++mFPS;
 	if(( mBitmapRedraw || mSpriteRedraw) && !mTextRedraw) {
 		bitmapRefresh();
 		spriteDraw();
@@ -263,6 +294,14 @@ void cScreen::refresh() {
 			surface = mSDLSurface;
 
 		mWindow->blit( surface, mDrawDestX, mDrawDestY, mDrawSrcX, mDrawSrcY );
+
+		if(mCursorOn) {
+			size_t x =  ((mCursorX) * 2 ) * mScale;
+			size_t y =  70 + (mCursorY) * mScale;
+
+			mWindow->blit( mSDLCursorSurface, x, y  );
+
+		}
 	}
 
 }
