@@ -126,6 +126,12 @@ size_t cRoom::saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMar
 }
 
 cBuilder::cBuilder() {
+	// Change window title
+	stringstream windowTitle;
+	windowTitle << "The Castles of Dr. Creep: Castle Builder";
+	mScreen->windowTitleSet( windowTitle.str() );
+
+	// Top Left of usable screen area
 	mCursorX = 0x10;
 	mCursorY = 0;
 
@@ -199,6 +205,8 @@ void cBuilder::objectStringPrint( sString pString ) {
 }
 
 void cBuilder::mainLoop() {
+
+	mScreen->levelNameSet("Untitled");
 
 	mIntro = false;
 
@@ -423,6 +431,22 @@ void cBuilder::parseInput() {
 		update = true;
 	}
 
+	if( mCursorX > 0x9C )
+		mCursorX = 0x9C;
+
+	if( mCursorX < 0x10 )
+		mCursorX = 0x10;
+
+	if( mCursorY > 0xF0 )
+		mCursorY = 0;
+
+	if( mCursorY > 0xA8 )
+		mCursorY = 0xA8;
+
+
+
+
+	//if( mCursorY >
 	if(update) 
 		cursorObjectUpdate();
 }
