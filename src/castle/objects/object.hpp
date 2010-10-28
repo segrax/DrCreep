@@ -65,6 +65,9 @@ protected:
 
 public:
 
+	inline byte	 mPartCountGet()	{ return mPartCount; }
+	inline byte	 mPartGet()			{ return mPart; }
+
 	inline bool  isPlaced()			{ return mPlaced; }
 
 	void		 mPartAdd()			{ ++mPart; }
