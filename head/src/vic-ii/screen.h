@@ -105,4 +105,6 @@ public:
 													return 0;
 												else
 													return (mFPSTotal / mFPSSeconds); }
+
+	inline void				 windowTitleSet( string mTitle ) { mWindowTitle = mTitle; }
 };
