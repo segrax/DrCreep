@@ -705,6 +705,7 @@ void cBuilder::selectedObjectDelete() {
 }
 
 void cBuilder::selectPlacedObject( bool pChangeUp ) {
+	bool changeObject = false;
 
 	// If the cursor currently has an unplaced object on it,
 	// Delete it
@@ -712,27 +713,49 @@ void cBuilder::selectPlacedObject( bool pChangeUp ) {
 		mCurrentRoom->objectDelete( mCurrentObject );
 		delete mCurrentObject; 
 		mCurrentObject = 0;
+	} 
 
-	} else if( mCurrentObject )
-		mCurrentObject->isSelected(false);
-	
-	if( pChangeUp )
-		++mRoomSelectedObject;
-	else
-		--mRoomSelectedObject;
+	if( mCurrentObject ) {
+		if( mCurrentObject->mPartGet() < mCurrentObject->mPartCountGet() && pChangeUp )
+			mCurrentObject->partSet( mCurrentObject->mPartGet() + 1 );
+		
+		else if( mCurrentObject->mPartGet() > 0 && !pChangeUp )
+			mCurrentObject->partSet( mCurrentObject->mPartGet() - 1 );
 
-	// Get the next object
-	mCurrentObject = mCurrentRoom->objectGet( mRoomSelectedObject );
-	if( mCurrentObject == 0 ) {
-		mRoomSelectedObject = 0;
+		else
+			changeObject = true;
+
+		// Last Part?
+		if( mCurrentObject->mPartGet() == mCurrentObject->mPartCountGet() )
+			changeObject = true;
+
+	} else
+		changeObject = true;
+
+	if( changeObject ) {
+
+		if(mCurrentObject)
+			mCurrentObject->isSelected(false);
+
+		if( pChangeUp )
+			++mRoomSelectedObject;
+		else
+			--mRoomSelectedObject;
+
+		// Get the next object
 		mCurrentObject = mCurrentRoom->objectGet( mRoomSelectedObject );
+		if( mCurrentObject == 0 ) {
+			mRoomSelectedObject = 0;
+			mCurrentObject = mCurrentRoom->objectGet( mRoomSelectedObject );
+		}
+		
+		mCurrentObject->partSet(0);
 	}
-	
+
 	// Update the cursor
 	if(mCurrentObject) {
-		mCurrentObject->partSet(0);
-		mCursorX = mCurrentObject->partGet(0)->mX;
-		mCursorY = mCurrentObject->partGet(0)->mY;
+		mCursorX = mCurrentObject->partGet()->mX;
+		mCursorY = mCurrentObject->partGet()->mY;
 
 		mCurrentObject->isSelected( true );
 	}
