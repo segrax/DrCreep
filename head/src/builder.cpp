@@ -136,17 +136,21 @@ cBuilder::cBuilder() {
 	mCursorX = 0x10;
 	mCursorY = 0;
 
+	mOriginalObject = 0;
 	mRoomSelectedObject = 0;
 	mCurrentObject = 0;
 	mCurrentRoom = 0;
 
 	mDragMode = false;
+	mLinkMode = false;
 
 	mSelectedObject = eObjectsFinished;
 
 	mStart_Door_Player1 = mStart_Door_Player2 = 0;
 	mStart_Room_Player1 = mStart_Room_Player2 = 0;
 	mLives_Player1 = mLives_Player2 = 3;
+
+	mSearchObject = eObjectsFinished;
 }
 
 cBuilder::~cBuilder() {
@@ -241,7 +245,7 @@ void cBuilder::mainLoop() {
 				break;
 
 			case 's':	// Save Castle
-				selectCastleName();
+				castleSaveToDisk();
 				break;
 
 			case '[':	// Select a placed object
@@ -328,22 +332,39 @@ void cBuilder::cursorObjectUpdate() {
 		} else
 			if( mCurrentObject->partGet()->mPlaced == false )
 				mCurrentObject->partDel();
-
 		mCurrentObject = 0;
 	}
 
 	// No Current object? create a new one
 	if( !mCurrentObject )
 		mCurrentObject = objectCreate( mSelectedObject, mCursorX, mCursorY );
-	else
+	else {	
 		mCurrentObject->partSetPosition( mCursorX, mCursorY );
+	}
 
 	// If the object is placed, and not selected by the user
 	// Clear the current object
-	if( mCurrentObject && mCurrentObject->isPlaced() && !mCurrentObject->isSelected())
+	if( mCurrentObject && mCurrentObject->isPlaced() && !mCurrentObject->isSelected()) {
 		mCurrentObject = 0;
+	}
 
 	cursorUpdate();
+}
+
+size_t cBuilder::findItemIndex( cObject *pObject ) {
+	vector< cObject* > objects = mCurrentRoom->objectFind( pObject->objectTypeGet() );
+	vector< cObject* >::iterator	objIT;
+
+	size_t count = 0;
+
+	for(objIT = objects.begin(); objIT != objects.end(); ++objIT ) {
+		if( (*objIT) == pObject )
+			return count;
+
+		++count;	
+	}
+
+	return 0;
 }
 
 void cBuilder::cursorUpdate() {
@@ -376,29 +397,13 @@ void cBuilder::castlePrepare() {
 	img_Actions();
 }
 
-void cBuilder::selectCastleName() {
+void cBuilder::castleSaveToDisk() {
 	mScreen->cursorEnabled( false );
 
-	// get the filename to save as
-	screenClear();
-	word_3E = 0x2633;
-	roomPrepare();
-
-	*memory( 0x2788 ) = 0x20;
-	*memory( 0x2789 ) = 0x48;
-	*memory( 0x278C ) = 0x10;
-	*memory( 0x278A ) = 0x01;
-	*memory( 0x278B ) = 0x02;
-
-	textShow();
-
-	if(mStrLength) {
-		string filename = string( (char*) &mMemory[ 0x278E ], mStrLength );
-
-		// Do the save
-	}
+	gamePositionSave( true );
 
 	mScreen->cursorEnabled( true );
+	castlePrepare();
 }
 
 void cBuilder::parseInput() {
@@ -483,14 +488,35 @@ void cBuilder::parseInput() {
 				mDragMode = true;
 			else {
 				mDragMode = false;
-				if(mCurrentObject)
+				if(mLinkMode) {
+					mOriginalObject->mLinkedSet( findItemIndex( mCurrentObject ) );
+					mSearchObject = eObjectsFinished;
+					mLinkMode = false;
+
+				} else if(mCurrentObject) {
 					mCurrentObject->partPlace();
+					mSearchObject = mCurrentObject->mLinkObjectGet();
+					mOriginalObject = mCurrentObject;
+
+					if( mSearchObject != eObjectsFinished )
+						mLinkMode = true;
+				}
 			}
 
 		} else {
 			mDragMode = false;
-			if(mCurrentObject)
+			if(mLinkMode) {
+				mOriginalObject->mLinkedSet( findItemIndex( mCurrentObject ) );
+				mSearchObject = eObjectsFinished;
+				mLinkMode = false;
+
+			} else if(mCurrentObject) {
 				mCurrentObject->partPlace();
+				mOriginalObject = mCurrentObject;
+				mSearchObject = mCurrentObject->mLinkObjectGet();
+				if( mSearchObject != eObjectsFinished )
+					mLinkMode = true;
+			}
 		}
 
 		
@@ -575,7 +601,7 @@ void cBuilder::castleSave( ) {
 		memDest += 2;
 	}
 
-	writeLEWord(  &mMemory[ 0x7800 ], memDest );
+	writeLEWord(  &mMemory[ 0x7800 ], (memDest - 0x7800) );
 }
 
 cObject *cBuilder::objectCreate( eRoomObjects pObject, byte pPosX, byte pPosY ) {
@@ -838,22 +864,25 @@ void cBuilder::selectPlacedObject( bool pChangeUp ) {
 
 	// Change to a new room object
 	if( changeObject ) {
-
+		
 		if(mCurrentObject)
 			mCurrentObject->isSelected(false);
 
-		if( pChangeUp )
-			++mRoomSelectedObject;
-		else
-			--mRoomSelectedObject;
+		do {
+			if( pChangeUp )
+				++mRoomSelectedObject;
+			else
+				--mRoomSelectedObject;
 
-		// Get the next object
-		mCurrentObject = mCurrentRoom->objectGet( mRoomSelectedObject );
-		if( mCurrentObject == 0 ) {
-			mRoomSelectedObject = 0;
+			// Get the next object
 			mCurrentObject = mCurrentRoom->objectGet( mRoomSelectedObject );
-		}
-		
+			if( mCurrentObject == 0 ) {
+				mRoomSelectedObject = 0;
+				mCurrentObject = mCurrentRoom->objectGet( mRoomSelectedObject );
+				break;
+			}
+		} while (mSearchObject != mCurrentObject->objectTypeGet() || mSearchObject == eObjectsFinished );
+
 		mCurrentObject->partSet(0);
 	}
 
