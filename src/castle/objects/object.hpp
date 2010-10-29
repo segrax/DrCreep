@@ -65,11 +65,11 @@ protected:
 
 public:
 	inline bool			mLinkedGet()	 { return mLinked; }
-	
 
 	inline eRoomObjects mLinkObjectGet() { return mLinkObject; }
 	
 	virtual void mLinkedSet( byte pNumber )	{ return; }
+	virtual void mLinked2Set( byte pNumber ) { return; }
 
 	inline byte	 mPartCountGet()	{ return mPartCount; }
 	inline byte	 mPartGet()			{ return mPart; }

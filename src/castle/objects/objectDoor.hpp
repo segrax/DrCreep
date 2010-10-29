@@ -42,6 +42,18 @@ public:
 		mCastleExitDoor = 0;
 		mParts[0].mCursorWidth = 5;
 		mParts[0].mCursorHeight = 4;
+
+		mLinked = false;
+		mLinkObject = eObjectDoor;
+	}
+
+	void mLinkedSet( byte pNumber )	{ 
+		
+		mLinkDoor = pNumber;
+	}
+
+	void mLinked2Set( byte pNumber ) {
+		mLinkRoom = pNumber;
 	}
 
 	size_t		objectLoad( byte **pBuffer ) {
