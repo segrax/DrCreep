@@ -131,7 +131,7 @@ int	main( int argc, char *argv[] ) {
 	return 0;
 }
 
-string local_PathGenerate( string pFile, bool pDataSave ) {
+string local_PathGenerate( string pFile, string pPath, bool pDataSave ) {
 	stringstream	 filePathFinal;
 
 #ifdef _WII
@@ -144,14 +144,17 @@ string local_PathGenerate( string pFile, bool pDataSave ) {
 	else
 		filePathFinal << gSavePath;
 
+	if( pPath.size() )
+		filePathFinal << pPath << "/";
+
 	filePathFinal << pFile;
 	return filePathFinal.str();
 }
 
-bool local_FileCreate( string pFile, bool pDataSave ) {
+bool local_FileCreate( string pFile, string pPath, bool pDataSave ) {
 	ofstream		*fileStream;
 
-	string finalPath = local_PathGenerate( pFile, pDataSave );
+	string finalPath = local_PathGenerate( pFile, pPath, pDataSave );
 
 	fileStream = new ofstream ( finalPath.c_str(), ios::binary );
 	if( fileStream->is_open() == false) {
@@ -159,13 +162,14 @@ bool local_FileCreate( string pFile, bool pDataSave ) {
 		return false;
 	}
 
+	delete fileStream;
 	return true;
 }
 
-bool local_FileSave( string pFile, bool pDataSave, byte *pBuffer, size_t pBufferSize ) {
+bool local_FileSave( string pFile, string pPath, bool pDataSave, byte *pBuffer, size_t pBufferSize ) {
 	ofstream		*fileStream;
 
-	string finalPath = local_PathGenerate( pFile, pDataSave );
+	string finalPath = local_PathGenerate( pFile, pPath, pDataSave );
 	fileStream = new ofstream( finalPath.c_str(), ios::binary | ios::out );
 	if(fileStream->is_open() == false) {
 		delete fileStream;
@@ -174,14 +178,15 @@ bool local_FileSave( string pFile, bool pDataSave, byte *pBuffer, size_t pBuffer
 
 	fileStream->write( (char*) pBuffer, pBufferSize );
 	fileStream->close();
+	delete fileStream;
 
 	return true;
 }
 
-byte *local_FileRead( string pFile, size_t	&pFileSize, bool pDataSave ) {
+byte *local_FileRead( string pFile, string pPath, size_t	&pFileSize, bool pDataSave ) {
 	ifstream		*fileStream;
 	byte			*fileBuffer = 0;
-	string finalPath = local_PathGenerate( pFile, pDataSave );
+	string finalPath = local_PathGenerate( pFile, pPath, pDataSave );
 
 	// Attempt to open the file
 	fileStream = new ifstream ( finalPath.c_str(), ios::binary );
@@ -242,7 +247,7 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 
 	// Build the file path
 	stringstream finalPath;
-	finalPath << path << "\\";
+	finalPath << path << "/";
 	if(!pDataSave)
 		finalPath << gDataPath;
 	else
@@ -251,7 +256,7 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 	if(pPath.size())
 		finalPath << pPath;
 
-	finalPath << "\\*" << pExtension;
+	finalPath << "/*" << pExtension;
 
 	int size = MultiByteToWideChar( 0,0, finalPath.str().c_str(), finalPath.str().length(), 0, 0);
 	WCHAR    *pathFin = new WCHAR[ size + 1];

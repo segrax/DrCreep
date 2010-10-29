@@ -71,7 +71,7 @@ cCreep::cCreep() {
 	mSound = 0;
 
 	// Load the C64 Character Rom
-	if( (m64CharRom = local_FileRead( "char.rom", romSize, false )) == 0 ) {
+	if( (m64CharRom = local_FileRead( "char.rom", "",  romSize, false )) == 0 ) {
 		mDebug->error("File \"char.rom\" not found");
 		exit(1);
 	}
@@ -247,6 +247,7 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 
 	// Set the default screen scale
 	mScreen->scaleSet( 2 );
+	mScreen->windowTitleUpdate();
 
 	// Display the title screen
 #ifndef _DEBUG
