@@ -103,6 +103,8 @@ private:
 	cObject					*obj_Image_Create( byte pPosX, byte pPosY );
 	cObject					*obj_Multi_Create( byte pPosX, byte pPosY );
 
+	void					 selectCastleName();
+
 	void					 parseInput();
 	void					 selectedObjectChange( bool pChangeUp );
 	void					 selectedObjectDelete();

@@ -240,6 +240,10 @@ void cBuilder::mainLoop() {
 				selectedObjectChange( false );
 				break;
 
+			case 's':	// Save Castle
+				selectCastleName();
+				break;
+
 			case '[':	// Select a placed object
 				selectPlacedObject( false );
 				break;
@@ -372,6 +376,31 @@ void cBuilder::castlePrepare() {
 	img_Actions();
 }
 
+void cBuilder::selectCastleName() {
+	mScreen->cursorEnabled( false );
+
+	// get the filename to save as
+	screenClear();
+	word_3E = 0x2633;
+	roomPrepare();
+
+	*memory( 0x2788 ) = 0x20;
+	*memory( 0x2789 ) = 0x48;
+	*memory( 0x278C ) = 0x10;
+	*memory( 0x278A ) = 0x01;
+	*memory( 0x278B ) = 0x02;
+
+	textShow();
+
+	if(mStrLength) {
+		string filename = string( (char*) &mMemory[ 0x278E ], mStrLength );
+
+		// Do the save
+	}
+
+	mScreen->cursorEnabled( true );
+}
+
 void cBuilder::parseInput() {
 	sObjectPart		*part	= 0;
 	sPlayerInput	*input	= mInput->inputGet(0);
@@ -468,6 +497,7 @@ void cBuilder::parseInput() {
 		update = true;
 	}
 
+	// Cursor minimum and maximums
 	if( mCursorX > 0x9C )
 		mCursorX = 0x9C;
 
@@ -544,6 +574,8 @@ void cBuilder::castleSave( ) {
 
 		memDest += 2;
 	}
+
+	writeLEWord(  &mMemory[ 0x7800 ], memDest );
 }
 
 cObject *cBuilder::objectCreate( eRoomObjects pObject, byte pPosX, byte pPosY ) {
