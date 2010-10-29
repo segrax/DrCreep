@@ -30,11 +30,19 @@ public:
 
 public:
 	cObjectDoorBell( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
-		mObjectID = eObjectDoorBell;
-		mDoorID = 0;
+		mObjectID	= eObjectDoorBell;
+		mLinkObject = eObjectDoor;
+		mDoorID		= 0;
+		
+		mLinked = false;
 
 		mParts[0].mCursorWidth = 3;
 		mParts[0].mCursorHeight = 3;
+	}
+
+	void		mLinkedSet( byte pNumber )	{
+		mDoorID = pNumber;
+		mLinked = true;
 	}
 
 	size_t		objectLoad( byte **pBuffer ) {

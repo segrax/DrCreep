@@ -33,8 +33,17 @@ public:
 		mObjectID = eObjectLock;
 		mLockColor = 1;
 		mDoorNumber = 0;
+
+		mLinked = false;
+		mLinkObject = eObjectDoor;
+
 		mParts[0].mCursorWidth = 3;
 		mParts[0].mCursorHeight = 3;
+	}
+
+	void		mLinkedSet( byte pNumber )	{
+		mDoorNumber = pNumber;
+		mLinked = true;
 	}
 
 	size_t		objectLoad( byte **pBuffer ) {

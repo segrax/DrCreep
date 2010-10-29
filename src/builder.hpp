@@ -59,14 +59,14 @@ private:
 class cBuilder : public cCreep {
 
 private:
-	byte					 mCursorX,		mCursorY;
-	eRoomObjects			 mSelectedObject;
+	byte					 mCursorX,				mCursorY;
+	eRoomObjects			 mSelectedObject,		mSearchObject;
 	size_t					 mRoomSelectedObject;
 
 	cRoom					*mCurrentRoom;
-	cObject					*mCurrentObject;
+	cObject					*mCurrentObject, *mOriginalObject;
 
-	bool					 mDragMode;
+	bool					 mDragMode, mLinkMode;
 
 	byte					 mStart_Door_Player1, mStart_Door_Player2;
 	byte					 mStart_Room_Player1, mStart_Room_Player2;
@@ -83,6 +83,7 @@ private:
 
 	void					 cursorObjectUpdate();
 	void					 cursorUpdate();
+	size_t					 findItemIndex( cObject *pObject );
 
 	cObject					*obj_Door_Create( byte pPosX, byte pPosY );
 	cObject					*obj_Walkway_Create( byte pPosX, byte pPosY );
@@ -103,7 +104,7 @@ private:
 	cObject					*obj_Image_Create( byte pPosX, byte pPosY );
 	cObject					*obj_Multi_Create( byte pPosX, byte pPosY );
 
-	void					 selectCastleName();
+	void					 castleSaveToDisk();
 
 	void					 parseInput();
 	void					 selectedObjectChange( bool pChangeUp );

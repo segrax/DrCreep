@@ -3342,7 +3342,7 @@ s10EB:;
 		if( mRunStopPressed == 1 ) {
 
 			// Save the game
-			gamePositionSave();
+			gamePositionSave( false );
 
 			return true;
 		}
@@ -5119,8 +5119,8 @@ void cCreep::gamePositionLoad() {
 	sub_2973();
 }
 
-// 24FF
-void cCreep::gamePositionSave() {
+// 24FF: Save a game, or a castle
+void cCreep::gamePositionSave( bool pCastleSave ) {
 	
 	gamePositionFilenameGet( false );
 	if(!mStrLength)
@@ -5131,6 +5131,10 @@ void cCreep::gamePositionSave() {
 
 	word saveSize = readLEWord( memory( 0x7800 ) );
 	
+	// Castles save with a Z
+	if( pCastleSave )
+		filename.insert(0, "Z" );
+
 	if( mCastleManager->positionSave( filename, saveSize, memory( 0x7800 ) ) == false) {
 
 		word_3E = 0x25AA;	// IO ERROR

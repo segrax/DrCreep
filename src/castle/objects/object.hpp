@@ -60,10 +60,16 @@ protected:
 	bool			 mPartsAdd;
 	bool			 mPlaced;
 	byte			 mPart,		mPartCount;
-
-	bool			 mSelected;
+	eRoomObjects	 mLinkObject;
+	bool			 mSelected, mLinked;
 
 public:
+	inline bool			mLinkedGet()	 { return mLinked; }
+	
+
+	inline eRoomObjects mLinkObjectGet() { return mLinkObject; }
+	
+	virtual void mLinkedSet( byte pNumber )	{ return; }
 
 	inline byte	 mPartCountGet()	{ return mPartCount; }
 	inline byte	 mPartGet()			{ return mPart; }
@@ -104,6 +110,8 @@ public:
 		mPartCount = 1;
 		mPartsAdd = false;
 
+		mLinked = true;
+		mLinkObject = eObjectsFinished;
 		mObjectID = eObjectsFinished;
 
 		mRoom = pRoom;
