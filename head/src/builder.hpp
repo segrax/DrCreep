@@ -108,6 +108,8 @@ private:
 	void					 selectedObjectDelete();
 	void					 selectPlacedObject( bool pChangeUp );
 
+	void					 roomChange( int pRoomNumber );
+
 	void					 objectStringsClear();
 	void					 objectStringPrint( sString pString );
 	void					 objectStringsPrint();

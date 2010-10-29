@@ -247,7 +247,6 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 
 	// Set the default screen scale
 	mScreen->scaleSet( 2 );
-	mScreen->levelNameSet("");
 
 	// Display the title screen
 #ifndef _DEBUG

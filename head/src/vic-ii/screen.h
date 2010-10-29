@@ -48,7 +48,8 @@ class cScreen {
 
 	bool					 mFullScreen,		mBitmapRedraw, mSpriteRedraw, mScreenRedraw, mTextRedraw;
 	size_t					 mScale, mDrawDestX, mDrawDestY, mDrawSrcX, mDrawSrcY;
-	string					 mWindowTitle;
+	string					 mWindowTitle, mLevelName;
+	size_t					 mRoomNumber;
 
 	bool					 mCursorOn;
 	word					 mCursorX, mCursorY, mCursorWidth, mCursorHeight;
@@ -82,7 +83,13 @@ public:
 	cSprite					*spriteGet( byte pCount );
 	
 	void					 levelNameSet( string pName );
+	inline string			 levelNameGet() { return mLevelName; }
+
 	void					 refresh();
+
+	void					 windowTitleUpdate();
+
+	inline void				 roomNumberSet( size_t pValue ) { mRoomNumber = (pValue + 1); windowTitleUpdate(); }
 
 	inline vector< sScreenPiece* > *collisionsGet() { return &mCollisions; }
 	inline void						fullscreenToggle() {	mFullScreen = !mFullScreen;
@@ -106,5 +113,5 @@ public:
 												else
 													return (mFPSTotal / mFPSSeconds); }
 
-	inline void				 windowTitleSet( string mTitle ) { mWindowTitle = mTitle; }
+	inline void				 windowTitleSet( string mTitle ) { mWindowTitle = mTitle; windowTitleUpdate(); }
 };
