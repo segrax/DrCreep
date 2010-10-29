@@ -56,6 +56,8 @@ cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 	mWindow				= 0;
 	mWindowTitle		= pWindowTitle;
 
+	mRoomNumber			= 0;
+
 	mCursorOn						= false;
 	mCursorWidth = mCursorHeight	= 1;
 	mCursorX = mCursorY				= 0;
@@ -68,6 +70,8 @@ cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 	// Create the SDL surfaces 
 	mSDLSurface = SDL_CreateRGBSurface(	SDL_SWSURFACE,	gWidth,	gHeight,	 32, 0, 0, 0, 0);
 	mSDLCursorSurface = 0;
+
+	windowTitleUpdate();
 }
 
 cScreen::~cScreen() {
@@ -261,12 +265,29 @@ cSprite *cScreen::spriteGet( byte pCount ) {
 }
 
 void cScreen::levelNameSet( string pName ) {
+	mLevelName = pName;
+	windowTitleUpdate();
+}
+
+void cScreen::windowTitleUpdate() {
 	stringstream windowTitle;
 
 	windowTitle << mWindowTitle;
-	windowTitle << ". '";
-	windowTitle << pName;
-	windowTitle << "' (SVN: " << SVNREV;
+	windowTitle << ".";
+
+	// No level yet?
+	if( mLevelName.size() ) {
+		windowTitle << "'";
+		windowTitle << mLevelName;
+
+		// Room Number?
+		if(mRoomNumber)
+			windowTitle << " - Room: " << (mRoomNumber - 1);
+
+		windowTitle << "'";
+	}
+
+	windowTitle << " (SVN: " << SVNREV;
 	windowTitle << "-" << SVNDATE << ")";
 
 	mWindow->titleSet( windowTitle.str() );

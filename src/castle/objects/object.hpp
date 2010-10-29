@@ -119,6 +119,8 @@ public:
 		++mPartCount;
 		return;
 	}
+	
+	inline cRoom *roomGet()			{ return mRoom; }
 
 	virtual size_t	objectLoad( byte **pBuffer ) = 0;	// Load object from room stream
 	virtual size_t	objectSave( byte **pBuffer, size_t pPart ) {	// Save object to room stream

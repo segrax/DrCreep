@@ -46,6 +46,7 @@ size_t cRoom::roomSaveObjects( byte **pBuffer ) {
 	size += saveObject( pBuffer, eObjectConveyor, 0x80 );
 	size += saveObject( pBuffer, eObjectFrankenstein, 0x80 );
 	size += saveObject( pBuffer, eObjectText, 0x00 );
+
 	return size;
 }
 
@@ -154,13 +155,13 @@ cBuilder::~cBuilder() {
 
 void cBuilder::castleCreate() {
 
-	cRoom *room0 = roomCreate(0);
+	mCurrentRoom = roomCreate(0);
 
-	room0->mColor = 3;
-	room0->mMapHeight = 3;
-	room0->mMapWidth = 3;
-	room0->mMapX = 3;
-	room0->mMapY = 3;
+	mCurrentRoom->mColor = 3;
+	mCurrentRoom->mMapHeight = 3;
+	mCurrentRoom->mMapWidth = 3;
+	mCurrentRoom->mMapX = 3;
+	mCurrentRoom->mMapY = 3;
 
 	mStart_Room_Player1 = mStart_Room_Player2 = 0;
 	mStart_Door_Player1 = mStart_Door_Player2 = 0;
@@ -215,7 +216,6 @@ void cBuilder::mainLoop() {
 
 	// TODO: Check if we load a castle instead of make a new one
 	castleCreate();
-	mCurrentRoom = roomCreate(0);
 	castleSave();
 	
 	mScreen->cursorEnabled(true);
@@ -224,8 +224,7 @@ void cBuilder::mainLoop() {
 	mMemory[ 0x7809 ] = mMemory[ 0x7803 ];
 	mMemory[ 0x780B ] = mMemory[ 0x7805 ];
 
-	roomLoad();
-	objectStringsPrint();
+	roomChange(0);
 
 	while(!mQuit) {
 		byte key = tolower( mInput->keyGet() );
@@ -249,6 +248,20 @@ void cBuilder::mainLoop() {
 				selectPlacedObject( true );
 				break;
 
+			case '-':	{// Previous Room
+				int newRoom = mCurrentRoom->mNumber - 1;
+				if(newRoom < 0)
+					newRoom = 0;
+				
+				roomChange( newRoom );
+				break;
+						}
+			case '=':	{// Next Room
+				int newRoom = mCurrentRoom->mNumber + 1;
+				
+				roomChange( newRoom );
+				break;
+						}
 			case 0x7F:	// Delete Key
 				selectedObjectDelete();
 				break;
@@ -274,6 +287,26 @@ void cBuilder::mainLoop() {
 
 }
 
+void cBuilder::roomChange( int pNumber ) {
+
+	if( mCurrentObject && mCurrentObject->partGet(0)->mPlaced == false ) {
+		mCurrentRoom->objectDelete( mCurrentObject );
+		delete mCurrentObject;
+		mCurrentObject = 0;
+	}
+
+	castleSave();
+	mCurrentRoom = roomCreate( pNumber );
+	mMemory[ 0x7809 + 0 ] = pNumber;
+	mMemory[ 0x7809 + 1 ] = pNumber;
+
+	// Set the room number in the window title
+	mScreen->roomNumberSet( pNumber );
+
+	roomLoad();
+}
+
+
 void cBuilder::messagePrint( string pMessage ) {
 
 	objectStringAdd(pMessage, 0x10, 0xC0, 2);
@@ -281,8 +314,8 @@ void cBuilder::messagePrint( string pMessage ) {
 
 void cBuilder::cursorObjectUpdate() {
 
-	// Cursor object has changed?
-	if( mCurrentObject && !mCurrentObject->isSelected() && mCurrentObject->objectTypeGet() != mSelectedObject ) {
+	// Cursor object has changed? or Room has changed?
+	if( mCurrentObject && !mCurrentObject->isSelected() && mCurrentObject->objectTypeGet() != mSelectedObject) {
 
 		// Dont delete if its placed
 		if( mCurrentObject->partGet(0)->mPlaced == false ) {
@@ -325,6 +358,10 @@ void cBuilder::cursorUpdate() {
 
 void cBuilder::castlePrepare() {
 	castleSave();
+
+	mMemory[ 0x7809 + 0 ] = mCurrentRoom->mNumber;
+	mMemory[ 0x7809 + 1 ] = mCurrentRoom->mNumber;
+
 	roomLoad();
 
 	// Print any strings
@@ -336,8 +373,8 @@ void cBuilder::castlePrepare() {
 }
 
 void cBuilder::parseInput() {
-	sObjectPart		*part = 0;
-	sPlayerInput	*input = mInput->inputGet(0);
+	sObjectPart		*part	= 0;
+	sPlayerInput	*input	= mInput->inputGet(0);
 	bool			 update = false;
 	
 	// Get the current selected 'part' of the object
@@ -443,20 +480,16 @@ void cBuilder::parseInput() {
 	if( mCursorY > 0xA8 )
 		mCursorY = 0xA8;
 
-
-
-
-	//if( mCursorY >
 	if(update) 
 		cursorObjectUpdate();
 }
 
 cRoom *cBuilder::roomCreate( size_t pNumber ) {
-	cRoom *room = new cRoom( pNumber );
-
+	
 	if( mRooms.find( pNumber ) != mRooms.end() )
 		return mRooms.find( pNumber )->second;
 
+	cRoom *room = new cRoom( pNumber );
 	mRooms.insert( make_pair( pNumber, room ) );
 
 	return room;
@@ -504,6 +537,12 @@ void cBuilder::castleSave( ) {
 
 		// Save all objects, and add up memory size
 		memDest += roomIT->second->roomSaveObjects( &buffer );
+
+		// End room marker
+		*buffer++ = 0x00;
+		*buffer++ = 0x00;
+
+		memDest += 2;
 	}
 }
 
