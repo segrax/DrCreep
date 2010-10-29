@@ -207,7 +207,7 @@ public:
 		void	 gameMenuDisplaySetup();
 
 		void	 gamePositionLoad();
-		void	 gamePositionSave( bool pCastleSave );
+		void	 gameDataSave( bool pCastleSave );
 		void	 gamePositionFilenameGet( bool pLoading );
 
 		void	 graphicRoomColorsSet( byte pRoomColor );

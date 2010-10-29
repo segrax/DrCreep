@@ -98,6 +98,7 @@ private:
 	vector< cCastleInfo* >	 mCastles;				// All castles found
 	vector< cD64* >			 mDisks;				// Open disk images
 	vector< cD64* >			 mDisksPositions;		// Save Game Disks
+	vector< cD64* >			 mDisksCastles;			// Castle Disks
 	vector< sFileLocal* >	 mFiles;				// Open Local Files
 
 	void					 castlesCleanup();		// Cleanup mCastles vector
@@ -106,8 +107,12 @@ private:
 
 	void					 diskCleanup();			// Cleanup mDisks vector
 	void					 diskPosCleanup();
+	void					 diskCastlesCleanup();
 	void					 diskLoadCastles();		// Load all castles off disks
-	void					 disksFind( string pExtension );	// Find all D64 Images
+	void					 diskLoadCastle();		// Load all castles off castle folder disks
+
+	void					 disksFind( string pExtension );		// Find all D64 Images
+	void					 diskCastleFind( string pExtension );
 	void					 diskPosFind( string pExtension );
 
 	void					 localCleanup();
@@ -127,11 +132,15 @@ public:
 	
 	sFileLocal				*fileFind( string pFilename );
 	byte					*fileLoad( string pFilename, size_t &pBufferSize );
+
 	vector<string>			 filesFind( string pFilemask );
+
+	bool					 castleSave( string pFilename, size_t pSaveSize, byte *pData );
 
 	bool					 positionLoad( string pFilename, byte *pTarget );
 	bool					 positionSave( string pFilename, size_t pSaveSize, byte *pData );
 	cD64					*positionDiskCreate();
+	cD64					*castleDiskCreate();
 
 	bool					 scoresLoad( string pCastleName, byte *pData );
 	bool					 scoresSave( string pCastleName, size_t pSaveSize, byte *pData );
