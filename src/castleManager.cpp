@@ -93,6 +93,7 @@ void cCastleManager::castlesFind() {
 
 	// Find any d64 images in data
 	disksFind( ".d64" );
+	diskCastleFind( "*.d64" );
 
 	// Load castles from Disk images, and from data\castles folder
 	diskLoadCastles();
@@ -159,12 +160,46 @@ void cCastleManager::diskPosCleanup() {
 	mDisksPositions.clear();
 }
 
+void cCastleManager::diskCastlesCleanup() {
+	vector< cD64* >::iterator diskIT;
+
+	for( diskIT = mDisksCastles.begin(); diskIT != mDisksCastles.end(); ++diskIT )
+		delete *diskIT;
+
+	mDisksCastles.clear();
+}
+
 void cCastleManager::diskLoadCastles() {
 	vector< cD64* >::iterator	diskIT;
 	vector< sD64File*>::iterator	fileIT;
 
 	// Loop thro each file starting with Z of each disk
 	for( diskIT = mDisks.begin(); diskIT != mDisks.end(); ++diskIT ) {
+		vector<sD64File*>	files = (*diskIT)->directoryGet( "Z*" );
+
+		for( fileIT = files.begin(); fileIT != files.end(); ++fileIT ) {
+			
+			cCastleInfoD64 *castle = new cCastleInfoD64( this, (*diskIT), (*fileIT) );
+
+			// Dont add castles with the same name as already existing castles
+			if( castleInfoGet( castle->nameGet() ) ) {
+				delete castle;
+				continue;
+			}
+			
+			mCastles.push_back( castle );	
+		}
+	}
+
+	return;
+}
+
+void cCastleManager::diskLoadCastle() {
+	vector< cD64* >::iterator	diskIT;
+	vector< sD64File*>::iterator	fileIT;
+
+	// Loop thro each file starting with Z of each disk
+	for( diskIT = mDisksCastles.begin(); diskIT != mDisksCastles.end(); ++diskIT ) {
 		vector<sD64File*>	files = (*diskIT)->directoryGet( "Z*" );
 
 		for( fileIT = files.begin(); fileIT != files.end(); ++fileIT ) {
@@ -223,8 +258,19 @@ void cCastleManager::diskPosFind( string pExtension ) {
 	}
 }
 
+void cCastleManager::diskCastleFind( string pExtension ) {
+	vector<string> disks = directoryList( "castles", pExtension, false );
+	vector<string>::iterator diskIT;
+
+	diskCastlesCleanup();
+
+	for( diskIT = disks.begin(); diskIT != disks.end(); ++diskIT ) {
+		mDisksCastles.push_back( new cD64( *diskIT ) );
+	}
+}
+
 void cCastleManager::localLoadCastles() {
-	vector<string>			 files = directoryList( "castles", "Z", false);
+	vector<string>			 files = directoryList( "castle", "Z", false);
 	vector<string>::iterator fileIT;
 
 	for( fileIT = files.begin(); fileIT != files.end(); ++fileIT ) {
@@ -310,6 +356,29 @@ cD64 *cCastleManager::positionDiskCreate() {
 	return newDisk;
 }
 
+cD64 *cCastleManager::castleDiskCreate() {
+	cD64		 *newDisk	= 0;
+	stringstream  filename;
+
+	// FIXME: Temp for now, but who needs 100 save disks?
+	for(size_t count = 0; count < 100; ++count) {
+		filename.str("");
+		filename << "castles\\CASTLE_";
+		filename << count;
+		filename << ".D64";
+
+		newDisk = new cD64( filename.str().c_str(), true, false, false );
+		
+		if( newDisk->createdGet() == true )
+			break;
+
+		delete newDisk;
+		newDisk = 0;
+	}
+
+	return newDisk;
+}
+
 bool cCastleManager::positionLoad( string pFilename, byte *pTarget ) {
 	diskPosFind(".d64");
 	// Search all open disks  for filename
@@ -329,7 +398,37 @@ bool cCastleManager::positionLoad( string pFilename, byte *pTarget ) {
 	return false;
 }
 
-bool cCastleManager::positionSave( string pFilename, size_t pSaveSize, byte *pData ) {
+bool cCastleManager::castleSave( string pFilename, size_t pSaveSize, byte *pData ) {
+	vector< cD64* >::iterator		 diskIT;
+	cD64							*disk = 0;
+
+	diskCastleFind(".d64");
+	
+	// Calculate number of sectors required for file we're saving
+	size_t size = pSaveSize + 2;
+	size_t sectors = (size / 254);
+	if(size % 254)
+		++sectors;
+
+	// Search all available disks for enough available sectors 
+	for( diskIT = mDisksCastles.begin(); diskIT != mDisksCastles.end(); ++diskIT ) {
+		
+		if( (*diskIT)->sectorsFree() >= sectors)
+			break;
+	}
+
+	// No Disk found? create a new save disk
+	if( diskIT == mDisksCastles.end() ) {
+		disk = castleDiskCreate();
+		mDisksCastles.push_back( disk );
+	} else
+		disk = *diskIT;
+
+	// Save the file to the disk
+	return disk->fileSave( pFilename, pData, pSaveSize, 0x7800 );
+}
+
+bool cCastleManager::positionSave( string pFilename, size_t pSaveSize, byte *pData  ) {
 	vector< cD64* >::iterator		 diskIT;
 	cD64							*disk = 0;
 

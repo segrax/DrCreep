@@ -398,9 +398,18 @@ void cBuilder::castlePrepare() {
 }
 
 void cBuilder::castleSaveToDisk() {
-	mScreen->cursorEnabled( false );
 
-	gamePositionSave( true );
+	// Remove cursor object for now
+	mCurrentRoom->objectDelete( mCurrentObject );
+	castlePrepare();
+
+	mScreen->cursorEnabled( false );
+	
+
+	gameDataSave( true );
+	
+	// Re-add cursor object
+	mCurrentRoom->objectAdd( mCurrentObject );
 
 	mScreen->cursorEnabled( true );
 	castlePrepare();

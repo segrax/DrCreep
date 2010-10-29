@@ -3342,7 +3342,7 @@ s10EB:;
 		if( mRunStopPressed == 1 ) {
 
 			// Save the game
-			gamePositionSave( false );
+			gameDataSave( false );
 
 			return true;
 		}
@@ -5120,7 +5120,7 @@ void cCreep::gamePositionLoad() {
 }
 
 // 24FF: Save a game, or a castle
-void cCreep::gamePositionSave( bool pCastleSave ) {
+void cCreep::gameDataSave( bool pCastleSave ) {
 	
 	gamePositionFilenameGet( false );
 	if(!mStrLength)
@@ -5135,7 +5135,14 @@ void cCreep::gamePositionSave( bool pCastleSave ) {
 	if( pCastleSave )
 		filename.insert(0, "Z" );
 
-	if( mCastleManager->positionSave( filename, saveSize, memory( 0x7800 ) ) == false) {
+	bool result = false;
+
+	if( pCastleSave )
+		result = mCastleManager->castleSave( filename, saveSize, memory( 0x7800 ) );
+	else
+		result = mCastleManager->positionSave( filename, saveSize, memory( 0x7800 ) );
+
+	if( result == false) {
 
 		word_3E = 0x25AA;	// IO ERROR
 		screenClear();
@@ -5974,6 +5981,8 @@ void cCreep::obj_Door_Button_Prepare() {
 			}	
 
 			Y += 8;
+			if(Y == 0 )
+				return;
 		}
 
 		signed char Y2 = 8;
