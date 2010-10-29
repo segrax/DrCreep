@@ -63,7 +63,7 @@ private:
 	eRoomObjects			 mSelectedObject,		mSearchObject;
 	size_t					 mRoomSelectedObject;
 
-	cRoom					*mCurrentRoom;
+	cRoom					*mCurrentRoom,	 *mOriginalRoom;
 	cObject					*mCurrentObject, *mOriginalObject;
 
 	bool					 mDragMode, mLinkMode;
@@ -109,6 +109,7 @@ private:
 	void					 parseInput();
 	void					 selectedObjectChange( bool pChangeUp );
 	void					 selectedObjectDelete();
+	void					 selectedObjectLink();
 	void					 selectPlacedObject( bool pChangeUp );
 
 	void					 roomChange( int pRoomNumber );

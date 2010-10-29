@@ -244,6 +244,10 @@ void cBuilder::mainLoop() {
 				selectedObjectChange( false );
 				break;
 
+			case 'l':	// Link Objects
+				selectedObjectLink();
+				break;
+
 			case 's':	// Save Castle
 				castleSaveToDisk();
 				break;
@@ -301,6 +305,11 @@ void cBuilder::roomChange( int pNumber ) {
 		mCurrentRoom->objectDelete( mCurrentObject );
 		delete mCurrentObject;
 		mCurrentObject = 0;
+	}
+
+	if( mLinkMode ) {
+		mOriginalRoom = mCurrentRoom;
+		mOriginalObject = mCurrentObject;
 	}
 
 	castleSave();
@@ -498,33 +507,32 @@ void cBuilder::parseInput() {
 			else {
 				mDragMode = false;
 				if(mLinkMode) {
-					mOriginalObject->mLinkedSet( findItemIndex( mCurrentObject ) );
+					if(mOriginalObject) {
+						mOriginalObject->mLinkedSet( findItemIndex( mCurrentObject ) );
+						mOriginalObject->mLinked2Set( mOriginalRoom->mNumber );
+					}
 					mSearchObject = eObjectsFinished;
 					mLinkMode = false;
+					mCurrentObject = 0;
 
 				} else if(mCurrentObject) {
 					mCurrentObject->partPlace();
-					mSearchObject = mCurrentObject->mLinkObjectGet();
-					mOriginalObject = mCurrentObject;
-
-					if( mSearchObject != eObjectsFinished )
-						mLinkMode = true;
 				}
 			}
 
 		} else {
 			mDragMode = false;
 			if(mLinkMode) {
-				mOriginalObject->mLinkedSet( findItemIndex( mCurrentObject ) );
+				if(mOriginalObject) {
+					mOriginalObject->mLinkedSet( findItemIndex( mCurrentObject ) );
+					mOriginalObject->mLinked2Set( mCurrentRoom->mNumber );
+				}
 				mSearchObject = eObjectsFinished;
 				mLinkMode = false;
+				mCurrentObject = 0;
 
 			} else if(mCurrentObject) {
 				mCurrentObject->partPlace();
-				mOriginalObject = mCurrentObject;
-				mSearchObject = mCurrentObject->mLinkObjectGet();
-				if( mSearchObject != eObjectsFinished )
-					mLinkMode = true;
 			}
 		}
 
@@ -839,6 +847,20 @@ void cBuilder::selectedObjectDelete() {
 	cursorUpdate();
 }
 
+void cBuilder::selectedObjectLink() {
+	if( !mCurrentObject )
+		return;
+
+	if( mCurrentObject->mLinkObjectGet() == eObjectsFinished )
+		return;
+
+	mOriginalObject = mCurrentObject;
+	mOriginalRoom = mCurrentRoom;
+	mSearchObject = mCurrentObject->mLinkObjectGet();
+
+	mLinkMode = true;
+}
+
 void cBuilder::selectPlacedObject( bool pChangeUp ) {
 	bool changeObject = false;
 
@@ -890,7 +912,7 @@ void cBuilder::selectPlacedObject( bool pChangeUp ) {
 				mCurrentObject = mCurrentRoom->objectGet( mRoomSelectedObject );
 				break;
 			}
-		} while (mSearchObject != mCurrentObject->objectTypeGet() || mSearchObject == eObjectsFinished );
+		} while ((mLinkMode && mSearchObject != mCurrentObject->objectTypeGet()) );
 
 		mCurrentObject->partSet(0);
 	}
