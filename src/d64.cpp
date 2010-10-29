@@ -44,7 +44,7 @@ string stringRip(byte *pBuffer, byte pTerminator, size_t pLengthMax) {
 }
 
 // D64 Constructor
-cD64::cD64( string pD64, bool pCreate, bool pDataSave, bool pReadOnly ) {
+cD64::cD64( string pD64, string pPath, bool pCreate, bool pDataSave, bool pReadOnly ) {
 
 	// Prepare variables
 	mBufferSize = 0;
@@ -57,6 +57,7 @@ cD64::cD64( string pD64, bool pCreate, bool pDataSave, bool pReadOnly ) {
 	// Filename, Use datapath mode
 	mFilename = pD64;
 	mDataSave = pDataSave;
+	mPath = pPath;
 
 	// Number of tracks
 	mTrackCount = 35;
@@ -64,7 +65,7 @@ cD64::cD64( string pD64, bool pCreate, bool pDataSave, bool pReadOnly ) {
 	bamClear();
 
 	// Read the file
-	mBuffer = local_FileRead( pD64, mBufferSize, pDataSave );
+	mBuffer = local_FileRead( pD64, mPath, mBufferSize, pDataSave );
 
 	// Loaded size is 0 and we're not in create mode?
 	if( !mBuffer && !pCreate )
@@ -80,7 +81,7 @@ cD64::cD64( string pD64, bool pCreate, bool pDataSave, bool pReadOnly ) {
 		memset( mBuffer, 0, 0x2AB00 );
 		
 		// Create it
-		if( local_FileCreate( pD64, pDataSave ) == false ) 
+		if( local_FileCreate( pD64, mPath, pDataSave ) == false ) 
 			return;
 
 		// Build a BAM
@@ -819,7 +820,7 @@ bool cD64::diskWrite() {
 	// Store the internal 'mBuffer'
 	bamSaveToBuffer();
 
-	return local_FileSave( mFilename, mDataSave, mBuffer, mBufferSize );
+	return local_FileSave( mFilename, mPath, mDataSave, mBuffer, mBufferSize );
 }
 
 sD64File *cD64::fileGet( string pFilename ) {

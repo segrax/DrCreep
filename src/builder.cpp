@@ -509,7 +509,7 @@ void cBuilder::parseInput() {
 				if(mLinkMode) {
 					if(mOriginalObject) {
 						mOriginalObject->mLinkedSet( findItemIndex( mCurrentObject ) );
-						mOriginalObject->mLinked2Set( mOriginalRoom->mNumber );
+						mOriginalObject->mLinked2Set( mCurrentRoom->mNumber );
 					}
 					mSearchObject = eObjectsFinished;
 					mLinkMode = false;

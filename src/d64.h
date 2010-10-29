@@ -49,7 +49,7 @@ struct sD64Chain {
 struct sD64File {
 	bool	  mChainBroken;				// File Chain Broken
 	string	  mName;					// Name of the file
-	word	  mTrack, mSector;			// Starting T/S of file
+	byte	  mTrack, mSector;			// Starting T/S of file
 	word	  mFileSize;				// Number of blocks used by file
 	eD64FileType mFileType;				// Type of file
 
@@ -94,7 +94,7 @@ private:
 	vector< sD64File* >			 mFiles;										// Files in disk
 	string						 mFilename;										// Name of current D64
 	bool						 mDataSave;										// Save to Saves folder?
-
+	string						 mPath;
 
 
 	void						 bamClear();									// Clear the internal BAM
@@ -131,7 +131,7 @@ private:
 	}
 
 public:
-								 cD64( string pD64, bool pCreate = false, bool pDataSave = false, bool pReadOnly = true );
+								 cD64( string pD64, string pPath, bool pCreate = false, bool pDataSave = false, bool pReadOnly = true );
 								~cD64( );
 
 	vector< sD64File* >			 directoryGet( string pFind );		// Get a file list, with all files starting with 'pFind'

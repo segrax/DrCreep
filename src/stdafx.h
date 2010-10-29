@@ -121,9 +121,9 @@ extern cCreep	  *gCreep;
 
 bool CtrlHandler( dword fdwCtrlType );
 vector<string>	 directoryList(string pPath, string pExtension, bool pDataSave);
-byte			*local_FileRead( string pFile, size_t	&pFileSize, bool pDataSave );
-bool			 local_FileCreate( string pFile, bool pDataSave );
-bool			 local_FileSave( string pFile, bool pDataSave, byte *pBuffer, size_t pBufferSize );
+byte			*local_FileRead( string pFile, string pPath, size_t	&pFileSize, bool pDataSave );
+bool			 local_FileCreate( string pFile, string pPath, bool pDataSave );
+bool			 local_FileSave( string pFile, string pPath, bool pDataSave, byte *pBuffer, size_t pBufferSize );
 
 
 const byte byte_83F = 0x80;

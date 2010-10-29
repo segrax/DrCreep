@@ -93,10 +93,11 @@ void cCastleManager::castlesFind() {
 
 	// Find any d64 images in data
 	disksFind( ".d64" );
-	diskCastleFind( "*.d64" );
+	diskCastleFind( ".d64" );
 
-	// Load castles from Disk images, and from data\castles folder
+	// Load castles from main Disk images, and from data\castle folder
 	diskLoadCastles();
+	diskLoadCastle();
 	localLoadCastles();
 
 	// Ensure atleast one disk was found
@@ -242,7 +243,7 @@ void cCastleManager::disksFind( string pExtension ) {
 	vector<string>::iterator diskIT;
 
 	for( diskIT = disks.begin(); diskIT != disks.end(); ++diskIT ) {
-		mDisks.push_back( new cD64( *diskIT ) );
+		mDisks.push_back( new cD64( *diskIT, "" ) );
 	}
 }
 
@@ -254,7 +255,7 @@ void cCastleManager::diskPosFind( string pExtension ) {
 
 	for( diskIT = disks.begin(); diskIT != disks.end(); ++diskIT ) {
 		
-		mDisksPositions.push_back( new cD64( *diskIT, false, true, false ) );
+		mDisksPositions.push_back( new cD64( *diskIT, "", false, true, false ) );
 	}
 }
 
@@ -265,7 +266,7 @@ void cCastleManager::diskCastleFind( string pExtension ) {
 	diskCastlesCleanup();
 
 	for( diskIT = disks.begin(); diskIT != disks.end(); ++diskIT ) {
-		mDisksCastles.push_back( new cD64( *diskIT ) );
+		mDisksCastles.push_back( new cD64( *diskIT, "castles" ) );
 	}
 }
 
@@ -277,11 +278,8 @@ void cCastleManager::localLoadCastles() {
 		sFileLocal *file = fileFind( (*fileIT) );
 
 		if(!file) {
-			string final = "castles\\";
-			final.append( (*fileIT) );
-
 			size_t size = 0;
-			byte *buffer = local_FileRead( final, size, false );
+			byte *buffer = local_FileRead( (*fileIT) , "castles", size, false );
 			if(buffer)
 				mFiles.push_back( file = new sFileLocal( (*fileIT), buffer, size ));
 			else
@@ -344,7 +342,7 @@ cD64 *cCastleManager::positionDiskCreate() {
 		filename << count;
 		filename << ".D64";
 
-		newDisk = new cD64( filename.str().c_str(), true, true, false );
+		newDisk = new cD64( filename.str().c_str(), "", true, true, false );
 		
 		if( newDisk->createdGet() == true )
 			break;
@@ -363,11 +361,11 @@ cD64 *cCastleManager::castleDiskCreate() {
 	// FIXME: Temp for now, but who needs 100 save disks?
 	for(size_t count = 0; count < 100; ++count) {
 		filename.str("");
-		filename << "castles\\CASTLE_";
+		filename << "CASTLE_";
 		filename << count;
 		filename << ".D64";
 
-		newDisk = new cD64( filename.str().c_str(), true, false, false );
+		newDisk = new cD64( filename.str().c_str(), "castles", true, false, false );
 		
 		if( newDisk->createdGet() == true )
 			break;
@@ -496,7 +494,7 @@ byte *cCastleManager::fileLoad( string pFilename, size_t &pBufferSize ) {
 		
 		sFileLocal *file = fileFind( pFilename );
 		if(!file) {
-			buffer = local_FileRead( pFilename, size, false );
+			buffer = local_FileRead( pFilename, "", size, false );
 
 			if(!buffer)
 				return 0;
