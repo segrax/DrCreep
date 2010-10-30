@@ -46,8 +46,8 @@ enum eRoomObjects {
 	eObjectTrapDoor		= 0x082A,
 	eObjectConveyor		= 0x082D,
 	eObjectFrankenstein = 0x0830,
-	eObjectText	= 0x0833,
-	eObjectImageDraw	= 0x0836,
+	eObjectText			= 0x0833,
+	eObjectImage		= 0x0836,
 	eObjectMultiDraw	= 0x0821,
 
 	eObjectsFinished	= 0x0000,

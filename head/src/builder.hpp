@@ -82,6 +82,9 @@ private:
 	byte					 mStart_Door_Player1, mStart_Door_Player2;
 	byte					 mStart_Room_Player1, mStart_Room_Player2;
 	byte					 mLives_Player1, mLives_Player2;
+	byte					*mFinalScreen;
+	word					 mFinalPtr;
+	cRoom					*mFinalRoom;
 
 	map< size_t, cRoom *>	 mRooms;
 	vector< sString >		 mStrings;

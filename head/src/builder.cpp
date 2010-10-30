@@ -25,6 +25,8 @@
 #include "castle/objects/objectConveyor.hpp"
 #include "castle/objects/objectFrankenstein.hpp"
 #include "castle/objects/objectText.hpp"
+#include "castle/objects/objectImage.hpp"
+
 #include "debug.h"
 
 size_t cRoom::roomSaveObjects( byte **pBuffer ) {
@@ -46,6 +48,7 @@ size_t cRoom::roomSaveObjects( byte **pBuffer ) {
 	size += saveObject( pBuffer, eObjectConveyor, 0x80 );
 	size += saveObject( pBuffer, eObjectFrankenstein, 0x80 );
 	size += saveObject( pBuffer, eObjectText, 0x00 );
+	size += saveObject( pBuffer, eObjectImage, 0x00 );
 
 	return size;
 }
@@ -71,6 +74,7 @@ void cRoom::roomLoadObjects( byte **pBuffer ) {
 			case eObjectLock:
 			case eObjectTeleport:
 			case eObjectText:
+			case eObjectImage:
 				loadObject( pBuffer, (eRoomObjects) func, 0x00 );
 				break;
 
@@ -270,6 +274,9 @@ cBuilder::cBuilder( cCreep *pParent ) {
 	mRoomSelectedObject = 0;
 	mCurrentObject = 0;
 	mCurrentRoom = 0;
+	mFinalRoom = 0;
+	mFinalPtr = 0;
+	mFinalScreen = 0;
 
 	mDragMode = false;
 	mLinkMode = false;
@@ -285,6 +292,7 @@ cBuilder::cBuilder( cCreep *pParent ) {
 
 cBuilder::~cBuilder() {
 	delete mCurrentObject;
+	delete mFinalRoom;
 	roomCleanup();
 }
 
@@ -727,6 +735,10 @@ void cBuilder::castleLoad( ) {
 	mLives_Player1 = *(buffer + 7);
 	mLives_Player2 = *(buffer + 8);
 
+	mFinalPtr = readLEWord(buffer + 0x5F);
+
+	mFinalScreen = bufferStart + ( mFinalPtr - 0x7800 );
+
 	buffer += 0x100;
 
 	size_t count = 0;
@@ -757,7 +769,8 @@ void cBuilder::castleLoad( ) {
 		buffer += 2;
 	}
 
-
+	mFinalRoom = new cRoom( this, mRooms.size() );
+	mFinalRoom->roomLoadObjects( &mFinalScreen );
 }	
 
 void cBuilder::castleSave( ) {
@@ -885,7 +898,7 @@ cObject *cBuilder::objectCreate( cRoom *pRoom, eRoomObjects pObject, byte pPosX,
 				obj = obj_string_Create( pPosX, pPosY );
 				break;
 
-			case eObjectImageDraw:
+			case eObjectImage:
 				obj = obj_Image_Create( pPosX, pPosY );
 				break;
 
@@ -1018,8 +1031,9 @@ cObject *cBuilder::obj_string_Create( byte pPosX, byte pPosY ) {
 }
 
 cObject *cBuilder::obj_Image_Create( byte pPosX, byte pPosY ) {
+	cObjectImage *object = new cObjectImage( mCurrentRoom, pPosX, pPosY );
 
-	return 0;
+	return object;
 }
 
 cObject *cBuilder::obj_Multi_Create( byte pPosX, byte pPosY ) {
@@ -1240,10 +1254,10 @@ void cBuilder::selectedObjectChange( bool pChangeUp ) {
 				if( pChangeUp )
 					mSelectedObject = eObjectFrankenstein;
 				else
-					mSelectedObject = eObjectImageDraw;
+					mSelectedObject = eObjectImage;
 				break;
 
-			case eObjectImageDraw:
+			case eObjectImage:
 				if( pChangeUp )
 					mSelectedObject = eObjectText;
 				else
@@ -1253,7 +1267,7 @@ void cBuilder::selectedObjectChange( bool pChangeUp ) {
 			case eObjectMultiDraw:
 			case 0x160A:				// Intro
 				if( pChangeUp )
-					mSelectedObject = eObjectImageDraw;
+					mSelectedObject = eObjectImage;
 				else
 					mSelectedObject = eObjectsFinished;
 				break;

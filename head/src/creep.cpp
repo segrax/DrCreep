@@ -894,7 +894,7 @@ void cCreep::roomPrepare( ) {
 				obj_stringPrint();
 				break;
 
-			case eObjectImageDraw:
+			case eObjectImage:
 				obj_Image_Draw();
 				break;
 
