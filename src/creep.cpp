@@ -5106,19 +5106,20 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	sprite->streamLoad( &mMemory[ dataSrc ] );
 	mScreen->spriteRedrawSet();
 }
-void cCreep::stringSet( byte pPosX, byte pPosY, byte pColor, string pMessage ) {
-	memcpy( &mMemory[ 0x8306 ], pMessage.c_str(), pMessage.size() );
- 
-	mMemory[ 0x8300 ] = 0x6D;
-    mMemory[ 0x8301 ] = 0x2A;
-    mMemory[ 0x8302 ] = pPosX;
-	mMemory[ 0x8303 ] = pPosY;
-	mMemory[ 0x8304 ] = pColor;
-    mMemory[ 0x8305 ] = 0x22;
 
-    mMemory[ 0x8305 + pMessage.size() ] |= 0x80;
-	mMemory[ 0x8306 + pMessage.size() ] = 0;
-	mMemory[ 0x8307 + pMessage.size() ] = 0;
+void cCreep::stringSet( byte pPosX, byte pPosY, byte pColor, string pMessage ) {
+	memcpy( &mMemory[ 0x9006 ], pMessage.c_str(), pMessage.size() );
+ 
+	mMemory[ 0x9000 ] = 0x6D;
+    mMemory[ 0x9001 ] = 0x2A;
+    mMemory[ 0x9002 ] = pPosX;
+	mMemory[ 0x9003 ] = pPosY;
+	mMemory[ 0x9004 ] = pColor;
+    mMemory[ 0x9005 ] = 0x22;
+
+    mMemory[ 0x9005 + pMessage.size() ] |= 0x80;
+	mMemory[ 0x9006 + pMessage.size() ] = 0;
+	mMemory[ 0x9007 + pMessage.size() ] = 0;
 }
 
 // 25B8
@@ -5137,7 +5138,7 @@ void cCreep::gameFilenameGet( bool pLoading, bool pCastleSave ) {
 			word_3E = 0x2609;
 		else {
 			stringSet( 0x34, 0x00, 0x01, "SAVE CASTLE" );
-			word_3E = 0x8300;
+			word_3E = 0x9000;
 		}
 	}
 

@@ -284,7 +284,8 @@ cBuilder::cBuilder( cCreep *pParent ) {
 }
 
 cBuilder::~cBuilder() {
-	
+	delete mCurrentObject;
+	roomCleanup();
 }
 
 void cBuilder::castleCreate() {
@@ -321,16 +322,16 @@ void cBuilder::objectStringAdd( string pMessage, byte pPosX, byte pPosY, byte pC
 }
 
 void cBuilder::objectStringPrint( sString pString ) {
-	memcpy( &mMemory[ 0x8004 ], pString.mString.c_str(), pString.mString.size() );
+	memcpy( &mMemory[ 0x9004 ], pString.mString.c_str(), pString.mString.size() );
 
-	mMemory[ 0x8000 ] = pString.mPosX;
-	mMemory[ 0x8001 ] = pString.mPosY;
-	mMemory[ 0x8002 ] = pString.mColor;
-	mMemory[ 0x8003 ] = 0x21;
+	mMemory[ 0x9000 ] = pString.mPosX;
+	mMemory[ 0x9001 ] = pString.mPosY;
+	mMemory[ 0x9002 ] = pString.mColor;
+	mMemory[ 0x9003 ] = 0x21;
 
-	mMemory[ 0x8003 +  pString.mString.size() ] |= 0x80;
+	mMemory[ 0x9003 +  pString.mString.size() ] |= 0x80;
 
-	word_3E = 0x8000;
+	word_3E = 0x9000;
 	obj_stringPrint();
 
 	obj_Actions();
@@ -430,6 +431,16 @@ void cBuilder::mainLoop() {
 	}
 
 	mScreen->cursorEnabled(false);
+}
+
+void cBuilder::roomCleanup() {
+	map< size_t, cRoom *>::iterator roomIT;
+
+	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {
+		delete roomIT->second;
+	}
+
+	mRooms.clear();
 }
 
 void cBuilder::roomChange( int pNumber ) {
