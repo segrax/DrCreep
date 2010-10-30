@@ -124,6 +124,7 @@ private:
 	void					 selectedObjectLink();
 	void					 selectPlacedObject( bool pChangeUp );
 
+	void					 roomCleanup();
 	void					 roomChange( int pRoomNumber );
 
 	void					 objectStringsClear();
