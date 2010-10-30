@@ -38,7 +38,8 @@ cPlayerInput::cPlayerInput( cCreep *pCreep ) {
 	mRestore = false;
 	mF2 = false;
 	mF3 = false;
-
+	mF4 = false;
+	mF5 = false;
 }
 
 cPlayerInput::~cPlayerInput() {
@@ -52,6 +53,8 @@ void cPlayerInput::inputCheck( bool pClearAll ) {
 
 		mF2 = false;
 		mF3 = false;
+		mF4 = false;
+		mF5 = false;
 		mRunStop = false;
 		mRestore = false;
 	}
@@ -167,6 +170,14 @@ void cPlayerInput::KeyboardCheck() {
 				mF3 = false;
 				break;
 
+			case SDLK_F4:
+				mF4 = false;
+				break;
+
+			case SDLK_F5:
+				mF5 = false;
+				break;
+
 			case SDLK_ESCAPE:
 				mRestore = false;
 				break;
@@ -193,6 +204,14 @@ void cPlayerInput::KeyboardCheck() {
 
 			case SDLK_F3:
 				mF3 = true;
+				break;
+			
+			case SDLK_F4:
+				mF4 = true;
+				break;
+
+			case SDLK_F5:
+				mF5 = true;
 				break;
 
 			case SDLK_ESCAPE:

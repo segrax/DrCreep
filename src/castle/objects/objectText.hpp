@@ -37,7 +37,7 @@ public:
 		mString = "text";
 	}
 
-	size_t		objectLoad( byte **pBuffer ) {
+	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
 		
 		return 0;
 	}

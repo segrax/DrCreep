@@ -41,7 +41,7 @@ public:
 						 cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo );
 						~cCastle();
 
-	byte				*bufferGet( size_t &pBufferSize );
+	byte				*bufferGet( size_t &pBufferSize ) { return mBuffer; }
 	
 	inline cCreep		*creepGet() { return mCreep; }
 	inline string		 nameGet() { return mName; }		// Name of the castle

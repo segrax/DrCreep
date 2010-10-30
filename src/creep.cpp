@@ -32,6 +32,7 @@
 #include "castleManager.h"
 #include "creep.h"
 #include "sound/sound.h"
+#include "builder.hpp"
 
 #include "debug.h"
 
@@ -144,6 +145,7 @@ cCreep::cCreep() {
 	byte_574F = 0x01;	
 	byte_574C = 0x80;
 
+	mBuilder = 0;
 	mCastle = 0;
 	mJoyButtonState = 0xA0;
 
@@ -166,6 +168,16 @@ cCreep::~cCreep() {
 	delete mScreen;
 	delete mInput;
 	delete mDebug;
+	delete mBuilder;
+}
+
+void cCreep::builderStart( int pStartLevel ) {
+	
+	mBuilder = new cBuilder( this );
+	mBuilder->start(pStartLevel, false);
+
+	delete mBuilder;
+	mBuilder = 0;
 }
 
 void cCreep::titleDisplay() {
@@ -254,6 +266,8 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	titleDisplay();
 #endif
 
+	mStartCastle = playLevel;
+
 	// Start main loop
 	start( playLevel, unlimited );
 }
@@ -293,6 +307,8 @@ void cCreep::interruptWait( byte pCount) {
 //08C2
 void cCreep::start( int pStartLevel, bool pUnlimited ) {
 	byte	byte_30, byte_31, count;
+
+	mStartCastle = pStartLevel;
 
 	byte_30 = 0x40;
 	byte_31 = 0xD7;
@@ -1429,6 +1445,16 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	// Pause the game, or enter the options menu
 	if( mInput->runStopGet() )
 		mRunStopPressed = true;
+
+	if( mInput->f4Get() ) {
+
+		builderStart( mStartCastle );
+	}
+
+	if( mInput->f5Get() ) {
+
+		builderStart( -1 );
+	}
 
 	// Kill the player(s) if the restore key is pressed
 	if( mInput->restoreGet() ) {

@@ -61,6 +61,8 @@ enum eDirection {
 	eDirectionNone	 = 4
 };
 
+class cBuilder;
+
 class cCreep {
 
 protected:
@@ -74,6 +76,7 @@ protected:
 	cScreen			*mScreen;
 	cPlayerInput	*mInput;
 	cSound			*mSound;
+	cBuilder		*mBuilder;
 
 	string			 mMusicCurrent;
 	byte			*mMusicBuffer, *mMusicBufferStart;
@@ -150,6 +153,8 @@ protected:
 
 	bool		 mMenuReturn;
 
+	int		 mStartCastle;
+
 public:
 	byte		 mTxtX_0, mTxtY_0;
 
@@ -189,6 +194,10 @@ public:
 
 		inline cPlayerInput		*inputGet()		{ return mInput; }
 		inline cScreen			*screenGet()	{ return mScreen; }
+
+		void	 builderStart( int pStartCastle );
+
+		cCastle	*castleGet() { return mCastle; }
 
 		void	 start( int pStartLevel, bool pUnlimited );			// Game Entry Point
 		void	 run( int pArgCount, char *pArgs[] );					// Executed from main()

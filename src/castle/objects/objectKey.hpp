@@ -37,8 +37,10 @@ public:
 		mParts[0].mCursorHeight = 3;
 	}
 
-	size_t		objectLoad( byte **pBuffer ) {
-		
+	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
+		mKeyColor = *(*pBuffer)++;
+		cObject::objectLoad( pBuffer, pPart );
+
 		return 0;
 	}
 

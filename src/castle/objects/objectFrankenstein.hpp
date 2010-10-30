@@ -38,8 +38,13 @@ public:
 		mParts[0].mCursorHeight = 4;
 	}
 
-	size_t		objectLoad( byte **pBuffer ) {
-		
+	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
+		mState = *(*pBuffer)++;
+
+		cObject::objectLoad( pBuffer, pPart );
+
+		pBuffer += 4;
+
 		return 0;
 	}
 

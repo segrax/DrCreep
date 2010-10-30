@@ -56,9 +56,17 @@ public:
 		mLinkRoom = pNumber;
 	}
 
-	size_t		objectLoad( byte **pBuffer ) {
-		
-		return 0;
+	size_t		objectLoad( byte **pBuffer, size_t pPart  ) {
+		size_t strSize = cObject::objectLoad( pBuffer, 0 );
+
+		mDirection = (byte) *(*pBuffer)++;
+		mLinkRoom = *(*pBuffer)++;
+		mLinkDoor = *(*pBuffer)++;
+		mMapX = *(*pBuffer)++;
+		mMapY = *(*pBuffer)++;
+		mCastleExitDoor = *(*pBuffer)++;
+
+		return (strSize + 6);
 	}
 
 	size_t		objectSave( byte **pBuffer, size_t pPart ) {	

@@ -45,8 +45,10 @@ public:
 		mLinked = true;
 	}
 
-	size_t		objectLoad( byte **pBuffer ) {
-		
+	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
+		cObject::objectLoad( pBuffer,  pPart );
+		mDoorID = *(*pBuffer)++;
+
 		return 0;
 	}
 
