@@ -68,7 +68,21 @@ public:
 	}
 
 	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
-		
+		cObject::objectLoad( pBuffer, 0 );
+
+		mTarget = *(*pBuffer)++;
+
+		mPart = 1;
+		while( *(*pBuffer) != 0x00 ) {
+			cObject::objectLoad( pBuffer, mPart );
+			++mPart;
+			if(mPart == mPartCount)
+				++mPartCount;
+		}
+
+		--mPartCount;
+		(*pBuffer)++;
+
 		return 0;
 	}
 
@@ -82,9 +96,9 @@ public:
 			strSize += cObject::objectSave( pBuffer, i );
 		}
 	
-		//*(*pBuffer)++ = 0x00;
+		*(*pBuffer)++ = 0x00;
 
-		return (strSize + 1);
+		return (strSize + 2);
 	}
 
 };

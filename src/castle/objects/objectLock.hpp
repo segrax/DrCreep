@@ -47,7 +47,13 @@ public:
 	}
 
 	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
-		
+		mLockColor = *(*pBuffer)++;
+		*(*pBuffer)++;
+
+		mDoorNumber = *(*pBuffer)++;
+
+		cObject::objectLoad( pBuffer, pPart );
+
 		return 0;
 	}
 
@@ -58,7 +64,7 @@ public:
 
 		size_t strSize = cObject::objectSave( pBuffer, pPart );
 
-		return (strSize + 2);
+		return (strSize + 3);
 	}
 
 };

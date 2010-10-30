@@ -5106,9 +5106,23 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	sprite->streamLoad( &mMemory[ dataSrc ] );
 	mScreen->spriteRedrawSet();
 }
+void cCreep::stringSet( byte pPosX, byte pPosY, byte pColor, string pMessage ) {
+	memcpy( &mMemory[ 0x8306 ], pMessage.c_str(), pMessage.size() );
+ 
+	mMemory[ 0x8300 ] = 0x6D;
+    mMemory[ 0x8301 ] = 0x2A;
+    mMemory[ 0x8302 ] = pPosX;
+	mMemory[ 0x8303 ] = pPosY;
+	mMemory[ 0x8304 ] = pColor;
+    mMemory[ 0x8305 ] = 0x22;
+
+    mMemory[ 0x8305 + pMessage.size() ] |= 0x80;
+	mMemory[ 0x8306 + pMessage.size() ] = 0;
+	mMemory[ 0x8307 + pMessage.size() ] = 0;
+}
 
 // 25B8
-void cCreep::gamePositionFilenameGet( bool pLoading ) {
+void cCreep::gameFilenameGet( bool pLoading, bool pCastleSave ) {
 	
 	screenClear();
 	
@@ -5117,8 +5131,15 @@ void cCreep::gamePositionFilenameGet( bool pLoading ) {
 	
 	if( pLoading )
 		word_3E = 0x261F;
-	 else
-		word_3E = 0x2609;
+	else {
+
+		if(!pCastleSave)
+			word_3E = 0x2609;
+		else {
+			stringSet( 0x34, 0x00, 0x01, "SAVE CASTLE" );
+			word_3E = 0x8300;
+		}
+	}
 
 	roomPrepare();
 	*memory( 0x2788 ) = 0x20;
@@ -5133,7 +5154,7 @@ void cCreep::gamePositionFilenameGet( bool pLoading ) {
 // 24A7
 void cCreep::gamePositionLoad() {
 	
-	gamePositionFilenameGet( true );
+	gameFilenameGet( true, false );
 	if(!mStrLength)
 		return;
 
@@ -5149,7 +5170,7 @@ void cCreep::gamePositionLoad() {
 // 24FF: Save a game, or a castle
 void cCreep::gameDataSave( bool pCastleSave ) {
 	
-	gamePositionFilenameGet( false );
+	gameFilenameGet( false, pCastleSave );
 	if(!mStrLength)
 		return;
 
@@ -6152,6 +6173,8 @@ void cCreep::obj_Lightning_Prepare() {
 		img_FindFree( X );
 
 		mMemory[ 0xBE00 + X ] = byte_44E5;
+
+		// Is Switch On?
 		if( mMemory[ word_3E ] & byte_45DD ) {
 			// 441C
 			gfxPosX = mMemory[ word_3E + 1 ];
