@@ -63,8 +63,6 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 
 		gCreep->sub_2973();
 	}
-
-	//loadHeader();
 }
 
 cCastle::~cCastle() {

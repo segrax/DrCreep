@@ -348,60 +348,93 @@ void cBuilder::objectStringPrint( sString pString ) {
 	hw_Update();
 }
 
+void cBuilder::playerDraw() {
+
+	mMemory[ 0x780B ] = mMemory[ 0x7805 ];	// Player1 Start Door
+	mMemory[ 0x780C ] = mMemory[ 0x7806 ];	// Player2 Start Door
+
+	if( mStart_Room_Player1 == mCurrentRoom->mNumber ) {
+		byte_3638 = 0;
+		obj_Player_Add();
+	}
+
+	if( mStart_Room_Player2 == mCurrentRoom->mNumber ) {
+		byte_3638 = 1;
+		obj_Player_Add();
+	}
+}
+
 void cBuilder::mainLoop() {
 
 	mIntro = false;
+	mNoInput = true;
 
 	if( mStartCastle > -1 ) {
+		// Load Castle
 		mCastle = mCreepParent->castleGet();
-		castleLoad();
+		castleLoad();	
+
 	} else {
+
+		// New Castle
 		mScreen->levelNameSet("Untitled");
 		castleCreate();
 		castleSave();
 	}
-
+	
 	mScreen->bitmapLoad( &mMemory[ 0xE000 ], &mMemory[ 0xCC00 ], &mMemory[ 0xD800 ], 0 );
 	mScreen->cursorSet( mCursorX, mCursorY );
 	mScreen->cursorEnabled(true);
 
-	// Set player1 start room
-	mMemory[ 0x7809 ] = mMemory[ 0x7803 ];
-	mMemory[ 0x780B ] = mMemory[ 0x7805 ];
-
-	roomChange(0);
+	roomChange(mMemory[ 0x7803 ]);
 
 	while(!mQuit) {
 		byte key = tolower( mInput->keyGet() );
 		
 		// Check keyboard input
 		switch(key) {
+			
+			case 0x02:	// Set player one starting door
+				if( mCurrentObject && mCurrentObject->objectTypeGet() == eObjectDoor ) {
+					mStart_Room_Player1 = mCurrentRoom->mNumber;
+					mStart_Door_Player1 = findItemIndex( mCurrentObject );
+					castlePrepare();
+				}
+				break;
 
-			case 'q':	// Change Selected Placement Object 'Up'
+			case 0x03:	// Set player two starting door
+				if( mCurrentObject && mCurrentObject->objectTypeGet() == eObjectDoor ) {
+					mStart_Room_Player2 = mCurrentRoom->mNumber;
+					mStart_Door_Player2 = findItemIndex( mCurrentObject );
+					castlePrepare();
+				}
+				break;
+
+			case 0x10:	// Change Selected Placement Object 'Up'
 				selectedObjectChange( true );
 				break;
 
-			case 'a':	// Change Selected Placement Object 'Down'
+			case 0x1E:	// Change Selected Placement Object 'Down'
 				selectedObjectChange( false );
 				break;
 
-			case 'l':	// Link Objects
+			case 0x26:	// Link Objects
 				selectedObjectLink();
 				break;
 
-			case 's':	// Save Castle
+			case 0x1F:	// Save Castle
 				castleSaveToDisk();
 				break;
 
-			case '[':	// Select a placed object
+			case 0x1A:	// Select a placed object
 				selectPlacedObject( false );
 				break;
 
-			case ']':	// Select a placed object
+			case 0x1B:	// Select a placed object
 				selectPlacedObject( true );
 				break;
 
-			case '-':	{// Previous Room
+			case 0x0C:	{// Previous Room
 				int newRoom = mCurrentRoom->mNumber - 1;
 				if(newRoom < 0)
 					newRoom = 0;
@@ -409,21 +442,21 @@ void cBuilder::mainLoop() {
 				roomChange( newRoom );
 				break;
 						}
-			case '=':	{// Next Room
+			case 0x0D:	{// Next Room
 				int newRoom = mCurrentRoom->mNumber + 1;
 				
 				roomChange( newRoom );
 				break;
 						}
-			case 0x7F:	// Delete Key
+			case 0x73:	// Delete Key
 				selectedObjectDelete();
 				break;
 
 			default:
-				//if(key) {
-				//	cout << "0x";
-				//	cout << hex << (int) key << endl;
-				//}
+				if(key) {
+					cout << "0x";
+					cout << hex << (int) key << endl;
+				}
 				break;
 		}
 
@@ -432,6 +465,7 @@ void cBuilder::mainLoop() {
 
 		// Force draw of sprites
 		interruptWait( 1 );
+
 		obj_Actions();
 
 		// Redraw screen
@@ -466,13 +500,15 @@ void cBuilder::roomChange( int pNumber ) {
 
 	castleSave();
 	mCurrentRoom = roomCreate( pNumber );
-	mMemory[ 0x7809 + 0 ] = pNumber;
-	mMemory[ 0x7809 + 1 ] = pNumber;
 
 	// Set the room number in the window title
 	mScreen->roomNumberSet( pNumber );
 
+	mMemory[ 0x7809 ] = pNumber;
+	mMemory[ 0x780A ] = pNumber;
+
 	roomLoad();
+	playerDraw();
 }
 
 
@@ -545,8 +581,8 @@ void cBuilder::cursorUpdate() {
 void cBuilder::castlePrepare( ) {
 	castleSave();
 
-	mMemory[ 0x7809 + 0 ] = mCurrentRoom->mNumber;
-	mMemory[ 0x7809 + 1 ] = mCurrentRoom->mNumber;
+	mMemory[ 0x7809 ] = mCurrentRoom->mNumber;
+	mMemory[ 0x780A ] = mCurrentRoom->mNumber;
 
 	roomLoad();
 
@@ -556,6 +592,8 @@ void cBuilder::castlePrepare( ) {
 	// Force draw of sprites
 	obj_Actions();
 	img_Actions();
+
+	playerDraw();
 }
 
 void cBuilder::castleSaveToDisk() {

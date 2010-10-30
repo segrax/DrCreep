@@ -223,7 +223,7 @@ void cPlayerInput::KeyboardCheck() {
 				break;
 
 			default:
-				mKeyPressed = mEvent.key.keysym.sym;
+				mKeyPressed = mEvent.key.keysym.scancode;
 		}
 	}
 
