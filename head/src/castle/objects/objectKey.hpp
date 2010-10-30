@@ -39,6 +39,7 @@ public:
 
 	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
 		mKeyColor = *(*pBuffer)++;
+		*(*pBuffer)++;
 		cObject::objectLoad( pBuffer, pPart );
 
 		return 0;

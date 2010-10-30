@@ -58,7 +58,14 @@ public:
 	}
 
 	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
-		
+		mDirection = *(*pBuffer)++;
+		cObject::objectLoad( pBuffer, 0 );
+
+		mParts[0].mLength = *(*pBuffer)++;
+		mParts[2].mY = 		*(*pBuffer)++;
+
+		cObject::objectLoad( pBuffer, 1 );
+
 		return 0;
 	}
 

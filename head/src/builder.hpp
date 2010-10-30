@@ -59,10 +59,11 @@ public:
 private:
 	size_t			 saveCount( byte **pBuffer, eRoomObjects pObjectType );
 	size_t			 saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker = 0x00 );
+	size_t			 saveObjectLightning( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker);
 
 	void			 loadCount( byte **pBuffer, eRoomObjects pObjectType );
 	void			 loadObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker);
-
+	void			 loadObjectLightning( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker);
 };
 
 class cBuilder : public cCreep {

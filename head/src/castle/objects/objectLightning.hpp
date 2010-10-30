@@ -49,30 +49,58 @@ public:
 		mSwitchState = false;
 	}
 
-	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
-		
+	size_t		objectLoadMachine( byte **pBuffer, size_t pPart ) {
+		if( *(*pBuffer)++ == 0x40 )
+			mMachineState = true;
+		else
+			mMachineState = false;
+
+		cObject::objectLoad( pBuffer, 0 );
+
+		mParts[0].mLength = *(*pBuffer)++;
+
+		(*pBuffer) += 4;
+
 		return 0;
 	}
 
-	size_t		objectSave( byte **pBuffer , size_t pPart ) {	
+	void		objectLoadSwitch( byte **pBuffer, size_t pPart ) {
+		if( *(*pBuffer)++ == 0x80 )
+			mSwitchState = true;
+		else
+			mSwitchState = false;
+
+		cObject::objectLoad( pBuffer, 1 );
+		*(*pBuffer)++;
+
+		mMachine = *(*pBuffer)++;
+		mMachine = *(*pBuffer)++;
+		mMachine = *(*pBuffer)++;
+		mMachine = *(*pBuffer)++;
+	}
+
+	size_t		objectSaveMachine( byte **pBuffer, size_t pPart ) {
 		if( mMachineState == true )
 			*(*pBuffer)++ = 0x40;
 		else
 			*(*pBuffer)++ = 0x00;
 
-		size_t strSize = cObject::objectSave( pBuffer, 0 );
-		
+		size_t size = cObject::objectSave( pBuffer,0 );
+
 		*(*pBuffer)++ = mParts[0].mLength;
 
-		*(*pBuffer)++ = 0x00; *(*pBuffer)++ = 0x00;
-		*(*pBuffer)++ = 0x00; *(*pBuffer)++ = 0x00;
+		(*pBuffer) += 4;
 
+		return size + 6;
+	}
+
+	size_t		objectSaveSwitch( byte **pBuffer , size_t pPart ) {	
 		if( mSwitchState == true )
 			*(*pBuffer)++ = 0x80;
 		else
 			*(*pBuffer)++ = 0xC0;
 
-		strSize += cObject::objectSave( pBuffer, 1 );
+		size_t strSize = cObject::objectSave( pBuffer, 1 );
 		*(*pBuffer)++ = 0x00;
 
 		*(*pBuffer)++ = mMachine;
@@ -80,7 +108,12 @@ public:
 		*(*pBuffer)++ = mMachine;
 		*(*pBuffer)++ = mMachine;
 
-		return (strSize + 12);
+		return (strSize + 6);
+	}
+
+	size_t		objectSave( byte **pBuffer , size_t pPart ) {	
+
+		return 0;
 	}
 
 };

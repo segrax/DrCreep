@@ -134,6 +134,8 @@ public:
 		mParts[pPart].mX = *(*pBuffer)++;
 		mParts[pPart].mY = *(*pBuffer)++;
 
+		mParts[pPart].mPlaced = true;
+		mPlaced = true;
 		return 2;
 	}
 

@@ -43,7 +43,7 @@ public:
 
 		cObject::objectLoad( pBuffer, pPart );
 
-		pBuffer += 4;
+		(*pBuffer) += 4;
 
 		return 0;
 	}

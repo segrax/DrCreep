@@ -32,10 +32,10 @@ size_t cRoom::roomSaveObjects( byte **pBuffer ) {
 
 	size = saveCount( pBuffer, eObjectDoor );
 	size += saveObject( pBuffer, eObjectWalkway, 0x00 );
-	size += saveObject( pBuffer, eObjectSlidingPole, 0x00 );
 	size += saveObject( pBuffer, eObjectLadder, 0x00 );
+	size += saveObject( pBuffer, eObjectSlidingPole, 0x00 );
 	size += saveCount( pBuffer, eObjectDoorBell );
-	size += saveObject( pBuffer, eObjectLightning, 0x20 );
+	size += saveObjectLightning( pBuffer, eObjectLightning, 0x20 );
 	size += saveObject( pBuffer, eObjectForcefield, 0x00 );
 	size += saveObject( pBuffer, eObjectMummy, 0x00 );
 	size += saveObject( pBuffer, eObjectKey, 0x00 );
@@ -75,7 +75,7 @@ void cRoom::roomLoadObjects( byte **pBuffer ) {
 				break;
 
 			case eObjectLightning:
-				loadObject( pBuffer, (eRoomObjects) func, 0x20 );
+				loadObjectLightning( pBuffer, (eRoomObjects) func, 0x20 );
 				break;
 
 			case eObjectRayGun:
@@ -83,6 +83,11 @@ void cRoom::roomLoadObjects( byte **pBuffer ) {
 			case eObjectConveyor:
 			case eObjectFrankenstein:
 				loadObject( pBuffer, (eRoomObjects) func, 0x80 );
+				break;
+
+			default:
+				cout << "0x";
+				cout << hex << (int) func << endl;
 				break;
 		}
 	}
@@ -144,6 +149,46 @@ void cRoom::loadCount( byte **pBuffer, eRoomObjects pObjectType ) {
 	return;
 }
 
+void cRoom::loadObjectLightning( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker) {
+
+	while(*(*pBuffer) != pEndMarker ) { 
+		cObjectLightning *obj = (cObjectLightning*) mBuilder->objectCreate( this, pObjectType, 0, 0 );
+		
+		if( *(*pBuffer) & 0x80 ) 
+			obj->objectLoadSwitch(pBuffer, 0 );
+		else
+			obj->objectLoadMachine(pBuffer, 0);
+	};
+
+
+	(*pBuffer)++;
+
+	return;
+}
+
+size_t cRoom::saveObjectLightning( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker) {
+	vector< cObject* >	objects = objectFind( pObjectType );
+	vector< cObject* >::iterator	objectIT;
+	size_t size = 0;
+
+	if(objects.size() == 0)
+		return 0;
+
+	writeLEWord( *pBuffer, (word) pObjectType );
+	*pBuffer += 2;
+
+	for( objectIT = objects.begin(); objectIT != objects.end(); ++objectIT ) {
+		cObjectLightning *obj = (cObjectLightning*) *objectIT;
+
+		size += obj->objectSaveMachine(pBuffer, 0);
+		size += obj->objectSaveSwitch(pBuffer, 0 );
+	;}
+
+	*(*pBuffer)++ = pEndMarker;
+
+	return size + 3;
+}
+
 void cRoom::loadObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker ) {
 
 	// Load each object until end marker
@@ -194,7 +239,7 @@ size_t cRoom::saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMar
 	writeLEWord( *pBuffer, (word) pObjectType );
 	*pBuffer += 2;
 
-	// Write each Pole
+	// Write each
 	for( objectIT = objects.begin(); objectIT != objects.end(); ++objectIT ) 
 		size += (*objectIT)->objectSave( pBuffer, 0 );
 
@@ -658,7 +703,8 @@ cRoom *cBuilder::roomCreate( size_t pNumber ) {
 
 void cBuilder::castleLoad( ) {
 	size_t size = 0;
-	byte *buffer = mCastle->bufferGet( size );
+	byte *bufferStart = mCastle->bufferGet( size );
+	byte *buffer = bufferStart;
 
 	if( *(buffer + 2) != 0x80 )
 		return;
@@ -681,7 +727,7 @@ void cBuilder::castleLoad( ) {
 		room->roomLoad( &buffer );
 
 		buffer += 2;
-		room->mRoomDirPtr = &mMemory[readLEWord(buffer)];
+		room->mRoomDirPtr = bufferStart + (readLEWord(buffer) - 0x7800);
 		buffer += 2;
 	}
 
@@ -692,7 +738,12 @@ void cBuilder::castleLoad( ) {
 	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {
 		cRoom *room = roomIT->second;
 
+		buffer = room->mRoomDirPtr;
+
+		mCurrentRoom = room;
 		room->roomLoadObjects( &buffer );
+
+		buffer += 2;
 	}
 
 
@@ -725,7 +776,7 @@ void cBuilder::castleSave( ) {
 	}
 
 	// Room Directory Terminator
-	*(buffer + 5) = 0xFF;
+	*(buffer) = 0xFF;
 
 	word	memDest = 0x7900 + (mRooms.size() * 8) + 1;
 	size_t	size = 0;
