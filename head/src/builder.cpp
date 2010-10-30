@@ -50,6 +50,46 @@ size_t cRoom::roomSaveObjects( byte **pBuffer ) {
 	return size;
 }
 
+void cRoom::roomLoadObjects( byte **pBuffer ) {
+	word func = 0;
+
+	while( (func = readLEWord( *pBuffer )) != 0 ) {
+		*pBuffer += 2;
+
+		switch( func ) {
+			case eObjectDoor:
+			case eObjectDoorBell:
+				loadCount( pBuffer, (eRoomObjects) func );
+				break;
+
+			case eObjectWalkway:
+			case eObjectSlidingPole:
+			case eObjectLadder:
+			case eObjectForcefield:
+			case eObjectMummy:
+			case eObjectKey:
+			case eObjectLock:
+			case eObjectTeleport:
+			case eObjectText:
+				loadObject( pBuffer, (eRoomObjects) func, 0x00 );
+				break;
+
+			case eObjectLightning:
+				loadObject( pBuffer, (eRoomObjects) func, 0x20 );
+				break;
+
+			case eObjectRayGun:
+			case eObjectTrapDoor:
+			case eObjectConveyor:
+			case eObjectFrankenstein:
+				loadObject( pBuffer, (eRoomObjects) func, 0x80 );
+				break;
+		}
+	}
+
+	return;
+}
+
 size_t cRoom::roomSave( byte **pBuffer ) {
 	byte sizeFinal;
 	
@@ -67,6 +107,16 @@ size_t cRoom::roomSave( byte **pBuffer ) {
 	return 8;
 }
 
+void cRoom::roomLoad( byte **pBuffer ) {
+	mColor = *(*pBuffer)++;
+	mMapX  = *(*pBuffer)++;
+	mMapY  = *(*pBuffer)++;
+	size_t sizeFinal = *(*pBuffer)++;
+
+	mMapWidth = (sizeFinal & 7);
+	mMapHeight = (sizeFinal >> 3) & 7;
+}
+
 vector< cObject* > cRoom::objectFind( eRoomObjects pType ) {
 	vector< cObject* >			objects;
 	vector< cObject* >::iterator	objectIT;
@@ -78,6 +128,33 @@ vector< cObject* > cRoom::objectFind( eRoomObjects pType ) {
 	}	
 
 	return objects;
+}
+
+void cRoom::loadCount( byte **pBuffer, eRoomObjects pObjectType ) {
+
+	// Number of objects
+	byte count = *(*pBuffer)++;
+
+	// Read each object
+	for( int x = 0; x < count; ++x ) {
+		cObject *obj = mBuilder->objectCreate( this, pObjectType, 0, 0 );
+		obj->objectLoad(pBuffer, 0);
+	}
+
+	return;
+}
+
+void cRoom::loadObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker ) {
+
+	// Load each object until end marker
+	while(*(*pBuffer) != pEndMarker ) { 
+		cObject *obj = mBuilder->objectCreate( this, pObjectType, 0, 0 );
+		obj->objectLoad(pBuffer, 0);
+	}
+
+	(*pBuffer)++;
+
+	return;
 }
 
 size_t cRoom::saveCount( byte **pBuffer, eRoomObjects pObjectType ) {
@@ -126,7 +203,15 @@ size_t cRoom::saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMar
 	return size;
 }
 
-cBuilder::cBuilder() {
+cBuilder::cBuilder( cCreep *pParent ) {
+
+	if(pParent) {
+		mCreepParent = pParent;
+
+		delete mScreen;
+		mScreen = pParent->screenGet();
+	}
+
 	// Change window title
 	stringstream windowTitle;
 	windowTitle << "The Castles of Dr. Creep: Castle Builder";
@@ -211,17 +296,19 @@ void cBuilder::objectStringPrint( sString pString ) {
 
 void cBuilder::mainLoop() {
 
-	mScreen->levelNameSet("Untitled");
-
 	mIntro = false;
+
+	if( mStartCastle > -1 ) {
+		mCastle = mCreepParent->castleGet();
+		castleLoad();
+	} else {
+		mScreen->levelNameSet("Untitled");
+		castleCreate();
+		castleSave();
+	}
 
 	mScreen->bitmapLoad( &mMemory[ 0xE000 ], &mMemory[ 0xCC00 ], &mMemory[ 0xD800 ], 0 );
 	mScreen->cursorSet( mCursorX, mCursorY );
-
-	// TODO: Check if we load a castle instead of make a new one
-	castleCreate();
-	castleSave();
-	
 	mScreen->cursorEnabled(true);
 
 	// Set player1 start room
@@ -297,6 +384,7 @@ void cBuilder::mainLoop() {
 		hw_Update();
 	}
 
+	mScreen->cursorEnabled(false);
 }
 
 void cBuilder::roomChange( int pNumber ) {
@@ -346,7 +434,7 @@ void cBuilder::cursorObjectUpdate() {
 
 	// No Current object? create a new one
 	if( !mCurrentObject )
-		mCurrentObject = objectCreate( mSelectedObject, mCursorX, mCursorY );
+		mCurrentObject = objectCreate( mCurrentRoom, mSelectedObject, mCursorX, mCursorY );
 	else {	
 		mCurrentObject->partSetPosition( mCursorX, mCursorY );
 	}
@@ -387,10 +475,10 @@ void cBuilder::cursorUpdate() {
 	else
 		mScreen->cursorSize( 1, 1 );
 
-	castlePrepare();
+	castlePrepare( );
 }
 
-void cBuilder::castlePrepare() {
+void cBuilder::castlePrepare( ) {
 	castleSave();
 
 	mMemory[ 0x7809 + 0 ] = mCurrentRoom->mNumber;
@@ -410,7 +498,7 @@ void cBuilder::castleSaveToDisk() {
 
 	// Remove cursor object for now
 	mCurrentRoom->objectDelete( mCurrentObject );
-	castlePrepare();
+	castlePrepare( );
 
 	mScreen->cursorEnabled( false );
 	
@@ -421,7 +509,7 @@ void cBuilder::castleSaveToDisk() {
 	mCurrentRoom->objectAdd( mCurrentObject );
 
 	mScreen->cursorEnabled( true );
-	castlePrepare();
+	castlePrepare( );
 }
 
 void cBuilder::parseInput() {
@@ -562,11 +650,53 @@ cRoom *cBuilder::roomCreate( size_t pNumber ) {
 	if( mRooms.find( pNumber ) != mRooms.end() )
 		return mRooms.find( pNumber )->second;
 
-	cRoom *room = new cRoom( pNumber );
+	cRoom *room = new cRoom( this, pNumber );
 	mRooms.insert( make_pair( pNumber, room ) );
 
 	return room;
 }
+
+void cBuilder::castleLoad( ) {
+	size_t size = 0;
+	byte *buffer = mCastle->bufferGet( size );
+
+	if( *(buffer + 2) != 0x80 )
+		return;
+
+	mStart_Room_Player1 = *(buffer + 3);
+	mStart_Room_Player2 = *(buffer + 4);
+	mStart_Door_Player1 = *(buffer + 5);
+	mStart_Door_Player2 = *(buffer + 6);
+	mLives_Player1 = *(buffer + 7);
+	mLives_Player2 = *(buffer + 8);
+
+	buffer += 0x100;
+
+	size_t count = 0;
+
+	while( *buffer != 0xFF && *buffer != 0x40) {
+		cRoom *room = roomCreate( count );
+		mRooms.insert( make_pair( count++ , room) );
+
+		room->roomLoad( &buffer );
+
+		buffer += 2;
+		room->mRoomDirPtr = &mMemory[readLEWord(buffer)];
+		buffer += 2;
+	}
+
+	buffer++;
+
+	map< size_t, cRoom *>::iterator roomIT;
+
+	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {
+		cRoom *room = roomIT->second;
+
+		room->roomLoadObjects( &buffer );
+	}
+
+
+}	
 
 void cBuilder::castleSave( ) {
 	map< size_t, cRoom *>::iterator  roomIT;
@@ -621,7 +751,7 @@ void cBuilder::castleSave( ) {
 	writeLEWord(  &mMemory[ 0x7800 ], (memDest - 0x7800) );
 }
 
-cObject *cBuilder::objectCreate( eRoomObjects pObject, byte pPosX, byte pPosY ) {
+cObject *cBuilder::objectCreate( cRoom *pRoom, eRoomObjects pObject, byte pPosX, byte pPosY ) {
 	cObject *obj = 0;
 
 	switch( pObject ) {
@@ -709,8 +839,8 @@ cObject *cBuilder::objectCreate( eRoomObjects pObject, byte pPosX, byte pPosY ) 
 				break;
 	}
 
-	if(mCurrentRoom)
-		mCurrentRoom->objectAdd( obj );
+	if(pRoom)
+		pRoom->objectAdd( obj );
 
 	return obj;
 }

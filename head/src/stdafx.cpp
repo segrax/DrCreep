@@ -122,7 +122,7 @@ int	main( int argc, char *argv[] ) {
 #ifndef BUILDER
 	gCreep = new cCreep();
 #else
-	gCreep = new cBuilder();
+	gCreep = new cBuilder(0);
 #endif
 	gCreep->run( argc, argv );
 

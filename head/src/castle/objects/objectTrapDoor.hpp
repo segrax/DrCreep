@@ -38,7 +38,7 @@ public:
 		mParts[1].mCursorHeight = 2;
 	}
 
-	size_t		objectLoad( byte **pBuffer ) {
+	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
 		
 		return 0;
 	}

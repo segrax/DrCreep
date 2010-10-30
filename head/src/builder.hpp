@@ -1,4 +1,5 @@
 class cObjectText;
+class cObject;
 
 struct sString {
 	byte mPosX, mPosY;
@@ -12,6 +13,7 @@ struct sString {
 
 class cRoom {
 public:
+	cBuilder		*mBuilder;
 	byte			 mNumber;
 	byte			 mColor;
 	byte		 	 mMapX, mMapY;
@@ -41,24 +43,32 @@ public:
 		return mObjects[pNumber];
 	}
 
-					 cRoom( byte pNumber ) {
+					 cRoom( cBuilder *pBuilder, byte pNumber ) {
 						 mNumber = pNumber;
 						 mRoomDirPtr = 0;
+						 mBuilder = pBuilder;
 					 }
 
 	vector< cObject* > objectFind( eRoomObjects pType );
 
+	void			 roomLoad( byte **pBuffer );
+	void			 roomLoadObjects( byte **pBuffer );
 	size_t			 roomSaveObjects( byte **pBuffer );
 	size_t			 roomSave( byte **pBuffer );
 
 private:
 	size_t			 saveCount( byte **pBuffer, eRoomObjects pObjectType );
 	size_t			 saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker = 0x00 );
+
+	void			 loadCount( byte **pBuffer, eRoomObjects pObjectType );
+	void			 loadObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker);
+
 };
 
 class cBuilder : public cCreep {
 
 private:
+	cCreep					*mCreepParent;
 	byte					 mCursorX,				mCursorY;
 	eRoomObjects			 mSelectedObject,		mSearchObject;
 	size_t					 mRoomSelectedObject;
@@ -78,7 +88,8 @@ private:
 private:
 
 	void					 castleCreate();
-	void					 castlePrepare();
+	void					 castlePrepare( );
+	void					 castleLoad( );
 	void					 castleSave( );
 
 	void					 cursorObjectUpdate();
@@ -118,13 +129,15 @@ private:
 	void					 objectStringPrint( sString pString );
 	void					 objectStringsPrint();
 
+	void					 loadCount( byte **pBuffer, eRoomObjects pObjectType );
+
 public:
-							 cBuilder();
+							 cBuilder( cCreep *pParent );
 							~cBuilder();
 
 	void					 mainLoop();
 
-	cObject					*objectCreate( eRoomObjects pObject, byte pPosX, byte pPosY );
+	cObject					*objectCreate( cRoom *pRoom, eRoomObjects pObject, byte pPosX, byte pPosY );
 	cRoom					*roomCreate( size_t pNumber );
 
 	void					 objectStringAdd( string pMessage, byte pPosX, byte pPosY, byte pColor );

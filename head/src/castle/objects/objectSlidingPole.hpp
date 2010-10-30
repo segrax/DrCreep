@@ -35,7 +35,7 @@ public:
 		mParts[0].mLength = 1;
 	}
 
-	size_t		objectLoad( byte **pBuffer ) {
+	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
 		
 		return 0;
 	}

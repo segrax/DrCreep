@@ -40,8 +40,9 @@ public:
 
 	}
 
-	size_t		objectLoad( byte **pBuffer ) {
-		
+	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
+		cObject::objectLoad( pBuffer, 0 );
+		cObject::objectLoad( pBuffer, 1 );
 		return 0;
 	}
 

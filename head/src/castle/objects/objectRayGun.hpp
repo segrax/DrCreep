@@ -57,7 +57,7 @@ public:
 		mDirection = 0;
 	}
 
-	size_t		objectLoad( byte **pBuffer ) {
+	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
 		
 		return 0;
 	}

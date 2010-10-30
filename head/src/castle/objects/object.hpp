@@ -130,7 +130,13 @@ public:
 	
 	inline cRoom *roomGet()			{ return mRoom; }
 
-	virtual size_t	objectLoad( byte **pBuffer ) = 0;	// Load object from room stream
+	virtual size_t	objectLoad( byte **pBuffer, size_t pPart ) {	// Load object from room stream
+		mParts[pPart].mX = *(*pBuffer)++;
+		mParts[pPart].mY = *(*pBuffer)++;
+
+		return 2;
+	}
+
 	virtual size_t	objectSave( byte **pBuffer, size_t pPart ) {	// Save object to room stream
 		*(*pBuffer)++ = mParts[pPart].mX;
 		*(*pBuffer)++ = mParts[pPart].mY;
