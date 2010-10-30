@@ -454,6 +454,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\src\castle\objects\objectImage.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\src\castle\objects\objectKey.hpp"
 						>
 					</File>
