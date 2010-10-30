@@ -136,6 +136,8 @@ private:
 
 	void					 loadCount( byte **pBuffer, eRoomObjects pObjectType );
 
+	void					 playerDraw();
+
 public:
 							 cBuilder( cCreep *pParent );
 							~cBuilder();

@@ -58,6 +58,7 @@ cCreep::cCreep() {
 	mMenuMusicScore = 0xFF;
 	mUnlimitedLives = 0;
 	mQuit = false;
+	mNoInput = false;
 
 	// Prepare memory for use
 	mMemorySize = 0x10000;
@@ -1436,7 +1437,9 @@ void cCreep::menuUpdate( size_t pCastleNumber ) {
 // 5EFC
 void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	byte X = 0xFF, A = 0;
-	
+	if(mNoInput)
+		return;
+
 	byte_5F58 = pA;
 	mRunStopPressed = false;
 
@@ -1446,11 +1449,13 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	if( mInput->runStopGet() )
 		mRunStopPressed = true;
 
+	// Start the editor, using the current castle
 	if( mInput->f4Get() ) {
 
 		builderStart( mStartCastle );
 	}
 
+	// Start the editor, with a new castle
 	if( mInput->f5Get() ) {
 
 		builderStart( -1 );

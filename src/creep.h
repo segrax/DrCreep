@@ -151,7 +151,7 @@ protected:
 	 
 	word		 word_30, word_32, word_34, word_3C, word_3E, word_40, word_42, word_44;
 
-	bool		 mMenuReturn;
+	bool		 mMenuReturn, mNoInput;
 
 	int		 mStartCastle;
 
