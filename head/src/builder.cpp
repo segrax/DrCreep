@@ -247,6 +247,12 @@ size_t cRoom::saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMar
 	for( objectIT = objects.begin(); objectIT != objects.end(); ++objectIT ) 
 		size += (*objectIT)->objectSave( pBuffer, 0 );
 
+	if(size == 3 ) {
+		*pBuffer -= 2;
+		writeLEWord( *pBuffer, 0 );
+		return 0;
+	}
+
 	*(*pBuffer)++ = pEndMarker;
 
 	return size;
@@ -394,7 +400,7 @@ void cBuilder::mainLoop() {
 		// Check keyboard input
 		switch(key) {
 			
-			case 0x02:	// Set player one starting door
+			case 0x02:	// '1' Set player one starting door
 				if( mCurrentObject && mCurrentObject->objectTypeGet() == eObjectDoor ) {
 					mStart_Room_Player1 = mCurrentRoom->mNumber;
 					mStart_Door_Player1 = findItemIndex( mCurrentObject );
@@ -402,7 +408,7 @@ void cBuilder::mainLoop() {
 				}
 				break;
 
-			case 0x03:	// Set player two starting door
+			case 0x03:	// '2' Set player two starting door
 				if( mCurrentObject && mCurrentObject->objectTypeGet() == eObjectDoor ) {
 					mStart_Room_Player2 = mCurrentRoom->mNumber;
 					mStart_Door_Player2 = findItemIndex( mCurrentObject );
@@ -410,31 +416,31 @@ void cBuilder::mainLoop() {
 				}
 				break;
 
-			case 0x10:	// Change Selected Placement Object 'Up'
+			case 0x10:	// 'q' Change Selected Placement Object 'Up'
 				selectedObjectChange( true );
 				break;
 
-			case 0x1E:	// Change Selected Placement Object 'Down'
+			case 0x1E:	// 'a' Change Selected Placement Object 'Down'
 				selectedObjectChange( false );
 				break;
 
-			case 0x26:	// Link Objects
+			case 0x26:	// 'l' Link Objects
 				selectedObjectLink();
 				break;
 
-			case 0x1F:	// Save Castle
+			case 0x1F:	// 's' Save Castle
 				castleSaveToDisk();
 				break;
 
-			case 0x1A:	// Select a placed object
+			case 0x1A:	// '[' Select a placed object
 				selectPlacedObject( false );
 				break;
 
-			case 0x1B:	// Select a placed object
+			case 0x1B:	// ']' Select a placed object
 				selectPlacedObject( true );
 				break;
 
-			case 0x0C:	{// Previous Room
+			case 0x0C:	{// '-' Previous Room
 				int newRoom = mCurrentRoom->mNumber - 1;
 				if(newRoom < 0)
 					newRoom = 0;
@@ -442,13 +448,23 @@ void cBuilder::mainLoop() {
 				roomChange( newRoom );
 				break;
 						}
-			case 0x0D:	{// Next Room
+			case 0x0D:	{// '=' Next Room
 				int newRoom = mCurrentRoom->mNumber + 1;
 				
 				roomChange( newRoom );
 				break;
 						}
-			case 0x73:	// Delete Key
+			case 0x2E:	// 'c'
+				if(mCurrentObject)
+					mCurrentObject->colorDecrease();
+
+				break;
+			case 0x2F:	// 'v'
+				if(mCurrentObject)
+					mCurrentObject->colorIncrease();
+
+				break;
+			case 0x73:	// 'Delete' Delete selected object
 				selectedObjectDelete();
 				break;
 
@@ -1177,7 +1193,7 @@ void cBuilder::selectedObjectChange( bool pChangeUp ) {
 	switch( mSelectedObject ) {
 			case eObjectsFinished:			// Finished
 				if( pChangeUp )
-					mSelectedObject = eObjectMultiDraw;
+					mSelectedObject = eObjectImage;
 				else
 					mSelectedObject = eObjectDoor;
 				break;
@@ -1299,17 +1315,17 @@ void cBuilder::selectedObjectChange( bool pChangeUp ) {
 				if( pChangeUp )
 					mSelectedObject = eObjectText;
 				else
-					mSelectedObject = eObjectMultiDraw;
+					mSelectedObject = eObjectsFinished;
 				break;
 
-			case eObjectMultiDraw:
+			/*case eObjectMultiDraw:
 			case 0x160A:				// Intro
 				if( pChangeUp )
 					mSelectedObject = eObjectImage;
 				else
 					mSelectedObject = eObjectsFinished;
 				break;
-
+*/
 			default:
 				cout << "selectedObjectChange: 0x";
 				cout << std::hex << mSelectedObject << "\n";

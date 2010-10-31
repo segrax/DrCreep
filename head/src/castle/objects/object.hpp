@@ -64,6 +64,9 @@ protected:
 	bool			 mSelected, mLinked;
 
 public:
+	virtual void		colorIncrease()	 { }
+	virtual void		colorDecrease()	 { }
+
 	inline bool			mLinkedGet()	 { return mLinked; }
 
 	inline eRoomObjects mLinkObjectGet() { return mLinkObject; }

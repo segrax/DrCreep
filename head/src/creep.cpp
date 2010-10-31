@@ -179,6 +179,7 @@ void cCreep::builderStart( int pStartLevel ) {
 
 	delete mBuilder;
 	mBuilder = 0;
+	mScreen->roomNumberSet(0);
 }
 
 void cCreep::titleDisplay() {
@@ -1453,12 +1454,14 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	if( mInput->f4Get() ) {
 
 		builderStart( mStartCastle );
+		input->clear();
 	}
 
 	// Start the editor, with a new castle
 	if( mInput->f5Get() ) {
 
 		builderStart( -1 );
+		input->clear();
 	}
 
 	// Kill the player(s) if the restore key is pressed

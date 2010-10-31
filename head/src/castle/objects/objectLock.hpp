@@ -41,6 +41,18 @@ public:
 		mParts[0].mCursorHeight = 3;
 	}
 
+	virtual void		colorIncrease()	 { 
+		++mLockColor;
+		if(mLockColor > 16)
+			mLockColor = 0;
+	}
+
+	virtual void		colorDecrease()	 { 
+		--mLockColor;
+		if(mLockColor == 0xFF)
+			mLockColor = 16;
+	}
+
 	void		mLinkedSet( byte pNumber )	{
 		mDoorNumber = pNumber;
 		mLinked = true;
