@@ -34,6 +34,8 @@ cPlayerInput::cPlayerInput( cCreep *pCreep ) {
 	mCreep = pCreep;
 
 	mKeyPressed = 0;
+	mKeyPressedRaw = 0;
+
 	mRunStop = false;
 	mRestore = false;
 	mF2 = false;
@@ -184,6 +186,7 @@ void cPlayerInput::KeyboardCheck() {
 
 			default:
 				mKeyPressed = 0;
+				mKeyPressedRaw = 0;
 				break;
 		}
 
@@ -224,6 +227,7 @@ void cPlayerInput::KeyboardCheck() {
 
 			default:
 				mKeyPressed = mEvent.key.keysym.scancode;
+				mKeyPressedRaw = mEvent.key.keysym.sym;
 		}
 	}
 

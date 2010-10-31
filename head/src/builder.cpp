@@ -457,13 +457,15 @@ void cBuilder::mainLoop() {
 			case 0x2E:	// 'c'
 				if(mCurrentObject)
 					mCurrentObject->colorDecrease();
-
+				castlePrepare();
 				break;
+
 			case 0x2F:	// 'v'
 				if(mCurrentObject)
 					mCurrentObject->colorIncrease();
-
+				castlePrepare();
 				break;
+
 			case 0x73:	// 'Delete' Delete selected object
 				selectedObjectDelete();
 				break;

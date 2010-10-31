@@ -45,7 +45,7 @@ private:
 	cCreep				*mCreep;
 	bool				 mRunStop,	mRestore, mF2, mF3, mF4, mF5;
 	bool				 mFullscreen;
-	byte				 mKeyPressed;
+	byte				 mKeyPressed, mKeyPressedRaw;
 
 	void		 KeyboardCheck();
 	void		 KeyboardInputSet1( sPlayerInput *pInput );
@@ -73,6 +73,7 @@ public:
 #define retVal( C, X ) C ret = X; X = 0; return ret; 
 
 	inline byte  keyGet()		 { retVal( byte, mKeyPressed ) }
+	inline byte  keyRawGet()	 { retVal( byte, mKeyPressedRaw ) }
 	inline bool	 f2Get()		 { retVal( bool, mF2) }
 	inline bool	 f3Get()		 { retVal( bool, mF3) }
 	inline bool	 f4Get()		 { retVal( bool, mF4) }
