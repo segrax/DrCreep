@@ -639,7 +639,7 @@ void cCreep::textPrintCharacter() {
 
 // 27A8
 byte cCreep::textGetKeyFromUser() {
-	byte key = mInput->keyGet();
+	byte key = mInput->keyRawGet();
 	
 	if( key == 0 )
 		return 0x80;

@@ -39,14 +39,14 @@ public:
 
 	virtual void		colorIncrease()	 { 
 		++mKeyColor;
-		if(mKeyColor > 16)
-			mKeyColor = 0;
+		if(mKeyColor > 7)
+			mKeyColor = 1;
 	}
 
 	virtual void		colorDecrease()	 { 
 		--mKeyColor;
-		if(mKeyColor == 0xFF)
-			mKeyColor = 16;
+		if(mKeyColor > 7)
+			mKeyColor = 7;
 	}
 
 	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
