@@ -45,7 +45,7 @@ public:
 
 	virtual void		colorDecrease()	 { 
 		--mKeyColor;
-		if(mKeyColor > 7)
+		if(mKeyColor > 7 || mKeyColor == 0)
 			mKeyColor = 7;
 	}
 
