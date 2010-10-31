@@ -37,6 +37,18 @@ public:
 		mParts[0].mCursorHeight = 3;
 	}
 
+	virtual void		colorIncrease()	 { 
+		++mKeyColor;
+		if(mKeyColor > 16)
+			mKeyColor = 0;
+	}
+
+	virtual void		colorDecrease()	 { 
+		--mKeyColor;
+		if(mKeyColor == 0xFF)
+			mKeyColor = 16;
+	}
+
 	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
 		mKeyColor = *(*pBuffer)++;
 		*(*pBuffer)++;
