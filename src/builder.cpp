@@ -448,19 +448,25 @@ void cBuilder::mainLoop() {
 				roomChange( newRoom );
 				break;
 						}
+
 			case 0x0D:	{// '=' Next Room
 				int newRoom = mCurrentRoom->mNumber + 1;
 				
 				roomChange( newRoom );
 				break;
 						}
-			case 0x2E:	// 'c'
+
+			case 0x21:	// 'f' edit final room
+				
+				break;
+
+			case 0x2E:	// 'c' color decrease
 				if(mCurrentObject)
 					mCurrentObject->colorDecrease();
 				castlePrepare();
 				break;
 
-			case 0x2F:	// 'v'
+			case 0x2F:	// 'v' color increase
 				if(mCurrentObject)
 					mCurrentObject->colorIncrease();
 				castlePrepare();
@@ -879,6 +885,13 @@ void cBuilder::castleSave( ) {
 		memDest += 2;
 	}
 
+	// Save final room ptr
+	writeLEWord(&mMemory[ 0x785F ], memDest);
+
+	// Save final room objects
+	memDest += mFinalRoom->roomSaveObjects( &buffer );
+	
+	// Write size of castle to beginning to castle memory
 	writeLEWord(  &mMemory[ 0x7800 ], (memDest - 0x7800) );
 }
 
