@@ -471,10 +471,10 @@ void cBuilder::mainLoop() {
 				break;
 
 			default:
-				if(key) {
+				/*if(key) {
 					cout << "0x";
 					cout << hex << (int) key << endl;
-				}
+				}*/
 				break;
 		}
 
