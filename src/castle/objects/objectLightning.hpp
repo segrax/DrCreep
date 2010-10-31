@@ -28,7 +28,7 @@ class cObjectLightning : public cObject {
 public:
 	bool		mMachineState;
 	bool		mSwitchState;
-	byte		mMachine;
+	byte		mMachine[4];
 
 public:
 	cObjectLightning( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
@@ -44,7 +44,7 @@ public:
 		mParts[1].mCursorHeight = 3;
 		mPartCount = 2;
 
-		mMachine = 0;
+		mMachine[0,1,2,3] = 0,0,0,0;
 		mMachineState = false;
 		mSwitchState = false;
 	}
@@ -73,10 +73,10 @@ public:
 		cObject::objectLoad( pBuffer, 1 );
 		*(*pBuffer)++;
 
-		mMachine = *(*pBuffer)++;
-		mMachine = *(*pBuffer)++;
-		mMachine = *(*pBuffer)++;
-		mMachine = *(*pBuffer)++;
+		mMachine[0] = *(*pBuffer)++;
+		mMachine[1]= *(*pBuffer)++;
+		mMachine[2] = *(*pBuffer)++;
+		mMachine[3] = *(*pBuffer)++;
 	}
 
 	size_t		objectSaveMachine( byte **pBuffer, size_t pPart ) {
@@ -103,10 +103,10 @@ public:
 		size_t strSize = cObject::objectSave( pBuffer, 1 );
 		*(*pBuffer)++ = 0x00;
 
-		*(*pBuffer)++ = mMachine;
-		*(*pBuffer)++ = mMachine;
-		*(*pBuffer)++ = mMachine;
-		*(*pBuffer)++ = mMachine;
+		*(*pBuffer)++ = mMachine[0];
+		*(*pBuffer)++ = mMachine[1];
+		*(*pBuffer)++ = mMachine[2];
+		*(*pBuffer)++ = mMachine[3];
 
 		return (strSize + 6);
 	}
