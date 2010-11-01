@@ -803,15 +803,16 @@ void cBuilder::parseInput() {
 	int downHeight = 1;
 
 	if(mCurrentObject) {
-		downHeight= mCurrentObject->partGet(0)->mCursorHeight;
-		downWidth = mCurrentObject->partGet(0)->mCursorWidth;
+		downHeight= mCurrentObject->partGet()->mCursorHeight;
+		downWidth = mCurrentObject->partGet()->mCursorWidth;
 	}
 
 	downHeight *= 8;
-	downWidth *= 8;
+	downWidth *= 4;
+
 	// Cursor minimum and maximums
-	if( (mCursorX + downWidth) > 0xB4)
-		mCursorX = 0xB4 - downWidth;
+	if( (mCursorX + downWidth) > 0xB0)
+		mCursorX = 0xB0 - downWidth;
 
 	if( mCursorX < 0x10 )
 		mCursorX = 0x10;
