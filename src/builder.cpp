@@ -331,7 +331,7 @@ cBuilder::cBuilder( cCreep *pParent ) {
 
 cBuilder::~cBuilder() {
 	delete mCurrentObject;
-	delete mFinalRoom;
+
 	roomCleanup();
 }
 
