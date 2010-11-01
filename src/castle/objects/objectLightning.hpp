@@ -26,6 +26,7 @@ class cRoom;
 
 class cObjectLightning : public cObject {
 public:
+	bool		mMachineMode;
 	bool		mMachineState;
 	bool		mSwitchState;
 	byte		mMachine[4];
@@ -34,6 +35,7 @@ public:
 	cObjectLightning( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectLightning;
 		
+		mMachineMode = false;
 		mParts[0].mDragDirection = eDirectionDown;
 		mParts[0].mDrags = true;
 		mParts[0].mLength = 0;
@@ -44,12 +46,18 @@ public:
 		mParts[1].mCursorHeight = 3;
 		mPartCount = 2;
 
-		mMachine[0,1,2,3] = 0,0,0,0;
+		mMachine[0] = 0;
+		mMachine[1] = 0;
+		mMachine[2] = 0;
+		mMachine[3] = 0;
+		
 		mMachineState = false;
 		mSwitchState = false;
 	}
 
 	size_t		objectLoadMachine( byte **pBuffer, size_t pPart ) {
+		mMachineMode = true;
+
 		if( *(*pBuffer)++ == 0x40 )
 			mMachineState = true;
 		else
@@ -65,6 +73,8 @@ public:
 	}
 
 	void		objectLoadSwitch( byte **pBuffer, size_t pPart ) {
+		mMachineMode = false;
+
 		if( *(*pBuffer)++ == 0x80 )
 			mSwitchState = true;
 		else
@@ -74,7 +84,7 @@ public:
 		*(*pBuffer)++;
 
 		mMachine[0] = *(*pBuffer)++;
-		mMachine[1]= *(*pBuffer)++;
+		mMachine[1] = *(*pBuffer)++;
 		mMachine[2] = *(*pBuffer)++;
 		mMachine[3] = *(*pBuffer)++;
 	}
@@ -89,7 +99,8 @@ public:
 
 		*(*pBuffer)++ = mParts[0].mLength;
 
-		(*pBuffer) += 4;
+		*(*pBuffer)++ = 0;		*(*pBuffer)++ = 0;
+		*(*pBuffer)++ = 0;		*(*pBuffer)++ = 0;
 
 		return size + 6;
 	}
@@ -112,8 +123,14 @@ public:
 	}
 
 	size_t		objectSave( byte **pBuffer , size_t pPart ) {	
+		size_t size = 0;
 
-		return 0;
+		if( mMachineMode )
+			size = objectSaveMachine( pBuffer, 0 );
+		else
+			size = objectSaveSwitch( pBuffer, 1 );
+		
+		return size;
 	}
 
 };

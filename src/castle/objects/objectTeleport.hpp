@@ -81,8 +81,7 @@ public:
 		}
 
 		--mPartCount;
-		//(*pBuffer)++;
-
+		(*pBuffer)++;
 		return 0;
 	}
 
@@ -96,8 +95,6 @@ public:
 			strSize += cObject::objectSave( pBuffer, i );
 		}
 	
-		//*(*pBuffer)++ = 0x00;
-
 		return (strSize + 1);
 	}
 
