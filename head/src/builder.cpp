@@ -419,7 +419,7 @@ void cBuilder::mainLoop() {
 			// New Castle
 			mScreen->levelNameSet("Untitled");
 			castleCreate();
-			castleSave();
+			castleSave( false );
 		}
 	}
 	
@@ -533,7 +533,7 @@ void cBuilder::mainLoop() {
 		// Check 'joystick' input
 		parseInput();
 
-		interruptWait( 1 );
+		interruptWait( 2 );
 
 		// Draw
 		obj_Actions();
@@ -544,6 +544,8 @@ void cBuilder::mainLoop() {
 	}
 
 	mScreen->cursorEnabled(false);
+	if( mTest )
+		castleSave( true );
 }
 
 void cBuilder::roomCleanup() {
@@ -569,7 +571,7 @@ void cBuilder::roomChange( int pNumber ) {
 		mOriginalObject = mCurrentObject;
 	}
 
-	castleSave();		
+	castleSave( false );		
 	mCurrentRoom = roomCreate( pNumber );
 
 	// Set the room number in the window title
@@ -659,7 +661,7 @@ void cBuilder::cursorUpdate() {
 }
 
 void cBuilder::castlePrepare( ) {
-	castleSave();
+	castleSave( false );
 
 	if( (char) mCurrentRoom->mNumber == -1) {
 		screenClear();
@@ -919,8 +921,11 @@ void cBuilder::castleLoad( ) {
 	mFinalRoom->roomLoadObjects( &mFinalScreen );
 }	
 
-void cBuilder::castleSave( ) {
+void cBuilder::castleSave( bool pRemoveCursor ) {
 	map< int, cRoom *>::iterator  roomIT;
+	
+	if(mCurrentRoom)
+		mCurrentRoom->objectDelete( mCurrentObject );
 
 	byte *buffer =  &mMemory[ 0x7800 ];
 
@@ -990,6 +995,9 @@ void cBuilder::castleSave( ) {
 	memDest += 2;
 	// Write size of castle to beginning to castle memory
 	writeLEWord(  &mMemory[ 0x7800 ], (memDest - 0x7800) );
+
+	if(mCurrentRoom)
+		mCurrentRoom->objectAdd( mCurrentObject );
 }
 
 cObject *cBuilder::objectCreate( cRoom *pRoom, eRoomObjects pObject, byte pPosX, byte pPosY ) {
