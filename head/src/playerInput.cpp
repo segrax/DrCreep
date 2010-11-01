@@ -53,6 +53,9 @@ void cPlayerInput::inputCheck( bool pClearAll ) {
 		mInput[0].clear();
 		mInput[1].clear();
 
+		mKeyPressed = 0;
+		mKeyPressedRaw = 0;
+
 		mF2 = false;
 		mF3 = false;
 		mF4 = false;

@@ -2072,7 +2072,7 @@ void cCreep::obj_Actions_Execute( byte pX ) {
 	//2ED5
 	byte Y =  mMemory[ 0xBD00 + pX ] << 3;
 	word func = readLEWord( &mMemory[ 0x88F + Y ]);
-	
+
 	switch(func) {
 
 		case 0x31F6:
@@ -2417,6 +2417,9 @@ void cCreep::obj_Frankie_Execute( byte pX ) {
 	char A = mMemory[ 0xBD04 + pX ];
 	byte byte_3F0B, byte_3F12;
 	char byte_3F0A, byte_3F10, byte_3F11;
+
+	if( mNoInput )
+		return;
 
 	if( A & byte_885 ) {
 		mMemory[ 0xBD04 + pX ] = (A ^ byte_885) | byte_886;
@@ -5134,7 +5137,8 @@ void cCreep::stringSet( byte pPosX, byte pPosY, byte pColor, string pMessage ) {
 void cCreep::gameFilenameGet( bool pLoading, bool pCastleSave ) {
 	
 	screenClear();
-	
+	mInput->inputCheck(true);
+
 	word_3E = 0x2633;
 	roomPrepare();
 	
@@ -6999,6 +7003,9 @@ void cCreep::obj_Mummy_Execute( byte pX ) {
 // 3A08
 void cCreep::obj_RayGun_Laser_Execute( byte pX ) {
 	byte A = mMemory[ 0xBD04 + pX ];
+	
+	if( mNoInput )
+		return;
 
 	mScreen->spriteRedrawSet();
 

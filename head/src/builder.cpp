@@ -517,10 +517,11 @@ void cBuilder::mainLoop() {
 		// Check 'joystick' input
 		parseInput();
 
-		// Force draw of sprites
 		interruptWait( 1 );
 
+		// Draw
 		obj_Actions();
+		img_Actions();
 
 		// Redraw screen
 		hw_Update();
@@ -798,9 +799,19 @@ void cBuilder::parseInput() {
 		update = true;
 	}
 
+	int downWidth = 1;
+	int downHeight = 1;
+
+	if(mCurrentObject) {
+		downHeight= mCurrentObject->partGet(0)->mCursorHeight;
+		downWidth = mCurrentObject->partGet(0)->mCursorWidth;
+	}
+
+	downHeight *= 8;
+	downWidth *= 8;
 	// Cursor minimum and maximums
-	if( mCursorX > 0x9C )
-		mCursorX = 0x9C;
+	if( (mCursorX + downWidth) > 0xB4)
+		mCursorX = 0xB4 - downWidth;
 
 	if( mCursorX < 0x10 )
 		mCursorX = 0x10;
@@ -808,8 +819,8 @@ void cBuilder::parseInput() {
 	if( mCursorY > 0xF0 )
 		mCursorY = 0;
 
-	if( mCursorY > 0xA8 )
-		mCursorY = 0xA8;
+	if( (mCursorY + downHeight) > 0xC8 )
+		mCursorY = 0xC8 - downHeight;
 
 	if(update) 
 		cursorObjectUpdate();
