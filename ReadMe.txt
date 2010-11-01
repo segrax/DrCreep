@@ -6,7 +6,8 @@ About:
 ------
  The Castles of Dr. Creep is an open source reimplementation of the 
   original 1984 Commodore 64 game by Ed Hobbs.
-
+ Now with a built in castle Builder, allowing the player to create their
+  own castles and build onto an existing castle.
 
 
 Required To Play:
@@ -15,6 +16,11 @@ Required To Play:
   which should be placed inside the game 'data' folder. 
  
  This file may have any name, but the 'D64' extension must remain.
+
+
+Whats Added:
+------------
+ *Castle Builder: Editing of existing castles, or creation of new ones
 
 
 Whats Missing:
@@ -62,21 +68,23 @@ Wii Version:
 
 
 
-Controls:
----------
+
+Game Controls:
+--------------
 
  General:
  --------
 
+  F4  = Start Builder using current castle
+  F5  = Start Builder with empty castle
   F10 = Fullscreen Toggle
-
 
  Intro:
  ------
 
   F1 = Options
   F3 = Display Highscores
-
+ 
 
  In Map Screen:
  --------------
@@ -107,6 +115,50 @@ Controls:
      Numpad Arrows = Left/Right/Up/Down
 
 
+
+
+
+Builder Controls:
+-----------------
+
+ General:
+ --------
+  Escape = Quit Builder
+
+  F2  = Save Castle to empty 'Castle Disk'
+  F4  = Return from Builder, in test castle mode
+
+
+ Objects:
+ --------
+ 
+  q = Cursor Create Object (Rotate Up)
+  a = Cursor Create Object (Rotate Down)
+
+  [ = Rotate up through Placed Objects
+  ] = Rotate down through placed objects
+
+  l = Link Object
+
+  - = Previous Room
+  = = Next Room
+  
+  f = Switch to exit room
+   
+  c = Change Key Color Down
+  v = Change Key COlor Up
+
+  'Delete' = Delete selected 'placed' object
+
+  
+  Cursor Keys move the "red" square pointer
+
+
+  Ctrl = Place Cursor Object, Select object to link to
+
+
+    
+  
 Playing:
 --------
 
@@ -124,6 +176,11 @@ Command Line Parameters:
  -l xx : Start Castle number 'xx'
 
 
+
+
+
+
+
 Thanks:
 -------
 
@@ -135,3 +192,4 @@ Dag Lem, for 'reSid' the MOS6581 SID emulation library (http://en.wikipedia.org/
 
 Peter Schepers and the authors of the documents contained in his collection (http://ist.uwaterloo.ca/~schepers/formats.html), for the detailed disk format information
 
+Thomas Bätzler, for his website 'Castles of Dr.Creep Revisited' (http://www.baetzler.de/c64/games/creep/)
