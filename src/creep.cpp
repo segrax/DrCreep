@@ -50,9 +50,7 @@
 
 cCreep::cCreep() {
 	size_t romSize;
-
-	stringstream windowTitle;
-	windowTitle << "The Castles of Dr. Creep";
+	mWindowTitle = "The Castles of Dr. Creep";
 
 	mLevel = 0;
 	mMenuMusicScore = 0xFF;
@@ -69,7 +67,7 @@ cCreep::cCreep() {
 	mDebug = new cDebug();
 	mCastleManager = new cCastleManager();
 	mInput = new cPlayerInput( this );
-	mScreen = new cScreen( this, windowTitle.str() );
+	mScreen = new cScreen( this, mWindowTitle );
 	mSound = 0;
 
 	// Load the C64 Character Rom
@@ -181,9 +179,6 @@ void cCreep::builderStart( int pStartLevel ) {
 
 	for(; mBuilder->mTestGet(); ) {
 
-		// Set the screen ptrs
-		mScreen->bitmapLoad( &mMemory[ 0xE000 ], &mMemory[ 0xCC00 ], &mMemory[ 0xD800 ], 0 );
-
 		// Copy the castle from editor memory to game memory
 		memcpy( &mMemory[0x7800], mBuilder->memory( 0x7800 ), 0x2000 );
 		memcpy( &mMemory[0x9800], mBuilder->memory( 0x7800 ), 0x2000 );
@@ -198,8 +193,23 @@ void cCreep::builderStart( int pStartLevel ) {
 		mBuilder->mainLoop();
 	}
 
+	// Remove screen ptr so builder doesnt delete it
+	mBuilder->screenSet(0);
+
+	// Delete Builder
 	delete mBuilder;
 	mBuilder = 0;
+
+	// Set the screen back
+	mScreen->clear(0);
+	mScreen->windowTitleSet(mWindowTitle);
+	mScreen->roomNumberSet(-1);
+
+	// Disable the sprites
+	mScreen->spriteDisable();
+
+	// Set the screen ptrs
+	mScreen->bitmapLoad( &mMemory[ 0xE000 ], &mMemory[ 0xCC00 ], &mMemory[ 0xD800 ], 0 );
 }
 
 void cCreep::titleDisplay() {
