@@ -72,8 +72,8 @@ public:
 
 #define retVal( C, X ) C ret = X; X = 0; return ret; 
 
-	inline byte  keyGet()		 { retVal( byte, mKeyPressed ) }
-	inline byte  keyRawGet()	 { retVal( byte, mKeyPressedRaw ) }
+	inline byte  keyGet()		 { retVal( byte, mKeyPressed ); mKeyPressedRaw = 0; }
+	inline byte  keyRawGet()	 { retVal( byte, mKeyPressedRaw ); mKeyPressed = 0; }
 	inline bool	 f2Get()		 { retVal( bool, mF2) }
 	inline bool	 f3Get()		 { retVal( bool, mF3) }
 	inline bool	 f4Get()		 { retVal( bool, mF4) }

@@ -266,7 +266,7 @@ void cCastleManager::diskCastleFind( string pExtension ) {
 	diskCastlesCleanup();
 
 	for( diskIT = disks.begin(); diskIT != disks.end(); ++diskIT ) {
-		mDisksCastles.push_back( new cD64( *diskIT, "castles" ) );
+		mDisksCastles.push_back( new cD64( *diskIT, "castles", false, false, false ) );
 	}
 }
 
