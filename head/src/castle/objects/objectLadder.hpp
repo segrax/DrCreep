@@ -38,7 +38,7 @@ public:
 	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
 		mParts[0].mLength = *(*pBuffer)++;
 
-		cObject::objectLoad( pBuffer, pPart );
+		cObject::objectLoad( pBuffer, 0 );
 
 		return 0;
 	}
@@ -46,7 +46,7 @@ public:
 	size_t		objectSave( byte **pBuffer , size_t pPart ) {	
 		*(*pBuffer)++ = (byte) mParts[0].mLength;
 			
-		size_t strSize = cObject::objectSave( pBuffer, pPart );
+		size_t strSize = cObject::objectSave( pBuffer, 0 );
 
 		return (strSize + 1);
 	}

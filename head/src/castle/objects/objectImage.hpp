@@ -101,7 +101,7 @@ public:
 
 		*(*pBuffer)++ = mWidth;
 		*(*pBuffer)++ = mHeight;
-		*(*pBuffer)++;
+		*(*pBuffer)++ = 0;
 
 		size_t strSize = 3;
 
