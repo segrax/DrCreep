@@ -827,6 +827,7 @@ void cBuilder::parseInput() {
 
 	// Quit the editor?
 	if( mInput->restoreGet() ) {
+		mTest = false;
 		mQuit = true;
 		return;
 	}
@@ -935,7 +936,7 @@ void cBuilder::castleLoad( ) {
 void cBuilder::castleSave( bool pRemoveCursor ) {
 	map< int, cRoom *>::iterator  roomIT;
 	
-	if(mCurrentRoom)
+	if(mCurrentRoom && pRemoveCursor )
 		mCurrentRoom->objectDelete( mCurrentObject );
 
 	byte *buffer =  &mMemory[ 0x7800 ];
@@ -1007,7 +1008,7 @@ void cBuilder::castleSave( bool pRemoveCursor ) {
 	// Write size of castle to beginning to castle memory
 	writeLEWord(  &mMemory[ 0x7800 ], (memDest - 0x7800) );
 
-	if(mCurrentRoom)
+	if(mCurrentRoom && pRemoveCursor )
 		mCurrentRoom->objectAdd( mCurrentObject );
 }
 

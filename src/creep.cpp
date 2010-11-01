@@ -1483,15 +1483,19 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	// Start the editor, using the current castle
 	if( mInput->f4Get() ) {
 
-		builderStart( mStartCastle );
-		input->clear();
+		if( !mBuilder ) {
+			builderStart( mStartCastle );
+			input->clear();
+		}
 	}
 
 	// Start the editor, with a new castle
 	if( mInput->f5Get() ) {
-
-		builderStart( -1 );
-		input->clear();
+		
+		if( !mBuilder ) {
+			builderStart( -1 );
+			input->clear();
+		}
 	}
 
 	// Kill the player(s) if the restore key is pressed
