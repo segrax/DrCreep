@@ -311,7 +311,7 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 	vector<string> ret;
 	transform( pExtension.begin(), pExtension.end(), pExtension.begin(), ::toupper);
 	
-	string path = local_PathGenerate( pPath, pDataSave );
+	string path = local_PathGenerate( "", pPath, pDataSave );
 
 	DIR* pdir = opendir(path.c_str());
 	if (pdir != NULL) {

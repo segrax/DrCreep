@@ -3417,6 +3417,7 @@ s10EB:;
 			byte_B83 = 0;
 			mMemory[ 0x11D0 ] = 0;
 			mMenuReturn = true;
+			mInput->inputCheck(true);
 			return false;
 		}
 

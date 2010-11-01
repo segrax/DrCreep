@@ -723,6 +723,8 @@ void cBuilder::parseInput() {
 				case eDirectionRight:
 					part->mLength--;
 					break;
+				default:
+					break;
 			}
 		} else
 			mCursorX -= 4;
@@ -741,6 +743,8 @@ void cBuilder::parseInput() {
 				case eDirectionRight:
 					part->mLength++;
 					break;
+				default:
+					break;
 			}
 		} else
 			mCursorX += 4;
@@ -758,6 +762,8 @@ void cBuilder::parseInput() {
 				case eDirectionUp:
 					part->mLength--;
 					break;
+				default:
+					break;
 			}
 		} else
 			mCursorY += 8;
@@ -774,6 +780,8 @@ void cBuilder::parseInput() {
 					break;
 				case eDirectionUp:
 					part->mLength++;
+					break;
+				default:
 					break;
 			}
 		} else
@@ -853,19 +861,32 @@ void cBuilder::parseInput() {
 	downHeight *= 8;
 	downWidth *= 4;
 
-	// Cursor minimum and maximums
-	if( (mCursorX + downWidth) > 0xB0)
-		mCursorX = 0xB0 - downWidth;
+	#ifndef _WII
+		// Cursor minimum and maximums
+		if( (mCursorX + downWidth) > 0xB0)
+			mCursorX = 0xB0 - downWidth;
 
-	if( mCursorX < 0x10 )
-		mCursorX = 0x10;
+		if( mCursorX < 0x10 )
+			mCursorX = 0x10;
 
-	if( mCursorY > 0xF0 )
-		mCursorY = 0;
+		if( mCursorY > 0xF0 )
+			mCursorY = 0;
 
-	if( (mCursorY + downHeight) > 0xC8 )
-		mCursorY = 0xC8 - downHeight;
+		if( (mCursorY + downHeight) > 0xC8 )
+			mCursorY = 0xC8 - downHeight;
+#else
+		if( (mCursorX = downWidth ) > 0xA0 )
+			mCursorX = 0xA0 - downWidth;
 
+		if( mCursorX < 0x00 )
+			mCursorX = 0x00;
+
+		if( mCursorY > 0xF0 )
+			mCursorY = 0;
+
+		if( (mCursorY + downHeight) > 0xC8 )
+			mCursorY = 0xC8 - downHeight;
+#endif
 
 	// Does the cursor actually need updating
 	if(update) 
@@ -957,7 +978,6 @@ void cBuilder::castleSave( bool pRemoveCursor ) {
 
 	// Write the room directory
 	buffer = &mMemory[ 0x7900 ];
-	//memDest = 0x7900;
 
 	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {	
 		if( roomIT->second == mFinalRoom )
@@ -967,7 +987,6 @@ void cBuilder::castleSave( bool pRemoveCursor ) {
 
 		// Skip the pointers to room objects for now
 		buffer += 4;
-		//memDest += 0x08;
 	}
 
 	// Room Directory Terminator
@@ -1022,7 +1041,7 @@ cObject *cBuilder::objectCreate( cRoom *pRoom, eRoomObjects pObject, byte pPosX,
 		return 0;
 
 	switch( pObject ) {
-			case eObjectNone:			// Finished
+			case eObjectNone:				// Finished
 				return 0;
 
 			case eObjectDoor:				// Doors

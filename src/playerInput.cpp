@@ -117,6 +117,12 @@ void cPlayerInput::wiiInputCheck() {
 	else
 		mF3 = false;
 
+	//case SDLK_F4:
+	if( held & WPAD_BUTTON_B )
+		mF4 = true;
+	else
+		mF4 = false;
+
 	//case SDLK_ESCAPE:
 	if( held & WPAD_BUTTON_A )
 		mRestore = true;
