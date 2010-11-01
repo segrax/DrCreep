@@ -828,7 +828,7 @@ void cCreep::roomPrepare( ) {
 		word_3E  += 2;
 
 		switch( func ) {
-			case eObjectsFinished:			// Finished
+			case eObjectNone:			// Finished
 				return;
 
 			case eObjectDoor:				// Doors

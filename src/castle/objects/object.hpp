@@ -114,8 +114,8 @@ public:
 		mPartsAdd = false;
 
 		mLinked = true;
-		mLinkObject = eObjectsFinished;
-		mObjectID = eObjectsFinished;
+		mLinkObject = eObjectNone;
+		mObjectID = eObjectNone;
 
 		mRoom = pRoom;
 		mSelected = false;
@@ -134,6 +134,9 @@ public:
 	inline cRoom *roomGet()			{ return mRoom; }
 
 	virtual size_t	objectLoad( byte **pBuffer, size_t pPart ) {	// Load object from room stream
+		if(pPart > 15)
+			return 0;
+
 		mParts[pPart].mX = *(*pBuffer)++;
 		mParts[pPart].mY = *(*pBuffer)++;
 
@@ -143,6 +146,9 @@ public:
 	}
 
 	virtual size_t	objectSave( byte **pBuffer, size_t pPart ) {	// Save object to room stream
+		if(pPart > 15)
+			return 0;
+				
 		*(*pBuffer)++ = mParts[pPart].mX;
 		*(*pBuffer)++ = mParts[pPart].mY;
 
