@@ -121,7 +121,7 @@ private:
 	void					 castleCreate();
 	void					 castlePrepare( );
 	void					 castleLoad( );
-	void					 castleSave( );
+	void					 castleSave( bool pRemoveCursor );
 
 	void					 cursorObjectUpdate();
 	void					 cursorUpdate();
