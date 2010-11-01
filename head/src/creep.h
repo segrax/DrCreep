@@ -50,7 +50,7 @@ enum eRoomObjects {
 	eObjectImage		= 0x0836,
 	eObjectMultiDraw	= 0x0821,
 
-	eObjectsFinished	= 0x0000,
+	eObjectNone	= 0x0000,
 };
 
 enum eDirection {

@@ -48,7 +48,8 @@ size_t cRoom::roomSaveObjects( byte **pBuffer ) {
 	size += saveObject( pBuffer, eObjectConveyor, 0x80 );
 	size += saveObject( pBuffer, eObjectFrankenstein, 0x80 );
 	size += saveObject( pBuffer, eObjectText, 0x00 );
-	size += saveObject( pBuffer, eObjectImage, 0x00 );
+
+	size += saveObjects( pBuffer, eObjectImage, 0x00 );
 
 	return size;
 }
@@ -258,6 +259,31 @@ size_t cRoom::saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMar
 	return size;
 }
 
+size_t cRoom::saveObjects( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker ) {
+	vector< cObject* >	objects = objectFind( pObjectType );
+	vector< cObject* >::iterator	objectIT;
+
+	size_t	size = 0;
+
+	// No objects to save?
+	if( objects.size() == 0 )
+		return 0;
+
+	// Write each
+	for( objectIT = objects.begin(); objectIT != objects.end(); ++objectIT ) {
+		// Write ObjectID
+		writeLEWord( *pBuffer, (word) pObjectType );
+		*pBuffer += 2;
+
+		size += 3;
+		size += (*objectIT)->objectSave( pBuffer, 0 );
+
+		*(*pBuffer)++ = pEndMarker;
+	}
+
+	return size;
+}
+
 cBuilder::cBuilder( cCreep *pParent ) {
 
 	if(pParent) {
@@ -287,13 +313,13 @@ cBuilder::cBuilder( cCreep *pParent ) {
 	mDragMode = false;
 	mLinkMode = false;
 
-	mSelectedObject = eObjectsFinished;
+	mSelectedObject = eObjectNone;
 
 	mStart_Door_Player1 = mStart_Door_Player2 = 0;
 	mStart_Room_Player1 = mStart_Room_Player2 = 0;
 	mLives_Player1 = mLives_Player2 = 3;
 
-	mSearchObject = eObjectsFinished;
+	mSearchObject = eObjectNone;
 }
 
 cBuilder::~cBuilder() {
@@ -336,16 +362,16 @@ void cBuilder::objectStringAdd( string pMessage, byte pPosX, byte pPosY, byte pC
 }
 
 void cBuilder::objectStringPrint( sString pString ) {
-	memcpy( &mMemory[ 0x9004 ], pString.mString.c_str(), pString.mString.size() );
+	memcpy( &mMemory[ 0x9904 ], pString.mString.c_str(), pString.mString.size() );
 
-	mMemory[ 0x9000 ] = pString.mPosX;
-	mMemory[ 0x9001 ] = pString.mPosY;
-	mMemory[ 0x9002 ] = pString.mColor;
-	mMemory[ 0x9003 ] = 0x21;
+	mMemory[ 0x9900 ] = pString.mPosX;
+	mMemory[ 0x9901 ] = pString.mPosY;
+	mMemory[ 0x9902 ] = pString.mColor;
+	mMemory[ 0x9903 ] = 0x21;
 
-	mMemory[ 0x9003 +  pString.mString.size() ] |= 0x80;
+	mMemory[ 0x9903 +  pString.mString.size() ] |= 0x80;
 
-	word_3E = 0x9000;
+	word_3E = 0x9900;
 	obj_stringPrint();
 
 	obj_Actions();
@@ -441,7 +467,7 @@ void cBuilder::mainLoop() {
 				break;
 
 			case 0x0C:	{// '-' Previous Room
-				int newRoom = mCurrentRoom->mNumber - 1;
+				int newRoom = ((char) mCurrentRoom->mNumber) - 1;
 				if(newRoom < 0)
 					newRoom = 0;
 				
@@ -450,13 +476,18 @@ void cBuilder::mainLoop() {
 						}
 
 			case 0x0D:	{// '=' Next Room
-				int newRoom = mCurrentRoom->mNumber + 1;
-				
+				int newRoom = ((char) mCurrentRoom->mNumber) + 1;
+				if( newRoom >= mRooms.size() )
+					newRoom = mRooms.size() - 1;
 				roomChange( newRoom );
 				break;
 						}
 
 			case 0x21:	// 'f' edit final room
+				if( mFinalRoom == mCurrentRoom )
+					roomChange(0);
+				else
+					roomChange(-1);
 				
 				break;
 
@@ -477,10 +508,10 @@ void cBuilder::mainLoop() {
 				break;
 
 			default:
-				/*if(key) {
-					cout << "0x";
-					cout << hex << (int) key << endl;
-				}*/
+				//if(key) {
+				//	cout << "0x";
+				//	cout << hex << (int) key << endl;
+				//}
 				break;
 		}
 
@@ -500,7 +531,7 @@ void cBuilder::mainLoop() {
 }
 
 void cBuilder::roomCleanup() {
-	map< size_t, cRoom *>::iterator roomIT;
+	map< int, cRoom *>::iterator roomIT;
 
 	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {
 		delete roomIT->second;
@@ -522,16 +553,24 @@ void cBuilder::roomChange( int pNumber ) {
 		mOriginalObject = mCurrentObject;
 	}
 
-	castleSave();
+	castleSave();		
 	mCurrentRoom = roomCreate( pNumber );
 
 	// Set the room number in the window title
 	mScreen->roomNumberSet( pNumber );
 
-	mMemory[ 0x7809 ] = pNumber;
-	mMemory[ 0x780A ] = pNumber;
+	if( pNumber == -1) {
 
-	roomLoad();
+		screenClear();
+		word_3E = readLEWord( &mMemory[ 0x785F ] );
+		roomPrepare();
+
+	} else {
+		mMemory[ 0x7809 ] = pNumber;
+		mMemory[ 0x780A ] = pNumber;
+		roomLoad();
+	}
+
 	playerDraw();
 }
 
@@ -605,10 +644,16 @@ void cBuilder::cursorUpdate() {
 void cBuilder::castlePrepare( ) {
 	castleSave();
 
-	mMemory[ 0x7809 ] = mCurrentRoom->mNumber;
-	mMemory[ 0x780A ] = mCurrentRoom->mNumber;
+	if( (char) mCurrentRoom->mNumber == -1) {
+		screenClear();
+		word_3E = readLEWord( &mMemory[ 0x785F ] );
+		roomPrepare();
 
-	roomLoad();
+	} else {
+		mMemory[ 0x7809 ] = mCurrentRoom->mNumber;
+		mMemory[ 0x780A ] = mCurrentRoom->mNumber;
+		roomLoad();
+	}
 
 	// Print any strings
 	objectStringsPrint();
@@ -725,7 +770,7 @@ void cBuilder::parseInput() {
 						mOriginalObject->mLinkedSet( findItemIndex( mCurrentObject ) );
 						mOriginalObject->mLinked2Set( mCurrentRoom->mNumber );
 					}
-					mSearchObject = eObjectsFinished;
+					mSearchObject = eObjectNone;
 					mLinkMode = false;
 					mCurrentObject = 0;
 
@@ -741,7 +786,7 @@ void cBuilder::parseInput() {
 					mOriginalObject->mLinkedSet( findItemIndex( mCurrentObject ) );
 					mOriginalObject->mLinked2Set( mCurrentRoom->mNumber );
 				}
-				mSearchObject = eObjectsFinished;
+				mSearchObject = eObjectNone;
 				mLinkMode = false;
 				mCurrentObject = 0;
 
@@ -771,7 +816,7 @@ void cBuilder::parseInput() {
 		cursorObjectUpdate();
 }
 
-cRoom *cBuilder::roomCreate( size_t pNumber ) {
+cRoom *cBuilder::roomCreate( int pNumber ) {
 	
 	if( mRooms.find( pNumber ) != mRooms.end() )
 		return mRooms.find( pNumber )->second;
@@ -818,7 +863,7 @@ void cBuilder::castleLoad( ) {
 
 	buffer++;
 
-	map< size_t, cRoom *>::iterator roomIT;
+	map< int, cRoom *>::iterator roomIT;
 
 	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {
 		cRoom *room = roomIT->second;
@@ -831,16 +876,16 @@ void cBuilder::castleLoad( ) {
 		buffer += 2;
 	}
 
-	mFinalRoom = new cRoom( this, mRooms.size() );
+	mFinalRoom = roomCreate(-1);
 	mFinalRoom->roomLoadObjects( &mFinalScreen );
 }	
 
 void cBuilder::castleSave( ) {
-	map< size_t, cRoom *>::iterator  roomIT;
+	map< int, cRoom *>::iterator  roomIT;
 
 	byte *buffer =  &mMemory[ 0x7800 ];
 
-	for( word addr = 0x7800; addr < 0x8200; ++addr )
+	for( word addr = 0x7800; addr < 0x9800; ++addr )
 		mMemory[ addr ] = 0;
 
 	*(buffer + 2) = 0x80;
@@ -850,11 +895,14 @@ void cBuilder::castleSave( ) {
 	*(buffer + 6) = mStart_Door_Player2;
 	*(buffer + 7) = mLives_Player1;
 	*(buffer + 8) = mLives_Player2;
-		
+
 	// Write the room directory
 	buffer = &mMemory[ 0x7900 ];
 	
 	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {	
+		if( roomIT->second == mFinalRoom )
+			continue;
+
 		roomIT->second->roomSave( &buffer );
 
 		// Skip the pointers to room objects for now
@@ -868,6 +916,8 @@ void cBuilder::castleSave( ) {
 	size_t	size = 0;
 
 	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {
+		if( (char) roomIT->second->mNumber == -1 )
+			continue;
 		buffer = &mMemory[ memDest ];
 
 		// Write pointer to room objects
@@ -885,21 +935,30 @@ void cBuilder::castleSave( ) {
 		memDest += 2;
 	}
 
+	buffer = &mMemory[ memDest ];
+
 	// Save final room ptr
 	writeLEWord(&mMemory[ 0x785F ], memDest);
 
 	// Save final room objects
 	memDest += mFinalRoom->roomSaveObjects( &buffer );
 	
+	writeLEWord( buffer, 0 );
+	buffer += 2;
+
+	memDest += 2;
 	// Write size of castle to beginning to castle memory
 	writeLEWord(  &mMemory[ 0x7800 ], (memDest - 0x7800) );
 }
 
 cObject *cBuilder::objectCreate( cRoom *pRoom, eRoomObjects pObject, byte pPosX, byte pPosY ) {
 	cObject *obj = 0;
+	
+	if( pRoom == mFinalRoom && pObject != eObjectImage )
+		return 0;
 
 	switch( pObject ) {
-			case eObjectsFinished:			// Finished
+			case eObjectNone:			// Finished
 				return 0;
 
 			case eObjectDoor:				// Doors
@@ -1126,7 +1185,7 @@ void cBuilder::selectedObjectLink() {
 	if( !mCurrentObject )
 		return;
 
-	if( mCurrentObject->mLinkObjectGet() == eObjectsFinished )
+	if( mCurrentObject->mLinkObjectGet() == eObjectNone )
 		return;
 
 	mOriginalObject = mCurrentObject;
@@ -1206,16 +1265,16 @@ void cBuilder::selectPlacedObject( bool pChangeUp ) {
 void cBuilder::selectedObjectChange( bool pChangeUp ) {
 
 	switch( mSelectedObject ) {
-			case eObjectsFinished:			// Finished
+			case eObjectNone:			// No object selected
 				if( pChangeUp )
-					mSelectedObject = eObjectImage;
+					mSelectedObject = eObjectText;
 				else
 					mSelectedObject = eObjectDoor;
 				break;
 
 			case eObjectDoor:			
 				if( pChangeUp )
-					mSelectedObject = eObjectsFinished;
+					mSelectedObject = eObjectNone;
 				else
 					mSelectedObject = eObjectWalkway;
 				break;
@@ -1323,14 +1382,14 @@ void cBuilder::selectedObjectChange( bool pChangeUp ) {
 				if( pChangeUp )
 					mSelectedObject = eObjectFrankenstein;
 				else
-					mSelectedObject = eObjectImage;
+					mSelectedObject = eObjectNone;
 				break;
 
-			case eObjectImage:
+			/*case eObjectImage:
 				if( pChangeUp )
 					mSelectedObject = eObjectText;
 				else
-					mSelectedObject = eObjectsFinished;
+					mSelectedObject = eObjectNone;
 				break;
 
 			/*case eObjectMultiDraw:
@@ -1338,7 +1397,7 @@ void cBuilder::selectedObjectChange( bool pChangeUp ) {
 				if( pChangeUp )
 					mSelectedObject = eObjectImage;
 				else
-					mSelectedObject = eObjectsFinished;
+					mSelectedObject = eObjectNone;
 				break;
 */
 			default:

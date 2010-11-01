@@ -59,6 +59,7 @@ public:
 private:
 	size_t			 saveCount( byte **pBuffer, eRoomObjects pObjectType );
 	size_t			 saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker = 0x00 );
+	size_t			 saveObjects( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker = 0x00 );
 	size_t			 saveObjectLightning( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker);
 
 	void			 loadCount( byte **pBuffer, eRoomObjects pObjectType );
@@ -86,7 +87,7 @@ private:
 	word					 mFinalPtr;
 	cRoom					*mFinalRoom;
 
-	map< size_t, cRoom *>	 mRooms;
+	map< int, cRoom *>	 mRooms;
 	vector< sString >		 mStrings;
 
 private:
@@ -145,7 +146,7 @@ public:
 	void					 mainLoop();
 
 	cObject					*objectCreate( cRoom *pRoom, eRoomObjects pObject, byte pPosX, byte pPosY );
-	cRoom					*roomCreate( size_t pNumber );
+	cRoom					*roomCreate( int pNumber );
 
 	void					 objectStringAdd( string pMessage, byte pPosX, byte pPosY, byte pColor );
 	void					 messagePrint( string pMessage );
