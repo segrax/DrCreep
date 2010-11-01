@@ -176,21 +176,26 @@ void cCreep::builderStart( int pStartLevel ) {
 	bool	run = true;
 
 	mBuilder = new cBuilder( this );
+	mScreen->roomNumberSet(0);
+	mBuilder->start(pStartLevel, false);
 
-	for(;;) {
-
-		mBuilder->start(pStartLevel, false);
-		pStartLevel = -2;
-
-		mScreen->roomNumberSet(0);
-
-		// Test executed from builder?
-		if( !mBuilder->mTestGet() )
-			break;	
+	for(; mBuilder->mTestGet(); ) {
 
 		// Set the screen ptrs
 		mScreen->bitmapLoad( &mMemory[ 0xE000 ], &mMemory[ 0xCC00 ], &mMemory[ 0xD800 ], 0 );
+
+		// Copy the castle from editor memory to game memory
+		memcpy( &mMemory[0x7800], mBuilder->memory( 0x7800 ), 0x2000 );
+		memcpy( &mMemory[0x9800], mBuilder->memory( 0x7800 ), 0x2000 );
+
+		// Run the level
+		mIntro = false;
 		mainLoop();	
+
+		// Return to the editor
+		mQuit = false;
+		mBuilder->mStartCastle = -2;
+		mBuilder->mainLoop();
 	}
 
 	delete mBuilder;
@@ -325,6 +330,7 @@ void cCreep::interruptWait( byte pCount) {
 void cCreep::start( int pStartLevel, bool pUnlimited ) {
 	byte	byte_30, byte_31, count;
 
+	mQuit = false;
 	mStartCastle = pStartLevel;
 
 	byte_30 = 0x40;
@@ -702,6 +708,9 @@ void cCreep::mainLoop() {
 		if( Intro() == true )
 			continue;
 		
+		if(mQuit)
+			break;
+
 		Game();
 	}
 
@@ -994,6 +1003,12 @@ bool cCreep::Intro() {
 			KeyboardJoystickMonitor( byte_D10 );
 			if( mJoyButtonState )
 				break;
+
+			if( byte_B83 ) {
+				byte_B83 = 0;
+				mQuit = true;
+				return false;
+			}
 
 			// Change which player controller is checked
 			byte_D10 ^= 0x01;
