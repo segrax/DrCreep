@@ -319,9 +319,8 @@ void cScreen::refresh() {
 		if(mCursorOn) {
 			size_t x =  ((mCursorX) * 2 ) * mScale;
 			size_t y =  70 + (mCursorY) * mScale;
-
+			
 			mWindow->blit( mSDLCursorSurface, x, y  );
-
 		}
 	}
 
