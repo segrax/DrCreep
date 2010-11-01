@@ -155,3 +155,21 @@ public:
 		return 2;
 	}
 };
+
+#include "castle/objects/objectDoor.hpp"
+#include "castle/objects/objectWalkway.hpp"
+#include "castle/objects/objectSlidingPole.hpp"
+#include "castle/objects/objectLadder.hpp"
+#include "castle/objects/objectDoorBell.hpp"
+#include "castle/objects/objectLightning.hpp"
+#include "castle/objects/objectForcefield.hpp"
+#include "castle/objects/objectMummy.hpp"
+#include "castle/objects/objectKey.hpp"
+#include "castle/objects/objectLock.hpp"
+#include "castle/objects/objectRayGun.hpp"
+#include "castle/objects/objectTeleport.hpp"
+#include "castle/objects/objectTrapDoor.hpp"
+#include "castle/objects/objectConveyor.hpp"
+#include "castle/objects/objectFrankenstein.hpp"
+#include "castle/objects/objectText.hpp"
+#include "castle/objects/objectImage.hpp"
