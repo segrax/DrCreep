@@ -79,6 +79,7 @@ protected:
 	cBuilder		*mBuilder;
 
 	string			 mMusicCurrent;
+	string			 mWindowTitle;
 	byte			*mMusicBuffer, *mMusicBufferStart;
 	size_t			 mMusicBufferSize;
 
@@ -194,6 +195,7 @@ public:
 
 		inline cPlayerInput		*inputGet()		{ return mInput; }
 		inline cScreen			*screenGet()	{ return mScreen; }
+		inline void				 screenSet( cScreen *pScreen ) { mScreen = pScreen; }
 
 		void	 builderStart( int pStartCastle );
 

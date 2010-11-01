@@ -468,9 +468,9 @@ void cBuilder::mainLoop() {
 				selectedObjectLink();
 				break;
 
-			case 0x1F:	// 's' Save Castle
-				castleSaveToDisk();
-				break;
+			//case 0x1F:	// 's' Save Castle
+			//	castleSaveToDisk();
+			//	break;
 
 			case 0x1A:	// '[' Select a placed object
 				selectPlacedObject( false );
@@ -484,7 +484,6 @@ void cBuilder::mainLoop() {
 				int newRoom = ((char) mCurrentRoom->mNumber) - 1;
 				if(newRoom < 0)
 					newRoom = 0;
-				
 				roomChange( newRoom );
 				break;
 						}
@@ -825,14 +824,18 @@ void cBuilder::parseInput() {
 		update = true;
 	}
 
-	// Quit the editor?
+	// ESC: Quit builder
 	if( mInput->restoreGet() ) {
 		mTest = false;
 		mQuit = true;
 		return;
 	}
 
-	// Return from the editor in test castle mode
+	// F1: Save Castle To Disk
+	if( mInput->runStopGet() )
+		castleSaveToDisk();
+	
+	// F4: Quit builder in test castle mode
 	if( mInput->f4Get() ) {
 		mTest = true;
 		mQuit = true;
