@@ -1,3 +1,28 @@
+/*
+ *  The Castles of Dr. Creep 
+ *  ------------------------
+ *
+ *  Copyright (C) 2009-2010 Robert Crossfield
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ *  ------------------------------------------
+ *  Castle Builder
+ *  ------------------------------------------
+ */
+
 #include "stdafx.h"
 #include "graphics/screenSurface.h"
 #include "vic-ii/screen.h"
@@ -9,24 +34,6 @@
 #include "sound/sound.h"
 #include "castle/objects/object.hpp"
 #include "builder.hpp"
-#include "castle/objects/objectDoor.hpp"
-#include "castle/objects/objectWalkway.hpp"
-#include "castle/objects/objectSlidingPole.hpp"
-#include "castle/objects/objectLadder.hpp"
-#include "castle/objects/objectDoorBell.hpp"
-#include "castle/objects/objectLightning.hpp"
-#include "castle/objects/objectForcefield.hpp"
-#include "castle/objects/objectMummy.hpp"
-#include "castle/objects/objectKey.hpp"
-#include "castle/objects/objectLock.hpp"
-#include "castle/objects/objectRayGun.hpp"
-#include "castle/objects/objectTeleport.hpp"
-#include "castle/objects/objectTrapDoor.hpp"
-#include "castle/objects/objectConveyor.hpp"
-#include "castle/objects/objectFrankenstein.hpp"
-#include "castle/objects/objectText.hpp"
-#include "castle/objects/objectImage.hpp"
-
 #include "debug.h"
 
 size_t cRoom::roomSaveObjects( byte **pBuffer ) {
@@ -476,7 +483,7 @@ void cBuilder::mainLoop() {
 
 			case 0x0D:	{// '=' Next Room
 				int newRoom = ((char) mCurrentRoom->mNumber) + 1;
-				if( newRoom >= mRooms.size() )
+				if( newRoom >= (int) mRooms.size() )
 					newRoom = mRooms.size() - 1;
 				roomChange( newRoom );
 				break;
