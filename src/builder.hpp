@@ -114,6 +114,7 @@ private:
 
 	map< int, cRoom *>	 mRooms;
 	vector< sString >		 mStrings;
+	bool					 mTest;
 
 private:
 
@@ -175,4 +176,6 @@ public:
 
 	void					 objectStringAdd( string pMessage, byte pPosX, byte pPosY, byte pColor );
 	void					 messagePrint( string pMessage );
+
+	inline bool				 mTestGet() { return mTest; }
 };

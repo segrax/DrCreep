@@ -318,6 +318,7 @@ cBuilder::cBuilder( cCreep *pParent ) {
 
 	mDragMode = false;
 	mLinkMode = false;
+	mTest = false;
 
 	mSelectedObject = eObjectNone;
 
@@ -407,25 +408,32 @@ void cBuilder::mainLoop() {
 	mIntro = false;
 	mNoInput = true;
 
-	if( mStartCastle > -1 ) {
+	if( mStartCastle != -2 && mStartCastle > -1 ) {
 		// Load Castle
 		mCastle = mCreepParent->castleGet();
 		castleLoad();	
 
 	} else {
-
-		// New Castle
-		mScreen->levelNameSet("Untitled");
-		castleCreate();
-		castleSave();
+	
+		if(mStartCastle != -2) {
+			// New Castle
+			mScreen->levelNameSet("Untitled");
+			castleCreate();
+			castleSave();
+		}
 	}
 	
+	// Set the screen ptrs
 	mScreen->bitmapLoad( &mMemory[ 0xE000 ], &mMemory[ 0xCC00 ], &mMemory[ 0xD800 ], 0 );
+
+	// Prep Cursor
 	mScreen->cursorSet( mCursorX, mCursorY );
 	mScreen->cursorEnabled(true);
 
+	// Change to first room
 	roomChange(mMemory[ 0x7803 ]);
 
+	// 
 	while(!mQuit) {
 		byte key = tolower( mInput->keyGet() );
 		
@@ -513,11 +521,12 @@ void cBuilder::mainLoop() {
 				selectedObjectDelete();
 				break;
 
+			
 			default:
-				//if(key) {
-				//	cout << "0x";
-				//	cout << hex << (int) key << endl;
-				//}
+				/*if(key) {
+					cout << "0x";
+					cout << hex << (int) key << endl;
+				}*/
 				break;
 		}
 
@@ -804,6 +813,17 @@ void cBuilder::parseInput() {
 
 		
 		update = true;
+	}
+
+	// Quit the editor?
+	if( mInput->restoreGet() ) {
+		mQuit = true;
+		return;
+	}
+
+	if( mInput->f4Get() ) {
+		mTest = true;
+		mQuit = true;
 	}
 
 	int downWidth = 1;

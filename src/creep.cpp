@@ -173,13 +173,28 @@ cCreep::~cCreep() {
 }
 
 void cCreep::builderStart( int pStartLevel ) {
-	
+	bool	run = true;
+
 	mBuilder = new cBuilder( this );
-	mBuilder->start(pStartLevel, false);
+
+	for(;;) {
+
+		mBuilder->start(pStartLevel, false);
+		pStartLevel = -2;
+
+		mScreen->roomNumberSet(0);
+
+		// Test executed from builder?
+		if( !mBuilder->mTestGet() )
+			break;	
+
+		// Set the screen ptrs
+		mScreen->bitmapLoad( &mMemory[ 0xE000 ], &mMemory[ 0xCC00 ], &mMemory[ 0xD800 ], 0 );
+		mainLoop();	
+	}
 
 	delete mBuilder;
 	mBuilder = 0;
-	mScreen->roomNumberSet(0);
 }
 
 void cCreep::titleDisplay() {
