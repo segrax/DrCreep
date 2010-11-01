@@ -369,16 +369,16 @@ void cBuilder::objectStringAdd( string pMessage, byte pPosX, byte pPosY, byte pC
 }
 
 void cBuilder::objectStringPrint( sString pString ) {
-	memcpy( &mMemory[ 0x9904 ], pString.mString.c_str(), pString.mString.size() );
+	memcpy( &mMemory[ 0xBB04 ], pString.mString.c_str(), pString.mString.size() );
 
-	mMemory[ 0x9900 ] = pString.mPosX;
-	mMemory[ 0x9901 ] = pString.mPosY;
-	mMemory[ 0x9902 ] = pString.mColor;
-	mMemory[ 0x9903 ] = 0x21;
+	mMemory[ 0xBB00 ] = pString.mPosX;
+	mMemory[ 0xBB01 ] = pString.mPosY;
+	mMemory[ 0xBB02 ] = pString.mColor;
+	mMemory[ 0xB03 ] = 0x21;
 
-	mMemory[ 0x9903 +  pString.mString.size() ] |= 0x80;
+	mMemory[ 0xBB03 +  pString.mString.size() ] |= 0x80;
 
-	word_3E = 0x9900;
+	word_3E = 0xBB00;
 	obj_stringPrint();
 
 	obj_Actions();
@@ -404,7 +404,7 @@ void cBuilder::playerDraw() {
 }
 
 void cBuilder::mainLoop() {
-
+	mQuit = false;
 	mIntro = false;
 	mNoInput = true;
 
@@ -615,7 +615,8 @@ void cBuilder::cursorObjectUpdate() {
 	if( !mCurrentObject )
 		mCurrentObject = objectCreate( mCurrentRoom, mSelectedObject, mCursorX, mCursorY );
 	else {	
-		mCurrentObject->partSetPosition( mCursorX, mCursorY );
+		if( mCurrentObject->mRoomGet() == mCurrentRoom )
+			mCurrentObject->partSetPosition( mCursorX, mCursorY );
 	}
 
 	// If the object is placed, and not selected by the user
@@ -1288,7 +1289,8 @@ void cBuilder::selectPlacedObject( bool pChangeUp ) {
 			}
 		} while ((mLinkMode && mSearchObject != mCurrentObject->objectTypeGet()) );
 
-		mCurrentObject->partSet(0);
+		if(mCurrentObject)
+			mCurrentObject->partSet(0);
 	}
 
 	// Update the cursor

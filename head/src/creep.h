@@ -153,9 +153,9 @@ protected:
 
 	bool		 mMenuReturn, mNoInput;
 
+public:
 	int		 mStartCastle;
 
-public:
 	byte		 mTxtX_0, mTxtY_0;
 
 				 cCreep();

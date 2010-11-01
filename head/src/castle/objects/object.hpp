@@ -64,6 +64,8 @@ protected:
 	bool			 mSelected, mLinked;
 
 public:
+
+	inline cRoom		*mRoomGet()	{ return mRoom; }
 	virtual void		colorIncrease()	 { }
 	virtual void		colorDecrease()	 { }
 
