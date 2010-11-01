@@ -636,6 +636,7 @@ size_t cBuilder::findItemIndex( cObject *pObject ) {
 
 	size_t count = 0;
 
+	// Find the 'index' of an item, of type 'pObject'
 	for(objIT = objects.begin(); objIT != objects.end(); ++objIT ) {
 		if( (*objIT) == pObject )
 			return count;
@@ -663,6 +664,7 @@ void cBuilder::cursorUpdate() {
 void cBuilder::castlePrepare( ) {
 	castleSave( false );
 
+	// Final Room?
 	if( (char) mCurrentRoom->mNumber == -1) {
 		screenClear();
 		word_3E = readLEWord( &mMemory[ 0x785F ] );
@@ -711,6 +713,7 @@ void cBuilder::parseInput() {
 	if(mCurrentObject)
 		part = mCurrentObject->partGet();
 
+	// Left
 	if(input->mLeft) {
 		if( part && mDragMode ) {
 
@@ -727,6 +730,7 @@ void cBuilder::parseInput() {
 		update = true;
 	}
 
+	// Right
 	if(input->mRight) {
 
 		if( part && mDragMode ) {
@@ -744,6 +748,7 @@ void cBuilder::parseInput() {
 		update = true;
 	}
 
+	// Down
 	if(input->mDown) {
 		if( part && mDragMode ) {
 
@@ -760,6 +765,7 @@ void cBuilder::parseInput() {
 		update = true;
 	}
 
+	// Up
 	if(input->mUp) {
 		if( part && mDragMode ) {
 
@@ -776,6 +782,7 @@ void cBuilder::parseInput() {
 		update = true;
 	}
 
+	// Button
 	if(input->mButton) {
 		mInput->inputCheck( true );
 
@@ -824,11 +831,13 @@ void cBuilder::parseInput() {
 		return;
 	}
 
+	// Return from the editor in test castle mode
 	if( mInput->f4Get() ) {
 		mTest = true;
 		mQuit = true;
 	}
 
+	// Check cursor position to see if its outside screen range
 	int downWidth = 1;
 	int downHeight = 1;
 
@@ -853,6 +862,8 @@ void cBuilder::parseInput() {
 	if( (mCursorY + downHeight) > 0xC8 )
 		mCursorY = 0xC8 - downHeight;
 
+
+	// Does the cursor actually need updating
 	if(update) 
 		cursorObjectUpdate();
 }
