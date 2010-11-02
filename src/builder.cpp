@@ -490,8 +490,8 @@ void cBuilder::mainLoop() {
 
 			case 0x0D:	{// '=' Next Room
 				int newRoom = ((char) mCurrentRoom->mNumber) + 1;
-				if( newRoom >= (int) mRooms.size() )
-					newRoom = mRooms.size() - 1;
+				//if( newRoom >= (int) mRooms.size() )
+				//	newRoom = mRooms.size() - 1;
 				roomChange( newRoom );
 				break;
 						}
