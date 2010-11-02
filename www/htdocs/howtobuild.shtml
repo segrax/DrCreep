@@ -61,7 +61,7 @@
 	    <td class="sideText">Editing an existing object<br/>
 	    <p class="Keys"><strong>Controls:</strong><br/>
         Pressing '[' or ']' will rotate through objects in the current room, allowing you to move an existing object.        </p>
-	    <p class="Keys">Pressing 'L' will allow linking it to another object (such as doors to door bells, or doors to other doors)</p>
+	    <p class="Keys">Pressing 'L' will allow linking it to another object (such as door bells to doors, or doors to other doors)</p>
 	    <p class="Keys">Pressing 'Delete' will remove the selected object from the room</p></td>
 	    <td><div><img src="images/howtobuild/4. Selected Object.jpg"  width="382" height="314" alt="edit object" /></div></td>
       </tr>
