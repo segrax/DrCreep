@@ -345,6 +345,8 @@ void cBuilder::castleCreate() {
 	mCurrentRoom->mMapX = 3;
 	mCurrentRoom->mMapY = 3;
 
+	mFinalRoom = roomCreate(-1);
+
 	mStart_Room_Player1 = mStart_Room_Player2 = 0;
 	mStart_Door_Player1 = mStart_Door_Player2 = 0;
 	mLives_Player1 = mLives_Player2 = 3;
@@ -572,7 +574,7 @@ void cBuilder::roomChange( int pNumber ) {
 
 	castleSave( false );		
 	mCurrentRoom = roomCreate( pNumber );
-
+	
 	// Set the room number in the window title
 	mScreen->roomNumberSet( pNumber );
 
