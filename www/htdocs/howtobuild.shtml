@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Castles of Dr. Creep :: How To Build</title>
+<link href="css/twoColHybRtHdr.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+<!--
+.NewsDates {
+	color: #004000;
+}
+.menuTitles {
+	color: #800080;
+	font-weight:bold;
+}
+#mainTitle {
+	color: #408080;
+}
+.Keys {
+	font-size: 80%;
+}
+.sideText {
+	font-size: 80%;
+	text-align: right;
+}
+-->
+</style>
+</head>
+
+<body class="twoColHybRtHdr">
+
+<div id="container">
+  <div id="header">
+    <h1 id="mainTitle">The Castles of Dr. Creep</h1>
+  <!-- end #header --></div>
+  <!--#include file="menu.shtml" --> 
+  
+  <div id="mainContent">
+    <table width="100%" cellspacing="5" >
+	  <tr>
+	    <td class="sideText">Launch the game from the shortcut</td>
+	    <td><div><img src="/images/howtoplay/0. shortcut.jpg" alt="shortcut" width="92" height="94" /></div></td>
+      </tr>
+     
+	  <tr>
+	    <td class="sideText">The intro will begin, scrolling through the castle rooms.<br/>
+	    <p class="Keys"><strong>Controls:</strong><br/>
+        Press F4 To Edit this Castle<br/>
+	    Press F5 to Build a new Castle</p></td>
+	    <td><div><img src="/images/howtoplay/2. intro0.jpg" width="382" height="314" alt="dr.creep intro" /></div></td>
+      </tr>
+     <tr>
+	    <td class="sideText">Placing new objects.<br/>
+	    <p class="Keys"><strong>Controls:</strong><br/>
+        Cursor Keys will move the red cursor</p>
+	    <p class="Keys">Q and A will rotate new objects through the cursor, allowing placement of objects such as doors, doorbells, poles, walkways.</p>
+	    <p class="Keys">Press the Ctrl Button to Place an object at the current cursor location</p></td>
+	    <td><div><img src="images/howtobuild/3. Main View.jpg" width="382" height="314" alt="place object" /></div></td>
+      </tr>
+      <tr>
+	    <td class="sideText">Editing an existing object<br/>
+	    <p class="Keys"><strong>Controls:</strong><br/>
+        Pressing '[' or ']' will rotate through objects in the current room, allowing you to move an existing object.        </p>
+	    <p class="Keys">Pressing 'L' will allow linking it to another object (such as doors to door bells, or doors to other doors)</p>
+	    <p class="Keys">Pressing 'Delete' will remove the selected object from the room</p></td>
+	    <td><div><img src="images/howtobuild/4. Selected Object.jpg"  width="382" height="314" alt="edit object" /></div></td>
+      </tr>
+      <tr>
+	    <td class="sideText">Change Player Starting Location<br/>
+	    <p class="Keys"><strong>Controls:</strong><br/>
+        Pressing '1' or '2' while a door is selected, will result in the players starting room/door being changed to the selected door object</p></td>
+	    <td><div><img src="images/howtobuild/5. Change Start Door.jpg"  width="382" height="314" alt="start locations" /></div></td>
+      </tr>
+      <tr>
+	    <td class="sideText">Change Rooms (Can be done in Link mode)<br/>
+	    <p class="Keys"><strong>Controls:</strong><br/>
+        Pressing '-' or '=' will change rooms either backwards or forwards).</p>
+	    <p class="Keys">If you move forward and the room does not exist, it will automatically be created.</p>
+	    <p class="Keys">Moving forward after Pressing 'L' on a door, will allow you to link doors between rooms. (simply rotate through the objects with [ or ] and press Ctrl once the object you want to link to is selected.</p></td>
+	    <td><div><img src="images/howtobuild/6. Change Rooms.jpg"  width="382" height="314" alt="room change" /></div></td>
+      </tr>
+            <tr>
+	    <td class="sideText">Changing Keys<br/>
+	    <p class="Keys"><strong>Controls:</strong><br/>
+        Pressing 'C' or 'V' while a key is selected, will rotate through the various types and colors</p></td>
+	    <td><div><img src="images/howtobuild/8. Change Color.jpg"  width="382" height="314" alt="key change" /></div></td>
+      </tr>
+      <tr>
+	    <td class="sideText">Testing<br/>
+	    <p class="Keys"><strong>Controls:</strong><br/>
+        Pressing 'F4' will return you to the game intro, Starting the game as normal from here will begin the castle you where just editing and any changes you made will be available.</p>
+	    <p class="Keys">Press 'Escape' until you return to the intro, and press escape in the intro to return to Build.</p></td>
+	    <td><div><img src="images/howtobuild/7. Test.jpg"  width="382" height="314" alt="" /></div></td>
+      </tr>
+      <tr>
+	    <td class="sideText">Final Room<br/>
+	    <p class="Keys"><strong>Controls:</strong><br/>
+        Pressing 'F' will display the final castle room (altho no editing is currently available for it)</p></td>
+	    <td><div><img src="images/howtobuild/9. final room.jpg"  width="382" height="314" alt="final room" /></div></td>
+      </tr>
+            <tr>
+	    <td class="sideText">Saving your Castle<br/>
+	    <p class="Keys"><strong>Controls:</strong><br/>
+        Pressing 'F1' at any time will save the castle to a disk image in the &quot;DATA\CASTLES&quot; Folder (the first with enough free space is selected)</p></td>
+	    <td><div><img src="images/howtobuild/10. save castle.jpg" alt="save castle"  width="382" height="314" /></div></td>
+      </tr>
+  </table>
+<!-- end #mainContent --></div>
+	<!-- This clearing element should immediately follow the #mainContent div in order to force the #container div to contain all child floats -->
+	
+	<br class="clearfloat" />
+	 <!--#include file="footer.shtml" --> 
+<!-- end #container --></div>
+</body>
+</html>
