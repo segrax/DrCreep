@@ -1021,7 +1021,8 @@ void cBuilder::castleSave( bool pRemoveCursor ) {
 	writeLEWord(&mMemory[ 0x785F ], memDest);
 
 	// Save final room objects
-	memDest += mFinalRoom->roomSaveObjects( &buffer );
+	if(mFinalRoom)
+		memDest += mFinalRoom->roomSaveObjects( &buffer );
 	
 	writeLEWord( buffer, 0 );
 	buffer += 2;
