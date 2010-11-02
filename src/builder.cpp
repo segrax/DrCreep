@@ -921,7 +921,8 @@ void cBuilder::castleLoad( ) {
 
 	mFinalPtr = readLEWord(buffer + 0x5F);
 
-	mFinalScreen = bufferStart + ( mFinalPtr - 0x7800 );
+	if(mFinalPtr)
+		mFinalScreen = bufferStart + ( mFinalPtr - 0x7800 );
 
 	buffer += 0x100;
 
@@ -953,8 +954,10 @@ void cBuilder::castleLoad( ) {
 		buffer += 2;
 	}
 
-	mFinalRoom = roomCreate(-1);
-	mFinalRoom->roomLoadObjects( &mFinalScreen );
+	if( mFinalScreen ) {
+		mFinalRoom = roomCreate(-1);
+		mFinalRoom->roomLoadObjects( &mFinalScreen );
+	}
 }	
 
 void cBuilder::castleSave( bool pRemoveCursor ) {
@@ -992,7 +995,7 @@ void cBuilder::castleSave( bool pRemoveCursor ) {
 	// Room Directory Terminator
 	*(buffer) = 0xFF;
 
-	word	memDest = 0x7900 + ((mRooms.size() - 1) * 8) + 1;
+	word	memDest = 0x7900 + (mRooms.size() * 8) + 1;
 	size_t	size = 0;
 
 	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {
@@ -1018,12 +1021,13 @@ void cBuilder::castleSave( bool pRemoveCursor ) {
 	buffer = &mMemory[ memDest ];
 
 	// Save final room ptr
-	writeLEWord(&mMemory[ 0x785F ], memDest);
+	if(mFinalRoom) {
+		writeLEWord(&mMemory[ 0x785F ], memDest);
 
-	// Save final room objects
-	if(mFinalRoom)
+		// Save final room objects
 		memDest += mFinalRoom->roomSaveObjects( &buffer );
-	
+	}
+
 	writeLEWord( buffer, 0 );
 	buffer += 2;
 
