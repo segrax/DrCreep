@@ -59,9 +59,6 @@ cBuilder::cBuilder( cCreep *pParent ) {
 	mRoomSelectedObject = 0;
 	mCurrentObject = 0;
 	mCurrentRoom = 0;
-	mFinalRoom = 0;
-	mFinalPtr = 0;
-	mFinalScreen = 0;
 
 	mDragMode = false;
 	mLinkMode = false;
@@ -69,27 +66,13 @@ cBuilder::cBuilder( cCreep *pParent ) {
 
 	mSelectedObject = eObjectNone;
 
-	mStart_Door_Player1 = mStart_Door_Player2 = 0;
-	mStart_Room_Player1 = mStart_Room_Player2 = 0;
-	mLives_Player1 = mLives_Player2 = 3;
-
 	mSearchObject = eObjectNone;
 }
 
 cBuilder::~cBuilder() {
 	delete mCurrentObject;
 
-	roomCleanup();
-}
-
-void cBuilder::castleCreate() {
-
-	mCurrentRoom = roomCreate(0);
-	mFinalRoom = roomCreate(-1);
-
-	mStart_Room_Player1 = mStart_Room_Player2 = 0;
-	mStart_Door_Player1 = mStart_Door_Player2 = 0;
-	mLives_Player1 = mLives_Player2 = 3;
+	mCastle->roomCleanup();
 }
 
 void cBuilder::objectStringsClear() {
@@ -129,17 +112,27 @@ void cBuilder::objectStringPrint( sString pString ) {
 	hw_Update();
 }
 
+void cBuilder::save( bool pRemoveCursor ) {
+	if(mCurrentRoom && pRemoveCursor && mCurrentObject)
+		mCurrentRoom->objectDelete( mCurrentObject );
+
+	mCastle->castleSave( &mMemory[0x7800] );
+
+	if(mCurrentRoom && pRemoveCursor && mCurrentObject )
+		mCurrentRoom->objectAdd( mCurrentObject );
+}
+
 void cBuilder::playerDraw() {
 
 	mMemory[ 0x780B ] = mMemory[ 0x7805 ];	// Player1 Start Door
 	mMemory[ 0x780C ] = mMemory[ 0x7806 ];	// Player2 Start Door
 
-	if( mStart_Room_Player1 == mCurrentRoom->mNumber ) {
+	if( mCastle->mStart_Room_Player1Get() == mCurrentRoom->mNumber ) {
 		byte_3638 = 0;
 		obj_Player_Add();
 	}
 
-	if( mStart_Room_Player2 == mCurrentRoom->mNumber ) {
+	if( mCastle->mStart_Room_Player2Get() == mCurrentRoom->mNumber ) {
 		byte_3638 = 1;
 		obj_Player_Add();
 	}
@@ -153,15 +146,16 @@ void cBuilder::mainLoop() {
 	if( mStartCastle != -2 && mStartCastle > -1 ) {
 		// Load Castle
 		mCastle = mCreepParent->castleGet();
-		castleLoad();	
+		mCastle->castleLoad( this );	
 
 	} else {
 	
 		if(mStartCastle != -2) {
 			// New Castle
 			mScreen->levelNameSet("Untitled");
-			castleCreate();
-			castleSave( false );
+			mCastle = new cCastle( this, 0 );
+
+			save( false );
 		}
 	}
 	
@@ -184,16 +178,16 @@ void cBuilder::mainLoop() {
 			
 			case 0x02:	// '1' Set player one starting door
 				if( mCurrentObject && mCurrentObject->objectTypeGet() == eObjectDoor ) {
-					mStart_Room_Player1 = mCurrentRoom->mNumber;
-					mStart_Door_Player1 = findItemIndex( mCurrentObject );
+					mCastle->mStart_Room_Player1Set(mCurrentRoom->mNumber);
+					mCastle->mStart_Door_Player1Set(findItemIndex( mCurrentObject ));
 					castlePrepare();
 				}
 				break;
 
 			case 0x03:	// '2' Set player two starting door
 				if( mCurrentObject && mCurrentObject->objectTypeGet() == eObjectDoor ) {
-					mStart_Room_Player2 = mCurrentRoom->mNumber;
-					mStart_Door_Player2 = findItemIndex( mCurrentObject );
+					mCastle->mStart_Room_Player2Set(mCurrentRoom->mNumber);
+					mCastle->mStart_Door_Player2Set(findItemIndex( mCurrentObject ));
 					castlePrepare();
 				}
 				break;
@@ -245,7 +239,7 @@ void cBuilder::mainLoop() {
 						}
 
 			case 0x21:	// 'f' edit final room
-				if( mFinalRoom == mCurrentRoom )
+				if( mCastle->mFinalRoomGet() == mCurrentRoom )
 					roomChange(0);
 				else
 					roomChange(-1);
@@ -292,17 +286,7 @@ void cBuilder::mainLoop() {
 
 	mScreen->cursorEnabled(false);
 	if( mTest )
-		castleSave( true );
-}
-
-void cBuilder::roomCleanup() {
-	map< int, cRoom *>::iterator roomIT;
-
-	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {
-		delete roomIT->second;
-	}
-
-	mRooms.clear();
+		save( true );
 }
 
 void cBuilder::roomChange( int pNumber ) {
@@ -318,8 +302,8 @@ void cBuilder::roomChange( int pNumber ) {
 		mOriginalObject = mCurrentObject;
 	}
 
-	castleSave( false );		
-	mCurrentRoom = roomCreate( pNumber );
+	save( false );		
+	mCurrentRoom = mCastle->roomCreate( this, pNumber );
 	
 	// Set the room number in the window title
 	mScreen->roomNumberSet( pNumber );
@@ -362,7 +346,7 @@ void cBuilder::cursorObjectUpdate() {
 
 	// No Current object? create a new one
 	if( !mCurrentObject )
-		mCurrentObject = objectCreate( mCurrentRoom, mSelectedObject, mCursorX, mCursorY );
+		mCurrentObject = mCurrentRoom->objectCreate( mCurrentRoom, mSelectedObject, mCursorX, mCursorY );
 	else {	
 		if( mCurrentObject->mRoomGet() == mCurrentRoom )
 			mCurrentObject->partSetPosition( mCursorX, mCursorY );
@@ -385,12 +369,6 @@ size_t cBuilder::findItemIndex( cObject *pObject ) {
 
 	// Find the 'index' of an item, of type 'pObject'
 	for(objIT = objects.begin(); objIT != objects.end(); ++objIT ) {
-		/*if( pObject->objectTypeGet() == eObjectLightning ) {
-			cObjectLightning *light = (cObjectLightning*) (*objIT);
-
-			if( !light->mMachineMode )
-				continue;
-		}*/
 
 		if( (*objIT) == pObject )
 			return count;
@@ -416,7 +394,7 @@ void cBuilder::cursorUpdate() {
 }
 
 void cBuilder::castlePrepare( ) {
-	castleSave( false );
+	save( false );
 
 	// Final Room?
 	if( (char) mCurrentRoom->mNumber == -1) {
@@ -460,11 +438,13 @@ void cBuilder::castleSaveToDisk() {
 
 void cBuilder::mapRoomsDraw( size_t pArrowRoom ) {
 	map< int, cRoom *>::iterator	roomIT;
-		
+	cRoom							*room = 0;
+	map< int, cRoom *>				*rooms = mCastle->roomsGet();
+
 	screenClear();
 
 	// Loop through the data for each room, marking it as visible
-	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {
+	for( roomIT = rooms->begin(); roomIT !=  rooms->end(); ++roomIT ) {
 		
 		// Skip Final Room
 		if( roomIT->second->mNumber == -1 )
@@ -487,6 +467,7 @@ void cBuilder::mapRoomsDraw( size_t pArrowRoom ) {
 	mScreen->spriteGet( 0 )->_color = 1;
 }
 
+// Main Map Builder Loop
 void cBuilder::mapBuilder() {
 	bool mapRedraw = true, saveCastle = false;
 
@@ -586,7 +567,7 @@ void cBuilder::mapBuilder() {
 		if( saveCastle ) {
 			saveCastle = false;
 			
-			castleSave(false);
+			save(false);
 			mapRedraw = true;
 		}
 
@@ -800,370 +781,6 @@ void cBuilder::parseInput() {
 	// Does the cursor actually need updating
 	if(update) 
 		cursorObjectUpdate();
-}
-
-cRoom *cBuilder::roomCreate( int pNumber ) {
-	
-	if( mRooms.find( pNumber ) != mRooms.end() )
-		return mRooms.find( pNumber )->second;
-
-	cRoom *room = new cRoom( this, pNumber );
-	mRooms.insert( make_pair( pNumber, room ) );
-
-	return room;
-}
-
-void cBuilder::castleLoad( ) {
-	size_t size = 0;
-	byte *bufferStart = mCastle->bufferGet( size );
-	byte *buffer = bufferStart;
-
-	if( *(buffer + 2) != 0x80 )
-		return;
-
-	mStart_Room_Player1 = *(buffer + 3);
-	mStart_Room_Player2 = *(buffer + 4);
-	mStart_Door_Player1 = *(buffer + 5);
-	mStart_Door_Player2 = *(buffer + 6);
-	mLives_Player1 = *(buffer + 7);
-	mLives_Player2 = *(buffer + 8);
-
-	mFinalPtr = readLEWord(buffer + 0x5F);
-
-	if(mFinalPtr)
-		mFinalScreen = bufferStart + ( mFinalPtr - 0x7800 );
-
-	buffer += 0x100;
-
-	size_t count = 0;
-
-	while( *buffer != 0xFF && *buffer != 0x40) {
-		cRoom *room = roomCreate( count );
-		mRooms.insert( make_pair( count++ , room) );
-
-		room->roomLoad( &buffer );
-
-		buffer += 2;
-		room->mRoomDirPtr = bufferStart + (readLEWord(buffer) - 0x7800);
-		buffer += 2;
-	}
-
-	buffer++;
-
-	map< int, cRoom *>::iterator roomIT;
-
-	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {
-		cRoom *room = roomIT->second;
-
-		buffer = room->mRoomDirPtr;
-
-		mCurrentRoom = room;
-		room->roomLoadObjects( &buffer );
-
-		buffer += 2;
-	}
-
-	if( mFinalScreen ) {
-		mFinalRoom = roomCreate(-1);
-		mFinalRoom->roomLoadObjects( &mFinalScreen );
-	}
-}	
-
-void cBuilder::castleSave( bool pRemoveCursor ) {
-	map< int, cRoom *>::iterator  roomIT;
-	
-	if(mCurrentRoom && pRemoveCursor )
-		mCurrentRoom->objectDelete( mCurrentObject );
-
-	byte *buffer =  &mMemory[ 0x7800 ];
-
-	for( word addr = 0x7800; addr < 0x9800; ++addr )
-		mMemory[ addr ] = 0;
-
-	*(buffer + 2) = 0x80;
-	*(buffer + 3) = mStart_Room_Player1;
-	*(buffer + 4) = mStart_Room_Player2;
-	*(buffer + 5) = mStart_Door_Player1;
-	*(buffer + 6) = mStart_Door_Player2;
-	*(buffer + 7) = mLives_Player1;
-	*(buffer + 8) = mLives_Player2;
-
-	// Write the room directory
-	buffer = &mMemory[ 0x7900 ];
-
-	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {	
-		if( roomIT->second == mFinalRoom )
-			continue;
-
-		roomIT->second->roomSave( &buffer );
-
-		// Skip the pointers to room objects for now
-		buffer += 4;
-	}
-
-	// Room Directory Terminator
-	*(buffer) = 0xFF;
-
-	word	memDest = 0x7900 + (mRooms.size() * 8) + 1;
-	size_t	size = 0;
-
-	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {
-		if( (char) roomIT->second->mNumber == -1 )
-			continue;
-		buffer = &mMemory[ memDest ];
-
-		// Write pointer to room objects
-		byte *dirBuffer = roomIT->second->mRoomDirPtr + 4;
-		writeLEWord( dirBuffer, memDest + 2);
-		writeLEWord( dirBuffer + 2, memDest );
-
-		// Save all objects, and add up memory size
-		memDest += roomIT->second->roomSaveObjects( &buffer );
-
-		// End room marker
-		*buffer++ = 0x00;
-		*buffer++ = 0x00;
-
-		memDest += 2;
-	}
-
-	buffer = &mMemory[ memDest ];
-
-	// Save final room ptr
-	if(mFinalRoom) {
-		writeLEWord(&mMemory[ 0x785F ], memDest);
-
-		// Save final room objects
-		memDest += mFinalRoom->roomSaveObjects( &buffer );
-	}
-
-	writeLEWord( buffer, 0 );
-	buffer += 2;
-
-	memDest += 2;
-	// Write size of castle to beginning to castle memory
-	writeLEWord(  &mMemory[ 0x7800 ], (memDest - 0x7800) );
-
-	if(mCurrentRoom && pRemoveCursor )
-		mCurrentRoom->objectAdd( mCurrentObject );
-}
-
-cObject *cBuilder::objectCreate( cRoom *pRoom, eRoomObjects pObject, byte pPosX, byte pPosY ) {
-	cObject *obj = 0;
-	
-	if( pRoom == mFinalRoom && pObject != eObjectImage )
-		return 0;
-
-	switch( pObject ) {
-			case eObjectNone:				// Finished
-				return 0;
-
-			case eObjectDoor:				// Doors
-				obj = obj_Door_Create( pPosX, pPosY );
-				break;
-
-			case eObjectWalkway:			// Walkway
-				obj = obj_Walkway_Create( pPosX, pPosY );
-				break;
-
-			case eObjectSlidingPole:		// Sliding Pole
-				obj = obj_SlidingPole_Create( pPosX, pPosY );
-				break;
-
-			case eObjectLadder:				// Ladder
-				obj = obj_Ladder_Create( pPosX, pPosY );
-				break;
-
-			case eObjectDoorBell:			// Doorbell
-				obj = obj_Door_Button_Create( pPosX, pPosY );
-				break;
-
-			case eObjectLightning:			// Lightning Machine
-				obj = obj_Lightning_Create( pPosX, pPosY );
-				break;
-
-			case eObjectForcefield:			// Forcefield
-				obj = obj_Forcefield_Create( pPosX, pPosY );
-				break;
-
-			case eObjectMummy:				// Mummy
-				obj = obj_Mummy_Create( pPosX, pPosY );
-				break;
-
-			case eObjectKey:				// Key
-				obj = obj_Key_Create( pPosX, pPosY );
-				break;
-
-			case eObjectLock:				// Lock
-				obj = obj_Door_Lock_Create( pPosX, pPosY );
-				break;
-
-			case eObjectRayGun:				// Ray Gun
-				obj = obj_RayGun_Create( pPosX, pPosY );
-				break;
-
-			case eObjectTeleport:			// Teleport
-				obj = obj_Teleport_Create( pPosX, pPosY );
-				break;
-
-			case eObjectTrapDoor:			// Trap Door
-				obj = obj_TrapDoor_Create( pPosX, pPosY );
-				break;
-
-			case eObjectConveyor:			// Conveyor
-				obj = obj_Conveyor_Create( pPosX, pPosY );
-				break;
-
-			case eObjectFrankenstein:		// Frankenstein
-				obj = obj_Frankie_Create( pPosX, pPosY );
-				break;
-
-			case eObjectText:		// String Print
-			case 0x2A6D:
-				obj = obj_string_Create( pPosX, pPosY );
-				break;
-
-			case eObjectImage:
-				obj = obj_Image_Create( pPosX, pPosY );
-				break;
-
-			case eObjectMultiDraw:
-			case 0x160A:				// Intro
-				obj = obj_Multi_Create( pPosX, pPosY );
-				break;
-
-			default:
-				cout << "roomPrepare: 0x";
-				cout << std::hex << pObject << "\n";
-
-				break;
-	}
-
-	if(pRoom)
-		pRoom->objectAdd( obj );
-
-	return obj;
-}
-
-cObject *cBuilder::obj_Door_Create( byte pPosX, byte pPosY ) {
-	cObjectDoor	*object = new cObjectDoor( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_Walkway_Create( byte pPosX, byte pPosY ) {
-	cObjectWalkway *object = new cObjectWalkway( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_SlidingPole_Create( byte pPosX, byte pPosY ) {
-	cObjectSlidingPole	*object = new cObjectSlidingPole( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_Ladder_Create( byte pPosX, byte pPosY ) {
-	cObjectLadder *object = new cObjectLadder( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_Door_Button_Create( byte pPosX, byte pPosY ) {
-	cObjectDoorBell *object = new cObjectDoorBell( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_Lightning_Create( byte pPosX, byte pPosY ) {
-	cObjectLightning *object = new cObjectLightning( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_Forcefield_Create( byte pPosX, byte pPosY ) {
-	cObjectForcefield *object = new cObjectForcefield( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_Mummy_Create( byte pPosX, byte pPosY ) {
-	cObjectMummy *object = new cObjectMummy( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_Key_Create( byte pPosX, byte pPosY ) {
-	cObjectKey *object = new cObjectKey( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_Door_Lock_Create( byte pPosX, byte pPosY ) {
-	cObjectLock *object = new cObjectLock( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_RayGun_Create( byte pPosX, byte pPosY ) {
-	cObjectRayGun *object = new cObjectRayGun( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_Teleport_Create( byte pPosX, byte pPosY ) {
-	vector< cObject*> objects = mCurrentRoom->objectFind( eObjectTeleport );
-	cObjectTeleport *object = 0;
-
-	// Already got a teleport on this screen?
-	if(objects.size() == 0 ) {
-		object = new cObjectTeleport( mCurrentRoom, pPosX, pPosY );
-
-	} else {
-		object = (cObjectTeleport*) objects[0];
-
-		if(object->partGet()->mPlaced) {
-			object->partAdd();
-			object->mPartAdd();
-		}
-	}
-
-	return object;
-}
-
-cObject *cBuilder::obj_TrapDoor_Create( byte pPosX, byte pPosY ) {
-	cObjectTrapDoor *object = new cObjectTrapDoor( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_Conveyor_Create( byte pPosX, byte pPosY ) {
-	cObjectConveyor *object = new cObjectConveyor( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_Frankie_Create( byte pPosX, byte pPosY ) {
-	cObjectFrankenstein *object = new cObjectFrankenstein( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_string_Create( byte pPosX, byte pPosY ) {
-	cObjectText *object = new cObjectText( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_Image_Create( byte pPosX, byte pPosY ) {
-	cObjectImage *object = new cObjectImage( mCurrentRoom, pPosX, pPosY );
-
-	return object;
-}
-
-cObject *cBuilder::obj_Multi_Create( byte pPosX, byte pPosY ) {
-
-	return 0;
 }
 
 void cBuilder::selectedObjectDelete() {

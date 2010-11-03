@@ -24,9 +24,8 @@
  */
 
 class cCastleInfo;
-class cCastle_Room;
-class cCastle_Object_Player;
-class cCastle_Object_Door;
+class cRoom;
+class cBuilder;
 
 class cCastle {
 private:
@@ -36,10 +35,27 @@ private:
 
 	string						 mName;
 	
+	byte						 mStart_Door_Player1, mStart_Door_Player2;
+	byte						 mStart_Room_Player1, mStart_Room_Player2;
+	byte						 mLives_Player1, mLives_Player2;
+
+	byte						*mFinalScreen;
+	word						 mFinalPtr;
+	cRoom						*mFinalRoom;
+
+	map< int, cRoom *>			 mRooms;
+
 
 public:
 						 cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo );
 						~cCastle();
+
+	void				 castleLoad( cBuilder *pBuilder );
+	void				 castleSave( byte *pTarget );
+	map< int, cRoom *>	*roomsGet()			{ return &mRooms; }
+	
+	void				 roomCleanup();
+	cRoom				*roomCreate( cBuilder *pBuilder, int pNumber );
 
 	byte				*bufferGet( size_t &pBufferSize ) { return mBuffer; }
 	
@@ -50,5 +66,14 @@ public:
 		return (mBuffer + (pAddress - 0x7800));
 	}
 
+	inline byte			 mStart_Room_Player1Get() { return mStart_Room_Player1; }
+	inline byte			 mStart_Room_Player2Get() { return mStart_Room_Player2; }
 
+	inline void			 mStart_Room_Player1Set( byte pVal ) { mStart_Room_Player1 = pVal; }
+	inline void			 mStart_Room_Player2Set( byte pVal ) { mStart_Room_Player2 = pVal; }
+	
+	inline void			 mStart_Door_Player1Set( byte pVal ) { mStart_Door_Player1 = pVal; }
+	inline void			 mStart_Door_Player2Set( byte pVal ) { mStart_Door_Player2 = pVal; }
+
+	inline cRoom		*mFinalRoomGet()					 { return mFinalRoom; }
 };

@@ -50,46 +50,16 @@ private:
 
 	bool					 mDragMode, mLinkMode;
 
-	byte					 mStart_Door_Player1, mStart_Door_Player2;
-	byte					 mStart_Room_Player1, mStart_Room_Player2;
-	byte					 mLives_Player1, mLives_Player2;
-	byte					*mFinalScreen;
-	word					 mFinalPtr;
-	cRoom					*mFinalRoom;
-
-	map< int, cRoom *>		 mRooms;
 	vector< sString >		 mStrings;
 	bool					 mTest;
 
 private:
 
-	void					 castleCreate();
 	void					 castlePrepare( );
-	void					 castleLoad( );
-	void					 castleSave( bool pRemoveCursor );
 
 	void					 cursorObjectUpdate();
 	void					 cursorUpdate();
 	size_t					 findItemIndex( cObject *pObject );
-
-	cObject					*obj_Door_Create( byte pPosX, byte pPosY );
-	cObject					*obj_Walkway_Create( byte pPosX, byte pPosY );
-	cObject					*obj_SlidingPole_Create( byte pPosX, byte pPosY );
-	cObject					*obj_Ladder_Create( byte pPosX, byte pPosY );
-	cObject					*obj_Door_Button_Create( byte pPosX, byte pPosY );
-	cObject					*obj_Lightning_Create( byte pPosX, byte pPosY );
-	cObject					*obj_Forcefield_Create( byte pPosX, byte pPosY );
-	cObject					*obj_Mummy_Create( byte pPosX, byte pPosY );
-	cObject					*obj_Key_Create( byte pPosX, byte pPosY );
-	cObject					*obj_Door_Lock_Create( byte pPosX, byte pPosY );
-	cObject					*obj_RayGun_Create( byte pPosX, byte pPosY );
-	cObject					*obj_Teleport_Create( byte pPosX, byte pPosY );
-	cObject					*obj_TrapDoor_Create( byte pPosX, byte pPosY );
-	cObject					*obj_Conveyor_Create( byte pPosX, byte pPosY );
-	cObject					*obj_Frankie_Create( byte pPosX, byte pPosY );
-	cObject					*obj_string_Create( byte pPosX, byte pPosY );
-	cObject					*obj_Image_Create( byte pPosX, byte pPosY );
-	cObject					*obj_Multi_Create( byte pPosX, byte pPosY );
 
 	void					 castleSaveToDisk();
 
@@ -99,7 +69,8 @@ private:
 	void					 selectedObjectLink();
 	void					 selectPlacedObject( bool pChangeUp );
 
-	void					 roomCleanup();
+	void					 save( bool pRemoveCursor );
+
 	void					 roomChange( int pRoomNumber );
 
 	void					 objectStringsClear();
@@ -117,9 +88,6 @@ public:
 							~cBuilder();
 
 	void					 mainLoop();
-
-	cObject					*objectCreate( cRoom *pRoom, eRoomObjects pObject, byte pPosX, byte pPosY );
-	cRoom					*roomCreate( int pNumber );
 
 	void					 objectStringAdd( string pMessage, byte pPosX, byte pPosY, byte pColor );
 	void					 messagePrint( string pMessage );
