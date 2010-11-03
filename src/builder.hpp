@@ -25,6 +25,7 @@
 
 class cObjectText;
 class cObject;
+class cRoom;
 
 struct sString {
 	byte mPosX, mPosY;
@@ -34,62 +35,6 @@ struct sString {
 	sString( byte pPosX, byte pPosY, byte pColor, string pString ) {
 		mPosX = pPosX; mPosY = pPosY; mColor = pColor; mString = pString;
 	}
-};
-
-class cRoom {
-public:
-	cBuilder		*mBuilder;
-	byte			 mNumber;
-	byte			 mColor;
-	byte		 	 mMapX, mMapY;
-	byte			 mMapWidth, mMapHeight;
-	byte			*mRoomDirPtr;
-
-	vector< cObject* >	mObjects;
-	
-	void			 objectAdd( cObject *pObject ) { 
-		if(pObject) 
-			if( find( mObjects.begin(), mObjects.end(), pObject ) == mObjects.end() )
-				mObjects.push_back( pObject ); 
-	}
-
-	void			 objectDelete( cObject *pObject ) {
-		vector<cObject* >::iterator objIT = find( mObjects.begin(), mObjects.end(), pObject );
-		if( objIT == mObjects.end() )
-			return;
-
-		mObjects.erase( objIT );
-	}
-
-	cObject			*objectGet( size_t pNumber ) {
-		if( pNumber >= mObjects.size() )
-			return 0;
-
-		return mObjects[pNumber];
-	}
-
-					 cRoom( cBuilder *pBuilder, byte pNumber ) {
-						 mNumber = pNumber;
-						 mRoomDirPtr = 0;
-						 mBuilder = pBuilder;
-					 }
-
-	vector< cObject* > objectFind( eRoomObjects pType );
-
-	void			 roomLoad( byte **pBuffer );
-	void			 roomLoadObjects( byte **pBuffer );
-	size_t			 roomSaveObjects( byte **pBuffer );
-	size_t			 roomSave( byte **pBuffer );
-
-private:
-	size_t			 saveCount( byte **pBuffer, eRoomObjects pObjectType );
-	size_t			 saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker = 0x00 );
-	size_t			 saveObjects( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker = 0x00 );
-	size_t			 saveObjectLightning( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker);
-
-	void			 loadCount( byte **pBuffer, eRoomObjects pObjectType );
-	void			 loadObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker);
-	void			 loadObjectLightning( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker);
 };
 
 class cBuilder : public cCreep {
@@ -112,7 +57,7 @@ private:
 	word					 mFinalPtr;
 	cRoom					*mFinalRoom;
 
-	map< int, cRoom *>	 mRooms;
+	map< int, cRoom *>		 mRooms;
 	vector< sString >		 mStrings;
 	bool					 mTest;
 
@@ -163,6 +108,8 @@ private:
 
 	void					 loadCount( byte **pBuffer, eRoomObjects pObjectType );
 
+	void					 mapRoomsDraw( size_t pArrowRoom );
+	void					 mapBuilder();
 	void					 playerDraw();
 
 public:

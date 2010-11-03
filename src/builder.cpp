@@ -33,262 +33,9 @@
 #include "creep.h"
 #include "sound/sound.h"
 #include "castle/objects/object.hpp"
+#include "castle/room.hpp"
 #include "builder.hpp"
 #include "debug.h"
-
-size_t cRoom::roomSaveObjects( byte **pBuffer ) {
-	size_t size = 0;
-
-	size = saveCount( pBuffer, eObjectDoor );
-	size += saveObject( pBuffer, eObjectWalkway, 0x00 );
-	size += saveObject( pBuffer, eObjectSlidingPole, 0x00 );
-	size += saveObject( pBuffer, eObjectLadder, 0x00 );
-	size += saveCount( pBuffer, eObjectDoorBell );
-	size += saveObjectLightning( pBuffer, eObjectLightning, 0x20 );
-	size += saveObject( pBuffer, eObjectForcefield, 0x00 );
-	size += saveObject( pBuffer, eObjectMummy, 0x00 );
-	size += saveObject( pBuffer, eObjectKey, 0x00 );
-	size += saveObject( pBuffer, eObjectLock, 0x00 );
-	size += saveObject( pBuffer, eObjectRayGun, 0x80 );
-	size += saveObject( pBuffer, eObjectTeleport, 0x00 );
-	size += saveObject( pBuffer, eObjectTrapDoor, 0x80 );
-	size += saveObject( pBuffer, eObjectConveyor, 0x80 );
-	size += saveObject( pBuffer, eObjectFrankenstein, 0x80 );
-	size += saveObject( pBuffer, eObjectText, 0x00 );
-
-	size += saveObjects( pBuffer, eObjectImage, 0x00 );
-
-	return size;
-}
-
-void cRoom::roomLoadObjects( byte **pBuffer ) {
-	word func = 0;
-
-	while( (func = readLEWord( *pBuffer )) != 0 ) {
-		*pBuffer += 2;
-
-		switch( func ) {
-			case eObjectDoor:
-			case eObjectDoorBell:
-				loadCount( pBuffer, (eRoomObjects) func );
-				break;
-
-			case eObjectWalkway:
-			case eObjectSlidingPole:
-			case eObjectLadder:
-			case eObjectForcefield:
-			case eObjectMummy:
-			case eObjectKey:
-			case eObjectLock:
-			case eObjectTeleport:
-			case eObjectText:
-			case eObjectImage:
-				loadObject( pBuffer, (eRoomObjects) func, 0x00 );
-				break;
-
-			case eObjectLightning:
-				loadObjectLightning( pBuffer, (eRoomObjects) func, 0x20 );
-				break;
-
-			case eObjectRayGun:
-			case eObjectTrapDoor:
-			case eObjectConveyor:
-			case eObjectFrankenstein:
-				loadObject( pBuffer, (eRoomObjects) func, 0x80 );
-				break;
-
-			default:
-				cout << "0x";
-				cout << hex << (int) func << endl;
-				break;
-		}
-	}
-
-	return;
-}
-
-size_t cRoom::roomSave( byte **pBuffer ) {
-	byte sizeFinal;
-	
-	mRoomDirPtr = *pBuffer;
-
-	*(*pBuffer)++ = mColor;
-	*(*pBuffer)++ = mMapX;
-	*(*pBuffer)++ = mMapY;
-
-	sizeFinal = mMapWidth;
-	sizeFinal |= (mMapHeight << 3);
-
-	*(*pBuffer)++ = sizeFinal;
-
-	return 8;
-}
-
-void cRoom::roomLoad( byte **pBuffer ) {
-	mColor = *(*pBuffer)++;
-	mMapX  = *(*pBuffer)++;
-	mMapY  = *(*pBuffer)++;
-	size_t sizeFinal = *(*pBuffer)++;
-
-	mMapWidth = (sizeFinal & 7);
-	mMapHeight = (sizeFinal >> 3) & 7;
-}
-
-vector< cObject* > cRoom::objectFind( eRoomObjects pType ) {
-	vector< cObject* >			objects;
-	vector< cObject* >::iterator	objectIT;
-
-	for( objectIT = mObjects.begin(); objectIT != mObjects.end(); ++objectIT ) {
-
-		if( (*objectIT)->objectTypeGet() == pType )
-			objects.push_back( *objectIT );
-	}	
-
-	return objects;
-}
-
-void cRoom::loadCount( byte **pBuffer, eRoomObjects pObjectType ) {
-
-	// Number of objects
-	byte count = *(*pBuffer)++;
-
-	// Read each object
-	for( int x = 0; x < count; ++x ) {
-		cObject *obj = mBuilder->objectCreate( this, pObjectType, 0, 0 );
-		obj->objectLoad(pBuffer, 0);
-	}
-
-	return;
-}
-
-void cRoom::loadObjectLightning( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker) {
-
-	while(*(*pBuffer) != pEndMarker ) { 
-		cObjectLightning *obj = (cObjectLightning*) mBuilder->objectCreate( this, pObjectType, 0, 0 );
-		
-		if( (*(*pBuffer) & 0x80) ) 
-			obj->objectLoadSwitch(pBuffer, 0 );
-		else
-			obj->objectLoadMachine(pBuffer, 0);
-	};
-
-
-	(*pBuffer)++;
-
-	return;
-}
-
-size_t cRoom::saveObjectLightning( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker) {
-	vector< cObject* >	objects = objectFind( pObjectType );
-	vector< cObject* >::iterator	objectIT;
-	size_t size = 0;
-
-	if(objects.size() == 0)
-		return 0;
-
-	writeLEWord( *pBuffer, (word) pObjectType );
-	*pBuffer += 2;
-
-	for( objectIT = objects.begin(); objectIT != objects.end(); ++objectIT ) {
-		cObjectLightning *obj = (cObjectLightning*) *objectIT;
-
-		size += obj->objectSave(pBuffer, 0);
-	}
-
-	*(*pBuffer)++ = pEndMarker;
-
-	return size + 3;
-}
-
-void cRoom::loadObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker ) {
-
-	// Load each object until end marker
-	while(*(*pBuffer) != pEndMarker ) { 
-		cObject *obj = mBuilder->objectCreate( this, pObjectType, 0, 0 );
-		obj->objectLoad(pBuffer, 0);
-	}
-
-	(*pBuffer)++;
-
-	return;
-}
-
-size_t cRoom::saveCount( byte **pBuffer, eRoomObjects pObjectType ) {
-	vector< cObject* >	objects = objectFind( pObjectType );
-	vector< cObject* >::iterator	objectIT;
-	size_t	size = 3;
-
-	// No objects to save?
-	if( objects.size() == 0 )
-		return 0;
-
-	// Write ID
-	writeLEWord( *pBuffer, (word) pObjectType );
-	*pBuffer += 2;
-
-	// Number of objects
-	*(*pBuffer)++ = objects.size();
-
-	// Write each door
-	for( objectIT = objects.begin(); objectIT != objects.end(); ++objectIT ) 
-		size += (*objectIT)->objectSave( pBuffer, 0 );
-
-	return size;
-}
-
-size_t cRoom::saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker ) {
-	vector< cObject* >	objects = objectFind( pObjectType );
-	vector< cObject* >::iterator	objectIT;
-
-	size_t	size = 3;
-
-	// No poles to save?
-	if( objects.size() == 0 )
-		return 0;
-
-	// Write ObjectID
-	writeLEWord( *pBuffer, (word) pObjectType );
-	*pBuffer += 2;
-
-	// Write each
-	for( objectIT = objects.begin(); objectIT != objects.end(); ++objectIT ) 
-		size += (*objectIT)->objectSave( pBuffer, 0 );
-
-	if(size == 3 ) {
-		*pBuffer -= 2;
-		writeLEWord( *pBuffer, 0 );
-		return 0;
-	}
-
-	*(*pBuffer)++ = pEndMarker;
-
-	return size;
-}
-
-size_t cRoom::saveObjects( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker ) {
-	vector< cObject* >	objects = objectFind( pObjectType );
-	vector< cObject* >::iterator	objectIT;
-
-	size_t	size = 0;
-
-	// No objects to save?
-	if( objects.size() == 0 )
-		return 0;
-
-	// Write each
-	for( objectIT = objects.begin(); objectIT != objects.end(); ++objectIT ) {
-		// Write ObjectID
-		writeLEWord( *pBuffer, (word) pObjectType );
-		*pBuffer += 2;
-
-		size += 3;
-		size += (*objectIT)->objectSave( pBuffer, 0 );
-
-		*(*pBuffer)++ = pEndMarker;
-	}
-
-	return size;
-}
 
 cBuilder::cBuilder( cCreep *pParent ) {
 
@@ -705,6 +452,150 @@ void cBuilder::castleSaveToDisk() {
 	castlePrepare( );
 }
 
+void cBuilder::mapRoomsDraw( size_t pArrowRoom ) {
+	map< int, cRoom *>::iterator	roomIT;
+		
+	screenClear();
+
+	// Loop through the data for each room, marking it as visible
+	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {
+		
+		// Skip Final Room
+		if( roomIT->second->mNumber == -1 )
+			continue;
+
+		castleRoomData( roomIT->second->mNumber );
+
+		mMemory[ word_42 ] |= byte_8C0;
+
+		// Draw the room
+		mapRoomDraw();
+
+		if( roomIT->second->mNumber == pArrowRoom ) {
+			castleRoomData( roomIT->second->mNumber );
+			mapArrowDraw( 0 );
+		}
+	}
+
+	// Set the sprite color to white
+	mScreen->spriteGet( 0 )->_color = 1;
+}
+
+void cBuilder::mapBuilder() {
+	bool mapRedraw = true, saveCastle = false;
+
+	while(!mQuit) {
+		byte key = tolower( mInput->keyGet() );
+
+		if( mInput->restoreGet() )
+			mQuit = true;
+
+		switch(key) {
+
+			case 0x0C:	{// '-' Previous Room
+				int newRoom = ((char) mCurrentRoom->mNumber) - 1;
+				if(newRoom < 0)
+					newRoom = 0;
+				roomChange( newRoom );
+				mapRedraw = true;
+				break;
+						}
+
+			case 0x0D:	{// '=' Next Room
+				int newRoom = ((char) mCurrentRoom->mNumber) + 1;
+				//if( newRoom >= (int) mRooms.size() )
+				//	newRoom = mRooms.size() - 1;
+				roomChange( newRoom );
+				mapRedraw = true;
+				break;
+						}
+
+			case 0x1A:	// '[' Increase Width
+				if(mCurrentRoom->mMapWidth < 0x255)
+					++mCurrentRoom->mMapWidth;
+
+				saveCastle = true;
+				break;
+
+			case 0x1B:	// ']' Decrease Width
+				if(mCurrentRoom->mMapWidth > 0)
+					--mCurrentRoom->mMapWidth;
+
+				saveCastle = true;
+				break;
+	
+			case 0x27:	// ';' Increase Height
+			if(mCurrentRoom->mMapHeight < 0x255)
+					++mCurrentRoom->mMapHeight;
+
+				saveCastle = true;
+				break;
+
+			case 0x28:	// ''' Decrease Height
+				if(mCurrentRoom->mMapHeight > 0)
+					--mCurrentRoom->mMapHeight;
+
+				saveCastle = true;
+				break;
+
+			case 0x2E:
+				if(mCurrentRoom->mColor < 0x15)
+					mCurrentRoom->mColor++;
+				else
+					mCurrentRoom->mColor = 0;
+
+				saveCastle = true;
+				break;
+
+			default:
+				if(key) {
+					cout << "0x";
+					cout << hex << (int) key << endl;
+				}
+		}
+
+		sPlayerInput *input = mInput->inputGet(0);
+		if(input->mLeft) {
+			if(mCurrentRoom->mMapX > 3)
+				mCurrentRoom->mMapX -= 4;
+			saveCastle = true;
+		}
+		if(input->mRight) {
+			if(mCurrentRoom->mMapX < 0x255)
+				mCurrentRoom->mMapX += 4;
+			saveCastle = true;
+		}
+		if(input->mUp) {
+			if(mCurrentRoom->mMapY > 7)
+				mCurrentRoom->mMapY -= 8;
+			saveCastle = true;
+		}
+		if(input->mDown) {
+			if(mCurrentRoom->mMapY < 0x255)
+				mCurrentRoom->mMapY += 8;
+			saveCastle = true;
+		}
+
+		if( saveCastle ) {
+			saveCastle = false;
+			
+			castleSave(false);
+			mapRedraw = true;
+		}
+
+		if( mapRedraw ) {
+			mapRedraw = false;
+
+			mapRoomsDraw( mCurrentRoom->mNumber );
+		}
+
+		hw_IntSleep(1);
+		hw_Update();	
+	}
+
+	mQuit = false;
+}
+
 void cBuilder::parseInput() {
 	sObjectPart		*part	= 0;
 	sPlayerInput	*input	= mInput->inputGet(0);
@@ -845,6 +736,11 @@ void cBuilder::parseInput() {
 	if( mInput->runStopGet() )
 		castleSaveToDisk();
 	
+	if( mInput->f3Get() ) {
+		mapBuilder();
+		update = true;
+	}
+
 	// F4: Quit builder in test castle mode
 	if( mInput->f4Get() ) {
 		mTest = true;
