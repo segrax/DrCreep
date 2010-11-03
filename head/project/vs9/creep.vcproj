@@ -426,6 +426,14 @@
 					RelativePath="..\..\src\castle\castle.h"
 					>
 				</File>
+				<File
+					RelativePath="..\..\src\castle\room.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\castle\room.hpp"
+					>
+				</File>
 				<Filter
 					Name="objects"
 					>

@@ -62,6 +62,12 @@ public:
 						 mNumber = pNumber;
 						 mRoomDirPtr = 0;
 						 mBuilder = pBuilder;
+
+						 mColor = 3;
+						 mMapHeight = 1;
+						 mMapWidth = 1;
+						 mMapX = 0x10;
+						 mMapY = 0;
 					 }
 
 	vector< cObject* > objectFind( eRoomObjects pType );

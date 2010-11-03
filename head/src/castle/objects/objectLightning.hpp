@@ -35,21 +35,18 @@ public:
 	cObjectLightning( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectLightning;
 		
+		mLinkObject = eObjectLightning;
+		mLinked = true;
+
 		mMachineMode = false;
-		mParts[0].mDragDirection = eDirectionDown;
-		mParts[0].mDrags = true;
-		mParts[0].mLength = 0;
+		
 		mParts[0].mCursorWidth = 3;
 		mParts[0].mCursorHeight = 3;
 
-		mParts[1].mCursorWidth = 3;
-		mParts[1].mCursorHeight = 3;
-		mPartCount = 2;
-
-		mMachine[0] = 0;
-		mMachine[1] = 0;
-		mMachine[2] = 0;
-		mMachine[3] = 0;
+		mMachine[0] = 0xFF;
+		mMachine[1] = 0xFF;
+		mMachine[2] = 0xFF;
+		mMachine[3] = 0xFF;
 		
 		mMachineState = false;
 		mSwitchState = false;
@@ -80,7 +77,7 @@ public:
 		else
 			mSwitchState = false;
 
-		cObject::objectLoad( pBuffer, 1 );
+		cObject::objectLoad( pBuffer, 0 );
 		*(*pBuffer)++;
 
 		mMachine[0] = *(*pBuffer)++;
@@ -111,7 +108,7 @@ public:
 		else
 			*(*pBuffer)++ = 0xC0;
 
-		size_t strSize = cObject::objectSave( pBuffer, 1 );
+		size_t strSize = cObject::objectSave( pBuffer, 0 );
 		*(*pBuffer)++ = 0x00;
 
 		*(*pBuffer)++ = mMachine[0];
@@ -128,9 +125,48 @@ public:
 		if( mMachineMode )
 			size = objectSaveMachine( pBuffer, 0 );
 		else
-			size = objectSaveSwitch( pBuffer, 1 );
+			size = objectSaveSwitch( pBuffer, 0 );
 		
 		return size;
+	}
+
+	void		mLinkedSet( byte pNumber ) {
+		size_t x = 0;
+
+		while( mMachine[x] != 0xFF && x < 4)
+			++x;
+
+		if( x > 3 )
+			x = 0;
+
+		mMachine[x] = (pNumber * 0x08);
+		
+	}
+
+	void		stateChange() {
+		if( mMachineMode ) {
+
+			if(mMachineState) {
+				mMachineMode = false; 
+				mMachineState = false;
+
+				mParts[0].mDrags = false;
+				mParts[0].mLength = 1;
+			} else
+				mMachineState = true;
+
+		} else {
+
+			if(mSwitchState) {
+				mParts[0].mDragDirection = eDirectionDown;
+				mParts[0].mDrags = true;
+				mParts[0].mLength = 1;
+
+				mMachineMode = true;
+				mSwitchState = false;
+			} else
+				mSwitchState = true;
+		}
 	}
 
 };

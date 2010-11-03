@@ -109,8 +109,8 @@ size_t cRoom::roomSave( byte **pBuffer ) {
 	*(*pBuffer)++ = mMapX;
 	*(*pBuffer)++ = mMapY;
 
-	sizeFinal = mMapWidth;
-	sizeFinal |= (mMapHeight << 3);
+	sizeFinal = mMapHeight;
+	sizeFinal |= (mMapWidth << 3);
 
 	*(*pBuffer)++ = sizeFinal;
 
@@ -123,8 +123,8 @@ void cRoom::roomLoad( byte **pBuffer ) {
 	mMapY  = *(*pBuffer)++;
 	size_t sizeFinal = *(*pBuffer)++;
 
-	mMapWidth = (sizeFinal & 7);
-	mMapHeight = (sizeFinal >> 3) & 7;
+	mMapHeight = (sizeFinal & 7);
+	mMapWidth  = (sizeFinal >> 3) & 7;
 }
 
 vector< cObject* > cRoom::objectFind( eRoomObjects pType ) {
