@@ -161,10 +161,10 @@ cCreep::cCreep() {
 
 cCreep::~cCreep() {
 
+	delete mSound;
 	delete m64CharRom;
 	delete mMemory;
 	delete mCastleManager;
-	delete mSound;
 	delete mScreen;
 	delete mInput;
 	delete mDebug;
@@ -175,6 +175,8 @@ void cCreep::builderStart( int pStartLevel ) {
 	bool	run = true;
 
 	mBuilder = new cBuilder( this );
+	mBuilder->mSoundSet( mSound );
+
 	mScreen->roomNumberSet(0);
 	mBuilder->start(pStartLevel, false);
 
@@ -194,8 +196,9 @@ void cCreep::builderStart( int pStartLevel ) {
 		mBuilder->mainLoop();
 	}
 
-	// Remove screen ptr so builder doesnt delete it
+	// Remove screen./sound ptr so builder doesnt delete it
 	mBuilder->screenSet(0);
+	mBuilder->mSoundSet(0);
 
 	// Delete Builder
 	delete mBuilder;
@@ -351,7 +354,8 @@ void cCreep::start( int pStartLevel, bool pUnlimited ) {
 	if(pUnlimited)
 		mUnlimitedLives = 0xFF;
 
-	mSound = new cSound( this );
+	if(!mSound)
+		mSound = new cSound( this );
 
 	for(;;) {
 		

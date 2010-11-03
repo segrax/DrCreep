@@ -56,4 +56,10 @@ public:
 		return (strSize + 1);
 	}
 
+	void		stateChange() {
+		if(mState)
+			mState = 0;
+		else
+			mState = 1;
+	}
 };
