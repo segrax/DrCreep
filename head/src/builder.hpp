@@ -125,4 +125,6 @@ public:
 	void					 messagePrint( string pMessage );
 
 	inline bool				 mTestGet() { return mTest; }
+
+	inline void				 mSoundSet( cSound *pSound ) { mSound = pSound; }
 };

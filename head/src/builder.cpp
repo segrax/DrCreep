@@ -544,7 +544,7 @@ void cBuilder::mapBuilder() {
 				saveCastle = true;
 				break;
 
-			case 0x2E:
+			case 0x2E:	// 'c' Change Room Color
 				if(mCurrentRoom->mColor < 0x15)
 					mCurrentRoom->mColor++;
 				else

@@ -59,4 +59,10 @@ public:
 		return (strSize + 1);
 	}
 
+	void		stateChange() {
+		++mState;
+		if(mState > 3 )
+			mState = 0;
+	}
+
 };
