@@ -96,6 +96,7 @@ protected:
 
 public:
 
+	virtual void		stateChange()	{ }
 	inline cRoom		*mRoomGet()	{ return mRoom; }
 	virtual void		colorIncrease()	 { }
 	virtual void		colorDecrease()	 { }

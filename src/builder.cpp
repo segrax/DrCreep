@@ -85,13 +85,6 @@ cBuilder::~cBuilder() {
 void cBuilder::castleCreate() {
 
 	mCurrentRoom = roomCreate(0);
-
-	mCurrentRoom->mColor = 3;
-	mCurrentRoom->mMapHeight = 3;
-	mCurrentRoom->mMapWidth = 3;
-	mCurrentRoom->mMapX = 3;
-	mCurrentRoom->mMapY = 3;
-
 	mFinalRoom = roomCreate(-1);
 
 	mStart_Room_Player1 = mStart_Room_Player2 = 0;
@@ -217,7 +210,13 @@ void cBuilder::mainLoop() {
 				selectedObjectLink();
 				break;
 
-			//case 0x1F:	// 's' Save Castle
+			case 0x1F:	// 's' Object State
+				if(mCurrentObject) {
+					mCurrentObject->stateChange();
+					castlePrepare();
+				}
+				break;
+
 			//	castleSaveToDisk();
 			//	break;
 
@@ -386,6 +385,13 @@ size_t cBuilder::findItemIndex( cObject *pObject ) {
 
 	// Find the 'index' of an item, of type 'pObject'
 	for(objIT = objects.begin(); objIT != objects.end(); ++objIT ) {
+		/*if( pObject->objectTypeGet() == eObjectLightning ) {
+			cObjectLightning *light = (cObjectLightning*) (*objIT);
+
+			if( !light->mMachineMode )
+				continue;
+		}*/
+
 		if( (*objIT) == pObject )
 			return count;
 
@@ -511,29 +517,29 @@ void cBuilder::mapBuilder() {
 						}
 
 			case 0x1A:	// '[' Increase Width
-				if(mCurrentRoom->mMapWidth < 0x255)
-					++mCurrentRoom->mMapWidth;
+				if(mCurrentRoom->mMapWidth < 7)
+					mCurrentRoom->mMapWidth ++;
 
 				saveCastle = true;
 				break;
 
 			case 0x1B:	// ']' Decrease Width
-				if(mCurrentRoom->mMapWidth > 0)
-					--mCurrentRoom->mMapWidth;
+				if(mCurrentRoom->mMapWidth > 1)
+					mCurrentRoom->mMapWidth --;
 
 				saveCastle = true;
 				break;
 	
 			case 0x27:	// ';' Increase Height
-			if(mCurrentRoom->mMapHeight < 0x255)
-					++mCurrentRoom->mMapHeight;
+			if(mCurrentRoom->mMapHeight < 7)
+					mCurrentRoom->mMapHeight ++;
 
 				saveCastle = true;
 				break;
 
 			case 0x28:	// ''' Decrease Height
-				if(mCurrentRoom->mMapHeight > 0)
-					--mCurrentRoom->mMapHeight;
+				if(mCurrentRoom->mMapHeight > 1)
+					mCurrentRoom->mMapHeight --;
 
 				saveCastle = true;
 				break;
@@ -548,10 +554,11 @@ void cBuilder::mapBuilder() {
 				break;
 
 			default:
-				if(key) {
+				/*if(key) {
 					cout << "0x";
 					cout << hex << (int) key << endl;
-				}
+				}*/
+				break;
 		}
 
 		sPlayerInput *input = mInput->inputGet(0);
@@ -681,6 +688,10 @@ void cBuilder::parseInput() {
 			mCursorY -= 8;
 		update = true;
 	}
+
+	//
+	if(part && ((int) part->mLength) < 1)
+		part->mLength = 1;
 
 	// Button
 	if(input->mButton) {
