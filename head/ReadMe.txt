@@ -126,8 +126,9 @@ Builder Controls:
   Escape = Quit Builder
 
   F2  = Save Castle to empty 'Castle Disk'
-  F4  = Return from Builder, in test castle mode
+  F3  = Edit Map Screen
 
+  F4  = Return from Builder, in test castle mode
 
  Objects:
  --------
@@ -156,6 +157,19 @@ Builder Controls:
 
   Ctrl = Place Cursor Object, Select object to link to
 
+
+ Map Screen:
+ -----------
+
+  - = Previous Room
+  = = Next Room
+
+  [ = Reduce Width
+  ] = Increase Width
+  ; = Decrease Height
+  ' = Increase Height
+
+  Cursor Keys = Move Room
 
     
   
