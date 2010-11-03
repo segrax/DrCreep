@@ -25,9 +25,11 @@
 
 class cBuilder;
 class cObject;
+class cCastle;
 
 class cRoom {
 public:
+	cCastle			*mCastle;
 	cBuilder		*mBuilder;
 	byte			 mNumber;
 	byte			 mColor;
@@ -58,7 +60,8 @@ public:
 		return mObjects[pNumber];
 	}
 
-					 cRoom( cBuilder *pBuilder, byte pNumber ) {
+					 cRoom( cBuilder *pBuilder, cCastle *pCastle, byte pNumber ) {
+						 mCastle = pCastle;
 						 mNumber = pNumber;
 						 mRoomDirPtr = 0;
 						 mBuilder = pBuilder;
@@ -70,13 +73,15 @@ public:
 						 mMapY = 0;
 					 }
 
-	vector< cObject* > objectFind( eRoomObjects pType );
+
+	cObject				*objectCreate( cRoom *pRoom, eRoomObjects pObject, byte pPosX, byte pPosY );
+	vector< cObject* >	 objectFind( eRoomObjects pType );
 
 	void			 roomLoad( byte **pBuffer );
 	void			 roomLoadObjects( byte **pBuffer );
 	size_t			 roomSaveObjects( byte **pBuffer );
 	size_t			 roomSave( byte **pBuffer );
-
+	
 private:
 	size_t			 saveCount( byte **pBuffer, eRoomObjects pObjectType );
 	size_t			 saveObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker = 0x00 );
@@ -86,4 +91,23 @@ private:
 	void			 loadCount( byte **pBuffer, eRoomObjects pObjectType );
 	void			 loadObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker);
 	void			 loadObjectLightning( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker);
+
+	cObject					*obj_Door_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Walkway_Create( byte pPosX, byte pPosY );
+	cObject					*obj_SlidingPole_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Ladder_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Door_Button_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Lightning_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Forcefield_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Mummy_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Key_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Door_Lock_Create( byte pPosX, byte pPosY );
+	cObject					*obj_RayGun_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Teleport_Create( byte pPosX, byte pPosY );
+	cObject					*obj_TrapDoor_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Conveyor_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Frankie_Create( byte pPosX, byte pPosY );
+	cObject					*obj_string_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Image_Create( byte pPosX, byte pPosY );
+	cObject					*obj_Multi_Create( byte pPosX, byte pPosY );
 };

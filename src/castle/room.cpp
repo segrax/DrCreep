@@ -28,6 +28,7 @@
 #include "room.hpp"
 #include "creep.h"
 #include "builder.hpp"
+#include "castle.h"
 
 size_t cRoom::roomSaveObjects( byte **pBuffer ) {
 	size_t size = 0;
@@ -147,7 +148,7 @@ void cRoom::loadCount( byte **pBuffer, eRoomObjects pObjectType ) {
 
 	// Read each object
 	for( int x = 0; x < count; ++x ) {
-		cObject *obj = mBuilder->objectCreate( this, pObjectType, 0, 0 );
+		cObject *obj = objectCreate( this, pObjectType, 0, 0 );
 		obj->objectLoad(pBuffer, 0);
 	}
 
@@ -157,7 +158,7 @@ void cRoom::loadCount( byte **pBuffer, eRoomObjects pObjectType ) {
 void cRoom::loadObjectLightning( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarker) {
 
 	while(*(*pBuffer) != pEndMarker ) { 
-		cObjectLightning *obj = (cObjectLightning*) mBuilder->objectCreate( this, pObjectType, 0, 0 );
+		cObjectLightning *obj = (cObjectLightning*) objectCreate( this, pObjectType, 0, 0 );
 		
 		if( (*(*pBuffer) & 0x80) ) 
 			obj->objectLoadSwitch(pBuffer, 0 );
@@ -197,7 +198,7 @@ void cRoom::loadObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarke
 
 	// Load each object until end marker
 	while(*(*pBuffer) != pEndMarker ) { 
-		cObject *obj = mBuilder->objectCreate( this, pObjectType, 0, 0 );
+		cObject *obj = objectCreate( this, pObjectType, 0, 0 );
 		obj->objectLoad(pBuffer, 0);
 	}
 
@@ -281,4 +282,222 @@ size_t cRoom::saveObjects( byte **pBuffer, eRoomObjects pObjectType, byte pEndMa
 	}
 
 	return size;
+}
+
+cObject *cRoom::objectCreate( cRoom *pRoom, eRoomObjects pObject, byte pPosX, byte pPosY ) {
+	cObject *obj = 0;
+	
+	if( pRoom == mCastle->mFinalRoomGet() && pObject != eObjectImage )
+		return 0;
+
+	switch( pObject ) {
+			case eObjectNone:				// Finished
+				return 0;
+
+			case eObjectDoor:				// Doors
+				obj = obj_Door_Create( pPosX, pPosY );
+				break;
+
+			case eObjectWalkway:			// Walkway
+				obj = obj_Walkway_Create( pPosX, pPosY );
+				break;
+
+			case eObjectSlidingPole:		// Sliding Pole
+				obj = obj_SlidingPole_Create( pPosX, pPosY );
+				break;
+
+			case eObjectLadder:				// Ladder
+				obj = obj_Ladder_Create( pPosX, pPosY );
+				break;
+
+			case eObjectDoorBell:			// Doorbell
+				obj = obj_Door_Button_Create( pPosX, pPosY );
+				break;
+
+			case eObjectLightning:			// Lightning Machine
+				obj = obj_Lightning_Create( pPosX, pPosY );
+				break;
+
+			case eObjectForcefield:			// Forcefield
+				obj = obj_Forcefield_Create( pPosX, pPosY );
+				break;
+
+			case eObjectMummy:				// Mummy
+				obj = obj_Mummy_Create( pPosX, pPosY );
+				break;
+
+			case eObjectKey:				// Key
+				obj = obj_Key_Create( pPosX, pPosY );
+				break;
+
+			case eObjectLock:				// Lock
+				obj = obj_Door_Lock_Create( pPosX, pPosY );
+				break;
+
+			case eObjectRayGun:				// Ray Gun
+				obj = obj_RayGun_Create( pPosX, pPosY );
+				break;
+
+			case eObjectTeleport:			// Teleport
+				obj = obj_Teleport_Create( pPosX, pPosY );
+				break;
+
+			case eObjectTrapDoor:			// Trap Door
+				obj = obj_TrapDoor_Create( pPosX, pPosY );
+				break;
+
+			case eObjectConveyor:			// Conveyor
+				obj = obj_Conveyor_Create( pPosX, pPosY );
+				break;
+
+			case eObjectFrankenstein:		// Frankenstein
+				obj = obj_Frankie_Create( pPosX, pPosY );
+				break;
+
+			case eObjectText:		// String Print
+			case 0x2A6D:
+				obj = obj_string_Create( pPosX, pPosY );
+				break;
+
+			case eObjectImage:
+				obj = obj_Image_Create( pPosX, pPosY );
+				break;
+
+			case eObjectMultiDraw:
+			case 0x160A:				// Intro
+				obj = obj_Multi_Create( pPosX, pPosY );
+				break;
+
+			default:
+				cout << "roomPrepare: 0x";
+				cout << std::hex << pObject << "\n";
+
+				break;
+	}
+
+	if(pRoom)
+		pRoom->objectAdd( obj );
+
+	return obj;
+}
+
+cObject *cRoom::obj_Door_Create( byte pPosX, byte pPosY ) {
+	cObjectDoor	*object = new cObjectDoor( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_Walkway_Create( byte pPosX, byte pPosY ) {
+	cObjectWalkway *object = new cObjectWalkway( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_SlidingPole_Create( byte pPosX, byte pPosY ) {
+	cObjectSlidingPole	*object = new cObjectSlidingPole( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_Ladder_Create( byte pPosX, byte pPosY ) {
+	cObjectLadder *object = new cObjectLadder( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_Door_Button_Create( byte pPosX, byte pPosY ) {
+	cObjectDoorBell *object = new cObjectDoorBell( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_Lightning_Create( byte pPosX, byte pPosY ) {
+	cObjectLightning *object = new cObjectLightning( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_Forcefield_Create( byte pPosX, byte pPosY ) {
+	cObjectForcefield *object = new cObjectForcefield( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_Mummy_Create( byte pPosX, byte pPosY ) {
+	cObjectMummy *object = new cObjectMummy( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_Key_Create( byte pPosX, byte pPosY ) {
+	cObjectKey *object = new cObjectKey( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_Door_Lock_Create( byte pPosX, byte pPosY ) {
+	cObjectLock *object = new cObjectLock( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_RayGun_Create( byte pPosX, byte pPosY ) {
+	cObjectRayGun *object = new cObjectRayGun( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_Teleport_Create( byte pPosX, byte pPosY ) {
+	vector< cObject*> objects = this->objectFind( eObjectTeleport );
+	cObjectTeleport *object = 0;
+
+	// Already got a teleport on this screen?
+	if(objects.size() == 0 ) {
+		object = new cObjectTeleport( this, pPosX, pPosY );
+
+	} else {
+		object = (cObjectTeleport*) objects[0];
+
+		if(object->partGet()->mPlaced) {
+			object->partAdd();
+			object->mPartAdd();
+		}
+	}
+
+	return object;
+}
+
+cObject *cRoom::obj_TrapDoor_Create( byte pPosX, byte pPosY ) {
+	cObjectTrapDoor *object = new cObjectTrapDoor( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_Conveyor_Create( byte pPosX, byte pPosY ) {
+	cObjectConveyor *object = new cObjectConveyor( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_Frankie_Create( byte pPosX, byte pPosY ) {
+	cObjectFrankenstein *object = new cObjectFrankenstein( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_string_Create( byte pPosX, byte pPosY ) {
+	cObjectText *object = new cObjectText( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_Image_Create( byte pPosX, byte pPosY ) {
+	cObjectImage *object = new cObjectImage( this, pPosX, pPosY );
+
+	return object;
+}
+
+cObject *cRoom::obj_Multi_Create( byte pPosX, byte pPosY ) {
+
+	return 0;
 }
