@@ -75,15 +75,15 @@
       </tr>
       
             <tr>
-	    <td class="sideText">Changing Keys<br/>
+	    <td class="sideText">Changing Object Direction<br/>
 	    <p class="Keys"><strong>Controls:</strong><br/>
-        Pressing 'C' or 'V' while a key is selected, will rotate through the various types and colors</p></td>
-	    <td><div><img src="images/howtobuild/8. Change Color.jpg"  width="382" height="314" alt="key change" /></div></td>
+        Pressing 'D' while an object is selected, will change its direction (Frankenstein, Raygun, and the direction a door appears on the map screen are influenced by this))</p></td>
+	    <td><div></div></td>
       </tr>
           <tr>
 	    <td class="sideText">Changing Object State<br/>
 	    <p class="Keys"><strong>Controls:</strong><br/>
-        Pressing 'S' will change the state of certain objects, such as the lightning, frankenstein, the raygun and the conveyor walkways.</p>
+        Pressing 'S' will change the state of certain objects, such as the lightning, key type/color, type of door (normal, or an exit castle door), and the conveyor walkways.</p>
 	    <p class="Keys">All Lightning parts appear under the switch cursor object, and can be accessed via this key.</p></td>
 	    <td><div><img src="images/howtobuild/11. state.jpg"  width="382" height="314" alt="key change" /></div></td>
       </tr>

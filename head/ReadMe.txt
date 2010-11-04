@@ -145,7 +145,9 @@ Builder Controls:
   = = Next Room
   
   f = Switch to exit room
-   
+
+  s = Change object state
+
   c = Change Key Color Down
   v = Change Key COlor Up
 
@@ -164,7 +166,7 @@ Builder Controls:
   - = Previous Room
   = = Next Room
 
-  [ = Reduce Width
+  [ = Decrease Width
   ] = Increase Width
   ; = Decrease Height
   ' = Increase Height
