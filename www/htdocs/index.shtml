@@ -41,6 +41,13 @@
     </table>
     <p>&nbsp;</p>
     <hr />
+    <p class="NewsDates"><strong>Friday, 5 November, 2010  8:06</strong></p>
+    <hr />
+    <p>SVN-342 Windows Package has been released which contains a few minor Builder improvements. </p>
+    <p>All objects can now be placed and linked.<br/>
+    The map screen can be edited with the door positions being adjustable.</p>
+    <p>&nbsp;</p>
+    <hr />
     <p class="NewsDates"><strong>Thursday, 4 November, 2010  12:35</strong></p>
     <hr />
     <p>SVN-338 Windows and Wii Package is now available for download. </p>
@@ -48,6 +55,7 @@
     <p>To get started, <br />
     Read the &quot;<a href="howtobuild.shtml">How to Build or Edit Castles</a>&quot; documentation, available in the menu to the right</p>
     <p>Added Page for &quot;<a href="castles.shtml">Custom Castles</a>&quot;, however no castles are available for download yet.</p>
+    <p>&nbsp;</p>
 <hr />
      <p class="NewsDates"><strong>Thursday, 15 July, 2010  8:23</strong></p>
     <hr />
