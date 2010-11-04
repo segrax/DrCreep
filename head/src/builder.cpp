@@ -257,10 +257,10 @@ void cBuilder::mainLoop() {
 
 			
 			default:
-				if(key) {
+				/*if(key) {
 					cout << "0x";
 					cout << hex << (int) key << endl;
-				}
+				}*/
 				break;
 		}
 
@@ -490,18 +490,16 @@ void cBuilder::mapBuilder() {
 				break;
 						}
 
-			case 0x1A:	// '[' Increase Width
-				if(mCurrentRoom->mMapWidth < 7)
-					mCurrentRoom->mMapWidth ++;
-
-				saveCastle = true;
+			case 0x1A:	// '[' Change object Down
+				mSearchObject = eObjectDoor;
+				selectPlacedObject( false );
+				mSearchObject = eObjectNone;
 				break;
 
-			case 0x1B:	// ']' Decrease Width
-				if(mCurrentRoom->mMapWidth > 1)
-					mCurrentRoom->mMapWidth --;
-
-				saveCastle = true;
+			case 0x1B:	// ']' Change object Up
+				mSearchObject = eObjectDoor;
+				selectPlacedObject( true );
+				mSearchObject = eObjectNone;
 				break;
 
 			case 0x20:	// 'd' object direction
@@ -511,16 +509,40 @@ void cBuilder::mapBuilder() {
 				}
 				break;
 
-			case 0x27:	// ';' Increase Height
-			if(mCurrentRoom->mMapHeight < 7)
-					mCurrentRoom->mMapHeight ++;
+			case 0x25:	// 'k'  Increase X of map door 
+				if( mCurrentObject && mCurrentObject->objectTypeGet() == eObjectDoor ) {
+					cObjectDoor *door = (cObjectDoor*) mCurrentObject;
+					if(door->mMapX < 0x1C )
+						door->mMapX += 2;
+					else
+						door->mMapX = 0;
+
+					saveCastle = true;
+				}
+				break;
+
+			case 0x26:	// 'l'  Increase Y of map door
+				if( mCurrentObject && mCurrentObject->objectTypeGet() == eObjectDoor ) {
+					cObjectDoor *door = (cObjectDoor*) mCurrentObject;
+					if(door->mMapY < 0x38 )
+						door->mMapY += 4;
+					else
+						door->mMapY = 0;
+
+					saveCastle = true;
+				}
+				break;
+
+			case 0x27:	// ';'  Decrease Width
+				if(mCurrentRoom->mMapWidth > 1)
+					mCurrentRoom->mMapWidth --;
 
 				saveCastle = true;
 				break;
 
-			case 0x28:	// ''' Decrease Height
-				if(mCurrentRoom->mMapHeight > 1)
-					mCurrentRoom->mMapHeight --;
+			case 0x28:	// ''' Increase Width
+				if(mCurrentRoom->mMapWidth < 7)
+					mCurrentRoom->mMapWidth ++;
 
 				saveCastle = true;
 				break;
@@ -534,6 +556,21 @@ void cBuilder::mapBuilder() {
 				saveCastle = true;
 				break;
 
+			case 0x34:	// '.' Decrease Height
+				if(mCurrentRoom->mMapHeight > 1)
+					mCurrentRoom->mMapHeight --;
+
+
+				saveCastle = true;
+				break;
+
+			case 0x35:	// '/' Increase Height
+				if(mCurrentRoom->mMapHeight < 7)
+					mCurrentRoom->mMapHeight ++;
+
+				saveCastle = true;
+				break;
+
 			default:
 				/*if(key) {
 					cout << "0x";
@@ -541,6 +578,10 @@ void cBuilder::mapBuilder() {
 				}*/
 				break;
 		}
+
+		// Allow a refresh of screen
+		if(mInput->f3Get())
+			saveCastle = true;
 
 		sPlayerInput *input = mInput->inputGet(0);
 		if(input->mLeft) {
@@ -847,6 +888,8 @@ void cBuilder::selectPlacedObject( bool pChangeUp ) {
 		if(mCurrentObject)
 			mCurrentObject->isSelected(false);
 
+		bool done = false;
+
 		do {
 			if( pChangeUp )
 				++mRoomSelectedObject;
@@ -856,9 +899,20 @@ void cBuilder::selectPlacedObject( bool pChangeUp ) {
 			// Get the next object
 			mCurrentObject = mCurrentRoom->objectGet( mRoomSelectedObject );
 			if( mCurrentObject == 0 ) {
-				mRoomSelectedObject = 0;
+				
+				if(pChangeUp) {
+					mRoomSelectedObject = 0;
+				} else {
+					mRoomSelectedObject = (mCurrentRoom->mObjects.size() - 1);
+				}
+
 				mCurrentObject = mCurrentRoom->objectGet( mRoomSelectedObject );
-				break;
+
+				// Already looped around once?
+				if(!done)
+					done = true;
+				else
+					break;
 			}
 		} while ((mLinkMode && mSearchObject != mCurrentObject->objectTypeGet()) );
 
