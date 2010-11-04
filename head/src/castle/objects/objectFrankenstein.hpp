@@ -27,19 +27,19 @@ class cRoom;
 
 class cObjectFrankenstein : public cObject {
 public:
-	byte	mState;
+	byte	mDirection;
 
 public:
 	cObjectFrankenstein( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectFrankenstein;
-		mState = 0;
+		mDirection = 0;
 
 		mParts[0].mCursorWidth = 2;
 		mParts[0].mCursorHeight = 4;
 	}
 
 	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
-		mState = *(*pBuffer)++;
+		mDirection = *(*pBuffer)++;
 
 		cObject::objectLoad( pBuffer, 0 );
 
@@ -49,7 +49,7 @@ public:
 	}
 
 	size_t		objectSave( byte **pBuffer , size_t pPart ) {	
-		*(*pBuffer)++ = mState;
+		*(*pBuffer)++ = mDirection;
 
 		size_t strSize = cObject::objectSave( pBuffer, 0 );
 		
@@ -59,10 +59,10 @@ public:
 		return (strSize + 5);
 	}
 
-	void		stateChange() {
-		if(mState)
-			mState = 0;
+	void		directionChange() {
+		if(mDirection)
+			mDirection = 0;
 		else
-			mState = 1;
+			mDirection = 1;
 	}
 };

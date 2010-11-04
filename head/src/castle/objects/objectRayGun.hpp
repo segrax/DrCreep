@@ -81,7 +81,7 @@ public:
 		return (strSize + 3);
 	}
 
-	void		stateChange() {
+	void		directionChange()	{
 		if(mDirection)
 			mDirection = 0;
 		else

@@ -200,10 +200,6 @@ void cBuilder::mainLoop() {
 				selectedObjectChange( false );
 				break;
 
-			case 0x26:	// 'l' Link Objects
-				selectedObjectLink();
-				break;
-
 			case 0x1F:	// 's' Object State
 				if(mCurrentObject) {
 					mCurrentObject->stateChange();
@@ -211,15 +207,24 @@ void cBuilder::mainLoop() {
 				}
 				break;
 
-			//	castleSaveToDisk();
-			//	break;
-
 			case 0x1A:	// '[' Select a placed object
 				selectPlacedObject( false );
 				break;
 
 			case 0x1B:	// ']' Select a placed object
 				selectPlacedObject( true );
+				break;
+			
+			case 0x20:	// 'd' object direction
+				if( mCurrentObject ) {
+					mCurrentObject->directionChange();
+					castlePrepare();
+				}
+
+				break;
+
+			case 0x26:	// 'l' Link Objects
+				selectedObjectLink();
 				break;
 
 			case 0x0C:	{// '-' Previous Room
@@ -246,28 +251,16 @@ void cBuilder::mainLoop() {
 				
 				break;
 
-			case 0x2E:	// 'c' color decrease
-				if(mCurrentObject)
-					mCurrentObject->colorDecrease();
-				castlePrepare();
-				break;
-
-			case 0x2F:	// 'v' color increase
-				if(mCurrentObject)
-					mCurrentObject->colorIncrease();
-				castlePrepare();
-				break;
-
 			case 0x73:	// 'Delete' Delete selected object
 				selectedObjectDelete();
 				break;
 
 			
 			default:
-				/*if(key) {
+				if(key) {
 					cout << "0x";
 					cout << hex << (int) key << endl;
-				}*/
+				}
 				break;
 		}
 
@@ -510,7 +503,14 @@ void cBuilder::mapBuilder() {
 
 				saveCastle = true;
 				break;
-	
+
+			case 0x20:	// 'd' object direction
+				if( mCurrentObject ) {
+					mCurrentObject->directionChange();
+					saveCastle = true;
+				}
+				break;
+
 			case 0x27:	// ';' Increase Height
 			if(mCurrentRoom->mMapHeight < 7)
 					mCurrentRoom->mMapHeight ++;

@@ -5583,7 +5583,7 @@ void cCreep::obj_RayGun_Img_Execute( byte pX ) {
 
 	byte A = mMemory[ 0xBF04 + pX ];
 	if(!( A & byte_83F )) {
-		if( mIntro == 1 )
+		if( mIntro == 1 || mNoInput )
 			return;
 
 		// 4B46

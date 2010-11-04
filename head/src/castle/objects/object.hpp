@@ -98,8 +98,8 @@ public:
 
 	virtual void		stateChange()	{ }
 	inline cRoom		*mRoomGet()	{ return mRoom; }
-	virtual void		colorIncrease()	 { }
-	virtual void		colorDecrease()	 { }
+
+	virtual void		directionChange()	{ }
 
 	inline bool			mLinkedGet()	 { return mLinked; }
 
