@@ -32,7 +32,7 @@ SetCompressor lzma
 	InstallDir "$PROGRAMFILES\DrCreep"
   
 	;Get installation folder from registry if available
-	InstallDirRegKey HKCU "Software\DrCreep" ""
+	InstallDirRegKey HKLM "Software\DrCreep" "Install_Dir"
 
 ;--------------------------------
 ;Variables
@@ -97,7 +97,7 @@ Section "Copy Files" drcreepInst
 
   SetOutPath "$INSTDIR"
   ;Store installation folder
-  WriteRegStr HKCU "Software\creep" "" $INSTDIR
+  WriteRegStr HKLM "Software\DrCreep" "Install_Dir" $INSTDIR
   
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
