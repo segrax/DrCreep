@@ -166,15 +166,27 @@ Builder Controls:
   - = Previous Room
   = = Next Room
 
-  [ = Decrease Width
-  ] = Increase Width
-  ; = Decrease Height
-  ' = Increase Height
+  [ = Rotate up through doors in this room
+  ] = Rotate down through doors in this room
 
-  Cursor Keys = Move Room
+  k = Increase Door X on map
+  l = Increase Door Y on map
+  d = Change Door Entry Direction
 
-    
+  ; = Decrease Room Width
+  ' = Increase Room width
+
+  . = Decrease Room Height
+  / = Increase Room Height
+
+
+  c = Change room color
+
+
+  Cursor Keys = Move Room 
   
+
+
 Playing:
 --------
 
