@@ -66,12 +66,6 @@
 	    <td><div><img src="images/howtobuild/4. Selected Object.jpg"  width="382" height="314" alt="edit object" /></div></td>
       </tr>
       <tr>
-	    <td class="sideText">Change Player Starting Location<br/>
-	    <p class="Keys"><strong>Controls:</strong><br/>
-        Pressing '1' or '2' while a door is selected, will result in the players starting room/door being changed to the selected door object</p></td>
-	    <td><div><img src="images/howtobuild/5. Change Start Door.jpg"  width="382" height="314" alt="start locations" /></div></td>
-      </tr>
-      <tr>
 	    <td class="sideText">Change Rooms (Can be done in Link mode)<br/>
 	    <p class="Keys"><strong>Controls:</strong><br/>
         Pressing '-' or '=' will change rooms either backwards or forwards).</p>
@@ -79,11 +73,25 @@
 	    <p class="Keys">Moving forward after Pressing 'L' on a door, will allow you to link doors between rooms. (simply rotate through the objects with [ or ] and press Ctrl once the object you want to link to is selected.</p></td>
 	    <td><div><img src="images/howtobuild/6. Change Rooms.jpg"  width="382" height="314" alt="room change" /></div></td>
       </tr>
+      
             <tr>
 	    <td class="sideText">Changing Keys<br/>
 	    <p class="Keys"><strong>Controls:</strong><br/>
         Pressing 'C' or 'V' while a key is selected, will rotate through the various types and colors</p></td>
 	    <td><div><img src="images/howtobuild/8. Change Color.jpg"  width="382" height="314" alt="key change" /></div></td>
+      </tr>
+          <tr>
+	    <td class="sideText">Changing Object State<br/>
+	    <p class="Keys"><strong>Controls:</strong><br/>
+        Pressing 'S' will change the state of certain objects, such as the lightning, frankenstein, the raygun and the conveyor walkways.</p>
+	    <p class="Keys">All Lightning parts appear under the switch cursor object, and can be accessed via this key.</p></td>
+	    <td><div><img src="images/howtobuild/11. state.jpg"  width="382" height="314" alt="key change" /></div></td>
+      </tr>
+            <tr>
+	    <td class="sideText">Change Player Starting Location<br/>
+	    <p class="Keys"><strong>Controls:</strong><br/>
+        Pressing '1' or '2' while a door is selected, will result in the players starting room/door being changed to the selected door object</p></td>
+	    <td><div><img src="images/howtobuild/5. Change Start Door.jpg"  width="382" height="314" alt="start locations" /></div></td>
       </tr>
       <tr>
 	    <td class="sideText">Testing<br/>
