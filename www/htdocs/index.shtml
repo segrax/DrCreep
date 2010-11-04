@@ -41,10 +41,10 @@
     </table>
     <p>&nbsp;</p>
     <hr />
-    <p class="NewsDates"><strong>Tuesday, 2 November, 2010  14:46</strong></p>
+    <p class="NewsDates"><strong>Thursday, 4 November, 2010  12:35</strong></p>
     <hr />
-    <p>SVN-329 Windows Package is now available for download. </p>
-    <p>A Castle Builder is now included, with the hotkey information available in the readme.</p>
+    <p>SVN-338 Windows and Wii Package is now available for download. </p>
+    <p>A Castle Builder is now included, with the hotkey information available in the readme (While this feature exists in the Wii version, at present it is unusable due to a lack of controls)</p>
     <p>To get started, <br />
     Read the &quot;<a href="howtobuild.shtml">How to Build or Edit Castles</a>&quot; documentation, available in the menu to the right</p>
     <p>Added Page for &quot;<a href="castles.shtml">Custom Castles</a>&quot;, however no castles are available for download yet.</p>
