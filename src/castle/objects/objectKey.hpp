@@ -37,16 +37,10 @@ public:
 		mParts[0].mCursorHeight = 3;
 	}
 
-	virtual void		colorIncrease()	 { 
+	virtual void		stateChange()	 { 
 		++mKeyColor;
 		if(mKeyColor > 7)
 			mKeyColor = 1;
-	}
-
-	virtual void		colorDecrease()	 { 
-		--mKeyColor;
-		if(mKeyColor > 7 || mKeyColor == 0)
-			mKeyColor = 7;
 	}
 
 	size_t		objectLoad( byte **pBuffer, size_t pPart ) {

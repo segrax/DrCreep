@@ -35,7 +35,7 @@ public:
 	cObjectDoor( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
 		mObjectID = eObjectDoor;
 
-		mDirection = eDirectionNone;
+		mDirection = eDirectionUp;
 		mLinkRoom = 0;
 		mLinkDoor = 0;
 		mMapX = mMapY = 0;
@@ -54,6 +54,22 @@ public:
 
 	void mLinked2Set( byte pNumber ) {
 		mLinkRoom = pNumber;
+	}
+
+	void	directionChange()	{
+
+		if( mDirection < eDirectionLeft )
+			++mDirection;
+		else
+			mDirection = 0;
+	}
+
+	void stateChange() {
+
+		if(mCastleExitDoor)
+			mCastleExitDoor = 0;
+		else
+			mCastleExitDoor = 1;
 	}
 
 	size_t		objectLoad( byte **pBuffer, size_t pPart  ) {
