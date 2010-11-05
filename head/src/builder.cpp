@@ -147,7 +147,7 @@ void cBuilder::mainLoop() {
 		// Load Castle
 		mCastle = mCreepParent->castleGet();
 		mCastle->castleLoad( this );	
-
+		
 	} else {
 	
 		if(mStartCastle != -2) {
@@ -295,9 +295,10 @@ void cBuilder::roomChange( int pNumber ) {
 		mOriginalObject = mCurrentObject;
 	}
 
-	save( false );		
 	mCurrentRoom = mCastle->roomCreate( this, pNumber );
 	
+	save( false );	
+
 	// Set the room number in the window title
 	mScreen->roomNumberSet( pNumber );
 
@@ -876,8 +877,11 @@ void cBuilder::selectPlacedObject( bool pChangeUp ) {
 			changeObject = true;
 
 		// Last Part?
-		if( mCurrentObject->mPartGet() == mCurrentObject->mPartCountGet() )
+		if( mCurrentObject->mPartGet() == mCurrentObject->mPartCountGet() && pChangeUp )
 			changeObject = true;
+
+		if( mCurrentObject->mPartGet() == mCurrentObject->mPartCountGet() && !pChangeUp )
+			mCurrentObject->partSet( mCurrentObject->mPartGet() - 1 );
 
 	} else
 		changeObject = true;
