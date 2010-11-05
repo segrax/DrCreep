@@ -161,7 +161,7 @@ void cCastle::castleSave( byte *pTarget ) {
 	buffer = pTarget + 0x100;
 
 	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {	
-		if( roomIT->second == mFinalRoom )
+		if( (char) roomIT->second->mNumber == -1 )
 			continue;
 
 		roomIT->second->roomSave( &buffer );
