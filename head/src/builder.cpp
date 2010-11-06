@@ -807,11 +807,11 @@ void cBuilder::parseInput() {
 		if( (mCursorY + downHeight) > 0xC8 )
 			mCursorY = 0xC8 - downHeight;
 #else
-		if( (mCursorX = downWidth ) > 0xA0 )
-			mCursorX = 0xA0 - downWidth;
+		if( mCursorX > 0xF0 )
+			mCursorX = 0;
 
-		if( mCursorX < 0x00 )
-			mCursorX = 0x00;
+		if( (mCursorX + downWidth ) > 0xA0 )
+			mCursorX = 0xA0 - downWidth;
 
 		if( mCursorY > 0xF0 )
 			mCursorY = 0;

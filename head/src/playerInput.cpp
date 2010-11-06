@@ -47,22 +47,26 @@ cPlayerInput::cPlayerInput( cCreep *pCreep ) {
 cPlayerInput::~cPlayerInput() {
 
 }
+
+void cPlayerInput::inputClear() {
+	mInput[0].clear();
+	mInput[1].clear();
+
+	mKeyPressed = 0;
+	mKeyPressedRaw = 0;
+
+	mF2 = false;
+	mF3 = false;
+	mF4 = false;
+	mF5 = false;
+	mRunStop = false;
+	mRestore = false;
+}
+
 void cPlayerInput::inputCheck( bool pClearAll ) {
 
-	if(pClearAll) {
-		mInput[0].clear();
-		mInput[1].clear();
-
-		mKeyPressed = 0;
-		mKeyPressedRaw = 0;
-
-		mF2 = false;
-		mF3 = false;
-		mF4 = false;
-		mF5 = false;
-		mRunStop = false;
-		mRestore = false;
-	}
+	if(pClearAll)
+		inputClear();
 
 	while( SDL_PollEvent(&mEvent) ) {
 

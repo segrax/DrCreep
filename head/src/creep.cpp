@@ -155,8 +155,7 @@ cCreep::cCreep() {
 	mMusicBufferSize = 0;
 
 	mMenuReturn = false;
-
-	ftime(&mTimePrevious);
+	mTicksPrevious = SDL_GetTicks();
 }
 
 cCreep::~cCreep() {
@@ -309,35 +308,36 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 }
 
 void cCreep::interruptWait( byte pCount) {
-	timeb tickNow;
-	ftime(&tickNow);
+	dword 	ticksNow = SDL_GetTicks();
+	
+	// Screen Refresh occurs 50 times per second on a PAL C64
+	// and 60 times on an NTSC
+	// Meaning the interrupt should fire once every
+	// 0.01666666666666666666666666666667 seconds on an NTSC C64
+	// and 0.02 seconds on a PAL C64
 
-	time_t diffSec = tickNow.time - mTimePrevious.time;
-	time_t diffMil = tickNow.millitm - mTimePrevious.millitm;
+	double diffMil = (ticksNow - mTicksPrevious);
+	double	sleepTime = 20;
 
-	if(diffMil < 0)
-		diffMil = -diffMil;
+	if( diffMil > sleepTime) 
+		sleepTime -= diffMil;
 
-	// Calculate time taken between calls to this function
-	double	sleepTime = 0;
-	//diffMil = 10;
-
-	if(diffSec <= 1) {
-		if(diffMil > 24)
+	if( sleepTime < 0 ) {
+		if(sleepTime < -16 )
 			sleepTime = 0;
-		else
-			sleepTime = 24 - (double) diffMil;
-
-		mInterruptCounter = pCount;
-		
-		while(mInterruptCounter > 0 ) {
-			Sleep( (dword) sleepTime );
-
-			--mInterruptCounter;
-		}
+		else 
+			sleepTime = -sleepTime;
 	}
 
-	ftime(&mTimePrevious);
+	mInterruptCounter = pCount;
+		
+	while(mInterruptCounter > 0 ) {
+		Sleep( (dword) sleepTime );
+
+		--mInterruptCounter;
+	}
+
+	mTicksPrevious = SDL_GetTicks();
 }
 
 //08C2
@@ -1514,9 +1514,8 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	}
 
 	// Kill the player(s) if the restore key is pressed
-	if( mInput->restoreGet() ) {
+	if( mInput->restoreGet() )
 		byte_B83 = 1;
-	}
 
 	if(input) {
 
@@ -3151,8 +3150,11 @@ void cCreep::Game() {
 		// E7D
 		while( mapDisplay() );
 
-		if(mMenuReturn)
+		if(mMenuReturn) {
+			mInput->inputClear();
+			hw_IntSleep(1);
 			return;
+		}
 
 		roomMain();
 		screenClear();
