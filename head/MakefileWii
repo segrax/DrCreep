@@ -22,7 +22,7 @@ include $(DEVKITPPC)/wii_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	obj
-SOURCES		:=	src/resid-0.16 src src/castle src/castle/object src/graphics  src/sound src/vic-ii src/graphics/scale
+SOURCES		:=	src/resid-0.16 src src/castle src/castle/objects src/graphics  src/sound src/vic-ii src/graphics/scale
 DATA		:=
 TEXTURES	:=	textures
 INCLUDES	:=	src /c/devkitPro/libogc/include /c/devkitPro/devkitPPC/include
