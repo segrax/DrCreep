@@ -34,11 +34,30 @@ public:
 		mObjectID = eObjectText;
 		mTextColor = 2;
 		mStyle = 0x22;		// single Height
-		mString = "text";
+		mString = "TEXT";
+	}
+	
+	void partPlace() {
+		textSet();
+		cObject::partPlace();
 	}
 
 	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
-		
+		cObject::objectLoad( pBuffer, 0 );
+
+		mTextColor = *(*pBuffer)++;
+		mStyle = *(*pBuffer)++;
+
+		mString.clear();
+
+		while( !(*(*pBuffer) & 0x80) ) {
+			mString.push_back( (*(*pBuffer) & 0x7F) );
+			(*pBuffer)++;
+		}
+
+		mString.push_back( (*(*pBuffer) & 0x7F) );
+		(*pBuffer)++;
+
 		return 0;
 	}
 
@@ -55,8 +74,20 @@ public:
 		(*pBuffer)--;
 		*(*pBuffer) |= 0x80;
 		(*pBuffer)++;
+		
+		++strSize;
 
 		return (strSize + 2);
+	}
+
+	void		textSet();
+
+	void		stateChange();
+	void		directionChange() {
+		if(mStyle == 0x22 )
+			mStyle = 0x21;
+		else
+			mStyle = 0x22;
 	}
 
 };

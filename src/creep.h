@@ -124,7 +124,7 @@ protected:
 	bool		 mMenuReturn, mNoInput;
 
 public:
-	int		 mStartCastle;
+	int			 mStartCastle;
 
 	byte		 mTxtX_0, mTxtY_0;
 
@@ -165,6 +165,8 @@ public:
 		inline cPlayerInput		*inputGet()		{ return mInput; }
 		inline cScreen			*screenGet()	{ return mScreen; }
 		inline void				 screenSet( cScreen *pScreen ) { mScreen = pScreen; }
+
+		inline byte	mStrLengthGet() { return mStrLength; }
 
 		void	 builderStart( int pStartCastle );
 
@@ -226,7 +228,7 @@ public:
 		void	 titleDisplay();						// Display 'PIC A TITLE'
 
 		void	 roomLoad();
-		void	 roomPrepare( );
+		void	 roomPrepare( word pAddress = 0);
 		
 		void	 sub_95F();
 		void	 obj_Image_Draw();
@@ -235,6 +237,7 @@ public:
 		
 		void	 textPrintCharacter();
 		byte	 textGetKeyFromUser();
+
 		void	 sub_2973();
 		void	 convertTimerToTime();
 		void	 convertTimeToNumber( byte pA, byte pY );

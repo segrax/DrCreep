@@ -200,6 +200,9 @@ void cRoom::loadObject( byte **pBuffer, eRoomObjects pObjectType, byte pEndMarke
 	while(*(*pBuffer) != pEndMarker ) { 
 		cObject *obj = objectCreate( this, pObjectType, 0, 0 );
 		obj->objectLoad(pBuffer, 0);
+
+		if(pObjectType == eObjectTeleport)
+			return;
 	}
 
 	(*pBuffer)++;

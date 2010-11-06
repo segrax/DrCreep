@@ -858,8 +858,11 @@ void cCreep::graphicRoomColorsSet( byte pRoomColor ) {
 }
 
 // 15E0
-void cCreep::roomPrepare( ) {
+void cCreep::roomPrepare( word pAddress ) {
 	word func = 0x01;
+
+	if(pAddress)
+		word_3E = pAddress;
 
 	while(func) {
 
