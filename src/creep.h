@@ -56,7 +56,8 @@ protected:
 	bool		 mIntro;
 	byte		 mMenuMusicScore, mMenuScreenCount, mMenuScreenTimer;
 	byte		 mUnlimitedLives;
-	timeb		 mTimePrevious, mPlayer1Time, mPlayer2Time;
+	dword		 mTicksPrevious;
+	timeb		 mPlayer1Time, mPlayer2Time;
 	size_t		 mPlayer1Seconds, mPlayer2Seconds;
 
 	word		 mVoice, mVoiceTmp;

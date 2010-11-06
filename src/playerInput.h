@@ -62,7 +62,8 @@ public:
 				~cPlayerInput();
 
 	void		 inputCheck( bool pClearAll = false );
-	
+	void		 inputClear();
+
 	sPlayerInput		*inputGet( byte pNumber ) { 
 		if( pNumber > 1 )
 			return 0;
