@@ -212,35 +212,33 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 
 		// Loop width
 		for( word x = 0; x < width; ++x ) {
-			
-			// Transparent?
-			//if( *sourceBuffer != 0 ) {
 
-				// Check for any collisions
-				if( dest->mPriority == ePriority_Foreground || dest->mSprite ) {
+			// Check for any collisions
+			if( dest->mPriority == ePriority_Foreground || dest->mSprite ) {
 
-					// 
-					if(dest->mSprite && dest->mSprite2 != pSpriteNo) {
-						dest->mSprite2 = pSpriteNo; 
-						if(!col1) {
-							mCollisions.push_back( dest );
-							col1 = true;
-						}
-					} else {
-						dest->mSprite = pSpriteNo;
-						if(!col2) {
-							mCollisions.push_back( dest );
-							col2 = true;
-						}
+				// 
+				if(dest->mSprite && dest->mSprite2 != pSpriteNo) {
+					dest->mSprite2 = pSpriteNo; 
+					if(!col1) {
+						mCollisions.push_back( dest );
+						col1 = true;
+					}
+				} else {
+					dest->mSprite = pSpriteNo;
+					if(!col2) {
+						mCollisions.push_back( dest );
+						col2 = true;
 					}
 				}
+			}
 
-				if( pSpriteNo && !dest->mSprite )
-					dest->mSprite = pSpriteNo;
+			if( pSpriteNo && !dest->mSprite )
+				dest->mSprite = pSpriteNo;
 
-				else if( pSpriteNo != dest->mSprite )
-					dest->mSprite2 = pSpriteNo;
-				if( *sourceBuffer != 0 ) {
+			else if( pSpriteNo != dest->mSprite )
+				dest->mSprite2 = pSpriteNo;
+
+			if( *sourceBuffer != 0 ) {
 				// Does this sprite have priority over the background?
 				if( !pPriority || (dest->mPriority == ePriority_Background && pPriority) ) {
 					*destBuffer = *sourceBuffer;
