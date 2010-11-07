@@ -498,6 +498,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\src\castle\objects\objectText.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\src\castle\objects\objectText.hpp"
 						>
 					</File>
