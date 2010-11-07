@@ -34,8 +34,9 @@
         <td ><img src="/images/screenshots/o_alternation2.png" width="185" height="143" alt="Alternation2" style="margin-top:15px" /></td>
         <td ><div class="about1">
           <p>Castles of Dr. Creep is a 1984 Commodore 64 game written by Ed Hobbs and published by Broderbund Software.</p>
-          <p>This project is an open source rewrite, allowing you to play the game using an image (D64) of the original disk.<br/><br/>
-          Presently it can compile and play on both Windows, Nintendo Wii, and Linux (Ubuntu specifically has been tested).</p>
+          <p>This project is an open source rewrite, allowing you to play the game using an image (D64) of the original disk.<br/>
+          Additionally, a Castle Builder has been added allowing the player to modify existing castles, or build new ones from scratch</p>
+            <p>Presently it can compile and play on both Windows, Nintendo Wii, and Linux (Ubuntu specifically has been tested).</p>
         </div></td>
       </tr>
     </table>
@@ -43,9 +44,10 @@
     <hr />
     <p class="NewsDates"><strong>Sunday, 7 November, 2010  9:35</strong></p>
     <hr />
-    <p>SVN-348 Windows / Wii Package is available. </p>
-    <p>Fix the game speed, making it run at the original PAL speed.<br/>
-    Adds the ability to edit text in Builder</p>
+    <p>SVN-351 Windows / Wii Package is available. </p>
+    <p>Fix sprite collision bug, Fix another object collision issue<br/>
+    Fix the game speed, making it run at the original PAL speed.<br/>
+      Adds the ability to edit text in Builder</p>
     <p>&nbsp;</p>
 <hr />
     <p class="NewsDates"><strong>Friday, 5 November, 2010  8:06</strong></p>
@@ -66,7 +68,7 @@
 <hr />
      <p class="NewsDates"><strong>Thursday, 15 July, 2010  8:23</strong></p>
     <hr />
-    <p>SVN-270 Windows and Nintendo Wii Packages are now available for download 
+    <p>SVN-270 Windows and Nintendo Wii Packages are now available for download </p>
     <ul>
 <li> Wii WAD/Dol Version now available! (sound is buggy)</li>
       <li>Options Menu is now implemented    </li>
@@ -96,11 +98,9 @@
     <br /> 
     <ul>
       <li>Highscores</li>
-      <li>Game Play Timer<br /> 
-      </li>
+      <li>Game Play Timer</li>
       <li>Save Game / Load Game (uses D64s, supports original savegames)</li>
-      <li>Sound Effects / Introduction Music<br />
-      </li>
+      <li>Sound Effects / Introduction Music<br /> </li>
 </ul>
      <hr />
       	
