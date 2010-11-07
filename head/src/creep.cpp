@@ -1623,8 +1623,8 @@ void cCreep::obj_CollisionSet() {
 			// Sprite collision
 			gfxSpriteCollision |= (1 << (piece->mSprite-1) );
 			gfxSpriteCollision |= (1 << (piece->mSprite2-1) );
-		
 		}
+
 	}
 
 	// Original
@@ -1964,6 +1964,10 @@ void cCreep::obj_Actions_Hit( byte pX, byte pY ) {
 			obj_Frankie_Hit( pX, pY );
 			break;
 
+		case 0x374F:
+			byte_311D = 0;
+			return;
+
 		default:
 			cout << "obj_Actions_Hit: 0x";
 			cout << std::hex << func << "\n";
@@ -1990,12 +1994,12 @@ void cCreep::obj_CheckCollisions( byte pX ) {
 		byte_311B = A;
 		byte_3117 = mMemory[ 0xBD01 + pX ];
 		byte_3118 = byte_3117 + mMemory[ 0xBD0A + pX];
-		if( (byte_3117 + mMemory[ 0xBD0A + pX ]) > 0x80 )
+		if( (byte_3117 + mMemory[ 0xBD0A + pX ]) > 0x100 )
 			byte_3117 = 0;
 
 		byte_3119 = mMemory[ 0xBD02 + pX ];
 		byte_311A = byte_3119 + mMemory[ 0xBD0B + pX ];
-		if( (byte_3119 + mMemory[ 0xBD0B + pX ]) > 0x80 )
+		if( (byte_3119 + mMemory[ 0xBD0B + pX ]) > 0x100 )
 			byte_3119 = 0;
 
 		Y = 0;
@@ -2009,11 +2013,11 @@ void cCreep::obj_CheckCollisions( byte pX ) {
 					
 					if( (A & byte_888) ) {
 						Y = mMemory[ 0xBD00 + Y ] << 3;
-						A = mMemory[ 0x395 + Y ];
+						A = mMemory[ 0x895 + Y ];
 
 						if( !(A & 0x80 )) {
 							if(! (A & byte_311B )) {
-								// 808E
+								// 308E
 								Y = byte_3116;
 								A = byte_3118;
 								if( A >= mMemory[ 0xBD01 + Y ] ) {
@@ -2027,9 +2031,6 @@ void cCreep::obj_CheckCollisions( byte pX ) {
 												Y = byte_3115;
 												obj_Actions_Hit( pX, Y );
 											}
-											// 30C5
-											pX = byte_3115;
-											Y = byte_3116;
 										}
 									}
 								}
@@ -2039,6 +2040,7 @@ void cCreep::obj_CheckCollisions( byte pX ) {
 				}
 			}
 
+			// 30C5
 			pX = byte_3115;
 			Y = byte_3116;
 			// 30CB
@@ -3266,6 +3268,7 @@ void cCreep::mapArrowDraw( byte pPlayer ) {
 
 	// Sprite X
 	sprite->mX = posX;
+	mMemory[ 0x10 + Y ] = A;
 
 	// Calculate Y
 	// 100D
@@ -5158,18 +5161,18 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 }
 
 void cCreep::stringSet( byte pPosX, byte pPosY, byte pColor, string pMessage ) {
-	memcpy( &mMemory[ 0x9006 ], pMessage.c_str(), pMessage.size() );
+	memcpy( &mMemory[ 0xB006 ], pMessage.c_str(), pMessage.size() );
  
-	mMemory[ 0x9000 ] = 0x6D;
-    mMemory[ 0x9001 ] = 0x2A;
-    mMemory[ 0x9002 ] = pPosX;
-	mMemory[ 0x9003 ] = pPosY;
-	mMemory[ 0x9004 ] = pColor;
-    mMemory[ 0x9005 ] = 0x22;
+	mMemory[ 0xB000 ] = 0x6D;
+    mMemory[ 0xB001 ] = 0x2A;
+    mMemory[ 0xB002 ] = pPosX;
+	mMemory[ 0xB003 ] = pPosY;
+	mMemory[ 0xB004 ] = pColor;
+    mMemory[ 0xB005 ] = 0x22;
 
-    mMemory[ 0x9005 + pMessage.size() ] |= 0x80;
-	mMemory[ 0x9006 + pMessage.size() ] = 0;
-	mMemory[ 0x9007 + pMessage.size() ] = 0;
+    mMemory[ 0xB005 + pMessage.size() ] |= 0x80;
+	mMemory[ 0xB006 + pMessage.size() ] = 0;
+	mMemory[ 0xB007 + pMessage.size() ] = 0;
 }
 
 // 25B8
@@ -5189,7 +5192,7 @@ void cCreep::gameFilenameGet( bool pLoading, bool pCastleSave ) {
 			word_3E = 0x2609;
 		else {
 			stringSet( 0x34, 0x00, 0x01, "SAVE CASTLE" );
-			word_3E = 0x9000;
+			word_3E = 0xB000;
 		}
 	}
 
@@ -6081,8 +6084,6 @@ void cCreep::obj_Door_Button_Prepare() {
 			}	
 
 			Y += 8;
-			if(Y == 0 )
-				return;
 		}
 
 		signed char Y2 = 8;
