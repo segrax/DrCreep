@@ -183,7 +183,7 @@ void cScreen::bitmapRefresh() {
 		mBitmap->load( mBitmapBuffer, mBitmapColorData, mBitmapColorRam, mBitmapBackgroundColor );
 		mBitmapRedraw = false;
 	}
-	blit( mBitmap->mSurface, 24, 50, false, false );
+	blit( mBitmap->mSurface, 24, 50, false, 0 );
 	mScreenRedraw = true;
 }
 
@@ -214,7 +214,7 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 		for( word x = 0; x < width; ++x ) {
 			
 			// Transparent?
-			if( *sourceBuffer != 0 ) {
+			//if( *sourceBuffer != 0 ) {
 
 				// Check for any collisions
 				if( dest->mPriority == ePriority_Foreground || dest->mSprite ) {
@@ -240,7 +240,7 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 
 				else if( pSpriteNo != dest->mSprite )
 					dest->mSprite2 = pSpriteNo;
-
+				if( *sourceBuffer != 0 ) {
 				// Does this sprite have priority over the background?
 				if( !pPriority || (dest->mPriority == ePriority_Background && pPriority) ) {
 					*destBuffer = *sourceBuffer;
