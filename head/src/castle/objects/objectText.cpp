@@ -16,7 +16,7 @@ void cObjectText::textSet() {
 	mRoom->mBuilder->screenClear();
 	mRoom->mBuilder->stringSet( 0x34, 0x00, 0x01, "ENTER TEXT" );
 
-	mRoom->mBuilder->roomPrepare( 0xB000 );
+	mRoom->mBuilder->roomPrepare( 0xB900 );
 
 	*mRoom->mBuilder->memory( 0x2788 ) = 0x20;
 	*mRoom->mBuilder->memory( 0x2789 ) = 0x48;
