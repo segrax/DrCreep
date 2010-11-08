@@ -317,13 +317,13 @@ void cCreep::interruptWait( byte pCount) {
 	// and 0.02 seconds on a PAL C64
 
 	double diffMil = (ticksNow - mTicksPrevious);
-	double	sleepTime = 20;
+	double	sleepTime = 20;	// Milliseconds
 
 	if( diffMil > sleepTime) 
 		sleepTime -= diffMil;
 
 	if( sleepTime < 0 ) {
-		if(sleepTime < -16 )
+		if(sleepTime < -20 )
 			sleepTime = 0;
 		else 
 			sleepTime = -sleepTime;
