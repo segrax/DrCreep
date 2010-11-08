@@ -149,6 +149,9 @@ void cRoom::loadCount( byte **pBuffer, eRoomObjects pObjectType ) {
 	// Read each object
 	for( int x = 0; x < count; ++x ) {
 		cObject *obj = objectCreate( this, pObjectType, 0, 0 );
+		if(!obj)
+			return;
+
 		obj->objectLoad(pBuffer, 0);
 	}
 
