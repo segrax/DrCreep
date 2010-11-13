@@ -22,11 +22,11 @@ cSound::cSound( cCreep *pCreep ) {
 	// Prepare the SID
 	mSID = new cSID();
 
-	// Set the sampling parameters, NTSC, at a rate of 44100Hz
-	mSID->set_sampling_parameters(1022727.1428571428, SAMPLE_FAST, 0xAC44);	// 44100
-
+	// Set the sampling parameters, PAL, at a rate of 44100Hz
+	mSID->set_sampling_parameters(985248, SAMPLE_FAST, 0xAC44);	// 44100
+	// 1022727.1428571428
 	//
-  	mSID->enable_filter(true);
+  	mSID->enable_filter(false);
   
   	mSID->reset();
 
@@ -77,7 +77,7 @@ void cSound::audioBufferFill( short *pBuffer, int pBufferSize ) {
 
 		// Time for video frame update?
   		if (mCyclesRemaining <= 0) {
-  			mCyclesRemaining = 0x42C7;	// NTSC
+  			mCyclesRemaining = 0x4CC8 / 2;	// PAL
   		}
 
   		// Clock the SID for 'samplesRemaining', only will do all if there is enough cpu cycles remaining

@@ -19,6 +19,8 @@
 
 #include "sid.h"
 #include <math.h>
+#include "wave.h"
+#include "voice.h"
 
 // Moved here by segra to compile with g++
 const int cSID::FIR_N = 125;
