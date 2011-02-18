@@ -36,7 +36,7 @@
 string stringRip(byte *pBuffer, byte pTerminator, size_t pLengthMax) {
 	string tmpString;
 
-	for(size_t i = 0; *pBuffer != pTerminator && i <= pLengthMax; i++) {
+	for(size_t i = 0; *pBuffer != pTerminator && i <= pLengthMax; ++i) {
 		tmpString += (char) *pBuffer++;
 	}
 
@@ -76,9 +76,9 @@ cD64::cD64( string pD64, string pPath, bool pCreate, bool pDataSave, bool pReadO
 		mRead = false;
 
 		// Create a new 35 Trackdisk
-		mBuffer = new byte[ 0x2AB00 ];
 		mBufferSize = 0x2AB00;
-		memset( mBuffer, 0, 0x2AB00 );
+		mBuffer = new byte[ mBufferSize ];
+		memset( mBuffer, 0, mBufferSize );
 		
 		// Create it
 		if( local_FileCreate( pD64, mPath, pDataSave ) == false ) 
