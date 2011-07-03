@@ -138,6 +138,10 @@ string local_PathGenerate( string pFile, string pPath, bool pDataSave ) {
 		filePathFinal << wiiBasePath;
 #endif
 
+$ifdef FREEBSD
+		filePathFinal << '/usr/local/lib/drcreep/';
+
+#endif
 	// Build the file path
 	if(!pDataSave)
 		filePathFinal << gDataPath;
