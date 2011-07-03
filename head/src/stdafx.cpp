@@ -138,10 +138,10 @@ string local_PathGenerate( string pFile, string pPath, bool pDataSave ) {
 		filePathFinal << wiiBasePath;
 #endif
 
-$ifdef FREEBSD
-		filePathFinal << '/usr/local/lib/drcreep/';
-
+#ifdef FREEBSD
+                filePathFinal << "/usr/local/lib/drcreep/";
 #endif
+
 	// Build the file path
 	if(!pDataSave)
 		filePathFinal << gDataPath;
@@ -152,6 +152,7 @@ $ifdef FREEBSD
 		filePathFinal << pPath << "/";
 
 	filePathFinal << pFile;
+
 	return filePathFinal.str();
 }
 
@@ -379,7 +380,12 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 	vector<string>		  results;
 
 	char path[2000];
+	#ifndef FREEBSD
 	getcwd(path, 2000);
+	#else
+	strcpy(&path[0],"/usr/local/lib/drcreep");
+	#endif
+	
 
 	// Build the file path
 	stringstream finalPath;
