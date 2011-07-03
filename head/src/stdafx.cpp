@@ -345,7 +345,11 @@ int ftime(timeb *nul) {
 }
 
 #else
+	
+#ifndef FREEBSD
 #include <direct.h>
+#endif
+
 #include <dirent.h>
 
 bool CtrlHandler( dword fdwCtrlType ) {
