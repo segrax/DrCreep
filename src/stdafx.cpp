@@ -139,7 +139,7 @@ string local_PathGenerate( string pFile, string pPath, bool pDataSave ) {
 #endif
 
 #ifdef FREEBSD
-                filePathFinal << "/usr/local/lib/drcreep/";
+                filePathFinal << "/usr/local/share/drcreep/";
 #endif
 
 	// Build the file path
@@ -383,7 +383,7 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 	#ifndef FREEBSD
 	getcwd(path, 2000);
 	#else
-	strcpy(&path[0],"/usr/local/lib/drcreep");
+	strcpy(&path[0],"/usr/local/share/drcreep");
 	#endif
 	
 
