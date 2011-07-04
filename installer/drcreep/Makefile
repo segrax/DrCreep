@@ -6,20 +6,20 @@
 #
 
 PORTNAME=      drcreep
-DISTVERSION=   360
-PORTVERSION=   1
+DISTVERSION=   361
+#PORTVERSION=   1
 CATEGORIES=    games
 MASTER_SITES=  SF/creep/
 
 MAINTAINER=    segra@strobs.com
 COMMENT=       The Castles of Dr. Creep
 
-DATADIR=	${PREFIX}/lib/${PORTNAME}
-MAN1=          drcreep.1
-MANCOMPRESSED= yes
+DATADIR=	${PREFIX}/share/${PORTNAME}
+#MAN1=          drcreep.1
+#MANCOMPRESSED= yes
 
 USE_GMAKE=      yes
-USE_ZIP=        no
+#USE_ZIP=        no
 USE_SDL=        sdl
 
 WRKSRC=		${WRKDIR}/head
@@ -34,6 +34,10 @@ do-install:
 	${INSTALL_PROGRAM} ${WRKSRC}/${PORTNAME} ${PREFIX}/bin
 	${MKDIR} ${DATADIR}	
 	${MKDIR} ${DATADIR}/data
+	${MKDIR} ${DATADIR}/data/castle
+	${MKDIR} ${DATADIR}/data/castles
+	${MKDIR} ${DATADIR}/data/save
+
 	${INSTALL_DATA} ${WRKSRC}/run/data/char.rom ${DATADIR}/data
 
 	echo 'Please copy your drcreep disk image to ${DATADIR}\data'
