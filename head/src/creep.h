@@ -31,9 +31,88 @@ class cSound;
 class cDebug;
 class cBuilder;
 
+enum {
+	byte_882 = 0x80,
+	byte_883 = 0x40,
+	byte_884 = 0x20,
+	byte_885 = 0x10,
+	byte_886 = 0x08,
+	byte_887 = 0x04,
+	byte_888 = 0x02,
+	byte_889 = 0x01
+};
+
+enum {
+	byte_88A = 0x80,
+	byte_88B = 0x40,
+	byte_88C = 0x20,
+	byte_88D = 0x10,
+	byte_88E = 0x01
+};
+
+struct sCreepSprite {
+	byte field_0;			// 0
+	byte spriteX;			// 1	
+	byte spriteY;			// 2
+	byte spriteImageID;		// 3
+	byte state;				// 4
+	byte field_5;			// 5
+	byte field_6;			// 6
+	byte field_7;			// 7
+	byte field_8;			// 8
+	byte spriteFlags;		// 9
+	byte field_A;			// A
+	byte field_B;			// B
+	byte spriteXAdd;		// C
+	byte spriteYAdd;		// D
+	byte field_E;			// E
+	byte field_F;			// F
+	byte field_10;			// 10
+	byte field_11;			// 11
+	byte field_12;			// 12
+	byte field_13;			// 13
+	byte field_14;			// 14
+	byte field_15;			// 15
+	byte field_16;			// 16
+	byte field_17;			// 17
+	byte field_18;			// 18
+	byte field_19;			// 19
+	byte field_1A;			// 1A
+	byte field_1B;			// 1B
+	byte playerNumber;		// 1C
+	byte field_1D;			// 1D
+	byte field_1E;			// 1E
+	byte field_1F;			// 1F
+};
+
+struct sCreepObject {
+	byte objNumber;
+	byte field_1;
+	byte field_2;
+	byte color;
+	byte field_4;
+	byte field_5;
+	byte field_6;
+	byte field_7;
+};
+
+struct sCreepAnim {
+	byte field_0;
+	byte gfxPosX;
+	byte gfxPosY;
+	byte gfxCurrentID;
+	byte field_4;
+	byte gfxWidth;
+	byte gfxHeight;
+	byte field_7;
+};
+
 class cCreep {
 
 protected:
+	sCreepSprite	 mRoomSprites[8];	// BD00
+	sCreepObject	 mRoomObjects[20];	// BE00
+	sCreepAnim		 mRoomAnim2[20];	// BF00
 
 	byte			*mMemory,			*mGameData,		*mLevel,		*m64CharRom;
 	size_t			 mMemorySize;
@@ -108,8 +187,8 @@ protected:
 	byte		 byte_5647, byte_5648, byte_5F58, mJoyButtonState, byte_5F56;
 	byte		 byte_3FD4;
 
-	byte		 byte_883, byte_884, byte_885, byte_886, byte_887, byte_888, byte_889, byte_88A, byte_88B, byte_88C, byte_88D, byte_88E, byte_882, byte_D10, byte_D12;
-	byte		 byte_839, mImageCount, byte_8C0, byte_8C1, byte_5CE2;
+	byte		 byte_D10, byte_D12;
+	byte		 byte_839, mObjectCount, byte_8C0, byte_8C1, byte_5CE2;
 	byte		 byte_B83, byte_603A, byte_5FD7;
 	byte		 byte_5FD5, byte_5FD6, byte_5FD8;
 	
@@ -254,9 +333,10 @@ public:
 		void	 sub_6009( byte pA );
 		
 		// Image Handling Functions
-		void	 img_Actions( );
-		bool	 img_FindFree( byte &pX );
-		void	 img_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
+		void	 anim_Actions( );
+		void	 anim_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
+		
+		bool	 object_Create( byte &pX );
 
 		// object Handling Functions
 		void	 obj_Actions( );
@@ -266,7 +346,7 @@ public:
 		void	 obj_Actions_Execute( byte pX );
 		void	 obj_CheckCollisions( byte pX );
 		void	 obj_CollisionSet();
-		void	 obj_FindFree( byte &pX );
+		void	 sprite_FindFree( byte &pX );
 		void	 obj_OverlapCheck( byte pX );
 
 		void	 obj_MultiDraw();					// Draw multiple objects
@@ -306,7 +386,7 @@ public:
 		void	 obj_Ladder_Prepare();
 
 		void	 obj_Lightning_Prepare( );
-		void	 obj_Lightning_Add( byte &pY );
+		void	 obj_Lightning_Create_Sprite( byte &pY );
 		void	 obj_Lightning_Execute( byte pX );
 		void	 obj_Lightning_Img_Execute( byte pX );
 		void	 obj_Lightning_Switch_InFront( byte pX, byte pY );
