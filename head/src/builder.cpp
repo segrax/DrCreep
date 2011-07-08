@@ -441,7 +441,7 @@ void cBuilder::mapRoomsDraw( size_t pArrowRoom ) {
 	for( roomIT = rooms->begin(); roomIT !=  rooms->end(); ++roomIT ) {
 		
 		// Skip Final Room
-		if( roomIT->second->mNumber == -1 )
+		if( roomIT->second->mNumber == 0xFF )
 			continue;
 
 		castleRoomData( roomIT->second->mNumber );
@@ -591,7 +591,7 @@ void cBuilder::mapBuilder() {
 			saveCastle = true;
 		}
 		if(input->mRight) {
-			if(mCurrentRoom->mMapX < 0x255)
+			if(mCurrentRoom->mMapX < 180)
 				mCurrentRoom->mMapX += 4;
 			saveCastle = true;
 		}
@@ -601,7 +601,7 @@ void cBuilder::mapBuilder() {
 			saveCastle = true;
 		}
 		if(input->mDown) {
-			if(mCurrentRoom->mMapY < 0x255)
+			if(mCurrentRoom->mMapY < 200)
 				mCurrentRoom->mMapY += 8;
 			saveCastle = true;
 		}
