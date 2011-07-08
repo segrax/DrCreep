@@ -111,8 +111,8 @@ cCreep::cCreep() {
 	byte_B83 = 0;
 
 	byte_20DE = 0x00;
+	byte_2232 = -1;
 	byte_24FD = 0x00;
-	mInterruptCounter = 0x00;
 	byte_2E36 = 0xA0;
 
 	byte_3638 = 0xBA;
@@ -329,13 +329,7 @@ void cCreep::interruptWait( byte pCount) {
 			sleepTime = -sleepTime;
 	}
 
-	mInterruptCounter = pCount;
-		
-	while(mInterruptCounter > 0 ) {
-		Sleep( (dword) sleepTime );
-
-		--mInterruptCounter;
-	}
+	Sleep( (dword) sleepTime * pCount );
 
 	mTicksPrevious = SDL_GetTicks();
 }
@@ -702,14 +696,12 @@ void cCreep::sub_95F() {
 		++A;
 	}
 
-	mMemory[ 0xD025 ] = 0x0A;
-	mMemory[ 0xD026 ] = 0x0D;
-
 	mMemory[ 0x21 ] = 0;
 	mScreen->spriteDisable();
 
 	interruptWait( 2 );
 
+	byte_2232 = -1;
 }
 
 // 0B84
@@ -1011,8 +1003,6 @@ bool cCreep::Intro() {
 			else {
 				// C0D
 				interruptWait( 2 );
-
-				mInterruptCounter = 2;
 			}
 
 			hw_Update();
@@ -1229,7 +1219,7 @@ musicUpdate:;
 	}	// for
 	
 	if( !mIntro ) {
-		*memory( 0x2232 ) = 0xFF;
+		byte_2232 = -1;
 		mMusicBuffer = 0;
 		
 	} else {
@@ -2101,7 +2091,6 @@ s2FE9:;
 		Y = pX >> 5;
 		sprite->_color = 1;
 
-		mMemory[ 0xD027 + Y ] = 1;
 		--mMemory[ 0xBD08 + pX ];
 
 		mMemory[ 0x760C ] = mMemory[ 0xBD08 + pX ] << 3;
@@ -2112,7 +2101,6 @@ s2FE9:;
 		// 3010
 		Y = pX >> 5;
 		sprite->_color = 0;
-		mMemory[ 0xD027 + Y ] = 0;
 	}
 
 	// 301C
@@ -2456,8 +2444,6 @@ void cCreep::obj_Player_Unk( byte pX ) {
 
 	byte_34D6 = pX >> 5;
 
-	mMemory[ 0xD027 + byte_34D6 ] = mMemory[ 0x34D3 + mMemory[ 0xBD1C + pX ] ];
-	
 	cSprite *sprite = mScreen->spriteGet( byte_34D6 );
 
 	sprite->_color = mMemory[ 0x34D3 + mMemory[ 0xBD1C + pX ] ];
@@ -2507,7 +2493,7 @@ void cCreep::obj_Frankie_Execute( byte pX ) {
 			A = mMemory[ 0xBD01 + pX ];
 			A -= mMemory[ 0xBD01 + Y ];
 
-			if( !(mMemory[ 0xBD01 + pX ] >= 0 && A < 0)) {
+			if( !(((char)mMemory[ 0xBD01 + pX ]) >= 0 && A < 0)) {
 				// We are behind frank
 
 				A = mMemory[ 0xBD1E + pX ];
@@ -3365,14 +3351,17 @@ bool cCreep::mapDisplay() {
 			mMemory[ 0x11CD ] = 0;
 			if( mMemory[ 0x780B ] == mMemory[ 0x780C ] ) {
 				mMemory[ 0x11CB ] = 1;
-				mMemory[ 0xD028 ] = mMemory[ 0xD027 ] = 1;
+
+				mScreen->spriteGet( 0 )->_color = 1;
+				mScreen->spriteGet( 1 )->_color = 1;
 				goto s10EB;
 			}
 		}
 	}
 
 	// 10E3
-	mMemory[ 0xD027 ] = mMemory[ 0xD028 ] = 0;
+	mScreen->spriteGet( 0 )->_color = 0;
+	mScreen->spriteGet( 1 )->_color = 0;
 
 s10EB:;
 	mMemory[ 0x11D0 ] = 1;
@@ -3384,7 +3373,6 @@ s10EB:;
 
 	// 110E
 	for( ;; ) {
-		mInterruptCounter = 1;
 
 		byte X = mMemory[ 0x11D7 ];
 
@@ -4602,7 +4590,6 @@ void cCreep::gameEscapeCastle() {
 		else
 			A = mMemory[ 0x34D3 ];
 
-		mMemory[ 0xD027 + Y ] = A;
 		sprite->_color = A;
 		--mMemory[ 0x1AE4 ];
 
@@ -4857,7 +4844,7 @@ void cCreep::sub_21C8( char pA ) {
 	if( byte_839 == 1 )
 		return;
 
-	if( byte_2232 < 0 )
+	if( byte_2232 >= 0 )
 		return;
 
 	byte_2232 = byte_2231;
@@ -5104,8 +5091,7 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	mMemory[ 0x26 + Y ] = mMemory[ 0x26 + Y ] ^ 8;
 
 	// Sprite Color
-	mMemory[ 0xD027 + Y ]  = mMemory[ 0xBD09 + pX ] & 0x0F;
-	sprite->_color = mMemory[ 0xD027 + Y ];
+	sprite->_color = mMemory[ 0xBD09 + pX ] & 0x0F;
 
 	if( !(mMemory[ 0xBD09 + pX ] & byte_88A )) {
 		A = (mMemory[ 0x2F82 + Y ] ^ 0xFF) & mMemory[ 0xD01D ];

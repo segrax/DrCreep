@@ -70,7 +70,8 @@ protected:
 	byte		 byte_20DE, byte_24FD, mRunStopPressed;
 	byte		 byte_2E02;
 
-	byte		 mInterruptCounter, byte_2E36, byte_2232;					// Conveyor
+	byte		 byte_2E36;
+	char		 byte_2232;					// Conveyor
 
 	byte		 byte_311D;
 
@@ -93,7 +94,7 @@ protected:
 	byte		 byte_5389, byte_538A;
 
 	word		 word_5748;											// Frankenstein
-	byte		 byte_574A, byte_574D, byte_574E, byte_574F;
+	char		 byte_574A, byte_574D, byte_574E, byte_574F;
 	
 	byte		 byte_31EF, byte_31F0, byte_31F1, byte_31F2;
 	byte		 byte_31F3, byte_31F4, byte_31F5;

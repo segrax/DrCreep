@@ -50,6 +50,7 @@ void cSprite::drawMulti( byte *pBuffer ) {
 	ePriority	priority;
 	byte		maxY = 20;
 	byte		maxX = 23;
+	byte		pixel;
 
 	if( _rDoubleHeight )
 		maxY *= 2;
@@ -62,7 +63,7 @@ void cSprite::drawMulti( byte *pBuffer ) {
 	
 		for( word X = 0; X <= maxX; ++X ) {
 
-			byte pixel = (currentByte & 0xC0) >> 6;
+			pixel = (currentByte & 0xC0) >> 6;
 			// 3 Bytes per row
 			
 			if(pixel == 0 || pixel == 1 )
@@ -72,20 +73,26 @@ void cSprite::drawMulti( byte *pBuffer ) {
 
 			if(pixel) {
 				
-				if(pixel == 1)
-					color = _multiColor0;
+				switch(pixel) {
+					case 0x01:
+						color = _multiColor0;
+						break;
 
-				else if(pixel == 2)
-					color = _color;
+					case 0x02:
+						color = _color;
+						break;
 
-				else if(pixel == 3)
-					color = _multiColor1;
-				
+					case 0x03:
+						color = _multiColor1;
+						break;
+				}
+
 				_surface->pixelDraw(X, Y, color, priority, 2);
 
 				if( _rDoubleHeight ) {
-					_surface->pixelDraw(X+1, Y+1, color, priority);
-					_surface->pixelDraw(X, Y+1, color, priority);	
+					//
+					//_surface->pixelDraw(X+1, Y+1, color, priority);
+					_surface->pixelDraw(X, Y+1, color, priority, 2);	
 				}
 
 			} 
@@ -150,9 +157,13 @@ void cSprite::drawSingle( byte *pBuffer ) {
 }
 
 void cSprite::streamLoad( byte *pBuffer ) {
+
+	// No stream provided, then use the previous one
 	if( !pBuffer )
 		pBuffer = _buffer;
+
 	else {
+		// Otherwise set the buffer to the new stream
 		_buffer = pBuffer;
 		return;
 	}
