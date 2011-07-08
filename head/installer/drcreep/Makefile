@@ -6,7 +6,7 @@
 #
 
 PORTNAME=      drcreep
-DISTVERSION=   361
+DISTVERSION=   366
 #PORTVERSION=   1
 CATEGORIES=    games
 MASTER_SITES=  SF/creep/
@@ -19,7 +19,6 @@ DATADIR=	${PREFIX}/share/${PORTNAME}
 #MANCOMPRESSED= yes
 
 USE_GMAKE=      yes
-#USE_ZIP=        no
 USE_SDL=        sdl
 
 WRKSRC=		${WRKDIR}/head
@@ -32,7 +31,7 @@ do-build:
 
 do-install:
 	${INSTALL_PROGRAM} ${WRKSRC}/${PORTNAME} ${PREFIX}/bin
-	${MKDIR} ${DATADIR}	
+	${MKDIR} ${DATADIR}
 	${MKDIR} ${DATADIR}/data
 	${MKDIR} ${DATADIR}/data/castle
 	${MKDIR} ${DATADIR}/data/castles
@@ -40,9 +39,10 @@ do-install:
 
 	${INSTALL_DATA} ${WRKSRC}/run/data/char.rom ${DATADIR}/data
 
-	echo 'Please copy your drcreep disk image to ${DATADIR}\data'
-	
+	@echo '------------------------------------------------------'
+	@echo ''
+	@echo 'Please copy your Castles of Dr. Creep disk image (D64) to ${DATADIR}/data'
+	@echo ''
+	@echo ''
+
 .include <bsd.port.mk>
-
-
-
