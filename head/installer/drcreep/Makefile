@@ -6,7 +6,7 @@
 #
 
 PORTNAME=      drcreep
-DISTVERSION=   366
+DISTVERSION=   370
 #PORTVERSION=   1
 CATEGORIES=    games
 MASTER_SITES=  SF/creep/
@@ -26,7 +26,9 @@ WRKSRC=		${WRKDIR}/head
 PLIST_FILES= 	bin/${PORTNAME}
 
 do-build:
-	cd ${WRKSRC} && ${CXX} -DFREEBSD -o ${PORTNAME} ${CXXFLAGS} \
+	cd ${WRKSRC}
+	./rev.sh
+	${CXX} -DFREEBSD -o ${PORTNAME} ${CXXFLAGS} \
 				`${SDL_CONFIG} --cflags --libs` -I./src src/*.cpp src/graphics/*.cpp src/graphics/scale/*.cpp src/castle/*.cpp src/castle/objects/*.cpp src/vic-ii/*.cpp src/resid-0.16/*.cpp src/sound/*.cpp -lcompat
 
 do-install:
