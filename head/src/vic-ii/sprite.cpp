@@ -89,20 +89,15 @@ void cSprite::drawMulti( byte *pBuffer ) {
 
 				_surface->pixelDraw(X, Y, color, priority, 2);
 
-				if( _rDoubleHeight ) {
-					//
-					//_surface->pixelDraw(X+1, Y+1, color, priority);
-					_surface->pixelDraw(X, Y+1, color, priority, 2);	
-				}
-
+				if( _rDoubleHeight )
+					_surface->pixelDraw(X, Y+1, color, priority, 2);
 			} 
 			
 			++X;
 			if( _rDoubleWidth )
 				++X;
 
-			currentByte <<= 1;
-			currentByte <<= 1;
+			currentByte <<= 2;
 			if(++count == 4) {
 				currentByte = *pBuffer++;
 				count = 0;
