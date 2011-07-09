@@ -6,7 +6,7 @@
 #
 
 PORTNAME=      drcreep
-DISTVERSION=   371
+DISTVERSION=   374
 #PORTVERSION=   1
 CATEGORIES=    games
 MASTER_SITES=  SF/creep/
