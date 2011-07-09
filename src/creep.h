@@ -2,7 +2,7 @@
  *  The Castles of Dr. Creep 
  *  ------------------------
  *
- *  Copyright (C) 2009-2010 Robert Crossfield
+ *  Copyright (C) 2009-2011 Robert Crossfield
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -52,87 +52,97 @@ enum {
 
 class sCreepSprite {
 public:
-	byte field_0;			// 0
-	byte spriteX;			// 1	
-	byte spriteY;			// 2
-	byte spriteImageID;		// 3
-	byte state;				// 4
-	byte field_5;			// 5
-	byte field_6;			// 6
-	byte field_7;			// 7
-	byte field_8;			// 8
-	byte spriteFlags;		// 9
-	byte field_A;			// A
-	byte field_B;			// B
-	byte spriteXAdd;		// C
-	byte spriteYAdd;		// D
-	byte field_E;			// E
-	byte field_F;			// F
-	byte field_10;			// 10
-	byte field_11;			// 11
-	byte field_12;			// 12
-	byte field_13;			// 13
-	byte field_14;			// 14
-	byte field_15;			// 15
-	byte field_16;			// 16
-	byte field_17;			// 17
-	byte field_18;			// 18
-	byte field_19;			// 19
-	byte field_1A;			// 1A
-	byte field_1B;			// 1B
-	byte playerNumber;		// 1C
-	byte field_1D;			// 1D
-	byte field_1E;			// 1E
-	byte field_1F;			// 1F
+	byte Sprite_field_0;			// 0
+	byte spriteX;					// 1	
+	byte spriteY;					// 2
+	byte spriteImageID;				// 3
+	byte state;						// 4
+	byte Sprite_field_5;			// 5
+	byte Sprite_field_6;			// 6
+	byte Sprite_field_7;			// 7
+	byte Sprite_field_8;			// 8
+	byte spriteFlags;				// 9
+	byte Sprite_field_A;			// A
+	byte Sprite_field_B;			// B
+	byte spriteXAdd;				// C
+	byte spriteYAdd;				// D
+	byte Sprite_field_E;			// E
+	byte Sprite_field_F;			// F
+	byte Sprite_field_10;			// 10
+	byte Sprite_field_11;			// 11
+	byte Sprite_field_12;			// 12
+	byte Sprite_field_13;			// 13
+	byte Sprite_field_14;			// 14
+	byte Sprite_field_15;			// 15
+	byte Sprite_field_16;			// 16
+	byte Sprite_field_17;			// 17
+	byte Sprite_field_18;			// 18
+	byte Sprite_field_19;			// 19
+	byte Sprite_field_1A;			// 1A
+	byte Sprite_field_1B;			// 1B
+	byte playerNumber;				// 1C
+	byte Sprite_field_1D;			// 1D
+	byte Sprite_field_1E;			// 1E
+	byte Sprite_field_1F;			// 1F
 
 	sCreepSprite() {
 		clear();
 	}
 
 	void clear() {
-		field_0 = spriteX = spriteY = spriteImageID = 0;
-		state = field_5 = field_6 = field_7 = field_8 = 0;
+		Sprite_field_0 = spriteX = spriteY = spriteImageID = 0;
+		state = Sprite_field_5 = Sprite_field_6 = Sprite_field_7 = Sprite_field_8 = 0;
 		spriteFlags = 0;
-		field_A = field_B = 0;
+		Sprite_field_A = Sprite_field_B = 0;
 		spriteXAdd = spriteYAdd = 0;
-		field_E = field_F = field_10 = field_11 = field_12 = field_13 = field_14 = field_15 = field_16 = 0;
-		field_17 = field_18 = field_19 = field_1A = field_1B = 0;
+		Sprite_field_E = Sprite_field_F = Sprite_field_10 = Sprite_field_11 = Sprite_field_12 = Sprite_field_13 = Sprite_field_14 = Sprite_field_15 = Sprite_field_16 = 0;
+		Sprite_field_17 = Sprite_field_18 = Sprite_field_19 = Sprite_field_1A = Sprite_field_1B = 0;
 		playerNumber = 0;
-		field_1D = field_1E = field_1F = 0;
+		Sprite_field_1D = Sprite_field_1E = Sprite_field_1F = 0;
 	}
 
 };
 
-struct sCreepObject {
+struct sCreepObject {		// 0xBE
 	byte objNumber;
-	byte field_1;
-	byte field_2;
+	byte Object_field_1;
+	byte Object_field_2;
 	byte color;
-	byte field_4;
-	byte field_5;
-	byte field_6;
-	byte field_7;
+	byte Object_field_4;
+	byte Object_field_5;
+	byte Object_field_6;
+	byte Object_field_7;
+
+	void clear() {
+		objNumber = Object_field_1 = Object_field_2 = color = Object_field_4 = Object_field_5 = Object_field_6 = Object_field_7 = 0;
+	}
+
 };
 
-struct sCreepAnim {
-	byte field_0;
+struct sCreepAnim {		// 0xBF
+	byte Anim_field_0;
 	byte gfxPosX;
 	byte gfxPosY;
 	byte gfxCurrentID;
-	byte field_4;
+	byte Anim_field_4;
 	byte gfxWidth;
 	byte gfxHeight;
-	byte field_7;
+	byte Anim_field_7;
+
+	void clear() {
+		Anim_field_0 = gfxPosX = gfxPosY = gfxCurrentID = Anim_field_4 = gfxWidth = gfxHeight = Anim_field_7 = 0;
+	}
 };
 
 #define MAX_SPRITES 8
+#define MAX_OBJECTS 20
 
 class cCreep {
 
 protected:
 	sCreepSprite	 mRoomSprites[ MAX_SPRITES ];	// BD00
-	sCreepObject	 mRoomObjects[20];	// BE00
-	sCreepAnim		 mRoomAnim2[20];	// BF00
+	sCreepObject	 mRoomObjects[ MAX_OBJECTS ];	// BE00
+	sCreepAnim		 mRoomAnim[ MAX_OBJECTS ];		// BF00
 
 	byte			*mMemory,			*mGameData,		*mLevel,		*m64CharRom;
 	size_t			 mMemorySize;
@@ -389,7 +399,7 @@ public:
 		void	 obj_Door_Lock_Prepare( );
 		
 		void	 obj_Forcefield_Prepare( );
-		void	 obj_Forcefield_Execute( byte pX );
+		void	 obj_ForceSprite_field_Execute( byte pX );
 		void	 obj_Forcefield_Create( );
 		void	 obj_Forcefield_Img_Timer_Execute( byte pX );
 		void	 obj_Forcefield_Timer_InFront( byte pX, byte pY );
