@@ -6468,13 +6468,9 @@ void cCreep::obj_Conveyor_Img_Execute( byte pX ) {
 	byte A = mMemory[ word_40 ];
 
 	// 539F
-	if( (A & byte_5646) )
-		if( !(A & byte_5644) )
-			goto s53B3;
-	
-	if( (A & byte_5645) && !(A & byte_5643) ) {
-		// 53B3
-s53B3:;
+	if( (A & byte_5646) && !(A & byte_5644) ||
+		(A & byte_5645) && !(A & byte_5643) ) {
+
 			if( A & byte_5648 ) {
 				
 				A ^= byte_5648;
