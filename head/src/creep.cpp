@@ -731,12 +731,8 @@ void cCreep::screenClear() {
 		}
 	}
 
-	for( Y = 0;; ) {
-		mMemory[ 0xBD04 + Y ] = byte_889;
-		Y += 0x20;
-		if(!Y)
-			break;
-	}
+	for( Y = 0; Y != MAX_SPRITES; ++Y )
+		mRoomSprites[Y].state = byte_889;
 
 	word_30 = 0xC000;
 
@@ -1091,6 +1087,9 @@ bool cCreep::musicBufferFeed() {
 musicUpdate:;
 
 	for(; !done ;) {
+		if(!mMusicBuffer)
+			return false;
+
 		byte A = *mMusicBuffer;
 		A >>= 2;
 
@@ -1609,7 +1608,7 @@ void cCreep::obj_CollisionSet() {
 
 	byte X = 0;
 	for(;;) {
-		byte A = mMemory[ 0xBD04 + X ];
+		byte A = mRoomSprites[X].state;
 		if( A & byte_889 ) {
 			gfxSpriteCollision >>= 1;
 			gfxBackgroundCollision >>= 1;
@@ -1624,10 +1623,10 @@ void cCreep::obj_CollisionSet() {
 				A |= 4;
 			gfxBackgroundCollision >>= 1;
 
-			mMemory[ 0xBD04 + X ] = A;
+			mRoomSprites[X].state = A;
 		}
 
-		X += 0x20;
+		++X;
 		if(!X)
 			break;
 	}
@@ -1635,43 +1634,44 @@ void cCreep::obj_CollisionSet() {
 
 // 2E79: Execute any objects with actions / collisions, enable their sprites
 void cCreep::obj_Actions( ) {
-	byte X = 0, A;
+	byte  A;
 	byte w30 = 0;
 
-	for(;;) {
-		A = mMemory[ 0xBD04 + X ];
+	for(byte X = 0 ; X != MAX_SPRITES; ++X ) {
+
+		A = mRoomSprites[X].state;
 
 		if(! (A & byte_889) ) {
 			// 2E8B
 			if(! (A & byte_885) ) {
 				
 				if(! (A & byte_883) ) {
-					--mMemory[ 0xBD05 + X ];
+					--mRoomSprites[X].field_5;
 
-					if( mMemory[ 0xBD05 + X ] != 0 ) {
+					if( mRoomSprites[X].field_5 != 0 ) {
 						if((A & byte_888)) {
 							obj_CheckCollisions(X);
-							A = mMemory[ 0xBD04 + X];
+							A = mRoomSprites[X].state;
 							if((A & byte_883))
 								goto s2EF3;
 						}
 						
-						goto s2F72;
+						continue;
 					} else {
 					// 2EAD
 						if(A & byte_884) 
 							goto s2EF3;
 						if((A & byte_887)) {
 							obj_OverlapCheck( X );
-							if( mMemory[ 0xBD04 + X ] & byte_883)
+							if( mRoomSprites[X].state & byte_883)
 								goto s2EF3;
 						}
 						// 2EC2
-						if(!(mMemory[ 0xBD04 + X ] & byte_888))
+						if(!(mRoomSprites[X].state & byte_888))
 							goto s2ED5;
 
 						obj_CheckCollisions(X);
-						if( mMemory[ 0xBD04 + X ] & byte_883)
+						if( mRoomSprites[X].state & byte_883)
 							goto s2EF3;
 
 						goto s2ED5;
@@ -1687,28 +1687,27 @@ s2EF3:
 				// 2ED5
 s2ED5:
 				obj_Actions_Execute(X);
-				if( mMemory[ 0xBD04 + X ] & byte_883 )
+				if( mRoomSprites[X].state & byte_883 )
 					goto s2EF3;
 			}
 			// 2EF6
-			if( mMemory[ 0xBD04 + X ] & byte_885 )
+			if( mRoomSprites[X].state & byte_885 )
 				goto s2ED5;
 
-			byte Y = (X >> 5);
-			cSprite *sprite = mScreen->spriteGet( Y );
+			cSprite *sprite = mScreen->spriteGet( X );
 
-			if( (mMemory[ 0xBD04 + X ] & byte_886) ) {
-				mMemory[ 0xBD04 + X ] = byte_889;
+			if( (mRoomSprites[X].state & byte_886) ) {
+				mRoomSprites[X].state = byte_889;
 				goto s2F51;
 			} else {
 				// 2F16
-				word_30 = mMemory[ 0xBD01 + X ];
+				word_30 = mRoomSprites[X].spriteX;
 				word_30 <<= 1;
 
 				w30 = (word_30 & 0xFF00) >> 8;
 
 				// Sprite X
-				mMemory[ 0x10 + Y ] = (word_30 - 8);
+				mMemory[ 0x10 + X ] = (word_30 - 8);
 				sprite->mX = (word_30 - 8);
 
 				if((word_30 >= 0x100) && ((word_30 - 8) < 0x100))
@@ -1717,13 +1716,13 @@ s2ED5:
 				if( (w30 & 0x80) ) {
 s2F51:;
 					// 2f51
-					A = (mMemory[ 0x2F82 + Y ] ^ 0xFF);
+					A = (mMemory[ 0x2F82 + X ] ^ 0xFF);
 					A &= mMemory[ 0x21 ];
 					sprite->_rEnabled = false;
 
 				} else {
 					if( w30 ) {
-						A = (mMemory[ 0x20 ] | mMemory[ 0x2F82 + Y ]);
+						A = (mMemory[ 0x20 ] | mMemory[ 0x2F82 + X ]);
 					} else
 						A = (mMemory[ 0x2F82 ] ^ 0xFF) & mMemory[ 0x20 ];
 
@@ -1731,14 +1730,14 @@ s2F51:;
 					mMemory[ 0x20 ] = A;
 
 					// 2F45
-					if((A & mMemory[ 0x2F82 + Y ]) && (mMemory[ 0x10 + Y ] >= 0x58) && w30 ) {
-						A = (mMemory[ 0x2F82 + Y ] ^ 0xFF) & mMemory[ 0x21 ];
+					if((A & mMemory[ 0x2F82 + X ]) && (mMemory[ 0x10 + X ] >= 0x58) && w30 ) {
+						A = (mMemory[ 0x2F82 + X ] ^ 0xFF) & mMemory[ 0x21 ];
 						sprite->_rEnabled = false;
 					} else {
 						// 2F5B
-						sprite->mY = ((char) mMemory[ 0xBD02 + X ]) + 0x32;
-						mMemory[ 0x18 + Y ] = mMemory[ 0xBD02 + X ] + 0x32;
-						A = mMemory[ 0x21 ] | mMemory[ 0x2F82 + Y ];
+						sprite->mY = ((char) mRoomSprites[X].spriteY) + 0x32;
+						mMemory[ 0x18 + X ] = mRoomSprites[X].spriteY+ 0x32;
+						A = mMemory[ 0x21 ] | mMemory[ 0x2F82 + X ];
 
 						sprite->_rEnabled = true;
 					}
@@ -1747,15 +1746,11 @@ s2F51:;
 				// 2F69
 				// Enabled Sprites
 				mMemory[ 0x21 ] = A;
-				mMemory[ 0xBD05 + X ] = mMemory[ 0xBD06 + X ];
+				mRoomSprites[X].field_5 = mRoomSprites[X].field_6;
 			}
 				
 		}
-s2F72:
 		// 2F72
-		X += 0x20;
-		if( !X )
-			break;
 	}
 
 }
@@ -1763,14 +1758,14 @@ s2F72:
 // 311E
 void cCreep::obj_OverlapCheck( byte pX ) {
 
-	byte_31F1 = mMemory[ 0xBD01 + pX ];
-	byte_31F2 = byte_31F1 + mMemory[ 0xBD0A + pX ];
-	if( (mMemory[ 0xBD01 + pX ] +  mMemory[ 0xBD0A + pX ]) > 0xFF )
+	byte_31F1 = mRoomSprites[pX].spriteX;
+	byte_31F2 = byte_31F1 + mRoomSprites[pX].field_A;
+	if( (mRoomSprites[pX].spriteX +  mRoomSprites[pX].field_A) > 0xFF )
 		byte_31F1 = 0;
 
-	byte_31F3 = mMemory[ 0xBD02 + pX ];
-	byte_31F4 = byte_31F3 + mMemory[ 0xBD0B + pX ];
-	if( (mMemory[ 0xBD02 + pX ] +  mMemory[ 0xBD0B + pX ]) > 0xFF )
+	byte_31F3 = mRoomSprites[pX].spriteY;
+	byte_31F4 = byte_31F3 + mRoomSprites[pX].field_B;
+	if( (mRoomSprites[pX].spriteY +  mRoomSprites[pX].field_B) > 0xFF )
 		byte_31F3 = 0;
 
 	// 3149
@@ -1791,12 +1786,12 @@ void cCreep::obj_OverlapCheck( byte pX ) {
 						if( !(mMemory[ 0xBF02 + Y ] + mMemory[ 0xBF06 + Y ] < byte_31F3) ) {
 						//318C
 							byte_31F5 = 1;
-							Y = mMemory[ 0xBD00 + pX ]  << 3;
+							Y = mRoomSprites[pX].field_0  << 3;
 
 							if( obj_Actions_Collision( pX, Y ) == true ) {
 
 								if( byte_31F5 == 1 ) 
-									mMemory[ 0xBD04 + pX ] |= byte_883;
+									mRoomSprites[pX].state |= byte_883;
 							}
 
 							Y = mMemory[ 0xBF00 + byte_31F0 ] << 2;
@@ -1915,13 +1910,13 @@ bool cCreep::obj_Actions_InFront( byte pX, byte pY ) {
 // 30D9
 void cCreep::obj_Actions_Hit( byte pX, byte pY ) {
 	
-	if( mMemory[ 0xBD04 + pX ] & byte_884 )
+	if( mRoomSprites[pX].state & byte_884 )
 		return;
 
 	byte_311D = 1;
 	mMemory[ 0x311C ] = pY;
 	
-	byte Y = mMemory[ 0xBD00 + pX ] << 3;
+	byte Y = mRoomSprites[pX].field_0 << 3;
 	word func = readLEWord( &mMemory[ 0x891 + Y ] );
 
 	switch( func ) {
@@ -1954,7 +1949,7 @@ void cCreep::obj_Actions_Hit( byte pX, byte pY ) {
 	if( byte_311D != 1 )
 		return;
 
-	mMemory[ 0xBD04 + pX ] |= byte_883;
+	mRoomSprites[pX].state |= byte_883;
 }
 
 // 3026
@@ -1962,20 +1957,20 @@ void cCreep::obj_CheckCollisions( byte pX ) {
 	byte byte_3115 = pX, byte_3116;
 	byte byte_311A, byte_311B, byte_3117, byte_3118, byte_3119;
 
-	byte Y = mMemory[ 0xBD00 + pX ] << 3;
+	byte Y = mRoomSprites[pX].field_0 << 3;
 	
 	byte A = mMemory[ 0x895 + Y ];
 	
 	if(!(A & 0x80)) {
 		byte_311B = A;
-		byte_3117 = mMemory[ 0xBD01 + pX ];
-		byte_3118 = byte_3117 + mMemory[ 0xBD0A + pX];
-		if( (byte_3117 + mMemory[ 0xBD0A + pX ]) > 0x100 )
+		byte_3117 = mRoomSprites[pX].spriteX;
+		byte_3118 = byte_3117 + mRoomSprites[pX].field_A;
+		if( (byte_3117 + mRoomSprites[pX].field_A) > 0x100 )
 			byte_3117 = 0;
 
-		byte_3119 = mMemory[ 0xBD02 + pX ];
-		byte_311A = byte_3119 + mMemory[ 0xBD0B + pX ];
-		if( (byte_3119 + mMemory[ 0xBD0B + pX ]) > 0x100 )
+		byte_3119 = mRoomSprites[pX].spriteY;
+		byte_311A = byte_3119 + mRoomSprites[pX].field_B;
+		if( (byte_3119 + mRoomSprites[pX].field_B) > 0x100 )
 			byte_3119 = 0;
 
 		Y = 0;
@@ -1983,12 +1978,12 @@ void cCreep::obj_CheckCollisions( byte pX ) {
 			// 3068
 			byte_3116 = Y;
 			if( byte_3115 != byte_3116 ) {
-				A = mMemory[ 0xBD04 + Y];
+				A = mRoomSprites[Y].state;
 
 				if( !(A & byte_889) ) {
 					
 					if( (A & byte_888) ) {
-						Y = mMemory[ 0xBD00 + Y ] << 3;
+						Y = mRoomSprites[Y].field_0 << 3;
 						A = mMemory[ 0x895 + Y ];
 
 						if( !(A & 0x80 )) {
@@ -1996,12 +1991,12 @@ void cCreep::obj_CheckCollisions( byte pX ) {
 								// 308E
 								Y = byte_3116;
 								A = byte_3118;
-								if( A >= mMemory[ 0xBD01 + Y ] ) {
-									A = mMemory[ 0xBD01 + Y ] + mMemory[ 0xBD0A + Y ];
+								if( A >= mRoomSprites[Y].spriteX ) {
+									A = mRoomSprites[Y].spriteX + mRoomSprites[Y].field_A;
 									if( A >= byte_3117 ) {
 										// 30A5
-										if( byte_311A >= mMemory[ 0xBD02 + Y ] ) {
-											if( (mMemory[ 0xBD02 + Y ] + mMemory[ 0xBD0B + Y ]) >= byte_3119 ) {
+										if( byte_311A >= mRoomSprites[Y].spriteY ) {
+											if( (mRoomSprites[Y].spriteY + mRoomSprites[Y].field_B) >= byte_3119 ) {
 												obj_Actions_Hit( pX, Y);
 												pX = byte_3116;
 												Y = byte_3115;
@@ -2020,7 +2015,7 @@ void cCreep::obj_CheckCollisions( byte pX ) {
 			pX = byte_3115;
 			Y = byte_3116;
 			// 30CB
-			Y+= 0x20;
+			++Y;
 			if(!Y)
 				break;
 		}
@@ -2030,74 +2025,72 @@ void cCreep::obj_CheckCollisions( byte pX ) {
 
 //2F8A
 void cCreep::sprite_FlashOnOff( byte pX ) {
-	byte A = mMemory[ 0xBD04 + pX ];
+	byte A = mRoomSprites[pX].state;
 	byte Y = 0;
 
 	mScreen->spriteRedrawSet();
-	cSprite *sprite = mScreen->spriteGet( pX >> 5 );
+	cSprite *sprite = mScreen->spriteGet( pX );
 
 	if( !(A & byte_883) ) {
 		
-		if( !(mMemory[ 0xBD08 + pX ] )) {
-			A = mMemory[ 0xBD04 + pX ] ^ byte_884;
+		if( !(mRoomSprites[pX].field_8 )) {
+			A = mRoomSprites[pX].state ^ byte_884;
 		} else
 			goto s2FE9;
 	
 	} else {
 		// 2FA3
 		A ^= byte_883;
-		mMemory[ 0xBD04 + pX ] = A;
-		Y = mMemory[ 0xBD00 + pX ] << 3;
+		mRoomSprites[pX].state = A;
+		Y = mRoomSprites[pX].field_0 << 3;
 		
 		A = mMemory[ 0x896 + Y ];
 		if(!(A & byte_88E))
-			A = mMemory[ 0xBD04 + pX ];
+			A = mRoomSprites[pX].state;
 		else
 			goto s2FC4;
 	}
 	// 2FBB
-	mMemory[ 0xBD04 + pX ] = A | byte_885;
+	mRoomSprites[pX].state = A | byte_885;
 	return;
 
 s2FC4:;
-	mMemory[ 0xBD08 + pX ] = 8;
-	Y = pX >> 5;
+	mRoomSprites[pX].field_8 = 8;
+	Y = pX;
 
 	// Sprite multicolor mode
 	mMemory[ 0xD01C ] = (mMemory[ 0x2F82 + Y ] ^ 0xFF) & mMemory[ 0xD01C ];
 	sprite->_rMultiColored = false;
 	
-	mMemory[ 0xBD04 + pX ] |= byte_884;
-	mMemory[ 0xBD06 + pX ] = 1;
+	mRoomSprites[pX].state |= byte_884;
+	mRoomSprites[pX].field_6 = 1;
 
 s2FE9:;
 	if(! (byte_2E36 & 1) ) {
 		// Flash On
 		// 2FF0
-		Y = pX >> 5;
 		sprite->_color = 1;
 
-		--mMemory[ 0xBD08 + pX ];
+		--mRoomSprites[pX].field_8;
 
-		mMemory[ 0x760C ] = mMemory[ 0xBD08 + pX ] << 3;
+		mMemory[ 0x760C ] = mRoomSprites[pX].field_8 << 3;
 		sub_21C8(8);
 		
 	} else {
 		// Flash Off
 		// 3010
-		Y = pX >> 5;
 		sprite->_color = 0;
 	}
 
 	// 301C
-	mMemory[ 0xBD05 + pX ] = mMemory[ 0xBD06 + pX ];
+	mRoomSprites[pX].field_5 = mRoomSprites[pX].field_6;
 }
 
 // Originally this was not a function, but its too big to bother
 // implementing in the original location
 void cCreep::obj_Actions_Execute( byte pX ) {
 	//2ED5
-	byte Y =  mMemory[ 0xBD00 + pX ] << 3;
+	byte Y =  mRoomSprites[pX].field_0 << 3;
 	word func = readLEWord( &mMemory[ 0x88F + Y ]);
 
 	switch(func) {
@@ -2135,15 +2128,15 @@ void cCreep::obj_Actions_Execute( byte pX ) {
 }
 
 void cCreep::obj_Player_Execute( byte pX ) {
-	byte A =  mMemory[ 0xBD04 + pX ];
+	byte A =  mRoomSprites[pX].state;
 
 	// Player leaving room?
 	if( A & byte_885 ) {
 		A ^= byte_885;
 		A |= byte_886;
-		mMemory[ 0xBD04 + pX ] = A;
+		mRoomSprites[pX].state = A;
 
-		char Y = mMemory[ 0xBD1C + pX ] << 1;
+		char Y = mRoomSprites[pX].playerNumber << 1;
 		
 		time_t diffSec;
 		timeb timeNow;
@@ -2196,10 +2189,10 @@ void cCreep::obj_Player_Execute( byte pX ) {
 	// Player entering room?
 	if( A & byte_882 ) {
 		A ^= byte_882;
-		mMemory[ 0xBD04 + pX ] = A;
+		mRoomSprites[pX].state = A;
 
 		// Current Player
-		char Y = mMemory[ 0xBD1C + pX ] << 1;
+		char Y = mRoomSprites[pX].playerNumber << 1;
 
 		if( Y == 0 )
 			ftime(&mPlayer1Time);
@@ -2215,7 +2208,7 @@ void cCreep::obj_Player_Execute( byte pX ) {
 		//for( Y = 3; Y >= 0; --Y ) 
 		//	mMemory[ word_32 + Y ] = mMemory[ word_30 + Y ];
 		
-		Y = mMemory[ 0xBD1C + pX ];
+		Y = mRoomSprites[pX].playerNumber;
 		A = mMemory[ 0x780D + Y ];
 		if( A != 6 ) {
 			obj_Player_Unk( pX );
@@ -2224,29 +2217,29 @@ void cCreep::obj_Player_Execute( byte pX ) {
 
 	} else {
 		// 3269
-		byte Y = mMemory[ 0xBD1C + pX ];
+		byte Y = mRoomSprites[pX].playerNumber;
 		A = mMemory[ 0x780D + Y ];
 
 		if( A == 5 ) {
 			//3280
 			byte_34D6 = Y;
-			Y = mMemory[ 0xBD1B + pX ];
+			Y = mRoomSprites[pX].field_1B;
 			A = mMemory[ 0x34A4 + Y ];
 
 			if( A != 0xFF ) {
 				Y = byte_34D6;
 				mMemory[ 0x780D + Y ] = A;
-				mMemory[ 0xBD06 + pX ] = 1;
+				mRoomSprites[pX].field_6 = 1;
 				A = mMemory[ 0x780D + Y ];
 				goto s32CB;
 
 			} else {
 				// 329E
-				mMemory[ 0xBD1B + pX ] += 0x04;
-				Y = mMemory[ 0xBD1B + pX ];
+				mRoomSprites[pX].field_1B += 0x04;
+				Y = mRoomSprites[pX].field_1B;
 
-				mMemory[ 0xBD01 + pX ] += mMemory[ 0x34A1 + Y ];
-				mMemory[ 0xBD02 + pX ] += mMemory[ 0x34A2 + Y ];
+				mRoomSprites[pX].spriteX += mMemory[ 0x34A1 + Y ];
+				mRoomSprites[pX].spriteY += mMemory[ 0x34A2 + Y ];
 			}
 
 		} else if( A == 6 ) {
@@ -2255,32 +2248,32 @@ void cCreep::obj_Player_Execute( byte pX ) {
 			goto s32CB;
 	}
 	// 32BC
-	mMemory[ 0xBD03 + pX ] = mMemory[ 0x34A3 + mMemory[ 0xBD1B + pX ] ];
+	mRoomSprites[pX].spriteImageID = mMemory[ 0x34A3 + mRoomSprites[pX].field_1B ];
 	obj_Player_Unk( pX );
 	return;
 s32CB:;
 	
 	if( A != 0 ) {
-		mMemory[ 0xBD04 + pX ] |= byte_885;
+		mRoomSprites[pX].state |= byte_885;
 		return;
 	}
 
 s32DB:;
-	A = mMemory[ 0xBD1A + pX ];
+	A = mRoomSprites[pX].field_1A;
 	char a = A;
 	if( A != 0xFF )
-		if( A != mMemory[ 0xBD19 + pX ] ) {
+		if( A != mRoomSprites[pX].field_19 ) {
 			sub_526F( a );
 			A = a;
 		}
 
-	mMemory[ 0xBD19 + pX ] = A;
-	mMemory[ 0xBD1A + pX ] = 0xFF;
+	mRoomSprites[pX].field_19 = A;
+	mRoomSprites[pX].field_1A = 0xFF;
 	sub_5F6B( pX );
 	
-	byte byte_34D5 = mMemory[ word_3C ] & mMemory[ 0xBD18 + pX ];
+	byte byte_34D5 = mMemory[ word_3C ] & mRoomSprites[pX].field_18;
 	//32FF
-	mMemory[ 0xBD18 + pX ] = 0xFF;
+	mRoomSprites[pX].field_18 = 0xFF;
 
 	if( byte_5FD8 != 0 ) {
 		// 3309
@@ -2316,21 +2309,21 @@ s32DB:;
 		}
 	}
 	// 338E
-	KeyboardJoystickMonitor( mMemory[ 0xBD1C + pX ] );
-	mMemory[ 0xBD1D + pX ] = mJoyButtonState;
-	mMemory[ 0xBD1E + pX ] = byte_5F56;
+	KeyboardJoystickMonitor( mRoomSprites[pX].playerNumber );
+	mRoomSprites[pX].field_1D = mJoyButtonState;
+	mRoomSprites[pX].field_1E = byte_5F56;
 	
 	byte Y = byte_5F56;
 	if( !(Y & 0x80 )) {
 
 		if( mMemory[ 0x2F82 + Y ] & byte_34D5 ) {
-			mMemory[ 0xBD1F + pX ] = Y;
+			mRoomSprites[pX].field_1F = Y;
 			goto s33DE;
 
 		} 
 
 		// 33B2
-		A = mMemory[ 0xBD1F + pX ];
+		A = mRoomSprites[pX].field_1F;
 
 		if(!( A & 0x80 )) {
 			A += 1;
@@ -2342,80 +2335,80 @@ s32DB:;
 					goto s33D6;
 			}
 			
-			if( mMemory[ 0x2F82 + mMemory[ 0xBD1F + pX ] ] & byte_34D5 )
+			if( mMemory[ 0x2F82 + mRoomSprites[pX].field_1F ] & byte_34D5 )
 				goto s33DE;
 		}
 	}
 s33D6:;
 	// 33D6
-	mMemory[ 0xBD1F + pX ] = 0x80;
+	mRoomSprites[pX].field_1F = 0x80;
 	return;
 
 	// Player Input
 	// 33DE
 s33DE:;
-	A = (mMemory[ 0xBD1F + pX ] & 3);
+	A = (mRoomSprites[pX].field_1F & 3);
 
 	if( A == 2 ) {
-		mMemory[ 0xBD02 + pX ] -= byte_5FD8;
+		mRoomSprites[pX].spriteY -= byte_5FD8;
 
 	} else {
 		// 33F4
 		if( A == 0 ) {
-			mMemory[ 0xBD01 + pX ] -= byte_5FD7;
-			++mMemory[ 0xBD01 + pX ];
+			mRoomSprites[pX].spriteX -= byte_5FD7;
+			++mRoomSprites[pX].spriteX;
 		}
 	}
 	// 3405
-	Y = mMemory[ 0xBD1F + pX ];
-	mMemory[ 0xBD01 + pX ] += mMemory[ 0x34D7 + Y ];
-	mMemory[ 0xBD02 + pX ] += mMemory[ 0x34DF + Y ];
+	Y = mRoomSprites[pX].field_1F;
+	mRoomSprites[pX].spriteX += mMemory[ 0x34D7 + Y ];
+	mRoomSprites[pX].spriteY += mMemory[ 0x34DF + Y ];
 
 	if( !(Y & 3) ) {
 		// 3421
 		if( byte_34D5 & 1 ) {
-			A = mMemory[ 0xBD1F + pX ];
+			A = mRoomSprites[pX].field_1F;
 			if( !A )
-				++mMemory[ 0xBD03 + pX ];
+				++mRoomSprites[pX].spriteImageID;
 			else 
-				--mMemory[ 0xBD03 + pX ];
+				--mRoomSprites[pX].spriteImageID;
 			
 			// 3436
 			// Ladder Movement 
-			A = mMemory[ 0xBD03 + pX ];
+			A = mRoomSprites[pX].spriteImageID;
 			if( A >= 0x2E ) {
 				// 3445
 				// Moving Up Ladder
 				if( A >= 0x32 )
-					mMemory[ 0xBD03 + pX ] = 0x2E;
+					mRoomSprites[pX].spriteImageID = 0x2E;
 			} else {
 				// 343D
 				// Moving Down Ladder
-				mMemory[ 0xBD03 + pX ] = 0x31;
+				mRoomSprites[pX].spriteImageID = 0x31;
 			}
 
 		} else {
 			//3451
 			// Down Pole
-			mMemory[ 0xBD03 + pX ] = 0x26;
+			mRoomSprites[pX].spriteImageID = 0x26;
 		}
 
 	} else {
 		// 3459
 		// Player Frame
-		++mMemory[ 0xBD03 + pX ];
+		++mRoomSprites[pX].spriteImageID;
 
-		if( mMemory[ 0xBD1F + pX ] < 4 ) {
+		if( mRoomSprites[pX].field_1F < 4 ) {
 			// 3463
-			A = mMemory[ 0xBD03 + pX ];
+			A = mRoomSprites[pX].spriteImageID;
 			if( A >= 6 || A < 3 )
-				mMemory[ 0xBD03 + pX ] = 3;
+				mRoomSprites[pX].spriteImageID = 3;
 
 		} else {
 			// 3476
 			// Max frame reached?
-			if( mMemory[ 0xBD03 + pX ] >= 3 )
-				mMemory[ 0xBD03 + pX ] = 0;
+			if( mRoomSprites[pX].spriteImageID >= 3 )
+				mRoomSprites[pX].spriteImageID = 0;
 		}
 	}
 
@@ -2428,18 +2421,18 @@ s33DE:;
 void cCreep::obj_Player_Unk( byte pX ) {
 	hw_SpritePrepare( pX );
 
-	byte_34D6 = pX >> 5;
+	byte_34D6 = pX;
 
-	cSprite *sprite = mScreen->spriteGet( byte_34D6 );
+	cSprite *sprite = mScreen->spriteGet( pX );
 
-	sprite->_color = mMemory[ 0x34D3 + mMemory[ 0xBD1C + pX ] ];
+	sprite->_color = mMemory[ 0x34D3 + mRoomSprites[pX].playerNumber ];
 	mScreen->spriteRedrawSet();
 }
 
 // 3AEB: Frankie Movement
 void cCreep::obj_Frankie_Execute( byte pX ) {
 	byte Y;
-	char A = mMemory[ 0xBD04 + pX ];
+	char A = mRoomSprites[pX].state;
 	byte byte_3F0B, byte_3F12;
 	char byte_3F0A, byte_3F10, byte_3F11;
 
@@ -2447,16 +2440,16 @@ void cCreep::obj_Frankie_Execute( byte pX ) {
 		return;
 
 	if( A & byte_885 ) {
-		mMemory[ 0xBD04 + pX ] = (A ^ byte_885) | byte_886;
+		mRoomSprites[pX].state = (A ^ byte_885) | byte_886;
 		return;
 	}
 
 	if( A & byte_882 ) 
-		mMemory[ 0xBD04 + pX ] ^= byte_882;
+		mRoomSprites[pX].state ^= byte_882;
 
-	word_40 = word_5748 + mMemory[ 0xBD1F + pX ];
+	word_40 = word_5748 + mRoomSprites[pX].field_1F;
 	
-	if( !(mMemory[ 0xBD1E + pX ] & byte_574E) ) {
+	if( !(mRoomSprites[pX].field_1E & byte_574E) ) {
 		if( mIntro == 1 )
 			return;
 
@@ -2468,21 +2461,21 @@ void cCreep::obj_Frankie_Execute( byte pX ) {
 				continue;
 
 			Y = mMemory[ 0x34D1 + Y ];
-			A = mMemory[ 0xBD02 + pX ];
-			A -= mMemory[ 0xBD02 + Y ];
+			A = mRoomSprites[pX].spriteY;
+			A -= mRoomSprites[Y].spriteY;
 
 			// Within 4 on the Y axis, then frank can wake up
 			if( (byte) A >= 4 )
 				continue;
 
 			// 3B4A
-			A = mMemory[ 0xBD01 + pX ];
-			A -= mMemory[ 0xBD01 + Y ];
+			A = mRoomSprites[pX].spriteX;
+			A -= mRoomSprites[Y].spriteX;
 
-			if( !(((char)mMemory[ 0xBD01 + pX ]) >= 0 && A < 0)) {
+			if( !(((char)mRoomSprites[pX].spriteX) >= 0 && A < 0)) {
 				// We are behind frank
 
-				A = mMemory[ 0xBD1E + pX ];
+				A = mRoomSprites[pX].field_1E;
 				if( !(A & byte_574F) )
 					continue;
 				else
@@ -2490,13 +2483,13 @@ void cCreep::obj_Frankie_Execute( byte pX ) {
 			}
 
 			// 3B5E
-			A = mMemory[ 0xBD1E + pX ];
+			A = mRoomSprites[pX].field_1E;
 			if( !(A & byte_574F)) {
 s3B6E:
 				A |= byte_574E;
-				mMemory[ 0xBD1E + pX ] = A;
+				mRoomSprites[pX].field_1E = A;
 				mMemory[ word_40 ] = A;
-				mMemory[ 0xBD1D + pX ] = 0x80;
+				mRoomSprites[pX].field_1D = 0x80;
 
 				sub_21C8(0x07);
 				break;
@@ -2510,25 +2503,25 @@ s3B6E:
 	}
 	
 	// 3B82
-	A = mMemory[ 0xBD1B + pX ];
+	A = mRoomSprites[pX].field_1B;
 
 	if( (byte) A != 0xFF )
-		if( A != mMemory[ 0xBD1A + pX ] ) {
+		if( A != mRoomSprites[pX].field_1A ) {
 			sub_526F(A);
 		}
 
-	mMemory[ 0xBD1A + pX ] = A;
-	mMemory[ 0xBD1B + pX ] = 0xFF;
+	mRoomSprites[pX].field_1A = A;
+	mRoomSprites[pX].field_1B = 0xFF;
 	sub_5F6B( pX );
 
 	//3B9C
-	A = mMemory[ word_3C ] & mMemory[ 0xBD1C + pX ];
+	A = mMemory[ word_3C ] & mRoomSprites[pX].playerNumber;
 	byte byte_3F13 = A;
 
-	mMemory[ 0xBD1C + pX ] = 0xFF;
+	mRoomSprites[pX].playerNumber = 0xFF;
 	A = byte_3F13;
 	if(!A) {
-		mMemory[ 0xBD1D + pX ] = 0x80;
+		mRoomSprites[pX].field_1D = 0x80;
 		goto s3CB4;
 	} else {
 		byte_3F0A = 0;
@@ -2545,13 +2538,13 @@ s3B6E:
 	
 		// 3BD1
 		if( byte_3F0A == 1 ) {
-			mMemory[ 0xBD1D + pX ] = byte_3F0B;
+			mRoomSprites[pX].field_1D = byte_3F0B;
 			goto s3CB4;
 		}
 		if( byte_3F0A == 2 ) {
 			byte Y = (byte_3F0B - 4) & 7;
 			if( mMemory[ 0x2F82 + Y ] & byte_3F13 ) {
-				Y = mMemory[ 0xBD1D + pX ];
+				Y = mRoomSprites[pX].field_1D;
 				if( !(Y & 0x80 ))
 					if( mMemory[ 0x2F82 + Y ] & byte_3F13 )
 						goto s3CB4;
@@ -2570,8 +2563,8 @@ s3B6E:
 			if( mMemory[ 0x780D + Y ] == 0 ) {
 				
 				Y = mMemory[ 0x34D1 + Y ];
-				A = mMemory[ 0xBD01 + Y ];
-				A -= mMemory[ 0xBD01 + pX ];
+				A = mRoomSprites[Y].spriteX;
+				A -= mRoomSprites[pX].spriteX;
 				//3C2A
 				if( A < 0 ) {
 					A ^= 0xFF;
@@ -2585,8 +2578,8 @@ s3B6E:
 
 				Y = byte_3F0A;
 				Y = mMemory[ 0x34D1 + Y ];
-				A = mMemory[ 0xBD02 + Y ];
-				A -= mMemory[ 0xBD02 + pX ];
+				A = mRoomSprites[Y].spriteY;
+				A -= mRoomSprites[pX].spriteY;
 				if( A < 0 ) {
 					A ^= 0xFF;
 					++A;
@@ -2623,14 +2616,14 @@ s3B6E:
 			//3C8E
 			A = byte_3F12;
 			if( A == -1 ) {
-				mMemory[ 0xBD1D + pX ] = 0x80;
+				mRoomSprites[pX].field_1D = 0x80;
 				goto s3CB4;
 			}
 
 			A = mMemory[ 0x2F82 + (byte_3F12 << 1) ];
 			if( A & byte_3F13 ) {
 				// 3CB0
-				mMemory[ 0xBD1D + pX ] = (byte_3F12 << 1);
+				mRoomSprites[pX].field_1D = (byte_3F12 << 1);
 				break;
 			}
 
@@ -2641,52 +2634,52 @@ s3B6E:
 
 	// 3CB4
 s3CB4:;
-	if( mMemory[ 0xBD1D + pX ] & 2 ) {
-		mMemory[ 0xBD02 + pX ] -= byte_5FD8;
+	if( mRoomSprites[pX].field_1D & 2 ) {
+		mRoomSprites[pX].spriteY -= byte_5FD8;
 
-		++mMemory[ 0xBD03 + pX ];
-		if( mMemory[ 0xBD1D + pX ] != 2 ) {
+		++mRoomSprites[pX].spriteImageID;
+		if( mRoomSprites[pX].field_1D != 2 ) {
 			// 3ccf
-			--mMemory[ 0xBD01 + pX ];
-			if( mMemory[ 0xBD03 + pX ] >= 0x87 )
-				if( mMemory[ 0xBD03 + pX ] < 0x8A )
+			--mRoomSprites[pX].spriteX;
+			if( mRoomSprites[pX].spriteImageID >= 0x87 )
+				if( mRoomSprites[pX].spriteImageID < 0x8A )
 					goto s3D4C;
 			
-			mMemory[ 0xBD03 + pX ] = 0x87;
+			mRoomSprites[pX].spriteImageID = 0x87;
 			
 		} else {
 			// 3ce5
-			++mMemory[ 0xBD01 + pX ];
-			if( mMemory[ 0xBD03 + pX ] >= 0x84 )
-				if( mMemory[ 0xBD03 + pX ] < 0x87 )
+			++mRoomSprites[pX].spriteX;
+			if( mRoomSprites[pX].spriteImageID >= 0x84 )
+				if( mRoomSprites[pX].spriteImageID < 0x87 )
 					goto s3D4C;
 
-			mMemory[ 0xBD03 + pX ] = 0x84;
+			mRoomSprites[pX].spriteImageID = 0x84;
 
 			goto s3D4C;
 		}
 	} else {
 		// 3CFB
-		A = mMemory[ 0xBD1D + pX ];
+		A = mRoomSprites[pX].field_1D;
 		if(A & 0x80)
 			goto s3D4F;
 
-		mMemory[ 0xBD01 + pX ] -= byte_5FD7;
-		++mMemory[ 0xBD01 + pX ];
+		mRoomSprites[pX].spriteX -= byte_5FD7;
+		++mRoomSprites[pX].spriteX;
 		if( !(mMemory[ word_3C ] & 1) ) {
 			// 3d15
-			mMemory[ 0xBD03 + pX ] = 0x8A;
-			mMemory[ 0xBD02 + pX ] += 2;
+			mRoomSprites[pX].spriteImageID = 0x8A;
+			mRoomSprites[pX].spriteY += 2;
 			goto s3D4C;
 		} else {
 			// 3d26
-			if( !(mMemory[ 0xBD1D + pX ]) )
-				mMemory[ 0xBD02 + pX ] -= 2;
+			if( !(mRoomSprites[pX].field_1D) )
+				mRoomSprites[pX].spriteY -= 2;
 			else
-				mMemory[ 0xBD02 + pX ] += 2;
+				mRoomSprites[pX].spriteY += 2;
 
 			// 3d40
-			mMemory[ 0xBD03 + pX ] = ((mMemory[ 0xBD02 + pX ] & 0x06) >> 1) + 0x8B;
+			mRoomSprites[pX].spriteImageID = ((mRoomSprites[pX].spriteY & 0x06) >> 1) + 0x8B;
 		}
 	}
 s3D4C:;
@@ -2694,15 +2687,15 @@ s3D4C:;
 	hw_SpritePrepare( pX );
 
 s3D4F:;
-	mMemory[ word_40 + 6 ] = mMemory[ 0xBD1D + pX ];
-	mMemory[ word_40 + 3 ] = mMemory[ 0xBD01 + pX ];
-	mMemory[ word_40 + 4 ] = mMemory[ 0xBD02 + pX ];
-	mMemory[ word_40 + 5 ] = mMemory[ 0xBD03 + pX ];
+	mMemory[ word_40 + 6 ] = mRoomSprites[pX].field_1D;
+	mMemory[ word_40 + 3 ] = mRoomSprites[pX].spriteX;
+	mMemory[ word_40 + 4 ] = mRoomSprites[pX].spriteY;
+	mMemory[ word_40 + 5 ] = mRoomSprites[pX].spriteImageID;
 }
 
 // 3D6E: Frankie?
 void cCreep::obj_Frankie_Collision( byte pX, byte pY ) {
-	char A = mMemory[ 0xBD01 + pX ] + mMemory[ 0xBD0C + pX ];
+	char A = mRoomSprites[pX].spriteX + mRoomSprites[pX].spriteXAdd;
 	A -= mMemory[ 0xBF01 + pY ];
 	if( A >= 4 ) {
 		byte_31F5 = 0;
@@ -2714,7 +2707,7 @@ void cCreep::obj_Frankie_Collision( byte pX, byte pY ) {
 		byte_31F5 = 0;
 		if( mMemory[ 0xBF00 + pY ] != 0x0C )
 			return;
-		mMemory[ 0xBD1B + pX ] = mMemory[ 0xBE00 + pY ];
+		mRoomSprites[pX].field_1B = mMemory[ 0xBE00 + pY ];
 		return;
 
 	} else {
@@ -2726,69 +2719,69 @@ void cCreep::obj_Frankie_Collision( byte pX, byte pY ) {
 			return;
 		}
 		
-		word_40 = word_5748 + mMemory[ 0xBD1F + pX ];
+		word_40 = word_5748 + mRoomSprites[pX].field_1F;
 
 		A = (byte_574E ^ 0xFF) & mMemory[ word_40 ];
 		A |= byte_574D;
 		mMemory[ word_40 ] = A;
-		mMemory[ 0xBD1E + pX ] = A;
+		mRoomSprites[pX].field_1E = A;
 	}
 }
 
 // 3DDE: Franky Hit 
 void cCreep::obj_Frankie_Hit(byte pX, byte pY) {
-	if( mMemory[ 0xBD1E + pX ] & byte_574E ) {
-		byte A = mMemory[ 0xBD00 + pY ];
+	if( mRoomSprites[pX].field_1E & byte_574E ) {
+		byte A = mRoomSprites[pY].field_0;
 
 		if( A && A != 2 && A != 3 ) {
 			// 3DF3
 			if( A != 5 ) {
 			
-				word_40 = word_5748 + mMemory[ 0xBD1F + pX ];
+				word_40 = word_5748 + mRoomSprites[pX].field_1F;
 				mMemory[ word_40 ] = ((byte_574E ^ 0xFF) & mMemory[ word_40 ]) | byte_574D;
 				return;
 
 			} else {
 				// 3E18
-				A = mMemory[ 0xBD03 + pX ];
+				A = mRoomSprites[pX].spriteImageID;
 				if( A >= 0x8A && A < 0x8F ) {
 					// 3E23
-					A = mMemory[ 0xBD03 + pY ];
+					A = mRoomSprites[pY].spriteImageID;
 					if( A < 0x8A || A >= 0x8F ) {
 						byte_311D = 0;
 						return;
 					}
 					// 3E2E
-					if( mMemory[ 0xBD02 + pX ] == mMemory[ 0xBD02 + pY ] ) {
+					if( mRoomSprites[pX].spriteY == mRoomSprites[pY].spriteY ) {
 						byte_311D = 0;
 						return;
 					}
-					if( mMemory[ 0xBD02 + pX ] < mMemory[ 0xBD02 + pY ] ) {
-						mMemory[ 0xBD1C + pX ] &= 0xEF;
+					if( mRoomSprites[pX].spriteY < mRoomSprites[pY].spriteY ) {
+						mRoomSprites[pX].playerNumber &= 0xEF;
 						byte_311D = 0;
 						return;
 					}
 					// 3E43
-					mMemory[ 0xBD1C + pX ] &= 0xFE;
+					mRoomSprites[pX].playerNumber &= 0xFE;
 					byte_311D = 0;
 					return;
 				}
 				// 3E4E
-				byte A =  mMemory[ 0xBD03 + pX ];
-				byte B = mMemory[ 0xBD03 + pY ];
+				byte A =  mRoomSprites[pX].spriteImageID;
+				byte B = mRoomSprites[pY].spriteImageID;
 
 				// 3E51
 				if( A < 0x84 || A >= 0x8A || B < 0x84 || B >= 0x8A ) {
 					byte_311D = 0;
 					return;
 				}
-				if( mMemory[ 0xBD01 + pX ] < mMemory[ 0xBD01 + pY ] ) {
-					mMemory[ 0xBD1C + pX ] &= 0xFB;
+				if( mRoomSprites[pX].spriteX < mRoomSprites[pY].spriteX ) {
+					mRoomSprites[pX].playerNumber &= 0xFB;
 					byte_311D = 0;
 					return;
 				}
 				// 3E77
-				mMemory[ 0xBD1C + pX ] &= 0xBF;
+				mRoomSprites[pX].playerNumber &= 0xBF;
 			}
 		} 	
 	}
@@ -2806,29 +2799,29 @@ void cCreep::obj_Frankie_Add() {
 	byte X;
 	
 	sprite_FindFree(X);
-	mMemory[ 0xBD00 + X ] = 5;
-	mMemory[ 0xBD1F + X ] = byte_574A;
-	mMemory[ 0xBD1E + X ] = mMemory[ word_3E ];
+	mRoomSprites[X].field_0 = 5;
+	mRoomSprites[X].field_1F = byte_574A;
+	mRoomSprites[X].field_1E = mMemory[ word_3E ];
 	if( !(mMemory[ word_3E ] & byte_574E) ) {
-		mMemory[ 0xBD01 + X ] = mMemory[ word_3E + 1 ];
-		mMemory[ 0xBD02 + X ] = mMemory[ word_3E + 2 ] + 7;
-		mMemory[ 0xBD03 + X ] = 0x8F;
+		mRoomSprites[X].spriteX= mMemory[ word_3E + 1 ];
+		mRoomSprites[X].spriteY= mMemory[ word_3E + 2 ] + 7;
+		mRoomSprites[X].spriteImageID= 0x8F;
 	} else {
 		// 3EC8
-		mMemory[ 0xBD01 + X ] = mMemory[ word_3E + 3 ];
-		mMemory[ 0xBD02 + X ] = mMemory[ word_3E + 4 ];
-		mMemory[ 0xBD03 + X ] = mMemory[ word_3E + 5 ];
-		mMemory[ 0xBD1D + X ] = mMemory[ word_3E + 6 ];
+		mRoomSprites[X].spriteX= mMemory[ word_3E + 3 ];
+		mRoomSprites[X].spriteY= mMemory[ word_3E + 4 ];
+		mRoomSprites[X].spriteImageID= mMemory[ word_3E + 5 ];
+		mRoomSprites[X].field_1D = mMemory[ word_3E + 6 ];
 	}
 	// 3ee4
-	mMemory[ 0xBD0C + X ] = 3;
-	mMemory[ 0xBD0D + X ] = 0x11;
+	mRoomSprites[X].spriteXAdd = 3;
+	mRoomSprites[X].spriteYAdd = 0x11;
 	hw_SpritePrepare(X);
-	mMemory[ 0xBD1C + X ] = 0xFF;
-	mMemory[ 0xBD1A + X ] = 0xFF;
-	mMemory[ 0xBD1B + X ] = 0xFF;
-	mMemory[ 0xBD06 + X ] = 2;
-	mMemory[ 0xBD05 + X ] = 2;
+	mRoomSprites[X].playerNumber = 0xFF;
+	mRoomSprites[X].field_1A = 0xFF;
+	mRoomSprites[X].field_1B = 0xFF;
+	mRoomSprites[X].field_6 = 2;
+	mRoomSprites[X].field_5 = 2;
 }
 
 void cCreep::anim_Actions() {
@@ -2923,33 +2916,33 @@ void cCreep::anim_Actions() {
 
 // 3639: 
 void cCreep::obj_Lightning_Execute( byte pX ) {
-	byte A = mMemory[ 0xBD04 + pX ];
+	byte A = mRoomSprites[pX].state;
 	if( A & byte_885 ) {
-		mMemory[ 0xBD04 + pX ] = (A ^ byte_885) | byte_886;
+		mRoomSprites[pX].state = (A ^ byte_885) | byte_886;
 		return;
 	}
 
 	if( A & byte_882 ) {
 		A ^= byte_882;
-		mMemory[ 0xBD04 + pX ] = A;
+		mRoomSprites[pX].state = A;
 	}
 
 	A = seedGet();
 	A &= 0x03;
-	mMemory[ 0xBD06 + pX ] = A;
-	++mMemory[ 0xBD06 + pX ];
+	mRoomSprites[pX].field_6 = A;
+	++mRoomSprites[pX].field_6;
 
 	A = seedGet();
 	A &= 3;
 
 	A += 0x39;
-	if( A == mMemory[ 0xBD03 + pX ] ) {
+	if( A == mRoomSprites[pX].spriteImageID ) {
 		A += 0x01;
 		if( A >= 0x3D )
 			A = 0x39;
 	}
 	// 3679
-	mMemory[ 0xBD03 + pX ] = A;
+	mRoomSprites[pX].spriteImageID = A;
 	hw_SpritePrepare( pX );
 }
 
@@ -2958,36 +2951,36 @@ void cCreep::obj_Lightning_Create_Sprite( byte &pY  ) {
 	byte X;
 
 	sprite_FindFree( X );
-	mMemory[ 0xBD00 + X ] = 1;
+	mRoomSprites[X].field_0 = 1;
 	
-	mMemory[ 0xBD02 + X ] = mMemory[ 0xBF02 + pY ] + 8;
-	mMemory[ 0xBD01 + X ] = mMemory[ 0xBF01 + pY ];
-	mMemory[ 0xBD1F + X ] = mMemory[ 0xBE00 + pY ];
+	mRoomSprites[X].spriteY= mMemory[ 0xBF02 + pY ] + 8;
+	mRoomSprites[X].spriteX= mMemory[ 0xBF01 + pY ];
+	mRoomSprites[X].field_1F = mMemory[ 0xBE00 + pY ];
 
 }
 
 // 36B3: Forcefield
 void cCreep::obj_Forcefield_Execute( byte pX ) {
-	byte A = mMemory[ 0xBD04 + pX ];
+	byte A = mRoomSprites[pX].state;
 	byte Y;
 
 	if(A & byte_885 ) {
 		A ^= byte_885;
 
 		A |= byte_886;
-		mMemory[ 0xBD04 + pX ] = A;
+		mRoomSprites[pX].state = A;
 		return;
 	}
 
 	if(A & byte_882 ) 
-		mMemory[ 0xBD04 + pX ] = (A ^ byte_882);
+		mRoomSprites[pX].state = (A ^ byte_882);
 
-	Y = mMemory[ 0xBD1F + pX ];
+	Y = mRoomSprites[pX].field_1F;
 
 	if( mMemory[ 0x4750 + Y ] == 1 ) {
 
-		if( mMemory[ 0xBD1E + pX ] != 1 ) {
-			mMemory[ 0xBD1E + pX ] = 1;
+		if( mRoomSprites[pX].field_1E != 1 ) {
+			mRoomSprites[pX].field_1E = 1;
 			sub_5F6B( pX );
 			
 			word_3C -= 2;
@@ -2997,7 +2990,7 @@ void cCreep::obj_Forcefield_Execute( byte pX ) {
 			A = 0x35;
 		} else {
 			// 3709
-			if( mMemory[ 0xBD03 + pX ] == 0x35 )
+			if( mRoomSprites[pX].spriteImageID == 0x35 )
 				A = 0x3D;
 			else
 				A = 0x35;
@@ -3005,10 +2998,10 @@ void cCreep::obj_Forcefield_Execute( byte pX ) {
 
 	} else {
 	// 371A
-		if( mMemory[ 0xBD1E + pX ] != 1 )
+		if( mRoomSprites[pX].field_1E != 1 )
 			return;
 
-		mMemory[ 0xBD1E + pX ] = 0;
+		mRoomSprites[pX].field_1E = 0;
 		sub_5F6B( pX );
 
 		word_3C -= 2;
@@ -3018,7 +3011,7 @@ void cCreep::obj_Forcefield_Execute( byte pX ) {
 	}
 
 	// 3746
-	mMemory[ 0xBD03 + pX ] = A;
+	mRoomSprites[pX].spriteImageID = A;
 
 	// Draw the forcefield
 	hw_SpritePrepare( pX );
@@ -3224,9 +3217,9 @@ void cCreep::mapArrowDraw( byte pPlayer ) {
 	
 	// Object Number (saved as sprite number)
 	sprite_FindFree( pPlayer );
-	mMemory[ 0x11D8 ] = (pPlayer >> 5);
+	mMemory[ 0x11D8 ] = pPlayer;
 
-	cSprite *sprite = mScreen->spriteGet( (pPlayer >> 5) );
+	cSprite *sprite = mScreen->spriteGet( pPlayer );
 	
 	// Calculate X
 	byte A = mMemory[ word_42 + 1 ];	// X
@@ -3252,7 +3245,7 @@ void cCreep::mapArrowDraw( byte pPlayer ) {
 
 	// Sprite Y
 	sprite->mY = A;
-	mMemory[ 0xBD03 + pPlayer ] = mMemory[ 0x11E2 + mMemory[0x11D9] ];
+	mRoomSprites[pPlayer].spriteImageID = mMemory[ 0x11E2 + mMemory[0x11D9] ];
 	
 	// Enable the Arrow sprite
 	hw_SpritePrepare( pPlayer );
@@ -3452,11 +3445,11 @@ void cCreep::obj_Player_Collision( byte pX, byte pY ) {
 	byte A;
 	if( mMemory[ 0xBF00 + pY ] == 0x0B ) {
 		
-		A = mMemory[ 0xBD01 + pX ] + mMemory[ 0xBD0C + pX ];
+		A = mRoomSprites[pX].spriteX + mRoomSprites[pX].spriteXAdd;
 		A -= mMemory[ 0xBF01 + pY ];
 
 		if( A < 4 ) {
-			mMemory[ 0x780D + mMemory[ 0xBD1C + pX ] ] = 2;
+			mMemory[ 0x780D + mRoomSprites[pX].playerNumber ] = 2;
 			return;
 		}
 
@@ -3466,19 +3459,19 @@ void cCreep::obj_Player_Collision( byte pX, byte pY ) {
 	if( mMemory[ 0xBF00 + pY ] != 0x0C ) 
 		return;
 
-	A = mMemory[ 0xBD01 + pX ] + mMemory[ 0xBD0C + pX ];
+	A = mRoomSprites[pX].spriteX + mRoomSprites[pX].spriteXAdd;
 	A -= mMemory[ 0xBF01 + pY ];
 
 	if( A >= 4 )
 		return;
 
-	mMemory[ 0xBD1A + pX ] = mMemory[ 0xBE00 + pY ];
+	mRoomSprites[pX].field_1A = mMemory[ 0xBE00 + pY ];
 	return;
 }
 
 // 3534: Hit Player
 void cCreep::obj_Player_Hit( byte pX, byte pY ) {
-	byte A = mMemory[ 0xBD00 + pY ];
+	byte A = mRoomSprites[pY].field_0;
 
 	if( A == 2 ) {
 		byte_311D = 0;
@@ -3487,34 +3480,34 @@ void cCreep::obj_Player_Hit( byte pX, byte pY ) {
 
 	if( A != 0 ) {
 		// 358C
-		if( mMemory[ 0x780D + mMemory[ 0xBD1C + pX ] ] != 0 ) {
+		if( mMemory[ 0x780D + mRoomSprites[pX].playerNumber ] != 0 ) {
 			byte_311D = 0;
 			return;
 		}
 
-		mMemory[ 0x780D + mMemory[ 0xBD1C + pX ] ] = 2;
+		mMemory[ 0x780D + mRoomSprites[pX].playerNumber ] = 2;
 		return;
 	}
 	// 353F
 
-	A = mMemory[ 0xBD03 + pY ];
+	A = mRoomSprites[pY].spriteImageID;
 
 	if( A == 0x2E || A == 0x2F || A == 0x30 || A == 0x31 || A == 0x26 ) {
 		byte_311D = 0;
 		return;
 	} 
 	
-	if( mMemory[ 0xBD02 + pY ] == mMemory[ 0xBD02 + pX ] ) {
+	if( mRoomSprites[pY].spriteY == mRoomSprites[pX].spriteY ) {
 		byte_311D = 0;
 		return;
 	}
-	if( mMemory[ 0xBD02 + pY ] >= mMemory[ 0xBD02 + pX ] ) {
-		mMemory[ 0xBD18 + pX ] = 0xEF;
+	if( mRoomSprites[pY].spriteY >= mRoomSprites[pX].spriteY ) {
+		mRoomSprites[pX].field_18 = 0xEF;
 		byte_311D = 0;
 		return;
 	}
 
-	mMemory[ 0xBD18 + pX ] = 0xFE;
+	mRoomSprites[pX].field_18 = 0xFE;
 	byte_311D = 0;
 	return;
 }
@@ -3534,25 +3527,25 @@ void cCreep::obj_Player_Add( ) {
 	// 35C0
 	if( mMemory[ word_40 + 2 ] & 0x80 ) {
 		mMemory[ 0x780D + byte_3638 ] = 6;
-		mMemory[ 0xBD01 + X ] = mMemory[ word_40 ] + 0x0B;
-		mMemory[ 0xBD02 + X ] = mMemory[ word_40 + 1 ] + 0x0C;
-		mMemory[ 0xBD1B + X ] = 0x18;
-		mMemory[ 0xBD06 + X ] = 0x03;
+		mRoomSprites[X].spriteX= mMemory[ word_40 ] + 0x0B;
+		mRoomSprites[X].spriteY= mMemory[ word_40 + 1 ] + 0x0C;
+		mRoomSprites[X].field_1B = 0x18;
+		mRoomSprites[X].field_6 = 0x03;
 
 	} else {
 		// 35F1
 		mMemory[ 0x780D + byte_3638 ] = 0;
-		mMemory[ 0xBD01 + X ] = mMemory[ word_40 ] + 6;
-		mMemory[ 0xBD02 + X ] = mMemory[ word_40 + 1 ] + 0x0F;
+		mRoomSprites[X].spriteX= mMemory[ word_40 ] + 6;
+		mRoomSprites[X].spriteY= mMemory[ word_40 + 1 ] + 0x0F;
 	}
 
 	// 360D
-	mMemory[ 0xBD0C + X ] = 3;
-	mMemory[ 0xBD0D + X ] = 0x11;
-	mMemory[ 0xBD1F + X ] = 0x80;
-	mMemory[ 0xBD1C + X ] = byte_3638;
-	mMemory[ 0xBD03 + X ] = 0;
-	mMemory[ 0xBD19 + X ] = mMemory[ 0xBD1A + X ] = mMemory[ 0xBD18 + X ] = 0xFF;
+	mRoomSprites[X].spriteXAdd = 3;
+	mRoomSprites[X].spriteYAdd = 0x11;
+	mRoomSprites[X].field_1F = 0x80;
+	mRoomSprites[X].playerNumber = byte_3638;
+	mRoomSprites[X].spriteImageID= 0;
+	mRoomSprites[X].field_19 = mRoomSprites[X].field_1A = mRoomSprites[X].field_18 = 0xFF;
 }
 
 void cCreep::roomMain() {
@@ -3604,7 +3597,7 @@ void cCreep::roomMain() {
 				if( mMemory[ 0x780D + X ] == 0 ) {
 					mMemory[ 0x780D + X ] = 2;
 					byte Y = mMemory[ 0x34D1 + X ];
-					mMemory[ 0xBD04 + Y ] |= byte_883;
+					mRoomSprites[Y].state |= byte_883;
 				}
 				--X;
 				if(X < 0)
@@ -4501,8 +4494,8 @@ void cCreep::gameEscapeCastle() {
 	
 	byte Y = mMemory[ 0x1AB2 ];
 	byte X = mMemory[ 0x34D1 + Y ];
-	mMemory[ 0xBD02 + X ] = 0x87;
-	mMemory[ 0xBD01 + X ] = 0x08;
+	mRoomSprites[X].spriteY= 0x87;
+	mRoomSprites[X].spriteX= 0x08;
 
 	A =	seedGet() & 0x0E;
 	if( A != 0 )
@@ -4532,41 +4525,41 @@ void cCreep::gameEscapeCastle() {
 		if( mMemory[ 0x1AE3 ] >= 1 ) {
 			if( mMemory[ 0x1AE3 ] != 1 ) {
 				// 1A0A
-				++mMemory[ 0xBD03 + X];
-				A = mMemory[ 0xBD03 + X ];
+				++mRoomSprites[X].spriteImageID;
+				A = mRoomSprites[X].spriteImageID;
 				if( A >= 0x9B || A < 0x97 ) {
 					A = 0x97;
 				}
 			} else {
 				// 1A33
-				--mMemory[ 0xBD01 + X];
-				++mMemory[ 0xBD03 + X];
-				A = mMemory[ 0xBD03 + X ];
+				--mRoomSprites[X].spriteX;
+				++mRoomSprites[X].spriteImageID;
+				A = mRoomSprites[X].spriteImageID;
 				if( A >= 3 )
 					A = 0;
 			}
 
 		} else {
 			// 1A1D
-			++mMemory[ 0xBD01 + X];
-			++mMemory[ 0xBD03 + X];
-			A = mMemory[ 0xBD03 + X ];
+			++mRoomSprites[X].spriteX;
+			++mRoomSprites[X].spriteImageID;
+			A = mRoomSprites[X].spriteImageID;
 			if( A >= 6 || A < 3 )
 				A = 0x03;
 		}
 
 		// 1A42
-		mMemory[ 0xBD03 + X ] = A;
-		Y = X >> 5;
+		mRoomSprites[X].spriteImageID= A;
+		Y = X;
 
 		cSprite *sprite = mScreen->spriteGet( Y );
 
 		// 1A4B
-		mMemory[ 0x10 + Y ] = ((mMemory[ 0xBD01 + X ] - 0x10) << 1) + 0x18;
-		sprite->mX = ((mMemory[ 0xBD01 + X ] - 0x10) << 1) + 0x18;
+		mMemory[ 0x10 + Y ] = ((mRoomSprites[X].spriteX- 0x10) << 1) + 0x18;
+		sprite->mX = ((mRoomSprites[X].spriteX- 0x10) << 1) + 0x18;
 		
 		// 1A72
-		sprite->mY = mMemory[ 0xBD02 + X ] + 0x32;
+		sprite->mY = mRoomSprites[X].spriteY+ 0x32;
 
 		hw_SpritePrepare( X );
 		sprite->_rEnabled = true;
@@ -5008,24 +5001,23 @@ byte cCreep::seedGet() {
 
 // 5D26: Prepare sprites
 void cCreep::hw_SpritePrepare( byte &pX ) {
-	byte byte_5E8C, byte_5E8D, byte_5E88;
+	byte byte_5E8C, byte_5E8D;
 	byte A;
 
-	word word_38 = mMemory[ 0xBD03 + pX ];
+	word word_38 = mRoomSprites[pX].spriteImageID;
 	word_38 <<= 1;
 
 	word_38 += 0x603B;
 	
 	word_30 = readLEWord( &mMemory[ word_38 ] );
 	
-	mMemory[ 0xBD09 + pX ] = mMemory[ word_30 + 2 ];
+	mRoomSprites[pX].spriteFlags = mMemory[ word_30 + 2 ];
 	
 	byte_5E8D = mMemory[ word_30 ];
-	mMemory[ 0xBD0A + pX ] = byte_5E8D << 2;
-	mMemory[ 0xBD0B + pX ] = mMemory[ word_30 + 1 ];
+	mRoomSprites[pX].field_A = byte_5E8D << 2;
+	mRoomSprites[pX].field_B = mMemory[ word_30 + 1 ];
 	
-	byte_5E88 = pX >> 5;
-	byte Y = byte_5E88;
+	byte Y = pX;
 	// 5D72
 	
 	word_32 = mMemory[ 0x26 + Y ] ^ 8;
@@ -5056,7 +5048,7 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 		if( byte_5E8C == 0x15 )
 			break;
 
-		if( byte_5E8C < mMemory[ 0xBD0B + pX ] ) 
+		if( byte_5E8C < mRoomSprites[pX].field_B ) 
 			word_30 += byte_5E8D;
 		else 
 			word_30 = 0x5E89;
@@ -5066,9 +5058,9 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	}
 
 	// 5DFB
-	Y = byte_5E88;
+	Y = pX;
 	
-	cSprite *sprite = mScreen->spriteGet(Y);
+	cSprite *sprite = mScreen->spriteGet(pX);
 
 	word dataSrc = mMemory[ 0x26 + Y ] ^ 8;
 	dataSrc <<= 6;
@@ -5077,14 +5069,14 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	mMemory[ 0x26 + Y ] = mMemory[ 0x26 + Y ] ^ 8;
 
 	// Sprite Color
-	sprite->_color = mMemory[ 0xBD09 + pX ] & 0x0F;
+	sprite->_color = mRoomSprites[pX].spriteFlags & 0x0F;
 
-	if( !(mMemory[ 0xBD09 + pX ] & byte_88A )) {
+	if( !(mRoomSprites[pX].spriteFlags & byte_88A )) {
 		A = (mMemory[ 0x2F82 + Y ] ^ 0xFF) & mMemory[ 0xD01D ];
 		sprite->_rDoubleWidth = false;
 	} else {
 		A = (mMemory[ 0xD01D ] | mMemory[ 0x2F82 + Y ]);
-		mMemory[ 0xBD0A + pX ] <<= 1;
+		mRoomSprites[pX].field_A <<= 1;
 		sprite->_rDoubleWidth = true;
 	}
 
@@ -5092,12 +5084,12 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	mMemory[ 0xD01D ] = A;
 	
 	// 5E2D
-	if( !(mMemory[ 0xBD09 + pX ] & byte_88B )) {
+	if( !(mRoomSprites[pX].spriteFlags & byte_88B )) {
 		A = (mMemory[ 0x2F82 + Y ] ^ 0xFF) & mMemory[ 0xD017 ];
 		sprite->_rDoubleHeight = false;
 	} else {
 		A = (mMemory[ 0xD017 ] | mMemory[ 0x2F82 + Y ]);
-		mMemory[ 0xBD0B + pX ] <<= 1;
+		mRoomSprites[pX].field_B <<= 1;
 		sprite->_rDoubleHeight = true;
 	}
 
@@ -5105,7 +5097,7 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	mMemory[ 0xD017 ] = A;
 
 	// 5E4C
-	if( !(mMemory[ 0xBD09 + pX ] & byte_88C )) {
+	if( !(mRoomSprites[pX].spriteFlags & byte_88C )) {
 		A = mMemory[ 0xD01B ] | mMemory[ 0x2F82 + Y ];
 		sprite->_rPriority = true;
 	} else {
@@ -5117,7 +5109,7 @@ void cCreep::hw_SpritePrepare( byte &pX ) {
 	mMemory[ 0xD01B ] = A;
 
 	// 5E68
-	if(! (mMemory[ 0xBD09 + pX ] & byte_88D )) {
+	if(! (mRoomSprites[pX].spriteFlags & byte_88D )) {
 		A = mMemory[ 0xD01C ] | mMemory[ 0x2F82 + Y ];
 		sprite->_rMultiColored = true;
 	} else {
@@ -5231,12 +5223,12 @@ void cCreep::gameDataSave( bool pCastleSave ) {
 }
 
 void cCreep::sub_5F6B( byte &pX ) {
-	byte_5FD5 = mMemory[ 0xBD01 + pX ] + mMemory[ 0xBD0C + pX ];
+	byte_5FD5 = mRoomSprites[pX].spriteX + mRoomSprites[pX].spriteXAdd;
 	
 	byte_5FD7 = byte_5FD5 & 3;
 	byte_5FD5 = (byte_5FD5 >> 2) - 4;
 
-	byte_5FD6 = mMemory[ 0xBD02 + pX ] + mMemory[ 0xBD0D + pX ];
+	byte_5FD6 = mRoomSprites[pX].spriteY + mRoomSprites[pX].spriteYAdd;
 	byte_5FD8 = byte_5FD6 & 7;
 	byte_5FD6 >>= 3;
 	
@@ -5420,14 +5412,14 @@ void cCreep::obj_Door_InFront( byte pX, byte pY ) {
 	byte byte_41D5 = pY;
 	if( mMemory[ 0xBE01 + pY ] == 0 )
 		return;
-	if( mMemory[ 0xBD00 + pX ] )
+	if( mRoomSprites[pX].field_0 )
 		return;
 
 	// 4085
-	if( mMemory[ 0xBD1E + pX ] != 1 )
+	if( mRoomSprites[pX].field_1E != 1 )
 		return;
 	
-	pY = mMemory[ 0xBD1C + pX ];
+	pY = mRoomSprites[pX].playerNumber;
 
 	byte A = mMemory[ 0x780D + pY ];
 	if( A != 0 )
@@ -5435,8 +5427,8 @@ void cCreep::obj_Door_InFront( byte pX, byte pY ) {
 
 	// Enter the door
 	mMemory[ 0x780D + pY ] = 6;
-	mMemory[ 0xBD1B + pX ] = 0;
-	mMemory[ 0xBD06 + pX ] = 3;
+	mRoomSprites[pX].field_1B = 0;
+	mRoomSprites[pX].field_6 = 3;
 	
 	A = mMemory[ 0xBE00 + byte_41D5 ];
 	A <<= 3;
@@ -5445,10 +5437,10 @@ void cCreep::obj_Door_InFront( byte pX, byte pY ) {
 
 	// 40BB
 
-	mMemory[ 0xBD02 + pX ] = mMemory[ word_40 + 1 ] + 0x0F;
-	mMemory[ 0xBD01 + pX ] = mMemory[ word_40 ] + 0x06;
+	mRoomSprites[pX].spriteY = mMemory[ word_40 + 1 ] + 0x0F;
+	mRoomSprites[pX].spriteX = mMemory[ word_40 ] + 0x06;
 	if( mMemory[ word_40 + 7 ] != 0 ) {
-		mMemory[ 0x785D + mMemory[ 0xBD1C + pX ] ] = 1;
+		mMemory[ 0x785D + mRoomSprites[pX].playerNumber ] = 1;
 	}
 
 	//40DD
@@ -5457,7 +5449,7 @@ void cCreep::obj_Door_InFront( byte pX, byte pY ) {
 	
 	mMemory[ word_42 ] |= byte_8C0;
 
-	pY = mMemory[ 0xBD1C + pX ];
+	pY = mRoomSprites[pX].playerNumber;
 
 	// Set player room / door
 	mMemory[ 0x7809 + pY ] = word_41D6 & 0xFF;
@@ -5576,14 +5568,14 @@ void cCreep::obj_RayGun_Img_Execute( byte pX ) {
 
 				if( mMemory[ 0x780D + byte_4D5F ] == 0 ) {
 					byte Y = mMemory[ 0x34D1 + byte_4D5F ];
-					char A = mMemory[ 0xBD02 + Y ];
+					char A = mRoomSprites[Y].spriteY;
 					A -= mMemory[ 0xBF02 + pX ];
 					if( A < 0 )
 						A = (A ^ 0xFF) + 1;
 
 					if( A < byte_4D5D ) {
 						byte_4D5D = A;
-						byte A = mMemory[ 0xBD02 + Y ];
+						byte A = mRoomSprites[Y].spriteY;
 
 						if( A >= 0xC8 || A < mMemory[ 0xBF02 + pX ] ) {
 							byte_4D5E = byte_4D65;	// Will Move Up
@@ -5958,16 +5950,16 @@ void cCreep::obj_Lightning_Img_Execute( byte pX ) {
 
 			// 4326
 			for(;;) {
-				if( mMemory[ 0xBD00 + Y] == 1 ) {
-					if( !(mMemory[ 0xBD04 + Y ] & byte_889) )
-						if( mMemory[ 0xBD1F + Y ] == mMemory[ 0xBE00 + pX ] )
+				if( mRoomSprites[Y].field_0 == 1 ) {
+					if( !(mRoomSprites[Y].state & byte_889) )
+						if( mRoomSprites[Y].field_1F == mMemory[ 0xBE00 + pX ] )
 							break;
 				}
 
-				Y+= 0x20;
+				Y++;
 			}
 			// 4345
-			mMemory[ 0xBD04 + Y ] |= byte_885;
+			mRoomSprites[Y].state |= byte_885;
 			return;
 
 		} else {
@@ -6078,13 +6070,13 @@ void cCreep::obj_Door_Button_Prepare() {
 
 // 44E7: Lightning Switch
 void cCreep::obj_Lightning_Switch_InFront( byte pX, byte pY ) {
-	if( mMemory[ 0xBD00 + pX ] )
+	if( mRoomSprites[pX].field_0 )
 		return;
 
-	if( (mMemory[ 0xBD01 + pX ] + mMemory[ 0xBD0C + pX ]) - mMemory[ 0xBF01 + pY ] >= 4 )
+	if( (mRoomSprites[pX].spriteX + mRoomSprites[pX].spriteXAdd) - mMemory[ 0xBF01 + pY ] >= 4 )
 		return;
 
-	if( mMemory[ 0xBD1E + pX ] != 0 && mMemory[ 0xBD1E + pX ] != 4 )
+	if( mRoomSprites[pX].field_1E != 0 && mRoomSprites[pX].field_1E != 4 )
 		return;
 
 	// 4507
@@ -6093,10 +6085,10 @@ void cCreep::obj_Lightning_Switch_InFront( byte pX, byte pY ) {
 	byte byte_45D8 = pY;
 
 	if( !(mMemory[ word_30 ] & byte_45DE )) {
-		if( mMemory[ 0xBD1E + pX ] )
+		if( mRoomSprites[pX].field_1E )
 			return;
 	} else {
-		if( !(mMemory[ 0xBD1E + pX ]) )
+		if( !(mRoomSprites[pX].field_1E) )
 			return;
 	}
 	
@@ -6569,10 +6561,10 @@ s53B3:;
 void cCreep::obj_Mummy_Infront( byte pX, byte pY ) {
 	byte byte_4870 = pY;
 	
-	if( mMemory[ 0xBD00 + pX ] )
+	if( mRoomSprites[pX].field_0 )
 		return;
 
-	byte A = mMemory[ 0xBD01 + pX ] + mMemory[ 0xBD0C + pX ];
+	byte A = mRoomSprites[pX].spriteX + mRoomSprites[pX].spriteXAdd;
 	A -= mMemory[ 0xBF01 + pY ];
 
 	if( A >= 8 )
@@ -6757,16 +6749,16 @@ void cCreep::obj_Forcefield_Create() {
 
 	sprite_FindFree( X );
 
-	mMemory[ 0xBD00 + X ] = 2;
-	mMemory[ 0xBD01 + X ] = mMemory[ word_3E + 2 ];
-	mMemory[ 0xBD02 + X ] = mMemory[ word_3E + 3 ] + 2;
-	mMemory[ 0xBD03 + X ] = 0x35;
+	mRoomSprites[X].field_0 = 2;
+	mRoomSprites[X].spriteX= mMemory[ word_3E + 2 ];
+	mRoomSprites[X].spriteY= mMemory[ word_3E + 3 ] + 2;
+	mRoomSprites[X].spriteImageID= 0x35;
 
-	mMemory[ 0xBD1F + X ] = byte_474F;
-	mMemory[ 0xBD1E + X ] = 0;
-	mMemory[ 0xBD06 + X ] = 4;
-	mMemory[ 0xBD0C + X ] = 2;
-	mMemory[ 0xBD0D + X ] = 0x19;
+	mRoomSprites[X].field_1F = byte_474F;
+	mRoomSprites[X].field_1E = 0;
+	mRoomSprites[X].field_6 = 4;
+	mRoomSprites[X].spriteXAdd = 2;
+	mRoomSprites[X].spriteYAdd = 0x19;
 }
 
 // 38CE: Mummy ?
@@ -6774,7 +6766,7 @@ void cCreep::obj_Mummy_Collision( byte pX, byte pY ) {
 	byte byte_3A07 = pY;
 	if( mMemory[ 0xBF00 + pY ] == 0x0B ) {
 		
-		char A = mMemory[ 0xBD01 + pX ] + mMemory[ 0xBD0C + pX ];
+		char A = mRoomSprites[pX].spriteX + mRoomSprites[pX].spriteXAdd;
 		A -= mMemory[ 0xBF01 + pY ];
 		if( A < 4 ) {
 			
@@ -6782,7 +6774,7 @@ void cCreep::obj_Mummy_Collision( byte pX, byte pY ) {
 			// 38F7
 			if( mMemory[ word_40 ] & byte_538A ) {
 				// 3900
-				word_40 = word_498B + mMemory[ 0xBD1D + pX ];
+				word_40 = word_498B + mRoomSprites[pX].field_1D;
 				mMemory[ word_40 ] = 3;
 				return;
 			}
@@ -6795,23 +6787,23 @@ void cCreep::obj_Mummy_Collision( byte pX, byte pY ) {
 	if( mMemory[ 0xBF00 + pY ] != 0x0C )
 		return;
 
-	char A = mMemory[ 0xBD01 + pX ] + mMemory[ 0xBD0C + pX ];
+	char A = mRoomSprites[pX].spriteX + mRoomSprites[pX].spriteXAdd;
 	A -= mMemory[ 0xBF01 + pY ];
 	if( A >= 4 )
 		return;
 
-	mMemory[ 0xBD1C + pX ] = mMemory[ 0xBE00 + pY ];
+	mRoomSprites[pX].playerNumber = mMemory[ 0xBE00 + pY ];
 }
 
 // 3940: 
 void cCreep::sub_3940( byte pX, byte pY ) {
-	byte A = mMemory[ 0xBD00 + pY ];
+	byte A = mRoomSprites[pY].field_0;
 	if( A == 0 || A == 5 ) {
 		byte_311D = 0;
 		return;
 	}
 
-	word_40 = word_498B + mMemory[ 0xBD1D + pX ];
+	word_40 = word_498B + mRoomSprites[pX].field_1D;
 
 	mMemory[ word_40 ] = 3;
 }
@@ -6825,7 +6817,7 @@ void cCreep::sub_3A60( byte pX, byte pY ) {
 	if( A == 0x0F )
 		return;
 	if( A == 8 ) {
-		if( mMemory[ 0xBD1E + pX ] != mMemory[ 0xBE00 + pY ] )
+		if( mRoomSprites[pX].field_1E != mMemory[ 0xBE00 + pY ] )
 			return;
 	}
 
@@ -6846,19 +6838,19 @@ void cCreep::obj_RayGun_Laser_Add( byte pX ) {
 
 	byte X;
 	sprite_FindFree( X );
-	mMemory[ 0xBD00 + X ] = 4;
-	mMemory[ 0xBD01 + X ] = mMemory[ 0xBF01 + Y ];
-	mMemory[ 0xBD02 + X ] = mMemory[ 0xBF02 + Y ] + 0x05;
-	mMemory[ 0xBD03 + X ] = 0x6C;
-	mMemory[ 0xBD1E + X ] = mMemory[ 0xBE00 + Y ];
+	mRoomSprites[X].field_0 = 4;
+	mRoomSprites[X].spriteX= mMemory[ 0xBF01 + Y ];
+	mRoomSprites[X].spriteY= mMemory[ 0xBF02 + Y ] + 0x05;
+	mRoomSprites[X].spriteImageID= 0x6C;
+	mRoomSprites[X].field_1E = mMemory[ 0xBE00 + Y ];
 
 	if( mMemory[ word_40 ] & byte_4D67 ) {
-		mMemory[ 0xBD01 + X ] -= 0x08;
-		mMemory[ 0xBD1F + X ] = 0xFC;
+		mRoomSprites[X].spriteX-= 0x08;
+		mRoomSprites[X].field_1F = 0xFC;
 	} else {
 		// 3AD4	
-		mMemory[ 0xBD01 + X ] += 0x08;
-		mMemory[ 0xBD1F + X ] = 4;
+		mRoomSprites[X].spriteX+= 0x08;
+		mRoomSprites[X].field_1F = 4;
 	}
 
 	hw_SpritePrepare( X );
@@ -6872,30 +6864,30 @@ void cCreep::obj_Mummy_Add( byte pA, byte pX ) {
 
 	sprite_FindFree( X );
 	
-	mMemory[ 0xBD00 + X ] = 3;
-	mMemory[ 0xBD1B + X ] = 0xFF;
-	mMemory[ 0xBD1C + X ] = 0xFF;
-	mMemory[ 0xBD1D + X ] = mMemory[ 0xBE00 + Y ];
+	mRoomSprites[X].field_0 = 3;
+	mRoomSprites[X].field_1B = 0xFF;
+	mRoomSprites[X].playerNumber = 0xFF;
+	mRoomSprites[X].field_1D = mMemory[ 0xBE00 + Y ];
 	
-	word_40 = word_498B + mMemory[ 0xBD1D + X ];
+	word_40 = word_498B + mRoomSprites[X].field_1D;
 	//3998
 
-	mMemory[ 0xBD0C + X ] = 5;
-	mMemory[ 0xBD0D + X ] = 0x11;
-	mMemory[ 0xBD03 + X ] = 0xFF;
+	mRoomSprites[X].spriteXAdd = 5;
+	mRoomSprites[X].spriteYAdd = 0x11;
+	mRoomSprites[X].spriteImageID= 0xFF;
 	if( byte_39EE == 0 ) {
-		mMemory[ 0xBD1E + X ] = 0;
-		mMemory[ 0xBD1F + X ] = 0xFF;
-		mMemory[ 0xBD06 + X ] = 4;
+		mRoomSprites[X].field_1E = 0;
+		mRoomSprites[X].field_1F = 0xFF;
+		mRoomSprites[X].field_6 = 4;
 		
-		mMemory[ 0xBD01 + X ] = mMemory[ word_40 + 3 ] + 0x0D;
-		mMemory[ 0xBD02 + X ] = mMemory[ word_40 + 4 ] + 0x08;
+		mRoomSprites[X].spriteX= mMemory[ word_40 + 3 ] + 0x0D;
+		mRoomSprites[X].spriteY= mMemory[ word_40 + 4 ] + 0x08;
 	} else {
 		// 39D0
-		mMemory[ 0xBD1E + X ] = 1;
-		mMemory[ 0xBD01 + X ] = mMemory[ word_40 + 5 ];
-		mMemory[ 0xBD02 + X ] = mMemory[ word_40 + 6 ];
-		mMemory[ 0xBD06 + X ] = 2;
+		mRoomSprites[X].field_1E = 1;
+		mRoomSprites[X].spriteX= mMemory[ word_40 + 5 ];
+		mRoomSprites[X].spriteY= mMemory[ word_40 + 6 ];
+		mRoomSprites[X].field_6 = 2;
 	}
 
 	// 39E8
@@ -6903,53 +6895,53 @@ void cCreep::obj_Mummy_Add( byte pA, byte pX ) {
 
 // 379A: Mummy
 void cCreep::obj_Mummy_Execute( byte pX ) {
-	byte A = mMemory[ 0xBD04 + pX ];
+	byte A = mRoomSprites[pX].state;
 
 	if( A & byte_885 ) {
-		mMemory[ 0xBD04 + pX ] ^= byte_885;
-		mMemory[ 0xBD04 + pX ] |= byte_886;
+		mRoomSprites[pX].state ^= byte_885;
+		mRoomSprites[pX].state |= byte_886;
 		return;
 	}
 
 	if( A & byte_882 ) {
 		A ^= byte_882;
-		mMemory[ 0xBD04 + pX ] = A;
-		if( mMemory[ 0xBD1E + pX ] ) {
-			mMemory[ 0xBD03 + pX ] = 0x4B;
+		mRoomSprites[pX].state = A;
+		if( mRoomSprites[pX].field_1E ) {
+			mRoomSprites[pX].spriteImageID = 0x4B;
 			hw_SpritePrepare( pX );
 		}
 	}
 	// 37C6
-	char AA = mMemory[ 0xBD1C + pX ];
+	char AA = mRoomSprites[pX].playerNumber;
 	if( AA != -1 ) {
-		if( AA != mMemory[ 0xBD1B + pX ] )
+		if( AA != mRoomSprites[pX].field_1B )
 			sub_526F( AA );
 	}
 	// 37D5
-	mMemory[ 0xBD1B + pX ] = AA;
-	mMemory[ 0xBD1C + pX ] = 0xFF;
-	word_40 = word_498B + mMemory[ 0xBD1D + pX ];
-	if( mMemory[ 0xBD1E + pX ] == 0 ) {
-		++mMemory[ 0xBD1F + pX ];
-		byte Y = mMemory[ 0xBD1F + pX ];
+	mRoomSprites[pX].field_1B = AA;
+	mRoomSprites[pX].playerNumber = 0xFF;
+	word_40 = word_498B + mRoomSprites[pX].field_1D;
+	if( mRoomSprites[pX].field_1E == 0 ) {
+		++mRoomSprites[pX].field_1F;
+		byte Y = mRoomSprites[pX].field_1F;
 		A = mMemory[ 0x39EF + Y ];
 
 		if( A != 0xFF ) {
-			mMemory[ 0xBD03 + pX ] = A;
-			mMemory[ 0xBD01 + pX ] += mMemory[ 0x39F7 + Y ];
+			mRoomSprites[pX].spriteImageID = A;
+			mRoomSprites[pX].spriteX += mMemory[ 0x39F7 + Y ];
 
-			mMemory[ 0xBD02 + pX ] += mMemory[ 0x39FF + Y ];
+			mRoomSprites[pX].spriteY += mMemory[ 0x39FF + Y ];
 			
-			mMemory[ 0x7630 ] = (mMemory[ 0xBD1F + pX ] << 2) + 0x24;
+			mMemory[ 0x7630 ] = (mRoomSprites[pX].field_1F << 2) + 0x24;
 			sub_21C8( 0x0B );
 			hw_SpritePrepare( pX );
 			return;
 		}
 		// 3828
-		mMemory[ 0xBD1E + pX ] = 0x01;
-		mMemory[ 0xBD01 + pX ] = mMemory[ word_40 + 3 ] + 4;
-		mMemory[ 0xBD02 + pX ] = mMemory[ word_40 + 4 ] + 7;
-		mMemory[ 0xBD06 + pX ] = 2;
+		mRoomSprites[pX].field_1E = 0x01;
+		mRoomSprites[pX].spriteX = mMemory[ word_40 + 3 ] + 4;
+		mRoomSprites[pX].spriteY = mMemory[ word_40 + 4 ] + 7;
+		mRoomSprites[pX].field_6 = 2;
 	}
 	byte Y;
 
@@ -6969,8 +6961,8 @@ void cCreep::obj_Mummy_Execute( byte pX ) {
 	Y = mMemory[ 0x34D1 + Y ];
 	sub_5F6B( pX );
 
-	AA = mMemory[ 0xBD01 + pX ];
-	AA -= mMemory[ 0xBD01 + Y ];
+	AA = mRoomSprites[pX].spriteX;
+	AA -= mRoomSprites[Y].spriteX;
 	if( AA < 0 ) {
 		AA ^= 0xFF;
 		++AA;
@@ -6980,18 +6972,18 @@ void cCreep::obj_Mummy_Execute( byte pX ) {
 		return;
 
 	// Frame
-	++mMemory[ 0xBD03 + pX ];
-	if( mMemory[ 0xBD01 + pX ] < mMemory[ 0xBD01 + Y ] ) {
+	++mRoomSprites[pX].spriteImageID;
+	if( mRoomSprites[pX].spriteX < mRoomSprites[Y].spriteX ) {
 		// Walking Right
 		// 3881
 		if( !(mMemory[ word_3C ] & 0x04) )
 			return;
 		
 		// 3889
-		++mMemory[ 0xBD01 + pX ];
-		A = mMemory[ 0xBD03 + pX ];
+		++mRoomSprites[pX].spriteX;
+		A = mRoomSprites[pX].spriteImageID;
 		if( A < 0x4E || A >= 0x51 )
-				mMemory[ 0xBD03 + pX ] = 0x4E;
+				mRoomSprites[pX].spriteImageID = 0x4E;
 	
 	} else {
 		// Walking Left
@@ -6999,22 +6991,22 @@ void cCreep::obj_Mummy_Execute( byte pX ) {
 		if( !(mMemory[ word_3C ] & 0x40) )
 			return;
 
-		--mMemory[ 0xBD01 + pX ];
-		A = mMemory[ 0xBD03 + pX ];
+		--mRoomSprites[pX].spriteX;
+		A = mRoomSprites[pX].spriteImageID;
 		if( A < 0x4B || A >= 0x4E)
-			mMemory[ 0xBD03 + pX ] = 0x4B;
+			mRoomSprites[pX].spriteImageID = 0x4B;
 	}
 
 	// 38BA
-	mMemory[ word_40 + 5 ] = mMemory[ 0xBD01 + pX ];
-	mMemory[ word_40 + 6 ] = mMemory[ 0xBD02 + pX ];
+	mMemory[ word_40 + 5 ] = mRoomSprites[pX].spriteX;
+	mMemory[ word_40 + 6 ] = mRoomSprites[pX].spriteY;
 
 	hw_SpritePrepare( pX );
 }
 
 // 3A08
 void cCreep::obj_RayGun_Laser_Execute( byte pX ) {
-	byte A = mMemory[ 0xBD04 + pX ];
+	byte A = mRoomSprites[pX].state;
 	
 	if( mNoInput )
 		return;
@@ -7025,53 +7017,45 @@ void cCreep::obj_RayGun_Laser_Execute( byte pX ) {
 
 		A ^= byte_885;
 		A |= byte_886;
-		mMemory[ 0xBD04 + pX ] = A;
+		mRoomSprites[pX].state = A;
 		
-		word_40 = word_4D5B + mMemory[ 0xBD1E + pX ];
+		word_40 = word_4D5B + mRoomSprites[pX].field_1E;
 		mMemory[ word_40 ] = (0xFF ^ byte_4D61) & mMemory[ word_40 ];
 
 		return;
 	} else {
 		if( A & byte_882 )
-			mMemory[ 0xBD04 + pX ] = A ^ byte_882;
+			mRoomSprites[pX].state = A ^ byte_882;
 
 		// 3A42
-		A = mMemory[ 0xBD01 + pX ] + mMemory[ 0xBD1F + pX ];
-		mMemory[ 0xBD01 + pX ] = A;
+		A = mRoomSprites[pX].spriteX + mRoomSprites[pX].field_1F;
+		mRoomSprites[pX].spriteX = A;
 
 		if( A < 0xB0 )
 			if( A >= 8 )
 				return;
 		
-		mMemory[ 0xBD04 + pX ] |= byte_885;
+		mRoomSprites[pX].state |= byte_885;
 	}
 }
 
 // 3F14: Find a free object position, and clear it
 void cCreep::sprite_FindFree( byte &pX ) {
-	
-	pX = 0;
-	byte A;
 
-	for( ;; ) {
-		A = mMemory[ 0xBD04 + pX ];
-		if( A & byte_889 )
+	for( pX = 0 ; ; ) {
+
+		if( mRoomSprites[pX].state & byte_889 )
 			break;
 
-		pX += 0x20;
-		if( pX == 0 )
+		if( ++pX == MAX_SPRITES )
 			return;
 	}
 
-	for( byte Y = 0x20; Y > 0; --Y ) {
-		mMemory[ 0xBD00 + pX ] = 0;
-		++pX;
-	}
+	mRoomSprites[pX].clear();
 	
-	pX -= 0x20;
-	mMemory[ 0xBD04 + pX ] = byte_882;
-	mMemory[ 0xBD05 + pX ] = 1;
-	mMemory[ 0xBD06 + pX ] = 1;
+	mRoomSprites[pX].state = byte_882;
+	mRoomSprites[pX].field_5 = 1;
+	mRoomSprites[pX].field_6 = 1;
 }
 
 void cCreep::anim_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX ) {
@@ -7104,19 +7088,19 @@ void cCreep::anim_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCu
 // 41D8: In Front Button?
 void cCreep::obj_Door_Button_InFront( byte pX, byte pY ) {
 
-	if( mMemory[ 0xBD00 + pX ] )
+	if( mRoomSprites[pX].field_0 )
 		return;
 
-	if( mMemory[ 0xBD1D + pX ] == 0 )
+	if( mRoomSprites[pX].field_1D == 0 )
 		return;
 
-	byte A = mMemory[ 0xBD01 + pX ] + mMemory[ 0xBD0C + pX ];
+	byte A = mRoomSprites[pX].spriteX + mRoomSprites[pX].spriteXAdd;
 
 	A -= mMemory[ 0xBF01 + pY ];
 	if( A >= 0x0C )
 		return;
 
-	pX =  mMemory[ 0xBD1C + pX ];
+	pX =  mRoomSprites[pX].playerNumber;
 	if( mMemory[ 0x780D + pX ] != 0 )
 		return;
 	
@@ -7136,10 +7120,10 @@ void cCreep::obj_Door_Button_InFront( byte pX, byte pY ) {
 
 // 4647: In Front Forcefield Timer
 void cCreep::obj_Forcefield_Timer_InFront( byte pX, byte pY ) {
-	if(mMemory[ 0xBD00 + pX ])
+	if(mRoomSprites[pX].field_0)
 		return;
 
-	if(!mMemory[ 0xBD1D + pX ])
+	if(!mRoomSprites[pX].field_1D)
 		return;
 
 	mMemory[ 0x75AB ] = 0x0C;
@@ -7162,13 +7146,13 @@ void cCreep::obj_Forcefield_Timer_InFront( byte pX, byte pY ) {
 // 4990: In front of key
 void cCreep::obj_Key_Infront( byte pX, byte pY ) {
 
-	if( mMemory[ 0xBD00 + pX ] )
+	if( mRoomSprites[pX].field_0 )
 		return;
 
-	if( mMemory[ 0x780D + mMemory[ 0xBD1C + pX ] ] != 0 )
+	if( mMemory[ 0x780D + mRoomSprites[pX].playerNumber ] != 0 )
 		return;
 	
-	if( mMemory[ 0xBD1D + pX ] == 0 )
+	if( mRoomSprites[pX].field_1D == 0 )
 		return;
 
 	sub_21C8( 0x0C );
@@ -7179,7 +7163,7 @@ void cCreep::obj_Key_Infront( byte pX, byte pY ) {
 	mMemory[ word_40 + 1 ] = 0;
 	byte_4A64 = mMemory[ word_40 ];
 
-	if( mMemory[ 0xBD1C + pX ] ) {
+	if( mRoomSprites[pX].playerNumber ) {
 		// 49DA
 		mMemory[ 0x7835 + mMemory[ 0x7814 ] ] = byte_4A64;
 		++mMemory[ 0x7814 ];
@@ -7194,15 +7178,15 @@ void cCreep::obj_Key_Infront( byte pX, byte pY ) {
 void cCreep::obj_Door_Lock_InFront( byte pX, byte pY ) {
 	byte byte_4B19 = pX;
 
-	if( mMemory[ 0xBD00 + pX ] )
+	if( mRoomSprites[pX].field_0 )
 		return;
 
-	pX = mMemory[ 0xBD1C + pX ];
+	pX = mRoomSprites[pX].playerNumber;
 	if( mMemory[ 0x780D + pX ] != 0 )
 		return;
 
 	pX = byte_4B19;
-	if(mMemory[ 0xBD1D + pX ] == 0)
+	if(mRoomSprites[pX].field_1D == 0)
 		return;
 
 	if( sub_5E8E( mMemory[ 0xBE00 + pY ], pX, pY ) == true )
@@ -7224,7 +7208,7 @@ void cCreep::obj_Door_Lock_InFront( byte pX, byte pY ) {
 bool cCreep::sub_5E8E( byte pA, byte pX, byte pY ) {
 	byte byte_5ED3, byte_5ED4 = pA;
 	
-	if( mMemory[ 0xBD1C + pX ] != 0 ) {
+	if( mRoomSprites[pX].playerNumber != 0 ) {
 		byte_5ED3 = mMemory[ 0x7814 ];
 		
 		word_30 = 0x7835;
@@ -7248,16 +7232,16 @@ bool cCreep::sub_5E8E( byte pA, byte pX, byte pY ) {
 void cCreep::obj_RayGun_Control_InFront( byte pX, byte pY ) {
 	byte byte_4E30 = pY;
 
-	if(mMemory[ 0xBD00 + pX ])
+	if(mRoomSprites[pX].field_0)
 		return;
 
-	byte A = mMemory[ 0xBD01 + pX ] + mMemory[ 0xBD0C + pX ];
+	byte A = mRoomSprites[pX].spriteX + mRoomSprites[pX].spriteXAdd;
 	A -= mMemory[ 0xBF01 + pY ];
 
 	if( A >= 8 )
 		return;
 
-	if( mMemory[ 0x780D + mMemory[ 0xBD1C + pX ] ] != 0)
+	if( mMemory[ 0x780D + mRoomSprites[pX].playerNumber ] != 0)
 		return;
 
 	pY = byte_4E30;
@@ -7268,7 +7252,7 @@ void cCreep::obj_RayGun_Control_InFront( byte pX, byte pY ) {
 	A ^= byte_4D66;
 	A &= mMemory[ word_40 ];
 
-	pY = mMemory[ 0xBD1E + pX ];
+	pY = mRoomSprites[pX].field_1E;
 	if( !pY ) 
 		A |= byte_4D65;
 	else {
@@ -7283,7 +7267,7 @@ void cCreep::obj_RayGun_Control_InFront( byte pX, byte pY ) {
 	A |= byte_4D62;
 
 	mMemory[ word_40 ] = A;
-	if( mMemory[ 0xBD1D + pX ] )
+	if( mRoomSprites[pX].field_1D )
 		A = mMemory[ word_40 ] | byte_4D64;
 	else
 		A = (0xFF ^ byte_4D64) & mMemory[ word_40 ];
@@ -7299,19 +7283,19 @@ void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 	if( mMemory[ 0xBF04 + pY ] & byte_840 )
 		return;
 
-	if( mMemory[ 0xBD00 + pX ] )
+	if( mRoomSprites[pX].field_0 )
 		return;
 
 	// 4EB5
 	byte_50CF = pY;
-	if( mMemory[ 0x780D + mMemory[ 0xBD1C + pX ] ] != 0 )
+	if( mMemory[ 0x780D + mRoomSprites[pX].playerNumber ] != 0 )
 		return;
 
 	// 4EC5
 	word_40 = readLEWord( &mMemory[ 0xBE00 + pY ] );
-	if(! (mMemory[ 0xBD1D + pX ]) ) {
+	if(! (mRoomSprites[pX].field_1D) ) {
 		// 4ED4
-		if( (mMemory[ 0xBD1E + pX ]) )
+		if( (mRoomSprites[pX].field_1E) )
 			return;
 
 		if( byte_2E36 & 0x0F )
@@ -7361,8 +7345,8 @@ void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 
 		// Set player new X/Y
 		pY = byte_50CF;
-		mMemory[ 0xBD02 + pX ] = mMemory[ 0xBE05 + pY ] + 0x07;
-		mMemory[ 0xBE04 + pY ] = mMemory[ 0xBD01 + pX ] = A2;
+		mRoomSprites[pX].spriteY = mMemory[ 0xBE05 + pY ] + 0x07;
+		mMemory[ 0xBE04 + pY ] = mRoomSprites[pX].spriteX = A2;
 	}
 
 }
@@ -7491,11 +7475,11 @@ void cCreep::obj_Conveyor_InFront( byte pX, byte pY ) {
 	if( !(mMemory[ word_40 ] & byte_5648 ))
 		return;
 	
-	byte A = mMemory[ 0xBD00 + pX ];
+	byte A = mRoomSprites[pX].field_0;
 
 	if( !A ) {
 		// 54B7
-		if( mMemory[ 0xBD03 + pX ] >= 6 )
+		if( mRoomSprites[pX].spriteImageID >= 6 )
 			return;
 
 	} else
@@ -7503,7 +7487,7 @@ void cCreep::obj_Conveyor_InFront( byte pX, byte pY ) {
 			return;
 	
 	// 54BE
-	A = mMemory[ 0xBD01 + pX ] + mMemory[ 0xBD0C + pX ];
+	A = mRoomSprites[pX].spriteX + mRoomSprites[pX].spriteXAdd;
 	if( (char) A >= 0 && ((char) (A - mMemory[ 0xBF01 + byte_564D ])) < 0 )
 		return;
 
@@ -7519,7 +7503,7 @@ void cCreep::obj_Conveyor_InFront( byte pX, byte pY ) {
 	// 54E2
 	byte byte_564A = A;
 	
-	if( mMemory[ 0xBD00 + pX ] == 0 ) {
+	if( mRoomSprites[pX].field_0 == 0 ) {
 		A = byte_2E36 & 7;
 		if( A )
 			goto s54F4;
@@ -7528,21 +7512,21 @@ void cCreep::obj_Conveyor_InFront( byte pX, byte pY ) {
 	byte_564A <<= 1;
 s54F4:;
 
-	mMemory[ 0xBD01 + pX ] += byte_564A;
+	mRoomSprites[pX].spriteX += byte_564A;
 }
 
 // 5611: In Front Conveyor Control
 void cCreep::obj_Conveyor_Control_InFront( byte pX, byte pY ) {
-	if( mMemory[ 0xBD00 + pX ] )
+	if( mRoomSprites[pX].field_0 )
 		return;
 
-	if( !mMemory[ 0xBD1D + pX ] )
+	if( !mRoomSprites[pX].field_1D )
 		return;
 
 	word_40 = word_564B + mMemory[ 0xBE00 + pY ];
 	byte A;
 
-	if( mMemory[ 0xBD1C + pX ] )
+	if( mRoomSprites[pX].playerNumber )
 		A = byte_5645;
 	else
 		A = byte_5646;
@@ -7553,7 +7537,7 @@ void cCreep::obj_Conveyor_Control_InFront( byte pX, byte pY ) {
 bool cCreep::object_Create( byte &pX ) {
 
 	if( mObjectCount == 0x20 )
-		return true;
+		return false;
 
 	pX = mObjectCount++;
 	pX <<= 3;
@@ -7570,5 +7554,5 @@ bool cCreep::object_Create( byte &pX ) {
 	pX -= 8;
 	mMemory[ 0xBF04 + pX ] = byte_83F;
 
-	return false;
+	return true;
 }

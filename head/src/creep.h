@@ -50,7 +50,8 @@ enum {
 	byte_88E = 0x01
 };
 
-struct sCreepSprite {
+class sCreepSprite {
+public:
 	byte field_0;			// 0
 	byte spriteX;			// 1	
 	byte spriteY;			// 2
@@ -83,6 +84,23 @@ struct sCreepSprite {
 	byte field_1D;			// 1D
 	byte field_1E;			// 1E
 	byte field_1F;			// 1F
+
+	sCreepSprite() {
+		clear();
+	}
+
+	void clear() {
+		field_0 = spriteX = spriteY = spriteImageID = 0;
+		state = field_5 = field_6 = field_7 = field_8 = 0;
+		spriteFlags = 0;
+		field_A = field_B = 0;
+		spriteXAdd = spriteYAdd = 0;
+		field_E = field_F = field_10 = field_11 = field_12 = field_13 = field_14 = field_15 = field_16 = 0;
+		field_17 = field_18 = field_19 = field_1A = field_1B = 0;
+		playerNumber = 0;
+		field_1D = field_1E = field_1F = 0;
+	}
+
 };
 
 struct sCreepObject {
@@ -107,10 +125,12 @@ struct sCreepAnim {
 	byte field_7;
 };
 
+#define MAX_SPRITES 8
+
 class cCreep {
 
 protected:
-	sCreepSprite	 mRoomSprites[8];	// BD00
+	sCreepSprite	 mRoomSprites[ MAX_SPRITES ];	// BD00
 	sCreepObject	 mRoomObjects[20];	// BE00
 	sCreepAnim		 mRoomAnim2[20];	// BF00
 

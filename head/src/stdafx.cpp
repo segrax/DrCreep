@@ -199,7 +199,7 @@ byte *local_FileRead( string pFile, string pPath, size_t	&pFileSize, bool pDataS
 	
 		// Get file size
 		fileStream->seekg(0, ios::end );
-		pFileSize = fileStream->tellg();
+		pFileSize = (size_t) fileStream->tellg();
 		fileStream->seekg( ios::beg );
 
 		// Allocate buffer, and read the file into it
