@@ -239,6 +239,7 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 				dest->mSprite2 = pSpriteNo;
 
 			if( *sourceBuffer != 0 ) {
+
 				// Does this sprite have priority over the background?
 				if( !pPriority || (dest->mPriority == ePriority_Background && pPriority) ) {
 					*destBuffer = *sourceBuffer;

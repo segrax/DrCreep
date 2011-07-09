@@ -7504,7 +7504,7 @@ void cCreep::obj_Conveyor_InFront( byte pX, byte pY ) {
 	
 	// 54BE
 	A = mMemory[ 0xBD01 + pX ] + mMemory[ 0xBD0C + pX ];
-	if( A >= 0 && ((char) (A - mMemory[ 0xBF01 + byte_564D ])) < 0 )
+	if( (char) A >= 0 && ((char) (A - mMemory[ 0xBF01 + byte_564D ])) < 0 )
 		return;
 
 	A -= mMemory[ 0xBF01 + byte_564D ];
