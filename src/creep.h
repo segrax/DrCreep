@@ -32,22 +32,23 @@ class cDebug;
 class cBuilder;
 
 enum {
-	byte_882	 = 0x80,
-	OBJ_DIE		 = 0x40,	// Die
-	OBJ_FLASH	 = 0x20,	// Sprite Flash?
-	OBJ_DESTROY	 = 0x10,	// Disable ? Dead ? Destroy ?
-	OBJ_FREE	 = 0x08,	// Cause the object to be set free
-	OBJ_OVERLAPS = 0x04,
-	OBJ_COLLIDES = 0x02,
-	OBJ_STATE_FREE = 0x01
+	OBJ_ACTION_CREATED	= 0x80,	// Just Created
+	OBJ_ACTION_FLASH	= 0x40,	// Die
+	OBJ_ACTION_DIEING	= 0x20,	// Sprite Flash?
+	OBJ_ACTION_DESTROY	= 0x10,	// Disable ? Dead ? Destroy ?
+	OBJ_ACTION_FREE		= 0x08,	// Cause the object to be set free
+
+	OBJ_FLAG_OVERLAPS	= 0x04,
+	OBJ_FLAG_COLLIDES	= 0x02,
+	OBJ_FLAG_FREE		= 0x01
 };
 
 enum {
-	byte_88A = 0x80,
-	byte_88B = 0x40,
-	byte_88C = 0x20,
-	byte_88D = 0x10,
-	byte_88E = 0x01
+	SPRITE_DOUBLEWIDTH	= 0x80,
+	SPRITE_DOUBLEHEIGHT = 0x40,
+	SPRITE_PRIORITY		= 0x20,
+	SPRITE_MULTICOLOR	= 0x10,
+	SPRITE_FLASH_UNK	= 0x01
 };
 
 class sCreepSprite {
@@ -169,6 +170,7 @@ protected:
 	timeb		 mPlayer1Time, mPlayer2Time;
 	size_t		 mPlayer1Seconds, mPlayer2Seconds;
 
+	bool		 mPlayerStatus[2];
 	word		 mVoice, mVoiceTmp;
 	byte		 mVoiceNum;
 
@@ -184,7 +186,7 @@ protected:
 
 	byte		 byte_311D;
 
-	byte		 byte_34D6, byte_3638;
+	byte		 mPlayerExecutingSpriteNumber, byte_3638;
 	word		 word_41D3;
 
 	word		 word_4A65;											// Keys
@@ -405,10 +407,10 @@ public:
 		void	 obj_Forcefield_Execute( byte pX );
 		void	 obj_Forcefield_Create( );
 		void	 obj_Forcefield_Img_Timer_Execute( byte pX );
-		void	 obj_Forcefield_Timer_InFront( byte pX, byte pY );
+		void	 obj_Forcefield_Timer_InFront( byte pSpriteNumber, byte pObjectNumber );
 		
 		void	 obj_Frankie_Add( );
-		void	 obj_Frankie_Collision( byte pX, byte pY );
+		void	 obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Frankie_Load();
 		void	 obj_Frankie_Hit( byte pX, byte pY );
 		void	 obj_Frankie_Execute( byte pX );
@@ -434,8 +436,8 @@ public:
 		void	 obj_Player_Add( );
 		void	 obj_Player_Collision( byte pX, byte pY );
 		void	 obj_Player_Hit( byte pX, byte pY );
-		void	 obj_Player_Execute( byte pX );
-		void	 obj_Player_Unk( byte pX );
+		void	 obj_Player_Execute( byte pSpriteNumber );
+		void	 obj_Player_Color_Set( byte pSpriteNumber );
 		
 		void	 obj_SlidingPole_Prepare( );
 
