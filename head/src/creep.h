@@ -32,14 +32,14 @@ class cDebug;
 class cBuilder;
 
 enum {
-	byte_882 = 0x80,
-	byte_883 = 0x40,
-	byte_884 = 0x20,
-	byte_885 = 0x10,
-	byte_886 = 0x08,
-	byte_887 = 0x04,
-	byte_888 = 0x02,
-	byte_889 = 0x01
+	byte_882	 = 0x80,
+	OBJ_DIE		 = 0x40,	// Die
+	OBJ_FLASH	 = 0x20,	// Sprite Flash?
+	OBJ_DESTROY	 = 0x10,	// Disable ? Dead ? Destroy ?
+	OBJ_FREE	 = 0x08,	// Cause the object to be set free
+	OBJ_OVERLAPS = 0x04,
+	OBJ_COLLIDES = 0x02,
+	OBJ_STATE_FREE = 0x01
 };
 
 enum {
@@ -134,8 +134,8 @@ struct sCreepAnim {		// 0xBF
 	}
 };
 
-#define MAX_SPRITES 8
-#define MAX_OBJECTS 20
+#define MAX_SPRITES 0x8
+#define MAX_OBJECTS 0x20
 
 class cCreep {
 
@@ -376,7 +376,10 @@ public:
 		void	 obj_Actions_Execute( byte pX );
 		void	 obj_CheckCollisions( byte pX );
 		void	 obj_CollisionSet();
-		void	 sprite_FindFree( byte &pX );
+		
+		int		 sprite_CreepFindFree( );
+		sCreepSprite *sprite_CreepGetFree( );
+
 		void	 obj_OverlapCheck( byte pX );
 
 		void	 obj_MultiDraw();					// Draw multiple objects
@@ -399,7 +402,7 @@ public:
 		void	 obj_Door_Lock_Prepare( );
 		
 		void	 obj_Forcefield_Prepare( );
-		void	 obj_ForceSprite_field_Execute( byte pX );
+		void	 obj_Forcefield_Execute( byte pX );
 		void	 obj_Forcefield_Create( );
 		void	 obj_Forcefield_Img_Timer_Execute( byte pX );
 		void	 obj_Forcefield_Timer_InFront( byte pX, byte pY );
