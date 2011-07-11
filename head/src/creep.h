@@ -181,7 +181,7 @@ protected:
 	byte		 byte_20DE, byte_24FD, mRunStopPressed;
 	byte		 byte_2E02;
 
-	byte		 byte_2E36;
+	byte		 mEngine_Ticks;
 	char		 byte_2232;					// Conveyor
 
 	byte		 byte_311D;
@@ -234,6 +234,9 @@ protected:
 	word		 word_30, word_32, word_34, word_3C, word_3E, word_40, word_42, word_44;
 
 	bool		 mMenuReturn, mNoInput;
+
+	// HW Sprite Registers
+	byte		 mSprite_Multicolor_Enable, mSprite_DataPriority, mSprite_Y_Expansion, mSprite_X_Expansion;
 
 public:
 	int			 mStartCastle;
@@ -310,7 +313,7 @@ public:
 
 		void	 hw_Update();							// 
 		void	 hw_IntSleep( byte pA );				// hardware interrupt wait loop
-		void	 hw_SpritePrepare( byte &pX );			// prepare a sprite 
+		void	 hw_SpritePrepare( byte pSpriteNumber );// prepare a sprite 
 
 		bool	 Intro();								// Intro Loop
 		void	 interruptWait( byte pCount );			// Wait 'pCount' amount of VIC-II interrupt executions
@@ -333,7 +336,7 @@ public:
 		
 		byte	 seedGet( );
 
-		void	 sprite_FlashOnOff( byte pX );			// Flash a sprite on and off
+		void	 sprite_FlashOnOff( byte pSpriteNumber );// Flash a sprite on and off
 		void	 stringDraw( );							// Draw a string
 
 		void	 textShow();
@@ -358,10 +361,10 @@ public:
 		void	 obj_Teleport_unk( byte pA, byte pX );
 		void	 sub_5171( byte pA );
 		void	 sub_526F( char &pA );
-		void	 sub_57DF( byte pX );
+		void	 sub_57DF( byte pSpriteNumber );			// Redraw floor piece?
 		bool	 sub_5E8E( byte pA, byte pX, byte pY );
-		void	 sub_5F6B( byte &pX );
-		void	 sub_5FA3();
+		void	 positionCalculate( byte pSpriteNumber );
+		void	 word_3C_Calculate();
 		void	 sub_6009( byte pA );
 		
 		// Image Handling Functions
@@ -372,50 +375,50 @@ public:
 
 		// object Handling Functions
 		void	 obj_Actions( );
-		bool	 obj_Actions_Collision( byte pX, byte pY );
-		bool	 obj_Actions_InFront( byte pX, byte pY );
-		void	 obj_Actions_Hit( byte pX, byte pY );
-		void	 obj_Actions_Execute( byte pX );
-		void	 obj_CheckCollisions( byte pX );
+		bool	 obj_Actions_Collision( byte pSpriteNumber, byte pY );
+		bool	 obj_Actions_InFront( byte pSpriteNumber, byte pY );
+		void	 obj_Actions_Hit( byte pSpriteNumber, byte pY );
+		void	 obj_Actions_Execute( byte pSpriteNumber );
+		void	 obj_CheckCollisions( byte pSpriteNumber );
 		void	 obj_CollisionSet();
 		
 		int		 sprite_CreepFindFree( );
 		sCreepSprite *sprite_CreepGetFree( );
 
-		void	 obj_OverlapCheck( byte pX );
+		void	 obj_OverlapCheck( byte pSpriteNumber );
 
 		void	 obj_MultiDraw();					// Draw multiple objects
 		void	 obj_stringPrint(  );				// Draw a string
 
 		// Object Functions
 		void	 obj_Conveyor_Prepare( );
-		void	 obj_Conveyor_InFront( byte pX, byte pY );
-		void	 obj_Conveyor_Control_InFront( byte pX, byte pY );
+		void	 obj_Conveyor_InFront( byte pSpriteNumber, byte pY );
+		void	 obj_Conveyor_Control_InFront( byte pSpriteNumber, byte pY );
 		void	 obj_Conveyor_Img_Execute( byte pX );
 
 		void	 obj_Door_Prepare( );
-		void	 obj_Door_InFront( byte pX, byte pY );
-		void	 obj_Door_Img_Execute( byte pX );
+		void	 obj_Door_InFront( byte pSpriteNumber, byte pY );
+		void	 obj_Door_Img_Execute( byte pSpriteNumber );
 
 		void	 obj_Door_Button_Prepare( );
-		void	 obj_Door_Button_InFront( byte pX, byte pY );
+		void	 obj_Door_Button_InFront( byte pSpriteNumber, byte pY );
 
-		void	 obj_Door_Lock_InFront( byte pX, byte pY );
+		void	 obj_Door_Lock_InFront( byte pSpriteNumber, byte pY );
 		void	 obj_Door_Lock_Prepare( );
 		
 		void	 obj_Forcefield_Prepare( );
-		void	 obj_Forcefield_Execute( byte pX );
+		void	 obj_Forcefield_Execute( byte pSpriteNumber );
 		void	 obj_Forcefield_Create( );
-		void	 obj_Forcefield_Img_Timer_Execute( byte pX );
+		void	 obj_Forcefield_Img_Timer_Execute( byte pSpriteNumber );
 		void	 obj_Forcefield_Timer_InFront( byte pSpriteNumber, byte pObjectNumber );
 		
 		void	 obj_Frankie_Add( );
 		void	 obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Frankie_Load();
-		void	 obj_Frankie_Hit( byte pX, byte pY );
-		void	 obj_Frankie_Execute( byte pX );
+		void	 obj_Frankie_Hit( byte pSpriteNumber, byte pY );
+		void	 obj_Frankie_Execute( byte pSpriteNumber );
 
-		void	 obj_Key_Infront( byte pX, byte pY );
+		void	 obj_Key_Infront( byte pSpriteNumber, byte pY );
 		void	 obj_Key_Load( );
 
 		void	 obj_Ladder_Prepare();
@@ -428,14 +431,14 @@ public:
 		
 		void	 obj_Mummy_Prepare( );
 		void	 obj_Mummy_Add( byte pA, byte pX );
-		void	 obj_Mummy_Collision( byte pX, byte pY );
-		void	 obj_Mummy_Execute( byte pX );
-		void	 obj_Mummy_Infront( byte pX, byte pY );
+		void	 obj_Mummy_Collision( byte pSpriteNumber, byte pY );
+		void	 obj_Mummy_Execute( byte pSpriteNumber );
+		void	 obj_Mummy_Infront( byte pSpriteNumber, byte pY );
 		void	 obj_Mummy_Img_Execute( byte pX );
 
 		void	 obj_Player_Add( );
-		void	 obj_Player_Collision( byte pX, byte pY );
-		void	 obj_Player_Hit( byte pX, byte pY );
+		void	 obj_Player_Collision( byte pSpriteNumber, byte pY );
+		void	 obj_Player_Hit( byte pSpriteNumber, byte pY );
 		void	 obj_Player_Execute( byte pSpriteNumber );
 		void	 obj_Player_Color_Set( byte pSpriteNumber );
 		
@@ -443,16 +446,16 @@ public:
 
 		void	 obj_Teleport_Prepare( );
 		void	 obj_Teleport_Img_Execute( byte pX );
-		void	 obj_Teleport_InFront( byte pX, byte pY );
+		void	 obj_Teleport_InFront( byte pSpriteNumber, byte pY );
 
 		void	 obj_TrapDoor_Prepare();
 		void	 obj_TrapDoor_Switch_Img_Execute( byte pX );
 
 		void	 obj_RayGun_Prepare( );
 		void	 obj_RayGun_Laser_Add( byte pX );
-		void	 obj_RayGun_Laser_Execute( byte pX );
+		void	 obj_RayGun_Laser_Execute( byte pSpriteNumber );
 		void	 obj_RayGun_Img_Execute( byte pX );
-		void	 obj_RayGun_Control_InFront( byte pX, byte pY );
+		void	 obj_RayGun_Control_InFront( byte pSpriteNumber, byte pY );
 		void	 obj_RayGun_Control_Update( byte pA );
 
 		void	 obj_Walkway_Prepare( );
