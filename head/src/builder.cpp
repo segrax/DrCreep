@@ -107,7 +107,7 @@ void cBuilder::objectStringPrint( sString pString ) {
 	obj_stringPrint();
 
 	obj_Actions();
-	anim_Actions();
+	anim_Execute();
 
 	hw_Update();
 }
@@ -271,7 +271,7 @@ void cBuilder::mainLoop() {
 
 		// Draw
 		obj_Actions();
-		anim_Actions();
+		anim_Execute();
 
 		// Redraw screen
 		hw_Update();
@@ -407,7 +407,7 @@ void cBuilder::castlePrepare( ) {
 
 	// Force draw of sprites
 	obj_Actions();
-	anim_Actions();
+	anim_Execute();
 
 	playerDraw();
 }
