@@ -2300,7 +2300,7 @@ s32DB:;
 	}
 	// 338E
 	KeyboardJoystickMonitor( mRoomSprites[pSpriteNumber].playerNumber );
-	mRoomSprites[pSpriteNumber].Sprite_field_1D = mJoyButtonState;
+	mRoomSprites[pSpriteNumber].mButtonState = mJoyButtonState;
 	mRoomSprites[pSpriteNumber].Sprite_field_1E = byte_5F56;
 	
 	byte Y = byte_5F56;
@@ -2479,7 +2479,7 @@ s3B6E:
 				A |= byte_574E;
 				mRoomSprites[pSpriteNumber].Sprite_field_1E = A;
 				mMemory[ word_40 ] = A;
-				mRoomSprites[pSpriteNumber].Sprite_field_1D = 0x80;
+				mRoomSprites[pSpriteNumber].mButtonState = 0x80;
 
 				sub_21C8(0x07);
 				break;
@@ -2511,7 +2511,7 @@ s3B6E:
 	mRoomSprites[pSpriteNumber].playerNumber = 0xFF;
 	A = byte_3F13;
 	if(!A) {
-		mRoomSprites[pSpriteNumber].Sprite_field_1D = 0x80;
+		mRoomSprites[pSpriteNumber].mButtonState = 0x80;
 		goto s3CB4;
 	} else {
 		byte_3F0A = 0;
@@ -2528,13 +2528,13 @@ s3B6E:
 	
 		// 3BD1
 		if( byte_3F0A == 1 ) {
-			mRoomSprites[pSpriteNumber].Sprite_field_1D = byte_3F0B;
+			mRoomSprites[pSpriteNumber].mButtonState = byte_3F0B;
 			goto s3CB4;
 		}
 		if( byte_3F0A == 2 ) {
 			byte Y = (byte_3F0B - 4) & 7;
 			if( mMemory[ 0x2F82 + Y ] & byte_3F13 ) {
-				Y = mRoomSprites[pSpriteNumber].Sprite_field_1D;
+				Y = mRoomSprites[pSpriteNumber].mButtonState;
 				if( !(Y & 0x80 ))
 					if( mMemory[ 0x2F82 + Y ] & byte_3F13 )
 						goto s3CB4;
@@ -2606,14 +2606,14 @@ s3B6E:
 			//3C8E
 			A = byte_3F12;
 			if( A == -1 ) {
-				mRoomSprites[pSpriteNumber].Sprite_field_1D = 0x80;
+				mRoomSprites[pSpriteNumber].mButtonState = 0x80;
 				goto s3CB4;
 			}
 
 			A = mMemory[ 0x2F82 + (byte_3F12 << 1) ];
 			if( A & byte_3F13 ) {
 				// 3CB0
-				mRoomSprites[pSpriteNumber].Sprite_field_1D = (byte_3F12 << 1);
+				mRoomSprites[pSpriteNumber].mButtonState = (byte_3F12 << 1);
 				break;
 			}
 
@@ -2624,11 +2624,11 @@ s3B6E:
 
 	// 3CB4
 s3CB4:;
-	if( mRoomSprites[pSpriteNumber].Sprite_field_1D & 2 ) {
+	if( mRoomSprites[pSpriteNumber].mButtonState & 2 ) {
 		mRoomSprites[pSpriteNumber].mY -= byte_5FD8;
 
 		++mRoomSprites[pSpriteNumber].spriteImageID;
-		if( mRoomSprites[pSpriteNumber].Sprite_field_1D != 2 ) {
+		if( mRoomSprites[pSpriteNumber].mButtonState != 2 ) {
 			// 3ccf
 			--mRoomSprites[pSpriteNumber].mX;
 			if( mRoomSprites[pSpriteNumber].spriteImageID >= 0x87 )
@@ -2650,7 +2650,7 @@ s3CB4:;
 		}
 	} else {
 		// 3CFB
-		A = mRoomSprites[pSpriteNumber].Sprite_field_1D;
+		A = mRoomSprites[pSpriteNumber].mButtonState;
 		if(A & 0x80)
 			goto s3D4F;
 
@@ -2663,7 +2663,7 @@ s3CB4:;
 			goto s3D4C;
 		} else {
 			// 3d26
-			if( !(mRoomSprites[pSpriteNumber].Sprite_field_1D) )
+			if( !(mRoomSprites[pSpriteNumber].mButtonState) )
 				mRoomSprites[pSpriteNumber].mY -= 2;
 			else
 				mRoomSprites[pSpriteNumber].mY += 2;
@@ -2677,7 +2677,7 @@ s3D4C:;
 	hw_SpritePrepare( pSpriteNumber );
 
 s3D4F:;
-	mMemory[ word_40 + 6 ] = mRoomSprites[pSpriteNumber].Sprite_field_1D;
+	mMemory[ word_40 + 6 ] = mRoomSprites[pSpriteNumber].mButtonState;
 	mMemory[ word_40 + 3 ] = mRoomSprites[pSpriteNumber].mX;
 	mMemory[ word_40 + 4 ] = mRoomSprites[pSpriteNumber].mY;
 	mMemory[ word_40 + 5 ] = mRoomSprites[pSpriteNumber].spriteImageID;
@@ -2803,7 +2803,7 @@ void cCreep::obj_Frankie_Add() {
 		mRoomSprites[X].mX= mMemory[ word_3E + 3 ];
 		mRoomSprites[X].mY= mMemory[ word_3E + 4 ];
 		mRoomSprites[X].spriteImageID= mMemory[ word_3E + 5 ];
-		mRoomSprites[X].Sprite_field_1D = mMemory[ word_3E + 6 ];
+		mRoomSprites[X].mButtonState = mMemory[ word_3E + 6 ];
 	}
 	// 3ee4
 	mRoomSprites[X].mWidth = 3;
@@ -6755,7 +6755,7 @@ void cCreep::obj_Mummy_Collision( byte pSpriteNumber, byte pY ) {
 			// 38F7
 			if( mMemory[ word_40 ] & byte_538A ) {
 				// 3900
-				word_40 = word_498B + mRoomSprites[pSpriteNumber].Sprite_field_1D;
+				word_40 = word_498B + mRoomSprites[pSpriteNumber].mButtonState;
 				mMemory[ word_40 ] = 3;
 				return;
 			}
@@ -6784,7 +6784,7 @@ void cCreep::sub_3940( byte pSpriteNumber, byte pY ) {
 		return;
 	}
 
-	word_40 = word_498B + mRoomSprites[pSpriteNumber].Sprite_field_1D;
+	word_40 = word_498B + mRoomSprites[pSpriteNumber].mButtonState;
 
 	mMemory[ word_40 ] = 3;
 }
@@ -6847,9 +6847,9 @@ void cCreep::obj_Mummy_Add( byte pA, byte pX ) {
 	mRoomSprites[ sprite ].Sprite_field_0 = 3;
 	mRoomSprites[ sprite ].Sprite_field_1B = 0xFF;
 	mRoomSprites[ sprite ].playerNumber = 0xFF;
-	mRoomSprites[ sprite ].Sprite_field_1D = mRoomObjects[Y].objNumber;
+	mRoomSprites[ sprite ].mButtonState = mRoomObjects[Y].objNumber;
 	
-	word_40 = word_498B + mRoomSprites[ sprite ].Sprite_field_1D;
+	word_40 = word_498B + mRoomSprites[ sprite ].mButtonState;
 	//3998
 
 	mRoomSprites[ sprite ].mWidth = 5;
@@ -6900,7 +6900,7 @@ void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
 	// 37D5
 	mRoomSprites[pSpriteNumber].Sprite_field_1B = AA;
 	mRoomSprites[pSpriteNumber].playerNumber = 0xFF;
-	word_40 = word_498B + mRoomSprites[pSpriteNumber].Sprite_field_1D;
+	word_40 = word_498B + mRoomSprites[pSpriteNumber].mButtonState;
 	if( mRoomSprites[pSpriteNumber].Sprite_field_1E == 0 ) {
 		++mRoomSprites[pSpriteNumber].Sprite_field_1F;
 		byte Y = mRoomSprites[pSpriteNumber].Sprite_field_1F;
@@ -7086,7 +7086,7 @@ void cCreep::obj_Door_Button_InFront( byte pX, byte pY ) {
 	if( mRoomSprites[pX].Sprite_field_0 )
 		return;
 
-	if( mRoomSprites[pX].Sprite_field_1D == 0 )
+	if( mRoomSprites[pX].mButtonState == 0 )
 		return;
 
 	byte A = mRoomSprites[pX].mX + mRoomSprites[pX].mWidth;
@@ -7118,7 +7118,7 @@ void cCreep::obj_Forcefield_Timer_InFront( byte pSpriteNumber, byte pObjectNumbe
 	if(mRoomSprites[pSpriteNumber].Sprite_field_0)
 		return;
 
-	if(!mRoomSprites[pSpriteNumber].Sprite_field_1D)
+	if(!mRoomSprites[pSpriteNumber].mButtonState)
 		return;
 
 	mMemory[ 0x75AB ] = 0x0C;
@@ -7147,7 +7147,7 @@ void cCreep::obj_Key_Infront( byte pX, byte pY ) {
 	if( mMemory[ 0x780D + mRoomSprites[pX].playerNumber ] != 0 )
 		return;
 	
-	if( mRoomSprites[pX].Sprite_field_1D == 0 )
+	if( mRoomSprites[pX].mButtonState == 0 )
 		return;
 
 	sub_21C8( 0x0C );
@@ -7181,7 +7181,7 @@ void cCreep::obj_Door_Lock_InFront( byte pX, byte pY ) {
 		return;
 
 	pX = byte_4B19;
-	if(mRoomSprites[pX].Sprite_field_1D == 0)
+	if(mRoomSprites[pX].mButtonState == 0)
 		return;
 
 	if( sub_5E8E( mRoomObjects[pY].objNumber, pX, pY ) == true )
@@ -7262,7 +7262,7 @@ void cCreep::obj_RayGun_Control_InFront( byte pX, byte pY ) {
 	A |= byte_4D62;
 
 	mMemory[ word_40 ] = A;
-	if( mRoomSprites[pX].Sprite_field_1D )
+	if( mRoomSprites[pX].mButtonState )
 		A = mMemory[ word_40 ] | byte_4D64;
 	else
 		A = (0xFF ^ byte_4D64) & mMemory[ word_40 ];
@@ -7288,7 +7288,7 @@ void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 
 	// 4EC5
 	word_40 = readLEWord( &mRoomObjects[pY].objNumber );
-	if(! (mRoomSprites[pX].Sprite_field_1D) ) {
+	if(! (mRoomSprites[pX].mButtonState) ) {
 		// 4ED4
 		if( (mRoomSprites[pX].Sprite_field_1E) )
 			return;
@@ -7515,7 +7515,7 @@ void cCreep::obj_Conveyor_Control_InFront( byte pSpriteNumber, byte pY ) {
 	if( mRoomSprites[pSpriteNumber].Sprite_field_0 )
 		return;
 
-	if( !mRoomSprites[pSpriteNumber].Sprite_field_1D )
+	if( !mRoomSprites[pSpriteNumber].mButtonState )
 		return;
 
 	word_40 = word_564B + mRoomObjects[pY].objNumber;

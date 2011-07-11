@@ -94,7 +94,7 @@ public:
 	byte Sprite_field_1A;			// 1A
 	byte Sprite_field_1B;			// 1B
 	byte playerNumber;				// 1C
-	byte Sprite_field_1D;			// 1D
+	byte mButtonState;			// 1D
 	byte Sprite_field_1E;			// 1E
 	byte Sprite_field_1F;			// 1F
 
@@ -111,7 +111,7 @@ public:
 		Sprite_field_E = Sprite_field_F = Sprite_field_10 = Sprite_field_11 = Sprite_field_12 = Sprite_field_13 = Sprite_field_14 = Sprite_field_15 = Sprite_field_16 = 0;
 		Sprite_field_17 = Sprite_field_18 = Sprite_field_19 = Sprite_field_1A = Sprite_field_1B = 0;
 		playerNumber = 0;
-		Sprite_field_1D = Sprite_field_1E = Sprite_field_1F = 0;
+		mButtonState = Sprite_field_1E = Sprite_field_1F = 0;
 	}
 
 };
