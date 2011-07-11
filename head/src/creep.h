@@ -133,7 +133,7 @@ struct sCreepObject {		// 0xBE
 };
 
 struct sCreepAnim {		// 0xBF
-	byte Anim_field_0;
+	byte mFuncID;
 	byte mX;
 	byte mY;
 	byte mGfxID;
@@ -143,7 +143,7 @@ struct sCreepAnim {		// 0xBF
 	byte Anim_field_7;
 
 	void clear() {
-		Anim_field_0 = mX = mY = mGfxID = mFlags = mWidth = mHeight = Anim_field_7 = 0;
+		mFuncID = mX = mY = mGfxID = mFlags = mWidth = mHeight = Anim_field_7 = 0;
 	}
 };
 
@@ -229,7 +229,6 @@ protected:
 	word		 word_564B;													// Conveyor
 	byte		 byte_5642, byte_5643, byte_5644, byte_5645, byte_5646;		// Conveyor
 	byte		 byte_5647, byte_5648, byte_5F58, mJoyButtonState, byte_5F56;
-	byte		 byte_3FD4;
 
 	byte		 byte_D10, byte_D12;
 	byte		 byte_839, mObjectCount, byte_8C0, byte_8C1, byte_5CE2;
