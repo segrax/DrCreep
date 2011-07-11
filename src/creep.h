@@ -32,15 +32,15 @@ class cDebug;
 class cBuilder;
 
 enum {
-	OBJ_ACTION_CREATED	= 0x80,	// Just Created
-	OBJ_ACTION_FLASH	= 0x40,	// Die
-	OBJ_ACTION_DIEING	= 0x20,	// Sprite Flash?
-	OBJ_ACTION_DESTROY	= 0x10,	// Disable ? Dead ? Destroy ?
-	OBJ_ACTION_FREE		= 0x08,	// Cause the object to be set free
+	SPR_ACTION_CREATED	= 0x80,	// Just Created
+	SPR_ACTION_FLASH	= 0x40,	// Die
+	SPR_ACTION_DIEING	= 0x20,	// Sprite Flash?
+	SPR_ACTION_DESTROY	= 0x10,	// Disable ? Dead ? Destroy ?
+	SPR_ACTION_FREE		= 0x08,	// Cause the object to be set free
 
-	OBJ_FLAG_OVERLAPS	= 0x04,
-	OBJ_FLAG_COLLIDES	= 0x02,
-	OBJ_FLAG_FREE		= 0x01
+	SPR_FLAG_OVERLAPS	= 0x04,
+	SPR_FLAG_COLLIDES	= 0x02,
+	SPR_FLAG_FREE		= 0x01
 };
 
 enum {
@@ -51,11 +51,23 @@ enum {
 	SPRITE_FLASH_UNK	= 0x01
 };
 
+enum {
+	ITM_DISABLE	= 0x80,
+	ITM_EXECUTE = 0x40,
+	ITM_PICKED	= 0x20
+};
+
+enum {
+	byte_45DD = 0x80,
+	byte_45DE = 0x40,
+	byte_45DF = 0x20
+};
+
 class sCreepSprite {
 public:
 	byte Sprite_field_0;			// 0
-	byte spriteX;					// 1	
-	byte spriteY;					// 2
+	byte mX;						// 1	
+	byte mY;						// 2
 	byte spriteImageID;				// 3
 	byte state;						// 4
 	byte Sprite_field_5;			// 5
@@ -63,10 +75,10 @@ public:
 	byte Sprite_field_7;			// 7
 	byte Sprite_field_8;			// 8
 	byte spriteFlags;				// 9
-	byte Sprite_field_A;			// A
-	byte Sprite_field_B;			// B
-	byte spriteXAdd;				// C
-	byte spriteYAdd;				// D
+	byte mCollisionWidth;			// A
+	byte mCollisionHeight;			// B
+	byte mWidth;					// C
+	byte mHeight;					// D
 	byte Sprite_field_E;			// E
 	byte Sprite_field_F;			// F
 	byte Sprite_field_10;			// 10
@@ -91,11 +103,11 @@ public:
 	}
 
 	void clear() {
-		Sprite_field_0 = spriteX = spriteY = spriteImageID = 0;
+		Sprite_field_0 = mX = mY = spriteImageID = 0;
 		state = Sprite_field_5 = Sprite_field_6 = Sprite_field_7 = Sprite_field_8 = 0;
 		spriteFlags = 0;
-		Sprite_field_A = Sprite_field_B = 0;
-		spriteXAdd = spriteYAdd = 0;
+		mCollisionWidth = mCollisionHeight = 0;
+		mHeight = mHeight = 0;
 		Sprite_field_E = Sprite_field_F = Sprite_field_10 = Sprite_field_11 = Sprite_field_12 = Sprite_field_13 = Sprite_field_14 = Sprite_field_15 = Sprite_field_16 = 0;
 		Sprite_field_17 = Sprite_field_18 = Sprite_field_19 = Sprite_field_1A = Sprite_field_1B = 0;
 		playerNumber = 0;
@@ -122,16 +134,16 @@ struct sCreepObject {		// 0xBE
 
 struct sCreepAnim {		// 0xBF
 	byte Anim_field_0;
-	byte gfxPosX;
-	byte gfxPosY;
-	byte gfxCurrentID;
-	byte Anim_field_4;
-	byte gfxWidth;
-	byte gfxHeight;
+	byte mX;
+	byte mY;
+	byte mGfxID;
+	byte mFlags;
+	byte mWidth;
+	byte mHeight;
 	byte Anim_field_7;
 
 	void clear() {
-		Anim_field_0 = gfxPosX = gfxPosY = gfxCurrentID = Anim_field_4 = gfxWidth = gfxHeight = Anim_field_7 = 0;
+		Anim_field_0 = mX = mY = mGfxID = mFlags = mWidth = mHeight = Anim_field_7 = 0;
 	}
 };
 
@@ -211,7 +223,7 @@ protected:
 	byte		 byte_31F3, byte_31F4, byte_31F5;
 
 	word		 word_45DB;											// Lightning
-	byte		 byte_44E5, byte_45DD, byte_45DE, byte_45DF;		// Lightning
+	byte		 byte_44E5;											// Lightning
 	byte		 byte_474F;
 	
 	word		 word_564B;													// Conveyor
@@ -368,7 +380,7 @@ public:
 		void	 sub_6009( byte pA );
 		
 		// Image Handling Functions
-		void	 anim_Actions( );
+		void	 anim_Execute( );
 		void	 anim_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
 		
 		bool	 object_Create( byte &pX );
