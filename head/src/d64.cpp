@@ -2,7 +2,7 @@
  *  The Castles of Dr. Creep 
  *  ------------------------
  *
- *  Copyright (C) 2009-2011 Robert Crossfield
+ *  Copyright (C) 2009-2012 Robert Crossfield
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -165,9 +165,6 @@ void cD64::bamCreate() {
 
 	// Disk ID
 	buffer[0xA2] = 0x00;	buffer[0xA3] = 0x00;
-
-	// Buffer points to start of BAM Data
-	buffer += 0x04;
 	
 	// Clear the BAM to empty disk state
 	bamClear();
