@@ -405,7 +405,7 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
     transform( findType.begin(), findType.end(), findType.begin(), ::toupper);
 
 
-	int count = scandir(finalPath.str().c_str(), (dirent*) &directFiles, file_select, 0);
+	int count = scandir(finalPath.str().c_str(), (dirent***) &directFiles, file_select, 0);
 	
 	for( int i = 0; i < count; ++i ) {
 
