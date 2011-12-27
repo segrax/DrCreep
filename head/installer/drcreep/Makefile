@@ -1,32 +1,29 @@
-# New ports collection makefile for:   creep
-# Date created:        3 July 2011
+# New ports collection makefile for:   drcreep
+# Date created:        2011-07-03
 # Whom:                Robert Crossfield
 #
 # $FreeBSD$
 #
 
-PORTNAME=      drcreep
-DISTVERSION=   374
-#PORTVERSION=   1
-CATEGORIES=    games
-MASTER_SITES=  SF/creep/
+PORTNAME=	drcreep
+PORTVERSION=	374
+CATEGORIES=	games
+MASTER_SITES=	SF/creep/
 
-MAINTAINER=    segra@strobs.com
-COMMENT=       The Castles of Dr. Creep
+MAINTAINER=	robcrossfield@gmail.com
+COMMENT=	The Castles of Dr. Creep
+
+LICENSE=	GPLv3
 
 DATADIR=	${PREFIX}/share/${PORTNAME}
-#MAN1=          drcreep.1
-#MANCOMPRESSED= yes
 
-USE_GMAKE=      yes
-USE_SDL=        sdl
+USE_GMAKE=	yes
+USE_SDL=	sdl
 
 WRKSRC=		${WRKDIR}/head
 
-PLIST_FILES= 	bin/${PORTNAME}
-
 do-build:
-	cd ${WRKSRC} &&	${CXX} -DFREEBSD -o ${PORTNAME} ${CXXFLAGS} \
+		cd ${WRKSRC} &&	${CXX} -DFREEBSD -o ${PORTNAME} ${CXXFLAGS} \
 				`${SDL_CONFIG} --cflags --libs` -I./src src/*.cpp src/graphics/*.cpp src/graphics/scale/*.cpp src/castle/*.cpp src/castle/objects/*.cpp src/vic-ii/*.cpp src/resid-0.16/*.cpp src/sound/*.cpp -lcompat
 
 do-install:
