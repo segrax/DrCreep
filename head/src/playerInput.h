@@ -24,10 +24,12 @@
  */
 
 struct sPlayerInput {
+    SDL_Joystick    *mJoystick;
 	bool		 mRight, mLeft, mUp, mDown;
 	bool		 mButton;
 
 	sPlayerInput() {
+        mJoystick = 0;
 		clear();
 	}
 
@@ -51,6 +53,8 @@ private:
 	void		 KeyboardInputSet1( sPlayerInput *pInput );
 	void		 KeyboardInputSet2( sPlayerInput *pInput );
 
+    void         JoystickInputSet( sPlayerInput *pInput );
+
 #ifdef _WII	
 	void		 wiiInputCheck();
 	void		 wiiInputSet ( sPlayerInput *pInput, dword pChannel  );
@@ -70,6 +74,8 @@ public:
 
 		return &mInput[ pNumber ];
 	}
+
+    void joystickSet( size_t pPlayer, int pJoyNumber );
 
 #define retVal( C, X ) C ret = X; X = 0; return ret; 
 
