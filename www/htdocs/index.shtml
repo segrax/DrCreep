@@ -36,12 +36,19 @@
           <p>Castles of Dr. Creep is a 1984 Commodore 64 game written by Ed Hobbs and published by Broderbund Software.</p>
           <p>This project is an open source rewrite, allowing you to play the game using an image (D64) of the original disk.<br/>
           Additionally, a Castle Builder has been added allowing the player to modify existing castles, or build new ones from scratch</p>
-            <p>Presently it can compile and play on both Windows, Nintendo Wii, and Linux (Ubuntu specifically has been tested).</p>
+            <p>Presently it can compile and play on both Windows, Nintendo Wii, FreeBSD, and Linux (Ubuntu specifically has been tested).</p>
         </div></td>
       </tr>
     </table>
     <p>&nbsp;</p>
     <hr />
+    <p class="NewsDates"><strong>Friday, 23 September, 2011  08:02</strong></p>
+    <hr />
+    <p>A few months ago the source was made compilable on FreeBSD, a port is currentyly pending approval for addition to the ports collection</p>
+    <p></p>
+    <p>&nbsp;</p>
+<hr />
+
     <p class="NewsDates"><strong>Sunday, 7 November, 2010  9:35</strong></p>
     <hr />
     <p>SVN-351 Windows / Wii Package is available. </p>
