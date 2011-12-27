@@ -42,6 +42,7 @@ cPlayerInput::cPlayerInput( cCreep *pCreep ) {
 	mF3 = false;
 	mF4 = false;
 	mF5 = false;
+
 }
 
 cPlayerInput::~cPlayerInput() {
@@ -63,6 +64,23 @@ void cPlayerInput::inputClear() {
 	mRestore = false;
 }
 
+void cPlayerInput::joystickSet( size_t pPlayer, int pJoystickNumber ) {
+
+    if( pJoystickNumber == -1 ) {
+        mInput[pPlayer].mJoystick = 0;
+        return;
+    }
+
+    if( pJoystickNumber > SDL_NumJoysticks() )
+        return;
+
+    SDL_Joystick *joystick;
+
+    SDL_JoystickEventState(SDL_ENABLE);
+    mInput[pPlayer].mJoystick = SDL_JoystickOpen(pJoystickNumber);
+
+}
+
 void cPlayerInput::inputCheck( bool pClearAll ) {
 
 	if(pClearAll)
@@ -75,8 +93,15 @@ void cPlayerInput::inputCheck( bool pClearAll ) {
 
 #ifndef _WII
 		KeyboardCheck();
-		KeyboardInputSet1( &mInput[ 0 ] );
-		KeyboardInputSet2( &mInput[ 1 ] );
+        if( mInput[ 0 ].mJoystick == 0 )
+		    KeyboardInputSet1( &mInput[ 0 ] );
+        else
+            JoystickInputSet( &mInput[0] );
+
+        if( mInput[ 1 ].mJoystick == 0 )
+    		KeyboardInputSet2( &mInput[ 1 ] );
+        else
+            JoystickInputSet( &mInput[1] );
 #endif
 	}
 
@@ -246,47 +271,75 @@ void cPlayerInput::KeyboardCheck() {
 
 }
 
+void cPlayerInput::JoystickInputSet( sPlayerInput *pInput ) {
+    Uint8 button = SDL_JoystickGetButton( pInput->mJoystick, 0 );
+    Uint8 hatEvent = SDL_JoystickGetHat( pInput->mJoystick, 0 );
+
+    if( button == SDL_JOYBUTTONDOWN )
+        pInput->mButton = true;
+
+    if( button== SDL_JOYBUTTONUP )
+        pInput->mButton = false;
+
+    if ( hatEvent == SDL_HAT_CENTERED ) {
+        pInput->mDown = false;
+        pInput->mLeft = false;
+        pInput->mRight = false;
+        pInput->mUp = false;
+    }
+
+    if ( hatEvent & SDL_HAT_UP )
+        pInput->mUp = true;
+    else
+        pInput->mUp = false;
+
+    if ( hatEvent & SDL_HAT_LEFT )
+        pInput->mLeft = true;
+    else
+        pInput->mLeft = false;
+
+    if ( hatEvent & SDL_HAT_RIGHT )
+        pInput->mRight = true;
+    else
+        pInput->mRight = false;
+
+    if ( hatEvent & SDL_HAT_DOWN )
+        pInput->mDown = true;       
+    else
+        pInput->mDown = false;
+
+    
+}
+
 void cPlayerInput::KeyboardInputSet1( sPlayerInput *pInput ) {
+
+    bool pressed = false;
+
+    if( mEvent.type == SDL_KEYDOWN )
+        pressed = true;
 
 	switch( mEvent.key.keysym.sym ) {
 		case SDLK_RCTRL:
-
-			if( mEvent.type == SDL_KEYDOWN )
-				pInput->mButton = true;
-			else
-				pInput->mButton = false;
+                pInput->mButton = pressed;
 
 			break;
 
 		case SDLK_LEFT:
-
-			if( mEvent.type == SDL_KEYDOWN )
-				pInput->mLeft = true;
-			else
-				pInput->mLeft = false;
+				pInput->mLeft = pressed;
 
 			break;
 
 		case SDLK_RIGHT:
-			if( mEvent.type == SDL_KEYDOWN )
-				pInput->mRight = true;
-			else
-				pInput->mRight = false;
+				pInput->mRight = pressed;
 
 			break;
 
 		case SDLK_DOWN:
-			if( mEvent.type == SDL_KEYDOWN )
-				pInput->mDown = true;
-			else
-				pInput->mDown = false;
+				pInput->mDown = pressed;
 			break;
 
 		case SDLK_UP:
-			if( mEvent.type == SDL_KEYDOWN )
-				pInput->mUp = true;
-			else
-				pInput->mUp = false;
+				pInput->mUp = pressed;
 
 			break;
 

@@ -36,7 +36,7 @@ cVideoWindow::cVideoWindow( size_t pWidth, size_t pHeight, size_t pBytesPixel, b
 	_height = pHeight;
 	_pixelBytes = pBytesPixel;
 
-	SDL_Init ( SDL_INIT_VIDEO ); 
+	SDL_Init ( SDL_INIT_VIDEO |  SDL_INIT_JOYSTICK ); 
 	atexit ( SDL_Quit ) ;
 
 #ifdef _WII
