@@ -71,10 +71,13 @@ void cPlayerInput::joystickSet( size_t pPlayer, int pJoystickNumber ) {
         return;
     }
 
+    if( mInput[pPlayer].mJoystick != 0 ) {
+        mInput[pPlayer].mJoystick = 0;
+        return;
+    }
+
     if( pJoystickNumber > SDL_NumJoysticks() )
         return;
-
-    SDL_Joystick *joystick;
 
     SDL_JoystickEventState(SDL_ENABLE);
     mInput[pPlayer].mJoystick = SDL_JoystickOpen(pJoystickNumber);
@@ -217,6 +220,14 @@ void cPlayerInput::KeyboardCheck() {
 			case SDLK_F5:
 				mF5 = false;
 				break;
+
+            case SDLK_F6:
+                joystickSet(0, 0);
+                break;
+
+            case SDLK_F7:
+                joystickSet(1, 1);
+                break;
 
 			case SDLK_ESCAPE:
 				mRestore = false;
