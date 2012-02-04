@@ -76,7 +76,7 @@ void cPlayerInput::joystickSet( size_t pPlayer, int pJoystickNumber ) {
         return;
     }
 
-    if( pJoystickNumber > SDL_NumJoysticks() )
+    if( pJoystickNumber >= SDL_NumJoysticks() )
         return;
 
     SDL_JoystickEventState(SDL_ENABLE);
@@ -285,36 +285,43 @@ void cPlayerInput::KeyboardCheck() {
 void cPlayerInput::JoystickInputSet( sPlayerInput *pInput ) {
     Uint8 button = SDL_JoystickGetButton( pInput->mJoystick, 0 );
     Uint8 hatEvent = SDL_JoystickGetHat( pInput->mJoystick, 0 );
+	Uint8 hatNums = SDL_JoystickNumHats( pInput->mJoystick );
 
-    if( button == SDL_JOYBUTTONDOWN )
+	Sint16 axisX = SDL_JoystickGetAxis( pInput->mJoystick, 0 )  / 32767;
+	Sint16 axisY = SDL_JoystickGetAxis( pInput->mJoystick, 1 )  / 32767;
+
+    if( button == 1 )
         pInput->mButton = true;
 
-    if( button== SDL_JOYBUTTONUP )
+    if( button == 0 )
         pInput->mButton = false;
 
-    if ( hatEvent == SDL_HAT_CENTERED ) {
-        pInput->mDown = false;
+    if ( axisX == 0 ) {
         pInput->mLeft = false;
         pInput->mRight = false;
-        pInput->mUp = false;
     }
 
-    if ( hatEvent & SDL_HAT_UP )
+	if( axisY == 0 ) {
+		pInput->mDown = false;
+        pInput->mUp = false;
+	}
+
+    if ( axisY == -1 )
         pInput->mUp = true;
     else
         pInput->mUp = false;
 
-    if ( hatEvent & SDL_HAT_LEFT )
+    if ( axisX == -1 )
         pInput->mLeft = true;
     else
         pInput->mLeft = false;
 
-    if ( hatEvent & SDL_HAT_RIGHT )
+    if ( axisX == 1 )
         pInput->mRight = true;
     else
         pInput->mRight = false;
 
-    if ( hatEvent & SDL_HAT_DOWN )
+    if ( axisY == 1 )
         pInput->mDown = true;       
     else
         pInput->mDown = false;
