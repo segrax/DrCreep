@@ -460,6 +460,7 @@ void cCreep::gameMenuDisplaySetup() {
 		//
 		A = (byte_30 & 0xFF) + mMemory[ byte_3E ];
 		byte_30 = A + (byte_30 & 0xFF00);
+
 		
 		//0x75E1
 		Y = 0;
@@ -6533,7 +6534,7 @@ void cCreep::obj_Conveyor_Img_Execute( byte pX ) {
 				gfxCurrentID = 0x81;
 		}
 		// 5479
-		byte gfxPosX = mRoomAnim[pX].mY;
+		byte gfxPosX = mRoomAnim[pX].mX;
 		byte gfxPosY = mRoomAnim[pX].mY;
 		
 		anim_Update( gfxCurrentID, gfxPosX, gfxPosY, 0, pX );
