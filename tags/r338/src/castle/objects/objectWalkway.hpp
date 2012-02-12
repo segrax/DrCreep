@@ -1,0 +1,55 @@
+/*
+ *  The Castles of Dr. Creep 
+ *  ------------------------
+ *
+ *  Copyright (C) 2009-2010 Robert Crossfield
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ *  ------------------------------------------
+ *  Object
+ *  ------------------------------------------
+ */
+
+class cRoom;
+
+class cObjectWalkway : public cObject {
+public:
+
+public:
+	cObjectWalkway( cRoom *pRoom, byte pPosX, byte pPosY ) : cObject( pRoom, pPosX, pPosY ) {
+		mObjectID = eObjectWalkway;
+
+		mParts[0].mDrags = true;
+		mParts[0].mDragDirection = eDirectionRight;
+
+		mParts[0].mLength = 1;
+	}
+
+	size_t		objectLoad( byte **pBuffer, size_t pPart ) {
+		mParts[0].mLength = *(*pBuffer)++;
+
+		return (cObject::objectLoad( pBuffer, 0 ) + 1);
+	}
+
+	size_t		objectSave( byte **pBuffer , size_t pPart ) {	
+		*(*pBuffer)++ = (byte) mParts[0].mLength;
+			
+		size_t strSize = cObject::objectSave( pBuffer, 0 );
+
+		return (strSize + 1);
+	}
+
+};

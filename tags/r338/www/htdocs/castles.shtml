@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Castles of Dr. Creep :: Castles</title>
+<link href="css/twoColHybRtHdr.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+<!--
+.NewsDates {
+	color: #004000;
+}
+.menuTitles {
+	color: #800080;
+	font-weight:bold;
+}
+#mainTitle {
+	color: #408080;
+}
+.Keys {
+	font-size: 80%;
+}
+.sideText {
+	font-size: 80%;
+	text-align: right;
+}
+-->
+</style>
+</head>
+
+<body class="twoColHybRtHdr">
+
+<div id="container">
+  <div id="header">
+    <h1 id="mainTitle">The Castles of Dr. Creep</h1>
+  <!-- end #header --></div>
+  <!--#include file="menu.shtml" --> 
+  
+  <div id="mainContent">
+    <table width="100%" cellspacing="5" >
+	  <tr>
+	    <td class="sideText">Castle Title
+          <p class="Keys"><strong>Castle Details</strong><br/>
+        Castle Description<br/>
+        Castle Creator</p></td>
+	    <td><div><img src="images/howtoplay/5. InGame.jpg" alt="castle picture" width="382" height="314" /></div></td>
+      </tr>
+     
+  </table>
+<!-- end #mainContent --></div>
+	<!-- This clearing element should immediately follow the #mainContent div in order to force the #container div to contain all child floats -->
+	
+	<br class="clearfloat" />
+	 <!--#include file="footer.shtml" --> 
+<!-- end #container --></div>
+</body>
+</html>
