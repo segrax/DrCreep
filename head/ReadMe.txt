@@ -30,7 +30,6 @@ Whats Missing:
 
 Whats Broken:
 -------------
- *occasional lock-up, caused by walking, or mummy/franky walking
  *sound is not perfect
  *graphic glitch caused by floor-switch toggling
  
@@ -77,6 +76,8 @@ Game Controls:
 
   F4  = Start Builder using current castle
   F5  = Start Builder with empty castle
+  F6  = Enable Player 1 Joystick 
+  F7  = Enable Player 2 Joystick
   F10 = Fullscreen Toggle
 
  Intro:
