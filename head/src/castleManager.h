@@ -135,6 +135,8 @@ public:
 
 	vector<string>			 filesFind( string pFilemask );
 
+    byte                    *introLoad( size_t &pBufferSize );
+
 	bool					 castleSave( string pFilename, size_t pSaveSize, byte *pData );
 
 	bool					 positionLoad( string pFilename, byte *pTarget );

@@ -36,9 +36,8 @@
 string stringRip(byte *pBuffer, byte pTerminator, size_t pLengthMax) {
 	string tmpString;
 
-	for(size_t i = 0; *pBuffer != pTerminator && i <= pLengthMax; ++i) {
+	for(size_t i = 0; *pBuffer != pTerminator && i <= pLengthMax; ++i)
 		tmpString += (char) *pBuffer++;
-	}
 
 	return tmpString;
 }

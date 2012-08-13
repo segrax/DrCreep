@@ -295,5 +295,6 @@
     </None>
     <None Include="..\..\License.txt" />
     <None Include="ReadMe.txt" />
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>

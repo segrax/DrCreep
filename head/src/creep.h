@@ -359,7 +359,7 @@ public:
 		void	 sub_95F();
 		void	 obj_Image_Draw();
 		void	 gameHighScoresHandle();
-		void	 sub_21C8( char pA );
+		void	 sound_PlayEffect( char pA );
 		
 		void	 textPrintCharacter();
 		byte	 textGetKeyFromUser();
@@ -370,9 +370,9 @@ public:
 		void	 sub_3940( byte pX, byte pY );
 		void	 sub_3A60( byte pX, byte pY );
 		void	 obj_Teleport_unk( byte pA, byte pX );
-		void	 sub_5171( byte pA );
+		void	 obj_TrapDoor_PlaySound( byte pA );
 		void	 sub_526F( char &pA );
-		void	 sub_57DF( byte pSpriteNumber );			// Redraw floor piece?
+		void	 roomAnim_Disable( byte pSpriteNumber );			// Redraw floor piece?
 		bool	 sub_5E8E( byte pA, byte pX, byte pY );
 		void	 positionCalculate( byte pSpriteNumber );
 		void	 word_3C_Calculate();

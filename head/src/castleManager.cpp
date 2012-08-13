@@ -481,6 +481,24 @@ vector<string> cCastleManager::musicGet() {
 	return musicFiles;
 }
 
+byte *cCastleManager::introLoad( size_t &pBufferSize ) {
+    char *gIntroFilenames[] = {   "\x081PIC A TITLE",
+                                  "PIC A TITLE",
+
+                                  ""
+                              };
+
+    byte *buffer = 0;
+
+    for( char *pFilename = gIntroFilenames[0]; *pFilename; ++pFilename ) {
+
+        if( (buffer = fileLoad( pFilename, pBufferSize )) != 0 )
+            return buffer;
+    }
+
+    return 0;
+}
+
 byte *cCastleManager::fileLoad( string pFilename, size_t &pBufferSize ) {
 	byte *buffer = 0;
 	

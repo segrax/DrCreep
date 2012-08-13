@@ -201,10 +201,15 @@ void cCreep::builderStart( int pStartLevel ) {
 
 void cCreep::titleDisplay() {
 	size_t size;
-	byte *buffer = mCastleManager->fileLoad( "PIC A TITLE", size );
+	byte *buffer = mCastleManager->introLoad( size );
 	if(!buffer) {
-		mDebug->error("File \"PIC A TITLE\" not found");
 		
+        mDebug->error( "File \"PIC A TITLE\" not found" );
+
+        //stringSet( 0x34, 0x00, 0x01, "File \"PIC A TITLE\" not found" );
+        //roomPrepare( 0xB900 );
+        //textShow();
+
 		return;
 	}
 
@@ -269,12 +274,8 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	consoleShow = true;
 #endif
 	// Hide the console unless its requested by user
-	if( !consoleShow ) {
-#ifdef WIN32
-		HWND hWnd = GetConsoleWindow();
-		ShowWindow( hWnd, SW_HIDE );
-#endif
-	}
+	if( !consoleShow )
+        mDebug->consoleHide();
 
 	// Set the default screen scale
 	mScreen->scaleSet( 2 );
@@ -1737,12 +1738,15 @@ s2F51:;
 
 						sprite->_rEnabled = true;
 					}
+
 				}
 
 				// 2F69
 				// Enabled Sprites
 				mMemory[ 0x21 ] = A;
 				mRoomSprites[spriteNumber].Sprite_field_5 = mRoomSprites[spriteNumber].Sprite_field_6;
+
+                mScreen->spriteRedrawSet();
 			}
 				
 		}
@@ -2064,7 +2068,7 @@ s2FE9:;
 		--mRoomSprites[pSpriteNumber].Sprite_field_8;
 
 		mMemory[ 0x760C ] = mRoomSprites[pSpriteNumber].Sprite_field_8 << 3;
-		sub_21C8(8);
+		sound_PlayEffect(8);
 		
 	} else {
 		// Flash Off
@@ -2482,7 +2486,7 @@ s3B6E:
 				mMemory[ word_40 ] = A;
 				mRoomSprites[pSpriteNumber].mButtonState = 0x80;
 
-				sub_21C8(0x07);
+				sound_PlayEffect(0x07);
 				break;
 			}
 
@@ -2867,7 +2871,7 @@ void cCreep::anim_Execute() {
 		// 3F96
 		// Key picked up
 		if( A & ITM_PICKED ) {
-			sub_57DF( X );
+			roomAnim_Disable( X );
 
 			// Decrease image count
 			--mObjectCount;
@@ -3419,7 +3423,7 @@ s10EB:;
 		break;
 	}
 
-	sub_21C8( 9 );
+	sound_PlayEffect( 9 );
 	mMemory[ 0x11D0 ] = 0;
 	return false;
 }
@@ -4797,10 +4801,10 @@ void cCreep::gameHighScores( ) {
 }
 
 // 21C8
-void cCreep::sub_21C8( char pA ) {
+void cCreep::sound_PlayEffect( char pA ) {
 	char byte_2231 = pA;
 
-	if( mIntro == 1 )
+	if( mIntro )
 		return;
 
 	if( byte_839 == 1 )
@@ -4928,7 +4932,7 @@ void cCreep::obj_Walkway_Prepare() {
 
 }
 
-void cCreep::sub_57DF( byte pSpriteNumber ) {
+void cCreep::roomAnim_Disable( byte pSpriteNumber ) {
 
 	if( !(mRoomAnim[pSpriteNumber ].mFlags & ITM_DISABLE) ) {
 
@@ -5374,7 +5378,7 @@ void cCreep::obj_Door_Img_Execute( byte pSpriteNumber ) {
 	A -= mRoomObjects[pSpriteNumber].Object_field_2;
 	mMemory[ 0x75B7 ] = A;
 
-	sub_21C8( 3 );
+	sound_PlayEffect( 3 );
 	A = mRoomObjects[pSpriteNumber].Object_field_2;
 
 	if( A ) {
@@ -5672,7 +5676,7 @@ void cCreep::obj_Teleport_Img_Execute( byte pX ) {
 	A &= 0x3F;
 	
 	mMemory[ 0x75CD + 2 ] = A;
-	sub_21C8( 0x04 );
+	sound_PlayEffect( 0x04 );
 	if( mEngine_Ticks & 3  )
 		A = 1;
 	else
@@ -5949,6 +5953,8 @@ void cCreep::obj_Lightning_Img_Execute( byte pX ) {
 			}
 			// 4345
 			mRoomSprites[Y].state |= SPR_ACTION_DESTROY;			// Turning Off 
+            mScreen->clear(0);
+            mScreen->refresh();
 			return;
 
 		} else {
@@ -6122,7 +6128,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pX, byte pY ) {
 
 	anim_Update( A, mRoomAnim[byte_45D8].mX, mRoomAnim[byte_45D8].mY, 0, byte_45D8 );
 
-	sub_21C8(0x06);
+	sound_PlayEffect(0x06);
 }
 
 // 45E0: Forcefield Timer
@@ -6137,7 +6143,7 @@ void cCreep::obj_Forcefield_Img_Timer_Execute( byte pSpriteNumber ) {
 	byte A = mMemory[ 0x4756 + Y ];
 
 	mMemory[ 0x75AB ] = A;
-	sub_21C8( 2 );
+	sound_PlayEffect( 2 );
 
 	for( Y = 0; Y < 8; ++Y ) {
 		if( Y >= mRoomObjects[pSpriteNumber].Object_field_2 )
@@ -6425,7 +6431,7 @@ void cCreep::obj_TrapDoor_Switch_Img_Execute( byte pX ) {
 
 		byte A = mRoomObjects[pX].Object_field_2;
 
-		sub_5171( A );
+		obj_TrapDoor_PlaySound( A );
 		screenDraw( 1, 0, 0, 0, A );
 		if( mRoomObjects[pX].Object_field_2 != 0x78 ) {
 			// 515F
@@ -6438,11 +6444,11 @@ void cCreep::obj_TrapDoor_Switch_Img_Execute( byte pX ) {
 	} else {
 		// 5129
 		if( mRoomObjects[pX].Object_field_2 == 0x78 )
-			sub_57DF( pX );
+			roomAnim_Disable( pX );
 		
 		byte A = mRoomObjects[pX].Object_field_2;
 
-		sub_5171( A );
+		obj_TrapDoor_PlaySound( A );
 		screenDraw( 0, A, mMemory[ word_40 + 1 ], mMemory[ word_40 + 2 ], 0 );
 		if( mRoomObjects[pX].Object_field_2 != 0x73 ) {
 			--mRoomObjects[pX].Object_field_2;
@@ -6493,7 +6499,7 @@ void cCreep::obj_Conveyor_Img_Execute( byte pX ) {
 			byte gfxPosY = mMemory[ word_40 + 4 ];
 			screenDraw( 0, 0x82, gfxPosX, gfxPosY, 0 );
 
-			sub_21C8(0xA);
+			sound_PlayEffect(0xA);
 	}
 
 	// 541B
@@ -6816,7 +6822,7 @@ void cCreep::obj_RayGun_Laser_Add( byte pX ) {
 	
 	mMemory[ 0x7591 + 2 ] = A;
 
-	sub_21C8( 0 );
+	sound_PlayEffect( 0 );
 
 	byte X = sprite_CreepFindFree( );
 
@@ -6914,7 +6920,7 @@ void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
 			mRoomSprites[pSpriteNumber].mY += mMemory[ 0x39FF + Y ];
 			
 			mMemory[ 0x7630 ] = (mRoomSprites[pSpriteNumber].Sprite_field_1F << 2) + 0x24;
-			sub_21C8( 0x0B );
+			sound_PlayEffect( 0x0B );
 			hw_SpritePrepare( pSpriteNumber );
 			return;
 		}
@@ -7123,7 +7129,7 @@ void cCreep::obj_Forcefield_Timer_InFront( byte pSpriteNumber, byte pObjectNumbe
 		return;
 
 	mMemory[ 0x75AB ] = 0x0C;
-	sub_21C8( 0x02 );
+	sound_PlayEffect( 0x02 );
 	
 	mRoomAnim[pObjectNumber].mFlags |= ITM_EXECUTE;
 	mRoomObjects[pObjectNumber].Object_field_1 = 0x1E;
@@ -7151,7 +7157,7 @@ void cCreep::obj_Key_Infront( byte pX, byte pY ) {
 	if( mRoomSprites[pX].mButtonState == 0 )
 		return;
 
-	sub_21C8( 0x0C );
+	sound_PlayEffect( 0x0C );
 	mRoomAnim[pY].mFlags |= ITM_PICKED;
 
 	word_40 = word_4A65 + mRoomObjects[pY].objNumber;
@@ -7311,7 +7317,7 @@ void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 		// 4EF7
 		mMemory[ 0x75DB ] = mMemory[ word_40 + 2 ] + 0x32;
 
-		sub_21C8(5);
+		sound_PlayEffect(5);
 		A = mMemory[ word_40 + 2 ] + 2;
 
 		byte_50CE = pX;
@@ -7388,10 +7394,10 @@ void cCreep::obj_Teleport_unk( byte pA, byte pX ) {
 }
 
 // 5171: 
-void cCreep::sub_5171( byte pA ) {
+void cCreep::obj_TrapDoor_PlaySound( byte pA ) {
 	
 	mMemory[ 0x759F ] = pA - 0x48;
-	sub_21C8(1);
+	sound_PlayEffect(1);
 
 }
 

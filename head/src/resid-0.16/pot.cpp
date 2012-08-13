@@ -19,7 +19,7 @@
 
 #include "pot.h"
 
-reg8 Potentiometer::readPOT()
+unsigned int Potentiometer::readPOT()
 {
   // NB! Not modeled.
   return 0xff;
