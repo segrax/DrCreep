@@ -32,23 +32,35 @@
     <table border="0">
       <tr>
         <td ><img src="/images/screenshots/o_alternation2.png" width="185" height="143" alt="Alternation2" style="margin-top:15px" /></td>
-        <td ><div class="about1">
-          <p>Castles of Dr. Creep is a 1984 Commodore 64 game written by Ed Hobbs and published by Broderbund Software.</p>
-          <p>This project is an open source rewrite, allowing you to play the game using an image (D64) of the original disk.<br/>
-          Additionally, a Castle Builder has been added allowing the player to modify existing castles, or build new ones from scratch</p>
-            <p>Presently it can compile and play on both Windows, Nintendo Wii, FreeBSD, and Linux (Ubuntu specifically has been tested).</p>
-        </div></td>
+        <td >
+			<div class="about1">
+				<p>Castles of Dr. Creep is a 1984 Commodore 64 game written by Ed Hobbs and published by Broderbund Software.</p>
+				<p>This project is an open source rewrite, allowing you to play the game using an image (D64) of the original disk.<br/>
+			  Additionally, a Castle Builder has been added allowing the player to modify existing castles, or build new ones from scratch</p>
+				<p>Presently it can compile and play on both Windows, Nintendo Wii, FreeBSD, and Linux (Ubuntu specifically has been tested).</p>
+			</div>
+		</td>
       </tr>
     </table>
+	<p>&nbsp;</p>
+    <hr />
+    <p class="NewsDates"><strong>Sunday, 12 August, 2012  19:41</strong></p>
+    <hr />
+	<p>SVN-404 Windows Package is available</p>
+    <p>Fix for loading of the original 'PIC A TITLE' (Thanks Martin)<br/>
+	Fix lightning switch graphic glitch<br/>
+	Fix displaying of error messages to console window<br/>
+    </p>
     <p>&nbsp;</p>
     <hr />
+	
     <p class="NewsDates"><strong>Saturday, 4 February, 2012  17:23</strong></p>
     <hr />
 	<p>SVN-394 Windows Package is available</p>
     <p>Joystick support has been added, a bug fix for a random crash</p>
     <p></p>
     <p>&nbsp;</p>
-<hr />
+	<hr />
 
     <p class="NewsDates"><strong>Sunday, 7 November, 2010  9:35</strong></p>
     <hr />
