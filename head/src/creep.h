@@ -312,10 +312,10 @@ public:
 
 		void	 gameEscapeCastle();
 		void	 gameHighScores( );
-		void	 gameMenuDisplaySetup();
+		void	 optionMenuPrepare();
 
 		void	 gamePositionLoad();
-		void	 gameDataSave( bool pCastleSave );
+		void	 gamePositionSave( bool pCastleSave );
 		void	 gameFilenameGet( bool pLoading, bool pCastleSave );
 
 		void	 stringSet( byte pPosX, byte pPosY, byte pColor, string pMessage );

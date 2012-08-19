@@ -421,7 +421,7 @@ void cBuilder::castleSaveToDisk() {
 	mScreen->cursorEnabled( false );
 	
 
-	gameDataSave( true );
+	gamePositionSave( true );
 	
 	// Re-add cursor object
 	mCurrentRoom->objectAdd( mCurrentObject );

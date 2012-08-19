@@ -74,15 +74,15 @@ cCreep::cCreep() {
 	// Load the C64 Character Rom
 	if( (m64CharRom = local_FileRead( "char.rom", "",  romSize, false )) == 0 ) {
 		mDebug->error("File \"char.rom\" not found");
-		exit(1);
+		return;
 	}
 
 	if( (mGameData = mCastleManager->fileLoad( "OBJECT", romSize )) == 0 ) {
 		mDebug->error("File \"OBJECT\" not found");
-		exit(1);
-	} else
-		mGameData += 2;
+		return;
+	}
 
+    mGameData += 2;
 	romSize -= 2;
 
 	if(romSize)
@@ -152,6 +152,7 @@ cCreep::~cCreep() {
 	delete mInput;
 	delete mDebug;
 	delete mBuilder;
+    delete mGameData;
 }
 
 void cCreep::builderStart( int pStartLevel ) {
@@ -179,7 +180,7 @@ void cCreep::builderStart( int pStartLevel ) {
 		mBuilder->mainLoop();
 	}
 
-	// Remove screen./sound ptr so builder doesnt delete it
+	// Remove screen/sound ptr so builder doesnt delete it
 	mBuilder->screenSet(0);
 	mBuilder->mSoundSet(0);
 
@@ -201,15 +202,10 @@ void cCreep::builderStart( int pStartLevel ) {
 
 void cCreep::titleDisplay() {
 	size_t size;
-	byte *buffer = mCastleManager->introLoad( size );
+	byte *buffer, *introImage = buffer = mCastleManager->introLoad( size );
+
 	if(!buffer) {
-		
         mDebug->error( "File \"PIC A TITLE\" not found" );
-
-        //stringSet( 0x34, 0x00, 0x01, "File \"PIC A TITLE\" not found" );
-        //roomPrepare( 0xB900 );
-        //textShow();
-
 		return;
 	}
 
@@ -219,6 +215,8 @@ void cCreep::titleDisplay() {
 	mScreen->bitmapLoad( buffer,  buffer + 0x1F40, buffer + 0x2328, 1 );
 	mScreen->refresh();
 	hw_IntSleep(0x10);
+
+    delete introImage;
 }
 
 void cCreep::run( int pArgCount, char *pArgs[] ) {
@@ -374,10 +372,14 @@ void cCreep::start( int pStartLevel, bool pUnlimited ) {
 		++count;
 	}
 
-	// Removed 
+    /** Copy Protection
+      *
+	  * Removed: This is not necessary as the original copy protection 
+      * affects the various element function addresses (which are not used here)
+      */
 	// 0x091B
 	//copyProtection();
-	gameMenuDisplaySetup();
+	optionMenuPrepare();
 
 	if( mMemory[ 0x839 ] != 1 ) {
 
@@ -411,7 +413,7 @@ void cCreep::start( int pStartLevel, bool pUnlimited ) {
 }
 
 // 0x7572
-void cCreep::gameMenuDisplaySetup() {
+void cCreep::optionMenuPrepare() {
 	word byte_30;
 
 	byte_30 = 0x400;
@@ -523,20 +525,26 @@ void cCreep::gameMenuDisplaySetup() {
 
 		mMemory[ 0xBA02 + X ] = 2;
 
+        // 
 		X = mMemory[ 0x775F ];
-		word_32 = mMemory[ 0x5CE6 + X ];
-		//
+
+        //
 		A = mMemory[ 0x5D06 + X ] + 4;
+
+        word_32 = mMemory[ 0x5CE6 + X ];
 		word_32 = (A << 8) + (word_32 & 0xFF);
 
-
+        // 
 		X = mMemory[ 0x775E ];
 		X -= 0;
 		
+        // 
 		X += word_32 & 0xFF;
-		
+        
+        // Castle Name destination
 		word_32 = X + (word_32 & 0xFF00);
 		
+        // Loop the castle name, copying it to 'game memory'
 		for( size_t counter = 0; counter < castle->nameGet().length(); ++counter, ++word_32 )
 			mMemory[ word_32 ] = toupper(castle->nameGet()[ counter ]) & 0x3F;
 
@@ -939,6 +947,7 @@ bool cCreep::Intro() {
 	mIntro = true;
 	byte_D10 = 0;
 
+    // The intro screen loop
 	for(;;) {
 		++mMenuScreenTimer;
 		
@@ -1274,34 +1283,34 @@ void cCreep::musicChange() {
 	mSound->playback( true );
 }
 
-// 2233 : Intro Menu
+// 0x2233 : Intro Menu
 void cCreep::optionsMenu() {
 
-	for(;; ) {
+	for( ;; ) {
 		mScreen->spriteDisable();
 
-		//2257
-		// Set the color of all text positions to WHITE
-		word_30 = 0xD800;
-		for(word Y = 0;;Y=0) {
+		// 0x2257: Set the color of all text positions to WHITE
+		for(word_30 = 0xD800; word_30 < 0xDC00; word_30 += 0x100) {
 
-			for( ;Y != 0x100; ++Y ) 
+			for( word Y=0 ;Y != 0x100; ++Y ) 
 				mMemory[ word_30 + Y ] = 1;
-
-			word_30 += 0x100;
-			if( word_30 >= 0xDC00 )
-				break;
 		}
 		
 		// Decode the background as text
 		mScreen->drawStandardText( memory( 0x400 ), 0x1000, memory( 0xD800 ));
 
-		// 226E
+        // 
+        // 0x226E: Options Menu Loop
 		for(;;) {
-					
+		    
+            // Do hardware update/sleep
 			hw_Update();
 			hw_IntSleep(1);
+
+            // Check for input
 			KeyboardJoystickMonitor(0);
+
+            // No joystick button?
 			if( !mJoyButtonState ) {
 				
 				if( byte_5F56 & 0xFB )
@@ -1357,9 +1366,12 @@ void cCreep::optionsMenu() {
 				// 22E5
 				byte X = mFileListingNamePtr;
 
+                // Selected Menu Option
 				byte A = mMemory[ 0xBA02 + X ];
-				if( !A ) {
-					//  22ED
+                switch( A ) {
+
+                case 0: {
+                    //  22ED: Unlimited Lives Toggle
 					mUnlimitedLives ^= 0xFF;
 
 					byte Y = mMemory[ 0xBA01 + X ];
@@ -1375,41 +1387,44 @@ void cCreep::optionsMenu() {
 						}
 						++Y;
 					}
-
-				} else {
-					//  2326
-					if( A == 2 ) {
-						X = mFileListingNamePtr;
-						ChangeLevel(X);
-					} else if( A == 3 ) {
-						gamePositionLoad();
+                    break;
+                        }
+                case 1:{
+                default:
+                   //inputWait();
+				    sub_95F();
+				    return;
+                       }
+                case 2:{
+                    X = mFileListingNamePtr;
+					ChangeLevel(X);
+                    break;
+                       }
+                case 3:{
+                    gamePositionLoad();
 						
-						if( mMemory[ 0x24FD ] != 1 )
-							continue;
-					}
-					
-					if( A == 4 ) {
-						if( mMemory[ 0x2399 ] == 0xFF )
-							continue;
+				    if( mMemory[ 0x24FD ] != 1 )
+						continue;
 
-						sub_95F();
-						gameHighScores();
+                    break;
+                       }
+                case 4:{
+                    if( mMemory[ 0x2399 ] == 0xFF )
+						continue;
 
-						// Draw 'Press Enter to exit'
-						word_3E = 0x239C;
-						obj_stringPrint();
+					sub_95F();
+					gameHighScores();
 
-						mMemory[ 0x278C ] = 0;
-						textShow();
+					// Draw 'Press Enter to exit'
+					word_3E = 0x239C;
+					obj_stringPrint();
+
+					mMemory[ 0x278C ] = 0;
+					textShow();
 						
-						break;
-					} else {
-						//inputWait();
-						sub_95F();
-						return;
-					}
-
-				}	// Menu Item Pressed
+					break;
+                       }
+                }
 
 			}// Button Pressed
 			
@@ -1646,7 +1661,7 @@ void cCreep::obj_Actions( ) {
 					--mRoomSprites[spriteNumber].Sprite_field_5;
 
 					if( mRoomSprites[spriteNumber].Sprite_field_5 != 0 ) {
-						if((A & SPR_FLAG_COLLIDES)) {
+						if(A & SPR_FLAG_COLLIDES) {
 							obj_CheckCollisions(spriteNumber);
 							A = mRoomSprites[spriteNumber].state;
 							if((A & SPR_ACTION_FLASH))
@@ -1655,10 +1670,11 @@ void cCreep::obj_Actions( ) {
 						
 						continue;
 					} else {
-					// 2EAD
+					    // 2EAD
 						if(A & SPR_ACTION_DIEING) 
 							goto s2EF3;
-						if((A & SPR_FLAG_OVERLAPS)) {
+
+						if(A & SPR_FLAG_OVERLAPS) {
 							obj_OverlapCheck( spriteNumber );
 							if( mRoomSprites[spriteNumber].state & SPR_ACTION_FLASH)
 								goto s2EF3;
@@ -1693,7 +1709,7 @@ s2ED5:
 
 			cSprite *sprite = mScreen->spriteGet( spriteNumber );
 
-			if( (mRoomSprites[spriteNumber].state & SPR_ACTION_FREE) ) {
+			if( mRoomSprites[spriteNumber].state & SPR_ACTION_FREE ) {
 				mRoomSprites[spriteNumber].state = SPR_FLAG_FREE;
 				goto s2F51;
 			} else {
@@ -1710,7 +1726,7 @@ s2ED5:
 				if((word_30 >= 0x100) && ((word_30 - 8) < 0x100))
 					--w30;
 
-				if( (w30 & 0x80) ) {
+				if( w30 & 0x80 ) {
 s2F51:;
 					// 2f51
 					A = (mMemory[ 0x2F82 + spriteNumber ] ^ 0xFF);
@@ -3378,7 +3394,7 @@ s10EB:;
 		if( mRunStopPressed == 1 ) {
 
 			// Save the game
-			gameDataSave( false );
+			gamePositionSave( false );
 
 			return true;
 		}
@@ -3998,6 +4014,7 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 	// 5A77
 	for(;;) {
 		
+        // Bitmap: Overlay
 		if( pDecodeMode != 0 && mCount != 0 ) {
 			
 			if( drawingFirst != 1 ) {
@@ -4021,9 +4038,7 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 					if( gfxCurPos < 0x28 ) {
 						
 						byte A = mMemory[ word_30 + Y ];
-						A ^= 0xFF;
-						A &= mMemory[ word_36 + Y];
-						mMemory[ word_36 + Y] = A;
+						mMemory[ word_36 + Y] &= (A ^ 0xFF );
 					} 
 					// 5AC7
 					if( gfxCurPos == mTxtDestXRight )
@@ -4058,10 +4073,8 @@ s5AED:;
 
 				for( byte Y = 0; ; ++Y ) {
 					// 5B2E
-					if( gfxCurPos < 0x28 ) {
-						byte A = mMemory[ word_32 + Y ];
-						*memory( byte_36 + Y ) |= A;
-					}
+					if( gfxCurPos < 0x28 )
+						*memory( byte_36 + Y ) |= mMemory[ word_32 + Y ];
 
 					if( gfxCurPos == gfxPosRightX )
 						break;
@@ -4093,6 +4106,9 @@ noCarry2:;
 	if(pDecodeMode == 1)
 		return;
 
+    //
+    // Color 1
+    //
 	if( pGfxPosY & 0x7)
 		mMemory[0x5CE5] = 1;
 	else
@@ -4145,6 +4161,7 @@ noCarry2:;
 	}
 	
 	// 5C24
+    // Color 2
 	word_32 += mGfxWidth;
 	if( pGfxPosY & 0x7 )
 		mMemory[ 0x5CE5 ] = 1;
@@ -5175,7 +5192,7 @@ void cCreep::gamePositionLoad() {
 }
 
 // 24FF: Save a game, or a castle
-void cCreep::gameDataSave( bool pCastleSave ) {
+void cCreep::gamePositionSave( bool pCastleSave ) {
 	
 	gameFilenameGet( false, pCastleSave );
 	if(!mStrLength)

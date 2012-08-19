@@ -1,2 +1,2 @@
-const char *SVNREV = "403";
-const char *SVNDATE = "2012/02/12 15:19:30";
+const char *SVNREV = "404";
+const char *SVNDATE = "2012/08/13 19:04:06";
