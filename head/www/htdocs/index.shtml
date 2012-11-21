@@ -44,6 +44,19 @@
     </table>
 	<p>&nbsp;</p>
     <hr />
+	
+	<p class="NewsDates"><strong>Wednesday, 21 August, 2012  17:47</strong></p>
+    <hr />
+	<p>The last graphic glitches have just been fixed in the latest SVN, no release has been done yet (I also made it compile under Ubuntu again today)<br/>
+	I intend to release for all platforms at the same time, so stay tuned...</p>
+	<p>Just to clarify, I am not Ed Hobbs, But if you know how to find him.. I'd love to hear what he has to say!!<br/>
+	<br/>
+	<a href="https://www.facebook.com/robbie.crossfield">Robert Crossfield</a> (aka. segra)<br/>
+	
+    </p>
+    <p>&nbsp;</p>
+    <hr />
+	
     <p class="NewsDates"><strong>Sunday, 12 August, 2012  19:41</strong></p>
     <hr />
 	<p>SVN-404 Windows Package is available</p>
