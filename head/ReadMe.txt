@@ -31,7 +31,6 @@ Whats Missing:
 Whats Broken:
 -------------
  *sound is not perfect
- *graphic glitch caused by floor-switch toggling
  
 
 
