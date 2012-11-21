@@ -812,6 +812,7 @@ void cCreep::graphicRoomColorsSet( byte pRoomColor ) {
 	*memory( 0x6EC8 ) = pRoomColor;
 	*memory( 0x6EDB ) = pRoomColor;
 	*memory( 0x6EDC ) = pRoomColor;
+    *memory( 0x6EDD ) = pRoomColor;
 	*memory( 0x6EED ) = pRoomColor;
 	*memory( 0x6EEE ) = pRoomColor;
 	*memory( 0x6EEF ) = pRoomColor;
@@ -834,7 +835,12 @@ void cCreep::graphicRoomColorsSet( byte pRoomColor ) {
 	pRoomColor &= 0x0F;
 	pRoomColor |= 0x10;
 	*memory( 0x6584 ) = pRoomColor;
-	*memory( 0x659B ) = *memory( 0x65CD ) = (*memory( 0x649B ) & 0xF0) | 0x01;
+
+    byte A = (*memory( 0x649B ) & 0xF0);
+    A |= 0x01;
+
+	*memory( 0x659B ) = A;
+    *memory( 0x65CD ) = A;
 }
 
 // 15E0
@@ -5468,7 +5474,7 @@ void cCreep::obj_Door_InFront( byte pSpriteNumber, byte pY ) {
 void cCreep::obj_Teleport_Prepare() {
 
 	mTxtX_0 = mMemory[ word_3E ];
-	mTxtY_0 = mMemory[ word_3E + 1 ];
+	mTxtY_0 = mMemory[ word_3E + 1 ] + 0x18;
 
 	byte byte_50D0 = 3;
 	for(;;) {
@@ -5507,6 +5513,7 @@ void cCreep::obj_Teleport_Prepare() {
 	
 	byte_50D0 = 0x20;
 
+    // Draw the Teleport Sources
 	while( mMemory[ word_3E + 3 ] ) {
 		byte A = byte_50D0;
 		mMemory[ 0x6E95 ] = mMemory[ 0x6E96 ] = mMemory[ 0x6E97 ] = mMemory[ 0x6E98 ] = A;
