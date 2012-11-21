@@ -1,34 +1,36 @@
 pathInc = -I/usr/include/directfb/direct -I/usr/include/directfb -I./src
-Libs = `sdl-config --cflags --libs` -L/usr/local/lib -lresid
+Libs = `sdl-config --cflags` -L/usr/local/lib
+DLibs = `sdl-config --libs` -L/usr/local/lib
+ 
 CC = g++ -c -Wall $(pathInc) $(Libs)
-LD = g++ -o creep -Wall $(Libs)
+LD = g++ obj/*.o $(DLibs)
 
 all : vic sid graphics castle main creep
 
 vic:
 
-        $(CC) src/vic-ii/bitmapMulticolor.cpp src/vic-ii/screen.cpp src/vic-ii/sprite.cpp
+	$(CC) src/vic-ii/bitmapMulticolor.cpp src/vic-ii/screen.cpp src/vic-ii/sprite.cpp
 
 sid:
-        $(CC) src/sound/sound.cpp src/resid-0.16/*.cc
+	$(CC) src/sound/sound.cpp src/resid-0.16/*.cpp
 
 creep : main
-        mv *.o obj/
-        $(LD) -o run/creep obj/*.o
+	mv *.o obj/
+	$(LD) -o run/creep
 
 
 graphics :
-        $(CC) src/graphics/screenSurface.cpp src/graphics/window.cpp
-        $(CC) src/graphics/scale/scale2x.c src/graphics/scale/scale3x.c src/graphics/scale/scalebit.c
+	$(CC) src/graphics/screenSurface.cpp src/graphics/window.cpp
+	$(CC) src/graphics/scale/scale2x.cpp src/graphics/scale/scale3x.cpp src/graphics/scale/scalebit.cpp
 
 castle :
-        $(CC) src/castle/castle.cpp src/castle/image.cpp src/castle/room.cpp src/castle/object/*.cpp
+	$(CC) src/castle/castle.cpp  src/castle/room.cpp src/castle/objects/*.cpp 
 
 main :
-        $(CC) src/castleManager.cpp src/stdafx.cpp src/creep.cpp src/d64.cpp src/playerInput.cpp
+	$(CC) src/castleManager.cpp src/stdafx.cpp src/creep.cpp src/d64.cpp src/debug.cpp src/builder.cpp src/playerInput.cpp
 
 
 clean :
-        rm obj/*.o
+	rm obj/*.o
 
 
