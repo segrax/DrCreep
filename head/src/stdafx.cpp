@@ -107,9 +107,12 @@ void wiiStart() {
 }
 #endif
 
-
+#ifdef _MACOSX
+int SDL_main( int argc, char *argv[]) {
+#else
 int	main( int argc, char *argv[] ) {
-	
+#endif
+    
 #ifdef WIN32
 	SetConsoleTitle( L"The Castles of Dr.Creep" );
 	SetConsoleCtrlHandler( (PHANDLER_ROUTINE) CtrlHandler, TRUE );
@@ -136,6 +139,10 @@ string local_PathGenerate( string pFile, string pPath, bool pDataSave ) {
 
 #ifdef _WII
 		filePathFinal << wiiBasePath;
+#endif
+
+#ifdef _MACOSX
+    filePathFinal << "/Applications/DrCreep/";
 #endif
 
 #ifdef FREEBSD
@@ -352,7 +359,9 @@ int ftime(timeb *nul) {
 #else
 	
 #ifndef FREEBSD
+#ifndef _MACOSX
 #include <direct.h>
+#endif
 #endif
 
 #include <dirent.h>
@@ -381,11 +390,14 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 
 	char path[2000];
 	#ifndef FREEBSD
-	getcwd(path, 2000);
-	#else
+        #ifdef _MACOSX
+            strcpy(&path[0],"/Applications/DrCreep");
+        #else
+            getcwd(path, 2000);
+        #endif
+    #else
 	strcpy(&path[0],"/usr/local/share/drcreep");
 	#endif
-	
 
 	// Build the file path
 	stringstream finalPath;
