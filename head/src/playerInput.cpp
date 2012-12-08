@@ -337,7 +337,11 @@ void cPlayerInput::KeyboardInputSet1( sPlayerInput *pInput ) {
         pressed = true;
 
 	switch( mEvent.key.keysym.sym ) {
+#ifndef _MACOSX
 		case SDLK_RCTRL:
+#else
+        case SDLK_SPACE:
+#endif
                 pInput->mButton = pressed;
 
 			break;
