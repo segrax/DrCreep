@@ -278,7 +278,6 @@ rev.cmd
   <ItemGroup>
     <None Include="..\..\icon1.ico" />
     <None Include="..\..\License.txt" />
-    <None Include="ClassDiagram1.cd" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
