@@ -111,6 +111,7 @@ Game Controls:
    ---------
 
      Right Ctrl = Button 
+     Spacebar   = Button  (MACOSX Version)
      Arrows = Left/Right/Up/Down   (NOT the numpad)
 
 
