@@ -10,6 +10,12 @@ About:
   own castles and build onto an existing castle.
 
 
+Enjoy,
+  
+Robert Crossfield
+
+
+
 Required To Play:
 ----------------- 
  Commodore 64 Disk Image (D64) of "The Castles of Dr. Creep", 
