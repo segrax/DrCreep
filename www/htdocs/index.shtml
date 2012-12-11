@@ -53,6 +53,15 @@
     </table>
 	<br />
 	<div class="fb-like" data-send="true" data-width="450" data-show-faces="true"></div>
+	
+	<p>&nbsp;</p>
+	<hr />
+	
+	<p class="NewsDates"><strong>Tuesday, 11th December, 2012  21:16</strong></p>
+    <hr />
+	<p>Version 1.0 has been released, for Windows and is available on the <a href="https://sourceforge.net/projects/creep/files/">Downloads</a> page.</p>
+	<p>Last known graphic bugs have been fixed!</p>
+	<p>Stay tuned for Wii, Mac versions (I have to submit a patch to FreeBSD to get it updated, and it takes time)</p>
 	<p>&nbsp;</p>
 	<hr />
 	
