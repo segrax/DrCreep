@@ -1,5 +1,6 @@
 The Castles of Dr. Creep
 ------------------------
+Version 1.0
 
 
 About:
@@ -13,6 +14,34 @@ About:
 Enjoy,
   
 Robert Crossfield
+
+
+
+History:
+--------
+ I felt this was an important piece of the games' history, I hope you don't mind me sharing this Ed!
+
+
+Ed Hobbs:
+"
+ As a programmer, I appreciate the difficulty of reverse-engineering the 6502 object code to C++.  
+ When I wrote the game, the C-64 assembler was very primitive (it couldn’t handle programs larger than 16 kb), 
+ so I had to write and assemble the source code on an Apple II, and then transfer the binary to the C-64 through cables
+ connected to the joystick ports of the respective computers (my first experience with a “computer network”).
+ So even though the game could not be executed on the Apple II, this computer still played a vital part in Dr. Creep’s
+ creation.
+ 
+ One of the biggest problems was that the source code had to fit onto a single 144 kb floppy disk in order to work 
+ with the Apple 6502 assembler.  The only way to do this was by eliminating all comments in the source code—there 
+ just wasn't any room for them.  I maintained a notebook comprising hundreds of pages of flowcharts and data-layout
+ diagrams.  The nodes of the flowcharts were labeled to match the nametags in the source code.  In this way, I was
+ able to visually grasp what was going on in the code, and still fit it into the requisite space.
+
+ Furthermore, there was no such thing as a C-64 debugger, which added an additional twist to the programming.
+ 
+ I also didn’t have a level editor.  
+ I drew the levels out on custom graph paper, and then used these drawings to hand-code the level data.
+"
 
 
 

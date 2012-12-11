@@ -25,7 +25,7 @@
 class Potentiometer
 {
 public:
-  reg8 readPOT();
+  unsigned int readPOT();
 };
 
 #endif

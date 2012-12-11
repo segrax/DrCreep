@@ -27,7 +27,8 @@
 #include "creep.h"
 #include "castle/objects/object.hpp"
 #include "builder.hpp"
-#include "../rev.h"
+
+const char   *VERSION = "v1.0";
 
 const char	 *gDataPath = "data/";
 const char	 *gSavePath = "data/save/";

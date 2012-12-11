@@ -51,8 +51,7 @@ using namespace std;
 
 class cCreep;
 
-extern const char *SVNREV;
-extern const char *SVNDATE;
+extern const char *VERSION;
 extern cCreep	  *gCreep;
 
 #ifndef _WIN32

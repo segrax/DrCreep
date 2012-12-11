@@ -187,9 +187,6 @@
     <ClInclude Include="resource.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\rev.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\stdafx.h">
       <Filter>Source Files</Filter>
     </ClInclude>

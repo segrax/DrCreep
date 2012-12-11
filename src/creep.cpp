@@ -230,7 +230,7 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 #ifndef _WII
 
 	// Output console message
-	cout << "The Castles of Dr. Creep (SVN:" << SVNREV << " " << SVNDATE << ")" << endl << endl;
+	cout << "The Castles of Dr. Creep (" << VERSION << ")" << endl << endl;
 	cout << "http://creep.sourceforge.net/" << endl << endl ;
 
 	// Check command line parameters

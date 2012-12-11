@@ -286,8 +286,8 @@ void cScreen::windowTitleUpdate() {
 		windowTitle << "'";
 	}
 
-	windowTitle << " (SVN: " << SVNREV;
-	windowTitle << "-" << SVNDATE << ")";
+	windowTitle << " (" << VERSION;
+	windowTitle << " - " << __DATE__ << ")";
 
 	mWindow->titleSet( windowTitle.str() );
 }
