@@ -324,7 +324,6 @@ void cCreep::start( int pStartLevel, bool pUnlimited ) {
 
 	byte_30 = 0x40;
 	byte_31 = 0xD7;
-	count = 0xC8;
 	
 	if(pUnlimited)
 		mUnlimitedLives = 0xFF;
@@ -332,7 +331,7 @@ void cCreep::start( int pStartLevel, bool pUnlimited ) {
 	if(!mSound)
 		mSound = new cSound( this );
 
-	for(;;) {
+	for( count = 0xC8; ;) {
 		
 		mMemory[0xBC00 + count] = byte_30;
 		mMemory[0xBB00 + count] = byte_31;
@@ -360,8 +359,7 @@ void cCreep::start( int pStartLevel, bool pUnlimited ) {
 	// 0x08F9
 	byte_30 = byte_31 = 0;
 
-	count = 0;
-	while( count < 0x20 ) {
+	for( count = 0; count < 0x20; ++count ) {
 		mMemory[ 0x5CE6 + count ] = byte_30;
 		mMemory[ 0x5D06 + count ] = byte_31;
 
@@ -369,13 +367,12 @@ void cCreep::start( int pStartLevel, bool pUnlimited ) {
 			++byte_31;
 
 		byte_30 += 0x28;
-		++count;
 	}
 
     /** Copy Protection
       *
 	  * Removed: This is not necessary as the original copy protection 
-      * affects the various element function addresses (which are not used here)
+      * affects the various element function addresses (which are not used/needed here, and wouldnt work even if i tried)
       */
 	// 0x091B
 	//copyProtection();
@@ -5476,14 +5473,10 @@ void cCreep::obj_Teleport_Prepare() {
 	mTxtX_0 = mMemory[ word_3E ];
 	mTxtY_0 = mMemory[ word_3E + 1 ] + 0x18;
 
-	byte byte_50D0 = 3;
-	for(;;) {
+	for(byte byte_50D0 = 3; byte_50D0 > 0; --byte_50D0) {
 		screenDraw( 1, 0, 0, 0, 0x1C );
 		
 		mTxtX_0 += 0x04;
-		--byte_50D0;
-		if( byte_50D0 == 0 )
-			break;
 	}
 
 	byte gfxPosX = mMemory[ word_3E ];
@@ -5511,11 +5504,10 @@ void cCreep::obj_Teleport_Prepare() {
 
 	obj_Teleport_unk( (mMemory[ word_3E + 2 ] + 2), X );
 	
-	byte_50D0 = 0x20;
+	byte A = 0x20;
 
     // Draw the Teleport Sources
 	while( mMemory[ word_3E + 3 ] ) {
-		byte A = byte_50D0;
 		mMemory[ 0x6E95 ] = mMemory[ 0x6E96 ] = mMemory[ 0x6E97 ] = mMemory[ 0x6E98 ] = A;
 		gfxPosX = mMemory[ word_3E + 3 ];
 		gfxPosY = mMemory[ word_3E + 4 ];
@@ -5524,7 +5516,7 @@ void cCreep::obj_Teleport_Prepare() {
 		
 		word_3E += 2;
 
-		byte_50D0 += 0x10;
+		A += 0x10;
 	}
 
 	word_3E += 0x04;
