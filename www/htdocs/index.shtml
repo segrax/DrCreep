@@ -56,7 +56,14 @@
 	
 	<p>&nbsp;</p>
 	<hr />
-	
+	<p class="NewsDates"><strong>Thursday, 13th December, 2012  19:19</strong></p>
+    <hr />
+	<p>Version 1.0 has been released for the Nintendo Wii and is available on the <a href="https://sourceforge.net/projects/creep/files/">Downloads</a> page.</p>
+	<p>MacOSx is probably tomorrow</p>
+	<p>&nbsp;</p>
+
+	<p>&nbsp;</p>
+	<hr />
 	<p class="NewsDates"><strong>Tuesday, 11th December, 2012  21:16</strong></p>
     <hr />
 	<p>Version 1.0 has been released, for Windows and is available on the <a href="https://sourceforge.net/projects/creep/files/">Downloads</a> page.</p>
@@ -65,8 +72,8 @@
 	<br/>
 	<p>Source has also moved to Github, <a href="https://github.com/segrax/DrCreep">Here</a></p>
 	<p>&nbsp;</p>
-	<hr />
 	
+	<hr />
 	<p class="NewsDates"><strong>Saturday, 1st December, 2012  23:15</strong></p>
     <hr />
 	<p>The latest svn will now compile on MacOS X, and the project files for XCode have been added!<br/>
@@ -75,7 +82,6 @@
     </p>
 
     <hr />
-	
 	<p class="NewsDates"><strong>Wednesday, 21 November, 2012  17:47</strong></p>
     <hr />
 	<p>The last graphic glitches have just been fixed in the latest SVN, no release has been done yet (I also made it compile under Ubuntu again today)<br/>
