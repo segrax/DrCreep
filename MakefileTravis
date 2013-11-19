@@ -23,7 +23,7 @@ USE_SDL=	sdl
 WRKSRC=		${WRKDIR}/head
 
 do-build:
-		cd ${WRKSRC} &&	${CXX} -DFREEBSD -o ${PORTNAME} ${CXXFLAGS} \
+		${CXX} -DFREEBSD -o ${PORTNAME} ${CXXFLAGS} \
 				`${SDL_CONFIG} --cflags --libs` -I./src src/*.cpp src/graphics/*.cpp src/graphics/scale/*.cpp src/castle/*.cpp src/castle/objects/*.cpp src/vic-ii/*.cpp src/resid-0.16/*.cpp src/sound/*.cpp -lcompat
 
 do-install:
