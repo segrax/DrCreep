@@ -42,4 +42,3 @@ do-install:
 	@echo ''
 	@echo ''
 
-.include <bsd.port.mk>
