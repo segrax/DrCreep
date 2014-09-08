@@ -17,13 +17,9 @@ Enjoy,
 Robert Crossfield
 
 
-
 History:
 --------
- I felt this was an important piece of the games' history, I hope you don't mind me sharing this Ed!
-
-
-Ed Hobbs:
+ 
 "
  As a programmer, I appreciate the difficulty of reverse-engineering the 6502 object code to C++.  
  When I wrote the game, the C-64 assembler was very primitive (it couldn’t handle programs larger than 16 kb), 
@@ -42,8 +38,7 @@ Ed Hobbs:
  
  I also didn’t have a level editor.  
  I drew the levels out on custom graph paper, and then used these drawings to hand-code the level data.
-"
-
+" - Ed Hobbs 2012
 
 
 Required To Play:
@@ -59,11 +54,6 @@ Whats Added:
  *Castle Builder: Editing of existing castles, or creation of new ones
 
 
-Whats Missing:
---------------
-  Nothing!
-
-
 Whats Broken:
 -------------
  *sound is not perfect
@@ -74,7 +64,6 @@ Save Game Support:
 ------------------
  D64s will be created in the data\save folder, and all save games will be stored in these files.
  These files are compatible with the original Commodore64 game, and in return the original save games are supported.
-
 
 
 Wii Version:
@@ -150,8 +139,6 @@ Game Controls:
  
      Numpad 0 = Button
      Numpad Arrows = Left/Right/Up/Down
-
-
 
 
 
@@ -239,9 +226,6 @@ Command Line Parameters:
  -u    : Unlimited Lives
  -c    : Display Console
  -l xx : Start Castle number 'xx'
-
-
-
 
 
 
