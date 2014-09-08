@@ -6,8 +6,8 @@ The Castles of Dr. Creep
 About:
 ------
  The Castles of Dr. Creep is an open source reimplementation of the 
-  original 1984 Commodore 64 game by Ed Hobbs.
- Now with a built in castle Builder, allowing the player to create their
+  original 1984 Commodore 64 game by Ed Hobbs. Allowing the game to be played like the original, but on many newer platforms.
+ Including a built in castle Builder, allowing the player to create their
   own castles and build onto an existing castle.
 
 
