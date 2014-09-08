@@ -1,7 +1,7 @@
 ;	The Castles of Dr. Creep
 ; 	-------------------------------
 ; 
-;	Copyright (C) 2009-2010 Robert Crossfield
+;	Copyright (C) 2009-2014 Robert Crossfield
 ;  
 ;	
 ;

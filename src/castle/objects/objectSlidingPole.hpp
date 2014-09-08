@@ -3,7 +3,7 @@ class cRoom;
  *  The Castles of Dr. Creep 
  *  ------------------------
  *
- *  Copyright (C) 2009-2013 Robert Crossfield
+ *  Copyright (C) 2009-2014 Robert Crossfield
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

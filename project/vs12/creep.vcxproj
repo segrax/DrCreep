@@ -73,12 +73,12 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Librarys\SDL-1.2.15\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Librarys\SDL-1.2.15\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Systems\Librarys\SDL-1.2.15\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Systems\Librarys\SDL-1.2.15\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Librarys\SDL-1.2.15\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Librarys\SDL-1.2.15\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Systems\Librarys\SDL-1.2.15\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Systems\Librarys\SDL-1.2.15\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
@@ -193,19 +193,22 @@ rev.cmd
     <ClCompile Include="..\..\src\resid-0.16\envelope.cpp">
       <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">FastCall</CallingConvention>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">FastCall</CallingConvention>
     </ClCompile>
     <ClCompile Include="..\..\src\resid-0.16\extfilt.cpp">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
       <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">FastCall</CallingConvention>
+      <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">FastCall</CallingConvention>
     </ClCompile>
     <ClCompile Include="..\..\src\resid-0.16\filter.cpp">
       <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">FastCall</CallingConvention>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">FastCall</CallingConvention>
     </ClCompile>
     <ClCompile Include="..\..\src\resid-0.16\pot.cpp">
       <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">FastCall</CallingConvention>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
-      <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">StdCall</CallingConvention>
+      <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">FastCall</CallingConvention>
     </ClCompile>
     <ClCompile Include="..\..\src\resid-0.16\sid.cpp">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>

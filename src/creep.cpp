@@ -2,7 +2,7 @@
  *  The Castles of Dr. Creep 
  *  ------------------------
  *
- *  Copyright (C) 2009-2013 Robert Crossfield
+ *  Copyright (C) 2009-2014 Robert Crossfield
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -152,7 +152,6 @@ cCreep::~cCreep() {
 	delete mInput;
 	delete mDebug;
 	delete mBuilder;
-    delete mGameData;
 }
 
 void cCreep::builderStart( int pStartLevel ) {
