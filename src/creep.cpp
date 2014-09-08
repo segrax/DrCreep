@@ -1634,11 +1634,11 @@ void cCreep::obj_CollisionSet() {
 
 			A &= 0xF9;
 			if( gfxSpriteCollision & 0x01 )
-				A |= 2;
+				A |= SPR_FLAG_COLLIDES;
 			gfxSpriteCollision >>= 1;
 			
 			if( gfxBackgroundCollision & 0x01 )
-				A |= 4;
+				A |= SPR_FLAG_OVERLAPS;
 			gfxBackgroundCollision >>= 1;
 
 			mRoomSprites[spriteNumber].state = A;
@@ -1750,7 +1750,7 @@ s2F51:;
 						sprite->_rEnabled = false;
 					} else {
 						// 2F5B
-						sprite->mY = ((char) mRoomSprites[spriteNumber].mY) + 0x32;
+						sprite->mY = ((byte) mRoomSprites[spriteNumber].mY) + 0x32;
 						mMemory[ 0x18 + spriteNumber ] = mRoomSprites[spriteNumber].mY+ 0x32;
 						A = mMemory[ 0x21 ] | mMemory[ 0x2F82 + spriteNumber ];
 
@@ -3960,8 +3960,8 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 			}
 		}
 
-		if(!A)
-			A = pGfxPosY;
+		//if(!A)
+		//	A = pGfxPosY;
 		
 		// 5A2E
 		gfxPosTopY = A;
@@ -6748,7 +6748,7 @@ void cCreep::obj_Forcefield_Create() {
 	sprite->Sprite_field_1F = byte_474F;
 	sprite->Sprite_field_1E = 0;
 	sprite->Sprite_field_6 = 4;
-	sprite->mHeight = 2;
+	sprite->mWidth = 2;
 	sprite->mHeight = 0x19;
 }
 
