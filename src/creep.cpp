@@ -2892,27 +2892,15 @@ void cCreep::anim_Execute() {
 		if( A & ITM_PICKED ) {
 			roomAnim_Disable( X );
 
-			// Decrease image count
+			// Decrease object count
 			--mObjectCount;
-			A = mObjectCount << 3;
 
-			// Last image?
-			if( X == A )
+			// Last object? then nothing to do
+			if( X == mObjectCount )
 				break;
 
-			byte Y = A;
-			byte byte_3FD3 = 8;
-
-			// Copy the last image entry, into the keys position
-			for(;;) {
-				mRoomAnim[X].mFuncID = mRoomAnim[Y].mFuncID;
-				mRoomObjects[X].objNumber = mRoomObjects[Y].objNumber;
-				++X;
-				++Y;
-				--byte_3FD3;
-				if( !byte_3FD3 )
-					break;
-			}
+			mRoomAnim[X] = mRoomAnim[mObjectCount];
+			mRoomObjects[X] = mRoomObjects[mObjectCount];
 		}
 
 		// 3FC7
