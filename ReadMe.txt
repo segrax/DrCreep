@@ -2,9 +2,7 @@ The Castles of Dr. Creep
 ------------------------
 Version 1.0
 
-### Status
 [![Build Status](https://travis-ci.org/segrax/DrCreep.svg?branch=master)](https://travis-ci.org/segrax/DrCreep)
-
 
 About:
 ------
