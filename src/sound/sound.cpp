@@ -70,6 +70,7 @@ cSound::cSound( cCreep *pCreep ) {
 
 cSound::~cSound() {
 
+	SDL_CloseAudio();
 	delete mAudioSpec;
 }
 
