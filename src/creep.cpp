@@ -1606,11 +1606,12 @@ void cCreep::obj_CollisionSet() {
 	for( colIT = collisions->begin(); colIT != collisions->end(); ++colIT ) {
 		sScreenPiece *piece = *colIT;
 
-		if( piece->mSprite2 == 0 ) {
+		if( piece->mPriority == ePriority_Background || piece->mSprite2 == 0 ) {
 			// Background collision
 			gfxBackgroundCollision |= (1 << (piece->mSprite-1) );
 
-		} else {
+		} 
+		if( piece->mSprite2 ) {
 			// Sprite collision
 			gfxSpriteCollision |= (1 << (piece->mSprite-1) );
 			gfxSpriteCollision |= (1 << (piece->mSprite2-1) );
