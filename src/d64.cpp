@@ -2,9 +2,9 @@
  *  The Castles of Dr. Creep 
  *  ------------------------
  *
- *  Copyright (C) 1997-2012 Robert Crossfield
+ *  Copyright (C) 1997-2014 Robert Crossfield
  *
-  *   Parts of this code came from my original 'D64-Pro' (ported from VB though)
+ *   Parts of this code came from my 'D64-Pro' (ported from VB though)
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

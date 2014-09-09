@@ -2,8 +2,10 @@
  *  The Castles of Dr. Creep 
  *  ------------------------
  *
- *  Copyright (C) 2009-2014 Robert Crossfield
+ *  Copyright (C) 1997-2014 Robert Crossfield
  *
+ *   Parts of this code came from my 'D64-Pro' (ported from VB though)
+ *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 3 of the License, or
@@ -19,10 +21,9 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  *  ------------------------------------------
- *  D64 Handler
+ *  Commodore 64 Disk Image Handling
  *  ------------------------------------------
  */
-
 enum eD64FileType {
 	eD64FileType_DEL = 0,
 	eD64FileType_SEQ = 1,
