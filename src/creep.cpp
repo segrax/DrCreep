@@ -1751,7 +1751,7 @@ s2F51:;
 						sprite->_rEnabled = false;
 					} else {
 						// 2F5B
-						sprite->mY = ((byte) mRoomSprites[spriteNumber].mY) + 0x32;
+						sprite->mY = mRoomSprites[spriteNumber].mY + 0x32;
 						mMemory[ 0x18 + spriteNumber ] = mRoomSprites[spriteNumber].mY+ 0x32;
 						A = mMemory[ 0x21 ] | mMemory[ 0x2F82 + spriteNumber ];
 
@@ -4550,11 +4550,11 @@ void cCreep::gameEscapeCastle() {
 		cSprite *sprite = mScreen->spriteGet( Y );
 
 		// 1A4B
-		mMemory[ 0x10 + Y ] = ((mRoomSprites[X].mX- 0x10) << 1) + 0x18;
-		sprite->mX = ((mRoomSprites[X].mX- 0x10) << 1) + 0x18;
+		mMemory[ 0x10 + Y ] = ((mRoomSprites[X].mX - 0x10) << 1) + 0x18;
+		sprite->mX = ((mRoomSprites[X].mX - 0x10) << 1) + 0x18;
 		
 		// 1A72
-		sprite->mY = mRoomSprites[X].mY+ 0x32;
+		sprite->mY = mRoomSprites[X].mY + 0x32;
 
 		hw_SpritePrepare( X );
 		sprite->_rEnabled = true;

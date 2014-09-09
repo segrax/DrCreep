@@ -207,8 +207,8 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 
 	// Loop height
 	for( word y = 0; y < height; ++y, ++pDestY ) {
-		dest = mSurface->screenPieceGet( pDestX, (byte) pDestY);
-		destBuffer = mSurface->screenBufferGet( pDestX, (byte) pDestY );
+		dest = mSurface->screenPieceGet( pDestX, pDestY);
+		destBuffer = mSurface->screenBufferGet( pDestX, pDestY );
 
 		// Loop width
 		for( word x = 0; x < width; ++x ) {
