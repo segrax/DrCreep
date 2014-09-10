@@ -2569,14 +2569,13 @@ s3B6E:
 			mMemory[ 0x3F0C + Y ] = 0xFF;
 		}
 
-		byte_3F0A = 1;
-
 		// 3C15
-		for(;;) {
-			byte Y = byte_3F0A;
-			if( mMemory[ 0x780D + Y ] == 0 ) {
+		for(byte_3F0A = 1; byte_3F0A>=0; --byte_3F0A) {
+
+			byte Y;
+			if( mMemory[ 0x780D + byte_3F0A ] == 0 ) {
 				
-				Y = mMemory[ 0x34D1 + Y ];
+				Y = mMemory[ 0x34D1 + byte_3F0A ];
 				A = mRoomSprites[Y].mX;
 				A -= mRoomSprites[pSpriteNumber].mX;
 				//3C2A
@@ -2590,8 +2589,7 @@ s3B6E:
 				if( A < mMemory[ 0x3F0C +  Y ] )
 					mMemory[ 0x3F0C + Y ] = A;
 
-				Y = byte_3F0A;
-				Y = mMemory[ 0x34D1 + Y ];
+				Y = mMemory[ 0x34D1 + byte_3F0A ];
 				A = mRoomSprites[Y].mY;
 				A -= mRoomSprites[pSpriteNumber].mY;
 				if( A < 0 ) {
@@ -2605,9 +2603,6 @@ s3B6E:
 					mMemory[ 0x3F0C + Y ] = A;
 			}
 			// 3C62
-			--byte_3F0A;
-			if( byte_3F0A < 0 )
-				break;
 		}
 
 		// 3C67
@@ -3258,11 +3253,11 @@ bool cCreep::mapDisplay() {
 	Sleep(300);
 	mInput->inputCheck( true );
 
-	mMemory[ 0x11D7 ] = 0;
+	;
 
 	// Draw both players Name/Time/Arrows
 	// FA9
-	for(;;) {
+	for(mMemory[ 0x11D7 ] = 0 ; mMemory[ 0x11D7 ] != 2; ++mMemory[ 0x11D7 ]) {
 
 		byte X = mMemory[ 0x11D7 ];
 
@@ -3305,9 +3300,6 @@ bool cCreep::mapDisplay() {
 		} 
 		
 		// 1087
-		++mMemory[ 0x11D7 ];
-		if( mMemory[ 0x11D7 ] == 2 )
-			break;
 	}
 	
 	// 1094
