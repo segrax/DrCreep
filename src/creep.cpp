@@ -3407,19 +3407,15 @@ s10EB:;
 		hw_Update();
 	}
 	// 11A5
-
-	for(;;) {
+	mJoyButtonState = 1;
+	while( mJoyButtonState == 1 ) {
 		hw_Update();
 
 		KeyboardJoystickMonitor(0);
-		if( mJoyButtonState )
-			continue;
+		if( !mJoyButtonState )
+			break;
 
 		KeyboardJoystickMonitor(1);
-		if( mJoyButtonState )
-			continue;
-		
-		break;
 	}
 
 	sound_PlayEffect( 9 );
@@ -4151,19 +4147,14 @@ noCarry2:;
 	for( ;; ) {
 		
 		if( gfxCurrentPosY < 0x19 ) {
-			gfxCurPos = gfxDestX2;
+			
 			
 			byte Y = 0;
 
-			for(;;) {
+			for(gfxCurPos = gfxDestX2; gfxCurPos != gfxPosRightX; ++gfxCurPos, ++Y) {
+
 				if( gfxCurPos < 0x28 ) 
 					mMemory[ word_30 + Y ] = mMemory[ word_32 + Y ];
-				
-				++Y;
-				if( gfxCurPos == gfxPosRightX )
-					break;
-
-				++gfxCurPos;
 			}
 		}
 		//5C7F
