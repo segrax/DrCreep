@@ -4206,11 +4206,11 @@ void cCreep::mapRoomDraw() {
 			
 			// Draw Room Floor Square
 			// 1260
-			for( byte_13EB = roomWidth; byte_13EB > 0; --byte_13EB) {
+			for( byte_13EB = roomWidth; byte_13EB ; --byte_13EB) {
 				
 				gfxPosX = roomX;
 				
-				for(byte_13EA = roomHeight; byte_13EA > 0; --byte_13EA) {
+				for(byte_13EA = roomHeight; byte_13EA; --byte_13EA) {
 					screenDraw( 0, 0x0A, gfxPosX, gfxPosY, 0 );
 					gfxPosX += 0x04;
 				}
@@ -4224,7 +4224,7 @@ void cCreep::mapRoomDraw() {
 			mTxtY_0 = roomY;
 			
 
-			for( byte_13EA = roomHeight; byte_13EA>0; --byte_13EA) {
+			for( byte_13EA = roomHeight; byte_13EA; --byte_13EA) {
 				screenDraw(1, 0, 0, 0, 0x0B );
 				mTxtX_0 += 0x04;
 			}
@@ -4234,7 +4234,7 @@ void cCreep::mapRoomDraw() {
 			mTxtX_0 = roomX;
 			mTxtY_0 = ((roomWidth << 3) + roomY) - 3;
 
-			for( byte_13EA = roomHeight; byte_13EA>0; --byte_13EA) {
+			for( byte_13EA = roomHeight; byte_13EA; --byte_13EA) {
 				screenDraw(1, 0, 0, 0, 0x0B );
 				mTxtX_0 += 0x04;
 			}
@@ -4244,12 +4244,9 @@ void cCreep::mapRoomDraw() {
 			mTxtX_0 = roomX;
 			mTxtY_0 = roomY;
 
-			for( byte_13EA = roomWidth; byte_13EA>0; --byte_13EA) {
+			for( byte_13EA = roomWidth; byte_13EA; --byte_13EA) {
 				screenDraw(1, 0, 0, 0, 0x0C );
 				mTxtY_0 += 0x08;
-				--byte_13EA;
-				if(!byte_13EA)
-					break;
 			}
 
 			//130D
@@ -4257,7 +4254,7 @@ void cCreep::mapRoomDraw() {
 			mTxtX_0 = ((roomHeight << 2) + roomX) - 4;
 			mTxtY_0 = roomY;
 
-			for( byte_13EA = roomWidth; byte_13EA>0; --byte_13EA) {
+			for( byte_13EA = roomWidth; byte_13EA; --byte_13EA) {
 				screenDraw(1, 0, 0, 0, 0x0D );
 				mTxtY_0 += 0x08;
 			}
