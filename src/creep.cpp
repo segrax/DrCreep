@@ -3559,32 +3559,27 @@ void cCreep::roomMain() {
 		hw_Update();
 
 		// Do pause?
-		if( mRunStopPressed == 1 ) {
+		if( mRunStopPressed == true ) {
 			//150E
-			for(;;) {
+			do {
 				interruptWait( 3 );
 
 				hw_Update();
 				KeyboardJoystickMonitor( 0 );						
-			
-				if( mRunStopPressed == 1 )
-					break;
-			}
+
+			} while( !mRunStopPressed );
 
 		}
 		// 156B
 		if( byte_B83 == 1 ) {
 			byte_B83 = 0;
-			signed char X = 1;
-			for(;;) {
+
+			for(signed char X=1; X>=0 ; --X) {
 				if( mMemory[ 0x780D + X ] == 0 ) {
 					mMemory[ 0x780D + X ] = 2;
 					byte Y = mMemory[ 0x34D1 + X ];
 					mRoomSprites[Y].state |= SPR_ACTION_FLASH;
 				}
-				--X;
-				if(X < 0)
-					break;
 			}
 		}
 		// 1594
