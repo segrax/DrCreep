@@ -4202,63 +4202,48 @@ void cCreep::mapRoomDraw() {
 			roomHeight	= (mMemory[ word_42 + 3 ] >> 3) & 7;	// height
 
 			gfxPosY = roomY;
-
-			byte_13EB = roomWidth;
 			
 			// Draw Room Floor Square
 			// 1260
-			for(;;) {
-				byte_13EA = roomHeight;
+			for(byte_13EB = roomWidth;byte_13EB > 0; --byte_13EB;) {
+				
 				gfxPosX = roomX;
 				
-				for(;;) {
+				for(byte_13EA = roomHeight; byte_13EA > 0; --byte_13EA) {
 					screenDraw( 0, 0x0A, gfxPosX, gfxPosY, 0 );
 					gfxPosX += 0x04;
-					--byte_13EA;
-					if(!byte_13EA)
-						break;
 				}
+
 				gfxPosY += 0x08;
-				--byte_13EB;
-				if(!byte_13EB)
-					break;
 			}
 
 			// 128B
 			// Top edge of room
 			mTxtX_0 = roomX;
 			mTxtY_0 = roomY;
-			byte_13EA = roomHeight;
+			
 
-			for(;;) {
+			for(byte_13EA = roomHeight; byte_13EA>0; --byte_13EA) {
 				screenDraw(1, 0, 0, 0, 0x0B );
 				mTxtX_0 += 0x04;
-				--byte_13EA;
-				if(!byte_13EA)
-					break;
 			}
 
 			// 12B8
 			// Bottom edge of room
 			mTxtX_0 = roomX;
 			mTxtY_0 = ((roomWidth << 3) + roomY) - 3;
-			byte_13EA = roomHeight;
 
-			for(;;) {
+			for(byte_13EA = roomHeight; byte_13EA>0; --byte_13EA) {
 				screenDraw(1, 0, 0, 0, 0x0B );
 				mTxtX_0 += 0x04;
-				--byte_13EA;
-				if(!byte_13EA)
-					break;
 			}
 
 			//12E5
 			// Draw Left Edge
 			mTxtX_0 = roomX;
 			mTxtY_0 = roomY;
-			byte_13EA = roomWidth;
 
-			for(;;) {
+			for(byte_13EA = roomWidth; byte_13EA>0; --byte_13EA) {
 				screenDraw(1, 0, 0, 0, 0x0C );
 				mTxtY_0 += 0x08;
 				--byte_13EA;
@@ -4270,14 +4255,10 @@ void cCreep::mapRoomDraw() {
 			// Draw Right Edge
 			mTxtX_0 = ((roomHeight << 2) + roomX) - 4;
 			mTxtY_0 = roomY;
-			byte_13EA = roomWidth;
 
-			for(;;) {
+			for(byte_13EA = roomWidth; byte_13EA>0; --byte_13EA) {
 				screenDraw(1, 0, 0, 0, 0x0D );
 				mTxtY_0 += 0x08;
-				--byte_13EA;
-				if(!byte_13EA)
-					break;
 			}
 
 			// 133E
