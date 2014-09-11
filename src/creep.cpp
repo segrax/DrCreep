@@ -3541,15 +3541,12 @@ void cCreep::roomMain() {
 
 	byte X = 0;
 
-	for(;;) {
+	for(byte X = 0; X < 2; ++X ) {
 		
 		if( mPlayerStatus[X] == 1 ) {
 			byte_3638 = X;
 			obj_Player_Add();
 		}
-		++X;
-		if(X >= 2)
-			break;
 	}
 
 	//14EA
