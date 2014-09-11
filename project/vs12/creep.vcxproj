@@ -77,8 +77,8 @@
     <LibraryPath>D:\Systems\Librarys\SDL-1.2.15\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>D:\Systems\Librarys\SDL-1.2.15\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Systems\Librarys\SDL-1.2.15\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Librarys\SDL-1.2.15\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Librarys\SDL-1.2.15\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>

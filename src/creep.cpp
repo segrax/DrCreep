@@ -3407,16 +3407,17 @@ s10EB:;
 		hw_Update();
 	}
 	// 11A5
-	mJoyButtonState = 1;
-	while( mJoyButtonState == 1 ) {
+	do {
 		hw_Update();
 
 		KeyboardJoystickMonitor(0);
-		if( !mJoyButtonState )
-			break;
+		if( mJoyButtonState )
+			continue;
 
 		KeyboardJoystickMonitor(1);
-	}
+
+	} while( mJoyButtonState );
+		
 
 	sound_PlayEffect( 9 );
 	mMemory[ 0x11D0 ] = 0;
@@ -4151,7 +4152,7 @@ noCarry2:;
 			
 			byte Y = 0;
 
-			for(gfxCurPos = gfxDestX2; gfxCurPos != gfxPosRightX; ++gfxCurPos, ++Y) {
+			for(gfxCurPos = gfxDestX2; gfxCurPos <= gfxPosRightX; ++gfxCurPos, ++Y) {
 
 				if( gfxCurPos < 0x28 ) 
 					mMemory[ word_30 + Y ] = mMemory[ word_32 + Y ];
