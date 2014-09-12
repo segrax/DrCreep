@@ -187,10 +187,11 @@ protected:
 	byte		 mVoiceNum;
 
 	bool		 mQuit;
+	bool		 mRunStopPressed;
 
 	byte		 mStrLength;
 
-	byte		 byte_20DE, byte_24FD, mRunStopPressed;
+	byte		 byte_20DE, byte_24FD;
 	byte		 byte_2E02;
 
 	byte		 mEngine_Ticks;

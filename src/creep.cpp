@@ -1026,7 +1026,7 @@ bool cCreep::Intro() {
 				return true;
 			}
 
-			if( mRunStopPressed == 1 ) {
+			if( mRunStopPressed == true ) {
 				optionsMenu();
 				if( byte_24FD == 1 ) {
 					mJoyButtonState = 1;
@@ -3374,7 +3374,7 @@ s10EB:;
 		}
 
 		// Check if run/stop was pressed
-		if( mRunStopPressed == 1 ) {
+		if( mRunStopPressed == true ) {
 
 			// Save the game
 			gamePositionSave( false );
@@ -3592,9 +3592,7 @@ void cCreep::roomMain() {
 		
 		byte X = 0;
 s15B4:;
-	if( mMemory[ 0x780D + X ] == 5 )
-		continue;
-	if( mMemory[ 0x780D + X ] == 6 )
+	if( (mMemory[ 0x780D + X ] == 5) || (mMemory[ 0x780D + X ] == 6) )
 		continue;
 
 	++X;
@@ -4331,49 +4329,35 @@ void cCreep::obj_Image_Draw() {
 	word_32 = (mMemory[ word_3E + 1 ] - 1) >> 3;
 	++word_32;
 
-	byte X =  mMemory[ word_3E ];
-
 	word_30 = 0;
 	
 	//1B18
-	for(;;) {
-		if( X == 0 )
-			break;
-
+	for( byte X =  mMemory[ word_3E ]; X; --X) {
 		word_30 += word_32;
-		X--;
 	}
+
 	// 1B2D
 	word_30 <<= 1;
-	X = mMemory[ word_3E + 1 ];
 
-	for(;;) {
-		if(X == 0 )
-			break;
-
+	for( byte X = mMemory[ word_3E + 1 ]; X; --X) {
 		word_30 += mMemory[ word_3E ];
-		--X;
 	}
+
 	// 1B4D
 	word_30 += 3;
 
 	word_3E += word_30;
 
 	//1B67
-	for(;;) {
-		byte A = mMemory[ word_3E ];
-		if( !A ) {
+	byte A;
+	while( (A = mMemory[ word_3E ]) ) {
+		// 1B7D
+		screenDraw( gfxDecodeMode, gfxCurrentID, A, mMemory[ word_3E + 1 ], 0 );
 			
-			++word_3E;
-			break;
-
-		} else {
-			// 1B7D
-			screenDraw( gfxDecodeMode, gfxCurrentID, A, mMemory[ word_3E + 1 ], 0 );
-			
-			word_3E += 2;
-		}
+		word_3E += 2;
 	}
+
+	++word_3E;
 }
 
 // 160A: Draw multiples of an object
@@ -4538,7 +4522,7 @@ void cCreep::gameHighScoresHandle() {
 		word_30 = 0xB804;
 
 	// 1BBE
-	mMemory[ 0x1CFE ] = 0x0A;
+	byte HighScorePosition = 0x0A;
 	
 	for(;;) {
 
@@ -4548,7 +4532,7 @@ void cCreep::gameHighScoresHandle() {
 			if( A < mMemory[ 0x1CF9 + Y ] ) {
 				// 1BD1
 				word_30 += 0x06;
-				--mMemory[ 0x1CFE ];
+				--HighScorePosition;
 				break;
 			}
 
@@ -4570,30 +4554,24 @@ s1BE7:;
 		mMemory[ 0x2788 ] = 0x18;
 	}
 	// 1BFF
-	byte A = 0x0A - mMemory[ 0x1CFE ];
+	byte A = 0x0A - HighScorePosition;
 	A <<= 3;
 	A += 0x38;
 	mMemory[ 0x2789 ] = A;
 
-	byte X = 0x0A - mMemory[ 0x1CFE ];
+	byte X = 0x0A - HighScorePosition;
 	
 	mMemory[ 0x278A ] = mMemory[ 0x1E85 + X ];
 
 	writeLEWord(&mMemory[ 0x1D03 ], (word_30 - 2));
 	
-	for(;;) {
-		--mMemory[ 0x1CFE ];
-		if( mMemory[ 0x1CFE ] == 0 )
-			break;
+	for( ;HighScorePosition ; --HighScorePosition ) {
 
 		mMemory[ 0x1CFF ] = 6;
 
-		for(;;) {
+		for( ; Y ; --Y ) 
 			mMemory[ 0xB806 + Y ] = mMemory[ 0xB800 + Y ];
-			--Y;
-			if( !Y )
-				break;
-		}
+		
 		//1C40
 	}
 
