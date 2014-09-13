@@ -713,34 +713,22 @@ void cCreep::mainLoop() {
 
 // 18E4
 void cCreep::screenClear() {
-	word word_30 = 0xFF00;
 
-	byte Y = 0xF9;
-	
 	mScreen->clear(0);
 
 	// Disable all sprites
 	mScreen->spriteDisable();
 
 	// Clear screen memory
-	for( ; word_30 >= 0xE000; word_30 -= 0x0100) {
+	for( word word_30 = 0xFFFF; word_30 >= 0xE000; --word_30 )
+		mMemory[ word_30 ] = 0;
 
-		for(;;) {
-			mMemory[ word_30 + Y ] = 0;
-			--Y;
-			if(Y == 0xFF)
-				break;
-		}
-	}
-
-	for( Y = 0; Y != MAX_SPRITES; ++Y )
+	for( byte Y = 0; Y != MAX_SPRITES; ++Y )
 		mRoomSprites[Y].state = SPR_FLAG_FREE;
 
-	word_30 = 0xC000;
-
-	while( word_30 < 0xC800) {
-		mMemory[word_30++] = 0;
-	}
+	for( word word_30 = 0xC000; word_30 < 0xC800; word_30++ ) 
+		mMemory[word_30] = 0;
+	
 	mObjectCount = 0;
 	mScreen->screenRedrawSet();
 	mScreen->bitmapRedrawSet();
@@ -1287,7 +1275,7 @@ void cCreep::musicChange() {
 
 // 0x2233 : Intro Menu
 void cCreep::optionsMenu() {
-
+s2238:
 	for( ;; ) {
 		mScreen->spriteDisable();
 
@@ -1391,17 +1379,20 @@ void cCreep::optionsMenu() {
 					}
                     break;
                         }
+
                 case 1:{
                 default:
                    //inputWait();
 				    sub_95F();
 				    return;
                        }
+
                 case 2:{
                     X = mFileListingNamePtr;
 					ChangeLevel(X);
                     break;
                        }
+
                 case 3:{
                     gamePositionLoad();
 						
@@ -1410,6 +1401,7 @@ void cCreep::optionsMenu() {
 
                     break;
                        }
+
                 case 4:{
                     if( mMemory[ 0x2399 ] == 0xFF )
 						continue;
@@ -1424,7 +1416,7 @@ void cCreep::optionsMenu() {
 					mMemory[ 0x278C ] = 0;
 					textShow();
 						
-					break;
+					goto s2238;
                        }
                 }
 
@@ -3182,6 +3174,7 @@ sEFC:;
 					word_3E = 0x0F72;	// For Player
 					obj_stringPrint();
 				}
+
 				// F39
 				if( mMemory[ 0x7810 ] != 1 ) {
 					word_3E = 0x0F83;	// For Player
@@ -3253,11 +3246,9 @@ bool cCreep::mapDisplay() {
 	Sleep(300);
 	mInput->inputCheck( true );
 
-	;
-
 	// Draw both players Name/Time/Arrows
 	// FA9
-	for(mMemory[ 0x11D7 ] = 0 ; mMemory[ 0x11D7 ] != 2; ++mMemory[ 0x11D7 ]) {
+	for(mMemory[ 0x11D7 ] = 0 ; mMemory[ 0x11D7 ] != 2; ++mMemory[ 0x11D7 ] ) {
 
 		byte X = mMemory[ 0x11D7 ];
 
@@ -3592,12 +3583,13 @@ void cCreep::roomMain() {
 		
 		byte X = 0;
 s15B4:;
-	if( (mMemory[ 0x780D + X ] == 5) || (mMemory[ 0x780D + X ] == 6) )
-		continue;
+		if( (mMemory[ 0x780D + X ] == 5) || 
+			(mMemory[ 0x780D + X ] == 6) )
+			continue;
 
-	++X;
-	if( X < 2 )
-		goto s15B4;
+		++X;
+		if( X < 2 )
+			goto s15B4;
 
 		break;
 	}
