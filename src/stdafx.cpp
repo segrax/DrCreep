@@ -28,7 +28,7 @@
 #include "castle/objects/object.hpp"
 #include "builder.hpp"
 
-const char   *VERSION = "v1.0";
+const char   *VERSION = "v1.1";
 
 const char	 *gDataPath = "data/";
 const char	 *gSavePath = "data/save/";

@@ -207,6 +207,11 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 
 	// Loop height
 	for( word y = 0; y < height; ++y, ++pDestY ) {
+
+		// This can occur in the builder...
+		//if( pDestY > mSurface->heightGet() )
+		//	return;
+
 		dest = mSurface->screenPieceGet( pDestX, pDestY);
 		destBuffer = mSurface->screenBufferGet( pDestX, pDestY );
 

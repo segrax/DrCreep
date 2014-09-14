@@ -233,9 +233,11 @@ protected:
 
 	byte		 byte_D10, byte_D12;
 	byte		 byte_839, mObjectCount, byte_8C0, byte_8C1, byte_5CE2;
-	byte		 byte_B83, byte_603A, byte_5FD7;
+	byte		 byte_603A, byte_5FD7;
 	byte		 byte_5FD5, byte_5FD6, byte_5FD8;
-	
+
+	bool		 mRestorePressed;
+
 	byte		 mGfxEdgeOfScreenX;
 	byte		 mTextXPos, mTextYPos, mTextColor, mTextFont, mTextFontt;
 	byte		 mTxtPosLowerY, mTxtDestXLeft, mTxtDestX, mTxtEdgeScreenX;
@@ -369,7 +371,7 @@ public:
 		void	 convertTimerToTime();
 		void	 convertTimeToNumber( byte pA, byte pY );
 		void	 sub_3940( byte pX, byte pY );
-		void	 sub_3A60( byte pX, byte pY );
+		void	 obj_Laser_Collision( byte pX, byte pY );
 		void	 obj_Teleport_unk( byte pA, byte pX );
 		void	 obj_TrapDoor_PlaySound( byte pA );
 		void	 sub_526F( char &pA );
