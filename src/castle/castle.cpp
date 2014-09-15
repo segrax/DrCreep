@@ -37,6 +37,9 @@
 	#include <string.h>
 #endif
 
+/**
+ * Constructor
+ */
 cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 	mStart_Room_Player1 = mStart_Room_Player2 = 0;
 	mStart_Door_Player1 = mStart_Door_Player2 = 0;
@@ -83,11 +86,17 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 	}
 }
 
+/**
+ * Destructor
+ */
 cCastle::~cCastle() {
 
 	roomCleanup();
 }
 
+/**
+ * Load a castle from memory
+ */
 void cCastle::castleLoad( cBuilder *pBuilder ) {
 	byte *buffer = mBuffer;
 
@@ -141,6 +150,9 @@ void cCastle::castleLoad( cBuilder *pBuilder ) {
 	}
 }	
 
+/**
+ * Save a castle to memory
+ */
 void cCastle::castleSave( byte *pTarget ) {
 	map< int, cRoom *>::iterator  roomIT;
 
@@ -214,6 +226,9 @@ void cCastle::castleSave( byte *pTarget ) {
 	writeLEWord(  pTarget, (memDest - 0x7800) );
 }
 
+/**
+ * Create a room
+ */
 cRoom *cCastle::roomCreate( cBuilder *pBuilder, int pNumber ) {
 	
 	if( mRooms.find( pNumber ) != mRooms.end() )
@@ -225,6 +240,9 @@ cRoom *cCastle::roomCreate( cBuilder *pBuilder, int pNumber ) {
 	return room;
 }
 
+/**
+ * Delete all rooms
+ */
 void cCastle::roomCleanup() {
 	map< int, cRoom *>::iterator roomIT;
 

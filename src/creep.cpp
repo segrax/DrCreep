@@ -5083,9 +5083,8 @@ void cCreep::gamePositionLoad() {
 
 	string filename = string( (char*) &mMemory[ 0x278E ], mStrLength );
 	
-	if( mCastleManager->positionLoad( filename, memory( 0x7800 ) ) == true) {
+	if( mCastleManager->positionLoad( filename, memory( 0x7800 ) ) == true)
 		byte_24FD = 1;
-	}
 
 	sub_2973();
 }
@@ -5346,9 +5345,8 @@ void cCreep::obj_Door_InFront( byte pSpriteNumber, byte pY ) {
 
 	mRoomSprites[pSpriteNumber].mY = mMemory[ word_40 + 1 ] + 0x0F;
 	mRoomSprites[pSpriteNumber].mX = mMemory[ word_40 ] + 0x06;
-	if( mMemory[ word_40 + 7 ] != 0 ) {
+	if( mMemory[ word_40 + 7 ] != 0 )
 		mMemory[ 0x785D + mRoomSprites[pSpriteNumber].playerNumber ] = 1;
-	}
 
 	//40DD
 	word word_41D6 = readLEWord( &mMemory[ word_40 + 3 ] );
