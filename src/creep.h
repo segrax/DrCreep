@@ -200,7 +200,7 @@ protected:
 	byte		 byte_311D;
 
 	byte		 mPlayerExecutingSpriteNumber, byte_3638;
-	word		 word_41D3;
+	word		 mRoomDoorDataPtr;
 
 	word		 word_4A65;											// Keys
 	byte		 mCurrentKeyID;

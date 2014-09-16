@@ -3499,7 +3499,7 @@ void cCreep::obj_Player_Add( ) {
 	
 	byte A = mMemory[ 0x780B + Y ];
 	A <<= 3;
-	word_40 = A + word_41D3;
+	word_40 = A + mRoomDoorDataPtr;
 	
 	// 35C0
 	if( mMemory[ word_40 + 2 ] & 0x80 ) {
@@ -5279,7 +5279,7 @@ void cCreep::obj_Door_Img_Execute( byte pSpriteNumber ) {
 		mRoomObjects[pSpriteNumber].Object_field_1 = 1;
 		mRoomObjects[pSpriteNumber].Object_field_2 = 0x0E;
 
-		word_40 = (mRoomObjects[pSpriteNumber].objNumber << 3) + word_41D3;
+		word_40 = (mRoomObjects[pSpriteNumber].objNumber << 3) + mRoomDoorDataPtr;
 		
 		mMemory[ word_40 + 2 ] |= 0x80;
 		byte A = mMemory[ word_40 + 4 ];
@@ -5339,7 +5339,7 @@ void cCreep::obj_Door_InFront( byte pSpriteNumber, byte pY ) {
 	A = mRoomObjects[byte_41D5].objNumber;
 	A <<= 3;
 
-	word_40 = word_41D3 + A;
+	word_40 = mRoomDoorDataPtr + A;
 
 	// 40BB
 
@@ -5748,12 +5748,12 @@ void cCreep::obj_Door_Lock_Prepare() {
 }
 
 void cCreep::obj_Door_Prepare() {
-	byte byte_41D0 = *level(word_3E++);
-	word_41D3 = word_3E;
+	byte DoorCount = *level(word_3E++);
+	mRoomDoorDataPtr = word_3E;
 	
 	byte X, gfxCurrentID, gfxPosX, gfxPosY;
 
-	for( byte count = 0; count != byte_41D0; ++count) {
+	for( byte count = 0; count != DoorCount; ++count) {
 		X = *level(word_3E + 7);
 		
 		gfxCurrentID  = mMemory[ 0x41D1 + X ];
@@ -5786,11 +5786,8 @@ void cCreep::obj_Door_Prepare() {
 			mRoomObjects[X].Object_field_1 = 1;
 			A = mRoomObjects[X].color;
 
-			byte Y = 5;
-			while(Y) {
+			for(byte Y = 5; Y; --Y ) 
 				mMemory[ 0x6390 + Y ] = A;
-				--Y;
-			}
 
 			A = 0x08;
 		} else
