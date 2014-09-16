@@ -5691,7 +5691,7 @@ void cCreep::obj_RayGun_Prepare() {
 void cCreep::obj_Key_Load() {
 	word_4A65 = word_3E;
 
-	byte_4A64 = 0;
+	mCurrentKeyID = 0;
 	
 	for(;;) {
 		if( mMemory[ word_3E ] == 0 ) {
@@ -5709,13 +5709,13 @@ void cCreep::obj_Key_Load() {
 			byte gfxPosY = mMemory[ word_3E + 3 ];
 			byte gfxCID = mMemory[ word_3E + 1 ];
 
-			mRoomObjects[X].objNumber = byte_4A64;
+			mRoomObjects[X].objNumber = mCurrentKeyID;
 
 			anim_Update( gfxCID, gfxPosX, gfxPosY, 0, X );
 		}
 
 		// 4A47
-		byte_4A64 += 0x04;
+		mCurrentKeyID += 0x04;
 		word_3E += 0x04;
 	}
 
@@ -5725,11 +5725,8 @@ void cCreep::obj_Door_Lock_Prepare() {
 	
 	byte X, gfxPosX, gfxPosY;
 
-	for(;;) {
+	for( ; mMemory[ word_3E ]; word_3E += 0x05) {
 		
-		if( mMemory[ word_3E ] == 0 )
-			break;
-
 		object_Create( X );
 		
 		mRoomAnim[X].mFuncID = 7;
@@ -5745,8 +5742,6 @@ void cCreep::obj_Door_Lock_Prepare() {
 		mRoomObjects[X].objNumber = *level( word_3E );
 		mRoomObjects[X].Object_field_1 = *level( word_3E + 2 );
 		anim_Update( 0x58, gfxPosX, gfxPosY, 0, X );
-
-		word_3E += 0x05;
 	}
 
 	++word_3E;
@@ -7044,15 +7039,15 @@ void cCreep::obj_Key_Infront( byte pX, byte pY ) {
 	word_40 = word_4A65 + mRoomObjects[pY].objNumber;
 
 	mMemory[ word_40 + 1 ] = 0;
-	byte_4A64 = mMemory[ word_40 ];
+	mCurrentKeyID = mMemory[ word_40 ];
 
 	if( mRoomSprites[pX].playerNumber ) {
 		// 49DA
-		mMemory[ 0x7835 + mMemory[ 0x7814 ] ] = byte_4A64;
+		mMemory[ 0x7835 + mMemory[ 0x7814 ] ] = mCurrentKeyID;
 		++mMemory[ 0x7814 ];
 		
 	} else {
-		mMemory[ 0x7815 + mMemory[ 0x7813 ] ] = byte_4A64;
+		mMemory[ 0x7815 + mMemory[ 0x7813 ] ] = mCurrentKeyID;
 		++mMemory[ 0x7813 ];
 	}
 }

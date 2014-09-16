@@ -203,7 +203,7 @@ protected:
 	word		 word_41D3;
 
 	word		 word_4A65;											// Keys
-	byte		 byte_4A64;
+	byte		 mCurrentKeyID;
 
 	word		 word_498B;											// Mummys
 
