@@ -5856,13 +5856,11 @@ void cCreep::obj_Lightning_Img_Execute( byte pX ) {
 	}
 	// 435B
 	++mRoomObjects[pX].Object_field_2;
-	byte A = mRoomObjects[pX].Object_field_2;
-	if( A >= 3 ) {
-		A = 0;
-		mRoomObjects[pX].Object_field_2 = A;
-	}
+
+	if( mRoomObjects[pX].Object_field_2 >= 3 )
+		mRoomObjects[pX].Object_field_2 = 0;
 	
-	byte_43E3 = A;
+	byte_43E3 = mRoomObjects[pX].Object_field_2;
 	
 	gfxPosX = mMemory[ word_40 + 1 ];
 	gfxPosY = mMemory[ word_40 + 2 ];
@@ -5913,6 +5911,7 @@ void cCreep::obj_Door_Button_Prepare() {
 		
 		byte A = 0;
 
+		// Find the colour of the door this button connects to
 		for( unsigned char Y = 0; Y < MAX_OBJECTS; ++Y ) {
 			if( mRoomAnim[Y].mFuncID == 0 ) {
 
@@ -5923,6 +5922,7 @@ void cCreep::obj_Door_Button_Prepare() {
 			}	
 		}
 
+		// Set the palette color
 		for( signed char Y = 8; Y >= 0; --Y )
 			mMemory[ 0x63D2 + Y ] = A;
 
@@ -5975,7 +5975,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pX, byte pY ) {
 		mMemory[ word_32 ] ^= byte_45DE;
 		byte Y;
 
-		for( Y = 0; ; ++Y ) {
+		for( Y = 0; Y < MAX_OBJECTS; ++Y ) {
 			
 			if( mRoomAnim[Y].mFuncID != 2 )
 				continue;
