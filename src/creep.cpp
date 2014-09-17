@@ -5817,8 +5817,7 @@ void cCreep::obj_Lightning_Img_Execute( byte pX ) {
 
 	} else {
 		// 42CF
-		byte A = mMemory[ word_40 + Y ];
-		if( !(A & byte_45DE )) {
+		if( !(mMemory[ word_40 + Y ] & byte_45DE )) {
 			// 42D8
 			mRoomObjects[pX].Object_field_1 = 0;
 			mRoomAnim[pX].mFlags ^= ITM_EXECUTE;
@@ -5976,7 +5975,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pX, byte pY ) {
 		mMemory[ word_32 ] ^= byte_45DE;
 		byte Y;
 
-		for(Y = 0;; ++Y ) {
+		for( Y = 0; ; ++Y ) {
 			
 			if( mRoomAnim[Y].mFuncID != 2 )
 				continue;
@@ -6008,8 +6007,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pX, byte pY ) {
 // 45E0: Forcefield Timer
 void cCreep::obj_Forcefield_Img_Timer_Execute( byte pSpriteNumber ) {
 
-	--mRoomObjects[pSpriteNumber].Object_field_1;
-	if( mRoomObjects[pSpriteNumber].Object_field_1 != 0 )
+	if( --mRoomObjects[pSpriteNumber].Object_field_1 != 0 )
 		return;
 
 	--mRoomObjects[pSpriteNumber].Object_field_2;
@@ -6047,12 +6045,7 @@ void cCreep::obj_Lightning_Prepare() {
 
 	byte X = 0, A;
 
-	for(;;) {
-		
-		if( mMemory[ word_3E ] & byte_45DF ) {
-			++word_3E;
-			break;
-		}
+	do {
 
 		object_Create( X );
 
@@ -6081,17 +6074,13 @@ void cCreep::obj_Lightning_Prepare() {
 			mRoomAnim[X].mFuncID = 2;
 			gfxPosX = mMemory[ word_3E + 1 ];
 			gfxPosY = mMemory[ word_3E + 2 ];
-
-			byte_44E6 = mMemory[ word_3E + 3 ];
+			
 			mRoomObjects[X].color = mMemory[ word_3E + 3 ];
 
-			for(;; ) {
-				if( !byte_44E6 ) 
-					break;
+			for( byte_44E6 = mMemory[ word_3E + 3 ]; byte_44E6; --byte_44E6) {
 
 				screenDraw( 0, 0x32, gfxPosX, gfxPosY, 0 );
 				gfxPosY += 0x08;
-				--byte_44E6;
 			}
 
 			gfxPosX -= 0x04;
@@ -6104,7 +6093,10 @@ void cCreep::obj_Lightning_Prepare() {
 		// 44C8
 		byte_44E5 += 0x08;
 		word_3E += 0x08;
-	}
+
+	} while ( !(mMemory[ word_3E ] & byte_45DF) );
+
+	++word_3E;
 }
 
 // 46AE: Forcefield
@@ -6114,12 +6106,7 @@ void cCreep::obj_Forcefield_Prepare() {
 
 	byte_474F = 0;
 	
-	for(;;) {
-		
-		if( mMemory[ word_3E ] == 0 ) {
-			++word_3E;
-			return;
-		}
+	do {
 
 		object_Create( X );
 
@@ -6154,8 +6141,9 @@ void cCreep::obj_Forcefield_Prepare() {
 		
 		++byte_474F;
 		word_3E += 0x04;
-	}
+	} while( mMemory[ word_3E ] );
 
+	++word_3E;
 }
 
 // 4872 : Load the rooms' Mummys
@@ -6166,13 +6154,7 @@ void cCreep::obj_Mummy_Prepare( ) {
 
 	word_498B = word_3E;
 
-	for(;;) {
-		
-		if( mMemory[ word_3E ] == 0 ) {
-			++word_3E;
-			return;
-		}
-
+	do {
 		object_Create( X );
 		
 		mRoomAnim[X].mFuncID = 5;
@@ -6228,7 +6210,10 @@ void cCreep::obj_Mummy_Prepare( ) {
 		// 496E
 		word_3E += 0x07;
 		byte_498D += 0x07;
-	}
+
+	} while( mMemory[ word_3E ] );
+
+	++word_3E;
 }
 
 // 517F : Load the rooms' Trapdoors
@@ -6239,12 +6224,7 @@ void cCreep::obj_TrapDoor_Prepare( ) {
 	byte X;
 
 	byte_5381 = 0;
-	for(;;) {
-	
-		if( (mMemory[ word_3E ] & byte_5389) ) {
-			++word_3E;
-			return;
-		}
+	do {
 		
 		object_Create( X );
 		mRoomAnim[X].mFuncID = 0x0B;
@@ -6290,8 +6270,10 @@ void cCreep::obj_TrapDoor_Prepare( ) {
 		
 		byte_5381 += 0x05;
 		word_3E += 0x05;
-	}
 
+	} while( !(mMemory[ word_3E ] & byte_5389) );
+
+	++word_3E;
 }
 
 // 50D2: Floor Switch
@@ -6452,14 +6434,9 @@ void cCreep::obj_Mummy_Infront( byte pSpriteNumber, byte pY ) {
 	mTxtX_0 = mMemory[ word_40 + 3 ] + 4;
 	mTxtY_0 = mMemory[ word_40 + 4 ] + 8;
 	
-	byte byte_4871 = 3;
-	
-	for(;;) {
+	for( byte byte_4871 = 3; byte_4871 ; --byte_4871) {
 		screenDraw( 1, 0, 0, 0, 0x42 );
 		mTxtX_0 += 4;
-		--byte_4871;
-		if( !byte_4871 )
-			break;
 	}
 
 	// 4842
@@ -6477,12 +6454,7 @@ void cCreep::obj_Frankie_Load() {
 
 	byte_574A = 0;
 
-	for(;;) {
-
-		if( mMemory[ word_3E ] & byte_574C ) {
-			++word_3E;
-			return;
-		}
+	do {
 
 		mTxtX_0 = mMemory[ word_3E + 1 ];
 		mTxtY_0 = mMemory[ word_3E + 2 ] + 0x18;
@@ -6528,8 +6500,10 @@ void cCreep::obj_Frankie_Load() {
 
 		word_3E += 0x07;
 		byte_574A += 0x07;
-	}
 
+	} while( !(mMemory[ word_3E ] & byte_574C) );
+
+	++word_3E;
 }
 
 // 5501: Load the rooms' Conveyors
@@ -6540,11 +6514,7 @@ void cCreep::obj_Conveyor_Prepare() {
 	
 	byte A, X;
 
-	for(;;) {
-		if( mMemory[ word_3E ] & byte_5642 ) {
-			++word_3E;
-			break;
-		}
+	do {
 		
 		//5527
 		A = 0xFF;
@@ -6604,7 +6574,10 @@ void cCreep::obj_Conveyor_Prepare() {
 		anim_Update( 0x83, gfxPosX, gfxPosY, 0, X );
 		byte_5649 += 0x05;
 		word_3E += 0x05;
-	}
+
+	} while( !(mMemory[ word_3E ] & byte_5642) );
+
+	++word_3E;
 }
 
 void cCreep::obj_Forcefield_Create() {
