@@ -208,48 +208,47 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 	// Loop height
 	for( word y = 0; y < height; ++y, ++pDestY ) {
 
-		// This can occur in the builder...
-		if( pDestY > mSurface->heightGet() )
-			return;
-
 		dest = mSurface->screenPieceGet( pDestX, pDestY);
 		destBuffer = mSurface->screenBufferGet( pDestX, pDestY );
 
 		// Loop width
 		for( word x = 0; x < width; ++x ) {
-
-			if( (pDestX + x) >= mSurface->widthGet() )
-				continue;
+			
+			if( dest->mPriority == ePriority_None )
+				dest->mPriority = source->mPriority;
 
 			// Check for any collisions
-			if( dest->mPriority == ePriority_Foreground || dest->mSprite ) {
+			if( source->mPriority != ePriority_None ) {
 
-				// 
-				if(dest->mSprite && dest->mSprite2 != pSpriteNo) {
-					dest->mSprite2 = pSpriteNo; 
-					if(!col1) {
-						mCollisions.push_back( dest );
-						col1 = true;
-					}
-				} else {
-					dest->mSprite = pSpriteNo;
-					if(!col2) {
-						mCollisions.push_back( dest );
-						col2 = true;
+				if( dest->mPriority == ePriority_Foreground || dest->mSprite ) {
+
+					// 
+					if(dest->mSprite && dest->mSprite2 != pSpriteNo) {
+						dest->mSprite2 = pSpriteNo; 
+						if(!col1) {
+							mCollisions.push_back( dest );
+							col1 = true;
+						}
+					} else {
+						dest->mSprite = pSpriteNo;
+						if(!col2) {
+							mCollisions.push_back( dest );
+							col2 = true;
+						}
 					}
 				}
+
+				if( pSpriteNo && !dest->mSprite )
+					dest->mSprite = pSpriteNo;
+
+				else if( pSpriteNo != dest->mSprite )
+					dest->mSprite2 = pSpriteNo;
 			}
-
-			if( pSpriteNo && !dest->mSprite )
-				dest->mSprite = pSpriteNo;
-
-			else if( pSpriteNo != dest->mSprite )
-				dest->mSprite2 = pSpriteNo;
 
 			if( *sourceBuffer != 0 ) {
 
 				// Does this sprite have priority over the background?
-				if( !pPriority || (dest->mPriority == ePriority_Background && pPriority) ) {
+				if( !pPriority || ((dest->mPriority == ePriority_Background) && pPriority) ) {
 					*destBuffer = *sourceBuffer;
 
 					dest->mPriority = source->mPriority;

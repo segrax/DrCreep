@@ -78,7 +78,7 @@ void cScreenSurface::Wipe( dword pColor ) {
 
 	for( size_t count = 0; count < mScreenSize; ++count, ++piece, ++buffer ) {
 		*buffer = pColor;
-		piece->mPriority = ePriority_Background;
+		piece->mPriority = ePriority_None;
 		piece->mSprite = piece->mSprite2 = 0;
 	}
 

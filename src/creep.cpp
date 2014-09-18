@@ -1971,7 +1971,7 @@ void cCreep::obj_CheckCollisions( byte pSpriteNumber ) {
 		if( (byte_3119 + mRoomSprites[pSpriteNumber].mCollisionHeight) > 0x100 )
 			byte_3119 = 0;
 
-		for(byte Y = 0; Y != MAX_OBJECTS; ++Y ) {
+		for(byte Y = 0; Y != MAX_SPRITES; ++Y ) {
 
 			// 3068
 			if( pSpriteNumber != Y ) {
