@@ -245,7 +245,7 @@ protected:
 	byte		 mGfxWidth, mGfxHeight;
 	byte		 mCount;
 	 
-	word		 word_30, word_32, word_34, word_3C, word_3E, word_40, word_42, word_44;
+	word		 word_30, word_32, word_34, word_3C, word_3E, word_40, mRoomPtr, word_44;
 
 	bool		 mMenuReturn, mNoInput;
 
@@ -304,7 +304,7 @@ public:
 		void	 start( int pStartLevel, bool pUnlimited );			// Game Entry Point
 		void	 run( int pArgCount, char *pArgs[] );					// Executed from main()
 
-		void	 castleRoomData( byte pRoomNumber );
+		void	 SetRoomPtr( byte pRoomNumber );
 
 		bool	 ChangeLevel( size_t pMenuItem );
 		void	 Game();

@@ -727,9 +727,8 @@ void cCreep::roomLoad() {
 
 	word_30 = 0xC000;
 
-	while( word_30 < 0xC800) {
+	while( word_30 < 0xC800)
 		mMemory[word_30++] = 0;
-	}
 
 	byte X, A;
 
@@ -744,16 +743,14 @@ void cCreep::roomLoad() {
 	else
 		A = mMemory[ 0x7809 + X ];
 
-	castleRoomData( A );
+	SetRoomPtr( A );
 	
 	// Room Color
-	A = mMemory[word_42] & 0xF;
-
-	graphicRoomColorsSet( A );
+	graphicRoomColorsSet( mMemory[mRoomPtr] & 0xF );
 
 	//14AC
 	// Ptr to start of room data
-	word_3E = readLEWord( &mMemory[word_42 + 6] );
+	word_3E = readLEWord( &mMemory[mRoomPtr + 6] );
 
 	if(mIntro)
 		word_3E += 0x2000;
@@ -931,9 +928,9 @@ bool cCreep::Intro() {
 
 		if( mMenuScreenTimer != 0 ) {
 			++mMenuScreenCount;
-			castleRoomData( mMenuScreenCount );
+			SetRoomPtr( mMenuScreenCount );
 
-			if( ((*level( word_42 )) & 0x40) )
+			if( ((*level( mRoomPtr )) & 0x40) )
 				mMenuScreenCount = 0;
 
 			roomLoad();
@@ -2993,13 +2990,13 @@ void cCreep::obj_Forcefield_Execute( byte pSpriteNumber ) {
 }
 
 // 5FD9
-void cCreep::castleRoomData( byte pRoomNumber ) {
+void cCreep::SetRoomPtr( byte pRoomNumber ) {
 
-	word_42 = pRoomNumber << 3;
-	word_42 += 0x7900;
+	mRoomPtr = pRoomNumber << 3;
+	mRoomPtr += 0x7900;
 
 	if( mIntro )
-		word_42 += 0x2000;
+		mRoomPtr += 0x2000;
 }
 
 bool cCreep::ChangeLevel( size_t pMenuItem ) {
@@ -3198,7 +3195,7 @@ void cCreep::mapArrowDraw( byte pPlayer ) {
 	cSprite *sprite = mScreen->spriteGet( pPlayer );
 	
 	// Calculate X
-	byte A = mMemory[ word_42 + 1 ];	// X
+	byte A = mMemory[ mRoomPtr + 1 ];	// X
 	A += mMemory[ word_40 + 5 ];
 
 	byte Y = mMemory[ 0x11D9 ];
@@ -3214,7 +3211,7 @@ void cCreep::mapArrowDraw( byte pPlayer ) {
 
 	// Calculate Y
 	// 100D
-	A = mMemory[ word_42 + 2 ];		// Y
+	A = mMemory[ mRoomPtr + 2 ];		// Y
 	A += mMemory[ word_40 + 6 ];
 	A += mMemory[ 0x11DE + mMemory[ 0x11D9 ] ];
 	A += 0x32;
@@ -3250,8 +3247,8 @@ bool cCreep::mapDisplay() {
 
 			// Mark Room as visible on map
 			byte A = mMemory[ 0x7809 + X ];
-			castleRoomData( A );
-			mMemory[ word_42 ] |= byte_8C0;
+			SetRoomPtr( A );
+			mMemory[ mRoomPtr ] |= byte_8C0;
 			
 			// 
 			mapArrowDraw( X );
@@ -3600,7 +3597,7 @@ s15B4:;
 void cCreep::sub_6009( byte pA ) {
 	byte_603A = pA;
 
-	word_40 = readLEWord( &mMemory[ word_42 + 4] );
+	word_40 = readLEWord( &mMemory[ mRoomPtr + 4] );
 	
 	byte A2 = mMemory[ word_40 ];
 	
@@ -4161,7 +4158,7 @@ void cCreep::mapRoomDraw() {
 	byte byte_13EA, byte_13EB, roomX;
 	byte roomY, roomHeight, roomWidth;
 
-	word_42 = 0x7900;
+	mRoomPtr = 0x7900;
 	
 	byte gfxPosX;
 	byte gfxPosY;
@@ -4169,17 +4166,17 @@ void cCreep::mapRoomDraw() {
 	//1210
 	for(;;) {
 		
-		if( mMemory[ word_42 ] & byte_8C1 )
+		if( mMemory[ mRoomPtr ] & byte_8C1 )
 			return;
 		
-		if( mMemory[ word_42 ] & byte_8C0 ) {
+		if( mMemory[ mRoomPtr ] & byte_8C0 ) {
 			//1224
 			
-			mMemory[ 0x63E7 ] = mMemory[ word_42 ] & 0xF;	// color
-			roomX		= mMemory[ word_42 + 1 ];				// top left x
-			roomY		= mMemory[ word_42 + 2 ];				// top left y
-			roomWidth	= mMemory[ word_42 + 3 ] & 7;			// width
-			roomHeight	= (mMemory[ word_42 + 3 ] >> 3) & 7;	// height
+			mMemory[ 0x63E7 ] = mMemory[ mRoomPtr ] & 0xF;	// color
+			roomX		= mMemory[ mRoomPtr + 1 ];				// top left x
+			roomY		= mMemory[ mRoomPtr + 2 ];				// top left y
+			roomWidth	= mMemory[ mRoomPtr + 3 ] & 7;			// width
+			roomHeight	= (mMemory[ mRoomPtr + 3 ] >> 3) & 7;	// height
 
 			gfxPosY = roomY;
 			
@@ -4247,7 +4244,7 @@ s1349:;
 		} 
 
 		//134E
-		word_42 += 0x08;
+		mRoomPtr += 0x08;
 	}
 
 	//135C
@@ -5274,7 +5271,7 @@ void cCreep::obj_Door_Img_Execute( byte pSpriteNumber ) {
 		mMemory[ word_40 + 2 ] |= 0x80;
 		byte A = mMemory[ word_40 + 4 ];
 
-		castleRoomData( mMemory[ word_40 + 3 ] );
+		SetRoomPtr( mMemory[ word_40 + 3 ] );
 		sub_6009( A );
 		mMemory[ word_40 + 2 ] |= 0x80;
 	}
@@ -5340,9 +5337,9 @@ void cCreep::obj_Door_InFront( byte pSpriteNumber, byte pY ) {
 
 	//40DD
 	word word_41D6 = readLEWord( &mMemory[ word_40 + 3 ] );
-	castleRoomData( (word_41D6 & 0xFF) );
+	SetRoomPtr( (word_41D6 & 0xFF) );
 	
-	mMemory[ word_42 ] |= byte_8C0;
+	mMemory[ mRoomPtr ] |= byte_8C0;
 
 	pY = mRoomSprites[pSpriteNumber].playerNumber;
 
@@ -5761,9 +5758,9 @@ void cCreep::obj_Door_Prepare() {
 		mRoomObjects[X].objNumber = count;
 		mRoomAnim[X].mFuncID = 0;
 
-		castleRoomData( *level( word_3E + 3 ) );
+		SetRoomPtr( *level( word_3E + 3 ) );
 		
-		byte A =  (*level( word_42 ) & 0xF);
+		byte A =  (*level( mRoomPtr ) & 0xF);
 
 		mRoomObjects[X].color = A;
 		A <<= 4;

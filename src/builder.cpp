@@ -444,15 +444,15 @@ void cBuilder::mapRoomsDraw( size_t pArrowRoom ) {
 		if( roomIT->second->mNumber == 0xFF )
 			continue;
 
-		castleRoomData( roomIT->second->mNumber );
+		SetRoomPtr( roomIT->second->mNumber );
 
-		mMemory[ word_42 ] |= byte_8C0;
+		mMemory[ mRoomPtr ] |= byte_8C0;
 
 		// Draw the room
 		mapRoomDraw();
 
 		if( roomIT->second->mNumber == pArrowRoom ) {
-			castleRoomData( roomIT->second->mNumber );
+			SetRoomPtr( roomIT->second->mNumber );
 			mapArrowDraw( 0 );
 		}
 	}
