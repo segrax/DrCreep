@@ -370,7 +370,7 @@ public:
 		void	 sub_2973();
 		void	 convertTimerToTime();
 		void	 convertTimeToNumber( byte pA, byte pY );
-		void	 sub_3940( byte pX, byte pY );
+		void	 obj_Mummy_Hit_Player( byte pX, byte pY );
 		void	 obj_Laser_Collision( byte pX, byte pY );
 		void	 obj_Teleport_unk( byte pA, byte pX );
 		void	 obj_TrapDoor_PlaySound( byte pA );

@@ -28,6 +28,8 @@
 #include "sprite.h"
 
 cSprite::cSprite( ) {
+	_maxY = 21;
+	_maxX = 24;
 
 	mX = mY = _color = 0;
 
@@ -35,7 +37,7 @@ cSprite::cSprite( ) {
 	_multiColor1 = 0x0D;
 
 	_rEnabled = _rMultiColored = _rDoubleWidth = _rDoubleHeight = false;
-	_surface = new cScreenSurface(48, 42);
+	_surface = 0;
 	_buffer = 0;
 }
 
@@ -48,20 +50,12 @@ void cSprite::drawMulti( byte *pBuffer ) {
 	byte		currentByte = *pBuffer++, count = 0;
 	byte		color;
 	ePriority	priority;
-	byte		maxY = 20;
-	byte		maxX = 23;
 	byte		pixel;
 
-	if( _rDoubleHeight )
-		maxY *= 2;
-
-	if( _rDoubleWidth )
-		maxX *= 2;
-
 	// Draw the sprite
-	for( word Y = 0; Y <= maxY; ++Y ) {
+	for( word Y = 0; Y < currentHeight; ++Y ) {
 	
-		for( word X = 0; X <= maxX; ++X ) {
+		for( word X = 0; X < currentWidth; ++X ) {
 
 			pixel = (currentByte & 0xC0) >> 6;
 			// 3 Bytes per row
@@ -112,17 +106,10 @@ void cSprite::drawMulti( byte *pBuffer ) {
 void cSprite::drawSingle( byte *pBuffer ) {
 	byte		currentByte = *pBuffer++, count = 0;
 	byte		byteCount = 1;
-	byte		maxY = 20;
-	byte		maxX = 23;
 
-	if( _rDoubleHeight )
-		maxY *= 2;
-	if( _rDoubleWidth )
-		maxX *= 2;
-
-	for( word Y = 0; Y <= maxY; ++Y ) {
+	for( word Y = 0; Y < currentHeight; ++Y ) {
 	
-		for( word X = 0; X <= maxX; ++X ) {
+		for( word X = 0; X < currentWidth; ++X ) {
 
 			if(currentByte & 0x80) {
 				_surface->pixelDraw(X, Y, _color, ePriority_Foreground);
@@ -163,6 +150,16 @@ void cSprite::streamLoad( byte *pBuffer ) {
 		return;
 	}
 
+	currentWidth = _maxX;
+	currentHeight = _maxY;
+
+	if( _rDoubleHeight )
+		currentHeight *= 2;
+	if( _rDoubleWidth )
+		currentWidth *= 2;
+
+	delete _surface;
+	_surface = new cScreenSurface(currentWidth, currentHeight);
 	_surface->Wipe(0);
 
 	if( _rMultiColored )

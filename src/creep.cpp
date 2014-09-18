@@ -379,7 +379,6 @@ void cCreep::start( int pStartLevel, bool pUnlimited ) {
 
 	if( mMemory[ 0x839 ] != 1 ) {
 
-		// 93A
 		for( word_30 = 0x7572, word_32 = 0x77F7; word_30 < 0x7800; word_30 += 0x1, word_32 += 0x1)
 			mMemory[ word_30 ] = mMemory[ word_32 ];
 		
@@ -1821,7 +1820,7 @@ bool cCreep::obj_Actions_Collision( byte pSpriteNumber, byte pY ) {
 			break;
 
 		case 0x3940:
-			sub_3940( pSpriteNumber, byte_31F0 );
+			obj_Mummy_Hit_Player( pSpriteNumber, byte_31F0 );
 			break;
 
 		case 0x3A60:		// Laser
@@ -1929,13 +1928,17 @@ void cCreep::obj_Actions_Hit( byte pSpriteNumber, byte pY ) {
 			byte_311D = 0;
 			break;
 
-		case 0x3DDE:				//  Hit Frankie
-			obj_Frankie_Hit( pSpriteNumber, pY );
-			break;
-
 		case 0x374F:
 			byte_311D = 0;
 			return;
+		
+		case 0x3940:				// Hit Mummy
+			obj_Mummy_Hit_Player( pSpriteNumber, pY );
+			break;
+
+		case 0x3DDE:				//  Hit Frankie
+			obj_Frankie_Hit( pSpriteNumber, pY );
+			break;
 
 		default:
 			cout << "obj_Actions_Hit: 0x";
@@ -1985,9 +1988,9 @@ void cCreep::obj_CheckCollisions( byte pSpriteNumber ) {
 								// 308E
 								A = byte_3118;
 
-								if( A > mRoomSprites[Y].mX ) {
+								if( A >= mRoomSprites[Y].mX ) {
 									A = mRoomSprites[Y].mX + mRoomSprites[Y].mCollisionWidth;
-									if( A > byte_3117 ) {
+									if( A >= byte_3117 ) {
 										// 30A5
 										if( byte_311A >= mRoomSprites[Y].mY ) {
 											if( (mRoomSprites[Y].mY + mRoomSprites[Y].mCollisionHeight) >= byte_3119 ) {
@@ -6617,7 +6620,7 @@ void cCreep::obj_Mummy_Collision( byte pSpriteNumber, byte pY ) {
 }
 
 // 3940: 
-void cCreep::sub_3940( byte pSpriteNumber, byte pY ) {
+void cCreep::obj_Mummy_Hit_Player( byte pSpriteNumber, byte pY ) {
 	byte A = mRoomSprites[pY].Sprite_field_0;
 	if( A == 0 || A == 5 ) {
 		byte_311D = 0;
@@ -7045,6 +7048,7 @@ bool cCreep::obj_Key_NotFound( byte pA, byte pX, byte pY ) {
 	
 	if( mRoomSprites[pX].playerNumber != 0 ) {
 		byte_5ED3 = mMemory[ 0x7814 ];
+		
 		word_30 = 0x7835;
 	} else {
 		// 5EAA
@@ -7053,12 +7057,13 @@ bool cCreep::obj_Key_NotFound( byte pA, byte pX, byte pY ) {
 	}
 	return false;
 	//5EB8
-	for( pY = 0; pY != byte_5ED3; ++pY ) {
+	for( pY = 0;; ++pY ) {
+		if( pY == byte_5ED3 )
+			return true;
+
 		if( mMemory[ word_30 + pY ] == byte_5ED4 )
 			return false;
 	}
-
-	return true;
 }
 
 // 4D70: In Front RayGun Control
@@ -7247,10 +7252,9 @@ void cCreep::sub_526F( char &pA ) {
 	mMemory[ word_40 ] ^= byte_538A;
 	byte X;
 
-	for( X = 0; X < MAX_OBJECTS; ++X) {
+	for( X = 0 ;;++X) {
 		if( mRoomAnim[X].mFuncID != 0x0B )
 			continue;
-
 		if( mRoomObjects[X].objNumber == byte_5382 )
 			break;
 	}
