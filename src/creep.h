@@ -376,7 +376,7 @@ public:
 		void	 obj_TrapDoor_PlaySound( byte pA );
 		void	 sub_526F( char &pA );
 		void	 roomAnim_Disable( byte pSpriteNumber );			// Redraw floor piece?
-		bool	 sub_5E8E( byte pA, byte pX, byte pY );
+		bool	 obj_Key_NotFound( byte pA, byte pX, byte pY );
 		void	 positionCalculate( byte pSpriteNumber );
 		void	 word_3C_Calculate();
 		void	 sub_6009( byte pA );

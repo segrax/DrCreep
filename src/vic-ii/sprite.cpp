@@ -35,7 +35,7 @@ cSprite::cSprite( ) {
 	_multiColor1 = 0x0D;
 
 	_rEnabled = _rMultiColored = _rDoubleWidth = _rDoubleHeight = false;
-	_surface = new cScreenSurface(40, 46);
+	_surface = new cScreenSurface(48, 42);
 	_buffer = 0;
 }
 

@@ -379,22 +379,9 @@ void cCreep::start( int pStartLevel, bool pUnlimited ) {
 
 	if( mMemory[ 0x839 ] != 1 ) {
 
-		word_30 = 0x7572;
-		word_32 = 0x77F7;
 		// 93A
-		for( byte Y = 0; ; ) {
-			for(;;) {
-				mMemory[ word_30 + Y ] = mMemory[ word_32 + Y ];
-				if(++Y==0)
-					break;
-			}
-			
-			word_32 += 0x100;
-			word_30 += 0x100;
-
-			if( word_30 >= 0x7800 )
-				break;
-		}
+		for( word_30 = 0x7572, word_32 = 0x77F7; word_30 < 0x7800; word_30 += 0x1, word_32 += 0x1)
+			mMemory[ word_30 ] = mMemory[ word_32 ];
 		
 		if( pStartLevel > -1 )
 			if( !ChangeLevel( 0x10 + (pStartLevel * 4) ) )
@@ -1998,9 +1985,9 @@ void cCreep::obj_CheckCollisions( byte pSpriteNumber ) {
 								// 308E
 								A = byte_3118;
 
-								if( A >= mRoomSprites[Y].mX ) {
+								if( A > mRoomSprites[Y].mX ) {
 									A = mRoomSprites[Y].mX + mRoomSprites[Y].mCollisionWidth;
-									if( A >= byte_3117 ) {
+									if( A > byte_3117 ) {
 										// 30A5
 										if( byte_311A >= mRoomSprites[Y].mY ) {
 											if( (mRoomSprites[Y].mY + mRoomSprites[Y].mCollisionHeight) >= byte_3119 ) {
@@ -7037,7 +7024,7 @@ void cCreep::obj_Door_Lock_InFront( byte pX, byte pY ) {
 	if(mRoomSprites[pX].mButtonState == 0)
 		return;
 
-	if( sub_5E8E( mRoomObjects[pY].objNumber, pX, pY ) == true )
+	if( obj_Key_NotFound( mRoomObjects[pY].objNumber, pX, pY ) == true )
 		return;
 
 	for( pX = 0;; ++pX ) {
@@ -7053,27 +7040,25 @@ void cCreep::obj_Door_Lock_InFront( byte pX, byte pY ) {
 	mRoomAnim[pX].mFlags |= ITM_EXECUTE;
 }
 
-bool cCreep::sub_5E8E( byte pA, byte pX, byte pY ) {
+bool cCreep::obj_Key_NotFound( byte pA, byte pX, byte pY ) {
 	byte byte_5ED3, byte_5ED4 = pA;
 	
 	if( mRoomSprites[pX].playerNumber != 0 ) {
 		byte_5ED3 = mMemory[ 0x7814 ];
-		
 		word_30 = 0x7835;
 	} else {
 		// 5EAA
 		byte_5ED3 = mMemory[ 0x7813 ];
 		word_30 = 0x7815;
 	}
-
+	return false;
 	//5EB8
-	for( pY = 0;; ++pY ) {
-		if( pY == byte_5ED3 )
-			return true;
-
+	for( pY = 0; pY != byte_5ED3; ++pY ) {
 		if( mMemory[ word_30 + pY ] == byte_5ED4 )
 			return false;
 	}
+
+	return true;
 }
 
 // 4D70: In Front RayGun Control
@@ -7262,9 +7247,10 @@ void cCreep::sub_526F( char &pA ) {
 	mMemory[ word_40 ] ^= byte_538A;
 	byte X;
 
-	for( X = 0 ;;++X) {
+	for( X = 0; X < MAX_OBJECTS; ++X) {
 		if( mRoomAnim[X].mFuncID != 0x0B )
 			continue;
+
 		if( mRoomObjects[X].objNumber == byte_5382 )
 			break;
 	}
