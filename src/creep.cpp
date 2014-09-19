@@ -7021,18 +7021,23 @@ void cCreep::obj_Door_Lock_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 	if( obj_Key_NotFound( mRoomObjects[pObjectNumber].objNumber, pSpriteNumber ) == true )
 		return;
 
-	byte X = 0;
-	for( X = 0;; ++X ) {
+	// This loop expects to find the object, if it doesnt, its meant to loop forever
+	for( byte X = 0; X < MAX_OBJECTS; ++X ) {
+
 		if( mRoomAnim[X].mFuncID )
 			continue;
-		if( mRoomObjects[X].objNumber == mRoomObjects[pObjectNumber].Object_field_1 )
-			break;
-	}
-	// 4AA2
-	if( mRoomObjects[X].Object_field_1 )
-		return;
 
-	mRoomAnim[X].mFlags |= ITM_EXECUTE;
+		if( mRoomObjects[X].objNumber == mRoomObjects[pObjectNumber].Object_field_1 ) {
+
+			// 4AA2
+			if( mRoomObjects[X].Object_field_1 )
+				return;
+
+			mRoomAnim[X].mFlags |= ITM_EXECUTE;
+			return;
+		}
+	}
+	// Therefor, we should probably crash or something if this point is ever reached
 }
 
 bool cCreep::obj_Key_NotFound( byte pObjectNumber, byte pSpriteNumber ) {
@@ -7040,7 +7045,6 @@ bool cCreep::obj_Key_NotFound( byte pObjectNumber, byte pSpriteNumber ) {
 	
 	if( mRoomSprites[pSpriteNumber].playerNumber != 0 ) {
 		byte_5ED3 = mMemory[ 0x7814 ];
-		
 		word_30 = 0x7835;
 	} else {
 		// 5EAA
@@ -7366,7 +7370,7 @@ void cCreep::obj_Conveyor_Control_InFront( byte pSpriteNumber, byte pY ) {
 
 bool cCreep::object_Create( byte &pX ) {
 
-	if( mObjectCount == 0x20 )
+	if( mObjectCount == MAX_OBJECTS )
 		return false;
 
 	pX = mObjectCount++;
