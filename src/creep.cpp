@@ -2363,8 +2363,7 @@ s33DE:;
 	if( !(Y & 3) ) {
 		// 3421
 		if( byte_34D5 & 1 ) {
-			A = mRoomSprites[pSpriteNumber].Sprite_field_1F;
-			if( !A )
+			if( !mRoomSprites[pSpriteNumber].Sprite_field_1F )
 				++mRoomSprites[pSpriteNumber].spriteImageID;
 			else 
 				--mRoomSprites[pSpriteNumber].spriteImageID;
@@ -6635,8 +6634,10 @@ void cCreep::obj_Laser_Collision( byte pSpriteNumber, byte pY ) {
 	
 	if( A == 2 )
 		return;
+
 	if( A == 0x0F )
 		return;
+
 	if( A == 8 ) {
 		if( mRoomSprites[pSpriteNumber].Sprite_field_1E != mRoomObjects[pY].objNumber )
 			return;
@@ -6864,7 +6865,7 @@ void cCreep::obj_RayGun_Laser_Execute( byte pSpriteNumber ) {
 // 3F14: Find a free object position, and clear it
 int cCreep::sprite_CreepFindFree( ) {
 
-	for( int number = 0 ; number != MAX_SPRITES; ++number ) {
+	for( int number = 0 ; number < MAX_SPRITES; ++number ) {
 		sCreepSprite *sprite = &mRoomSprites[number];
 
 		if( sprite->state & SPR_FLAG_FREE ) {
@@ -7052,7 +7053,7 @@ bool cCreep::obj_Key_NotFound( byte pA, byte pX, byte pY ) {
 		byte_5ED3 = mMemory[ 0x7813 ];
 		word_30 = 0x7815;
 	}
-	return false;
+
 	//5EB8
 	for( pY = 0;; ++pY ) {
 		if( pY == byte_5ED3 )
