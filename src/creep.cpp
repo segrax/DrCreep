@@ -1774,7 +1774,7 @@ void cCreep::obj_OverlapCheck( byte pSpriteNumber ) {
 	byte Y = 0;
 
 	do {
-		byte_31F0 = Y;
+		mObjectNumber = Y;
 
 		if( !(mRoomAnim[Y].mFlags & ITM_DISABLE ))
 
@@ -1792,40 +1792,39 @@ void cCreep::obj_OverlapCheck( byte pSpriteNumber ) {
 									mRoomSprites[pSpriteNumber].state |= SPR_ACTION_FLASH;
 							}
 
-							Y = mRoomAnim[byte_31F0].mFuncID;
-							obj_Actions_InFront( pSpriteNumber, Y );
+							obj_Actions_InFront( pSpriteNumber, mRoomAnim[mObjectNumber].mFuncID );
 						} 
 		
-		Y = byte_31F0 + 1;
+		Y = mObjectNumber + 1;
 
 	} while(Y != byte_31EF);
 }
 
-bool cCreep::obj_Actions_Collision( byte pSpriteNumber, byte pY ) {
-	word func = readLEWord( &mMemory[ 0x893 + (pY << 3)]);
+bool cCreep::obj_Actions_Collision( byte pSpriteNumber, byte pFunctionId ) {
+	word func = readLEWord( &mMemory[ 0x893 + (pFunctionId << 3)]);
 	
 	switch( func ) {
 		case 0:
 			return false;
 
 		case 0x34EF:		// Player In Front
-			obj_Player_Collision( pSpriteNumber, byte_31F0 );
+			obj_Player_Collision( pSpriteNumber, mObjectNumber );
 			break;
 
 		case 0x38CE:		// Mummy
-			obj_Mummy_Collision( pSpriteNumber, byte_31F0 );
+			obj_Mummy_Collision( pSpriteNumber, mObjectNumber );
 			break;
 
 		case 0x3940:
-			obj_Mummy_Hit_Player( pSpriteNumber, byte_31F0 );
+			obj_Mummy_Hit_Player( pSpriteNumber, mObjectNumber );
 			break;
 
 		case 0x3A60:		// Laser
-			obj_Laser_Collision( pSpriteNumber, byte_31F0 );
+			obj_Laser_Collision( pSpriteNumber, mObjectNumber );
 			break;
 
 		case 0x3D6E:		// Frankie
-			obj_Frankie_Collision( pSpriteNumber, byte_31F0 );
+			obj_Frankie_Collision( pSpriteNumber, mObjectNumber );
 			break;
 
 		default:
@@ -1838,8 +1837,8 @@ bool cCreep::obj_Actions_Collision( byte pSpriteNumber, byte pY ) {
 	return true;
 }
 
-bool cCreep::obj_Actions_InFront( byte pSpriteNumber, byte pY ) {
-	word func = readLEWord( &mMemory[ 0x844 + (pY << 2) ] );
+bool cCreep::obj_Actions_InFront( byte pSpriteNumber, byte pFunctionId ) {
+	word func = readLEWord( &mMemory[ 0x844 + (pFunctionId << 2) ] );
 	
 	switch( func ) {
 		case 0:
@@ -1847,47 +1846,47 @@ bool cCreep::obj_Actions_InFront( byte pSpriteNumber, byte pY ) {
 			break;
 		
 		case 0x4075:		// In Front Door
-			obj_Door_InFront( pSpriteNumber, byte_31F0 );
+			obj_Door_InFront( pSpriteNumber, mObjectNumber );
 			break;
 
 		case 0x41D8:		// In Front Button
-			obj_Door_Button_InFront( pSpriteNumber, byte_31F0 );
+			obj_Door_Button_InFront( pSpriteNumber, mObjectNumber );
 			break;
 		
 		case 0x44E7:		// In Front Lightning Switch
-			obj_Lightning_Switch_InFront( pSpriteNumber, byte_31F0 );
+			obj_Lightning_Switch_InFront( pSpriteNumber, mObjectNumber );
 			break;
 
 		case 0x4647:		// In Front Forcefield Timer
-			obj_Forcefield_Timer_InFront( pSpriteNumber, byte_31F0 );
+			obj_Forcefield_Timer_InFront( pSpriteNumber, mObjectNumber );
 			break;
 
 		case 0x47A7:		// In Front Mummy Release
-			obj_Mummy_Infront( pSpriteNumber, byte_31F0 );
+			obj_Mummy_Infront( pSpriteNumber, mObjectNumber );
 			break;
 
 		case 0x4990:		// In Front Key
-			obj_Key_Infront( pSpriteNumber, byte_31F0 );
+			obj_Key_Infront( pSpriteNumber, mObjectNumber );
 			break;
 
 		case 0x4A68:		// In Front Lock
-			obj_Door_Lock_InFront( pSpriteNumber, byte_31F0 );
+			obj_Door_Lock_InFront( pSpriteNumber, mObjectNumber );
 			break;
 		
 		case 0x4D70:		// In Front RayGun Control
-			obj_RayGun_Control_InFront( pSpriteNumber, byte_31F0 );
+			obj_RayGun_Control_InFront( pSpriteNumber, mObjectNumber );
 			break;
 
 		case 0x4EA8:		// In Front Teleport
-			obj_Teleport_InFront( pSpriteNumber, byte_31F0 );
+			obj_Teleport_InFront( pSpriteNumber, mObjectNumber );
 			break;
 		
 		case 0x548B:		// In Front Conveyor
-			obj_Conveyor_InFront( pSpriteNumber, byte_31F0 );
+			obj_Conveyor_InFront( pSpriteNumber, mObjectNumber );
 			break;
 
 		case 0x5611:		// In Front Conveyor Control
-			obj_Conveyor_Control_InFront( pSpriteNumber, byte_31F0 );
+			obj_Conveyor_Control_InFront( pSpriteNumber, mObjectNumber );
 			break;
 
 		default:
@@ -1952,60 +1951,59 @@ void cCreep::obj_Actions_Hit( byte pSpriteNumber, byte pY ) {
 
 // 3026
 void cCreep::obj_CheckCollisions( byte pSpriteNumber ) {
-	byte byte_311A, byte_311B, byte_3117, byte_3118, byte_3119;
+	byte SpriteY_Bottom, byte_311B, SpriteX, SpriteX_Right, SpriteY;
 
 	byte A = mMemory[ 0x895 + (mRoomSprites[pSpriteNumber].Sprite_field_0 << 3) ];
 	
 	if(!(A & 0x80)) {
 		byte_311B = A;
-		byte_3117 = mRoomSprites[pSpriteNumber].mX;
-		byte_3118 = byte_3117 + mRoomSprites[pSpriteNumber].mCollisionWidth;
-		if( (byte_3117 + mRoomSprites[pSpriteNumber].mCollisionWidth) > 0x100 )
-			byte_3117 = 0;
+		SpriteX = mRoomSprites[pSpriteNumber].mX;
+		SpriteX_Right = SpriteX + mRoomSprites[pSpriteNumber].mCollisionWidth;
+		if( (SpriteX + mRoomSprites[pSpriteNumber].mCollisionWidth) > 0x100 )
+			SpriteX = 0;
 
-		byte_3119 = mRoomSprites[pSpriteNumber].mY;
-		byte_311A = byte_3119 + mRoomSprites[pSpriteNumber].mCollisionHeight;
-		if( (byte_3119 + mRoomSprites[pSpriteNumber].mCollisionHeight) > 0x100 )
-			byte_3119 = 0;
+		SpriteY = mRoomSprites[pSpriteNumber].mY;
+		SpriteY_Bottom = SpriteY + mRoomSprites[pSpriteNumber].mCollisionHeight;
+		if( (SpriteY + mRoomSprites[pSpriteNumber].mCollisionHeight) > 0x100 )
+			SpriteY = 0;
 
-		for(byte Y = 0; Y != MAX_SPRITES; ++Y ) {
+		for(byte Y = 0; Y < MAX_SPRITES; ++Y ) {
 
 			// 3068
-			if( pSpriteNumber != Y ) {
-				A = mRoomSprites[Y].state;
+			if( pSpriteNumber == Y )
+				continue;
 
-				if( !(A & SPR_FLAG_FREE) ) {
+			A = mRoomSprites[Y].state;
+
+			if( !(A & SPR_FLAG_FREE) ) {
 					
-					if( (A & SPR_FLAG_COLLIDES) ) {
-						A = mMemory[ 0x895 + (mRoomSprites[Y].Sprite_field_0 << 3) ];
+				if( (A & SPR_FLAG_COLLIDES) ) {
+					A = mMemory[ 0x895 + (mRoomSprites[Y].Sprite_field_0 << 3) ];
 
-						if( !(A & 0x80 )) {
-							if(! (A & byte_311B )) {
+					if( !(A & 0x80 )) {
+						if(! (A & byte_311B )) {
 
-								// 308E
-								A = byte_3118;
+							// 308E
+							if( SpriteX_Right >= mRoomSprites[Y].mX ) {
+								A = mRoomSprites[Y].mX + mRoomSprites[Y].mCollisionWidth;
 
-								if( A >= mRoomSprites[Y].mX ) {
-									A = mRoomSprites[Y].mX + mRoomSprites[Y].mCollisionWidth;
-									if( A >= byte_3117 ) {
-										// 30A5
-										if( byte_311A >= mRoomSprites[Y].mY ) {
-											if( (mRoomSprites[Y].mY + mRoomSprites[Y].mCollisionHeight) >= byte_3119 ) {
+								if( A >= SpriteX ) {
+									// 30A5
+									if( SpriteY_Bottom >= mRoomSprites[Y].mY ) {
+										if( (mRoomSprites[Y].mY + mRoomSprites[Y].mCollisionHeight) >= SpriteY ) {
 												
-												obj_Actions_Hit( pSpriteNumber, Y);
-												obj_Actions_Hit( Y, pSpriteNumber );
-											}
+											obj_Actions_Hit( pSpriteNumber, Y);
+											obj_Actions_Hit( Y, pSpriteNumber );
 										}
 									}
 								}
-
 							}
+
 						}
+					}
 
-					}	// COLLIDES
-				}	// FREE
-			} //
-
+				}	// COLLIDES
+			}	// FREE
 		}
 	}
 	// 30D5
@@ -3515,8 +3513,6 @@ void cCreep::roomMain() {
 
 	roomLoad();
 	mInput->inputCheck( true );
-
-	byte X = 0;
 
 	for(byte X = 0; X < 2; ++X ) {
 		
@@ -7011,40 +7007,38 @@ void cCreep::obj_Key_Infront( byte pX, byte pY ) {
 }
 
 // 4A68: In Front Lock
-void cCreep::obj_Door_Lock_InFront( byte pX, byte pY ) {
-	byte byte_4B19 = pX;
+void cCreep::obj_Door_Lock_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 
-	if( mRoomSprites[pX].Sprite_field_0 )
+	if( mRoomSprites[pSpriteNumber].Sprite_field_0 )
 		return;
 
-	pX = mRoomSprites[pX].playerNumber;
-	if( mMemory[ 0x780D + pX ] != 0 )
+	if( mMemory[ 0x780D + mRoomSprites[pSpriteNumber].playerNumber ] != 0 )
 		return;
 
-	pX = byte_4B19;
-	if(mRoomSprites[pX].mButtonState == 0)
+	if( mRoomSprites[pSpriteNumber].mButtonState == 0 ) 
 		return;
 
-	if( obj_Key_NotFound( mRoomObjects[pY].objNumber, pX, pY ) == true )
+	if( obj_Key_NotFound( mRoomObjects[pObjectNumber].objNumber, pSpriteNumber ) == true )
 		return;
 
-	for( pX = 0;; ++pX ) {
-		if( mRoomAnim[pX].mFuncID )
+	byte X = 0;
+	for( X = 0;; ++X ) {
+		if( mRoomAnim[X].mFuncID )
 			continue;
-		if( mRoomObjects[pX].objNumber == mRoomObjects[pY].Object_field_1 )
+		if( mRoomObjects[X].objNumber == mRoomObjects[pObjectNumber].Object_field_1 )
 			break;
 	}
 	// 4AA2
-	if( mRoomObjects[pX].Object_field_1 )
+	if( mRoomObjects[X].Object_field_1 )
 		return;
 
-	mRoomAnim[pX].mFlags |= ITM_EXECUTE;
+	mRoomAnim[X].mFlags |= ITM_EXECUTE;
 }
 
-bool cCreep::obj_Key_NotFound( byte pA, byte pX, byte pY ) {
-	byte byte_5ED3, byte_5ED4 = pA;
+bool cCreep::obj_Key_NotFound( byte pObjectNumber, byte pSpriteNumber ) {
+	byte byte_5ED3;
 	
-	if( mRoomSprites[pX].playerNumber != 0 ) {
+	if( mRoomSprites[pSpriteNumber].playerNumber != 0 ) {
 		byte_5ED3 = mMemory[ 0x7814 ];
 		
 		word_30 = 0x7835;
@@ -7055,11 +7049,11 @@ bool cCreep::obj_Key_NotFound( byte pA, byte pX, byte pY ) {
 	}
 
 	//5EB8
-	for( pY = 0;; ++pY ) {
+	for( byte pY = 0;; ++pY ) {
 		if( pY == byte_5ED3 )
 			return true;
 
-		if( mMemory[ word_30 + pY ] == byte_5ED4 )
+		if( mMemory[ word_30 + pY ] == pObjectNumber )
 			return false;
 	}
 }

@@ -220,7 +220,7 @@ protected:
 	word		 word_5748;											// Frankenstein
 	char		 byte_574A, byte_574D, byte_574E, byte_574F;
 	
-	byte		 byte_31EF, byte_31F0, byte_31F1, byte_31F2;
+	byte		 byte_31EF, mObjectNumber, byte_31F1, byte_31F2;
 	byte		 byte_31F3, byte_31F4, byte_31F5;
 
 	word		 word_45DB;											// Lightning
@@ -376,7 +376,7 @@ public:
 		void	 obj_TrapDoor_PlaySound( byte pA );
 		void	 sub_526F( char &pA );
 		void	 roomAnim_Disable( byte pSpriteNumber );			// Redraw floor piece?
-		bool	 obj_Key_NotFound( byte pA, byte pX, byte pY );
+		bool	 obj_Key_NotFound( byte pObjectNumber, byte pSpriteNumber );
 		void	 positionCalculate( byte pSpriteNumber );
 		void	 word_3C_Calculate();
 		void	 sub_6009( byte pA );
@@ -389,8 +389,8 @@ public:
 
 		// object Handling Functions
 		void	 obj_Actions( );
-		bool	 obj_Actions_Collision( byte pSpriteNumber, byte pY );
-		bool	 obj_Actions_InFront( byte pSpriteNumber, byte pY );
+		bool	 obj_Actions_Collision( byte pSpriteNumber, byte pFunctionId );
+		bool	 obj_Actions_InFront( byte pSpriteNumber, byte pFunctionId );
 		void	 obj_Actions_Hit( byte pSpriteNumber, byte pY );
 		void	 obj_Actions_Execute( byte pSpriteNumber );
 		void	 obj_CheckCollisions( byte pSpriteNumber );
