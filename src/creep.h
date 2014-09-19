@@ -304,7 +304,7 @@ public:
 		void	 start( int pStartLevel, bool pUnlimited );			// Game Entry Point
 		void	 run( int pArgCount, char *pArgs[] );					// Executed from main()
 
-		void	 SetRoomPtr( byte pRoomNumber );
+		void	 roomPtrSet( byte pRoomNumber );
 
 		bool	 ChangeLevel( size_t pMenuItem );
 		void	 Game();
@@ -315,7 +315,7 @@ public:
 
 		void	 gameEscapeCastle();
 		void	 gameHighScores( );
-		void	 optionMenuPrepare();
+		void	 optionsMenuPrepare();
 
 		void	 gamePositionLoad();
 		void	 gamePositionSave( bool pCastleSave );

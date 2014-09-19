@@ -444,7 +444,7 @@ void cBuilder::mapRoomsDraw( size_t pArrowRoom ) {
 		if( roomIT->second->mNumber == 0xFF )
 			continue;
 
-		SetRoomPtr( roomIT->second->mNumber );
+		roomPtrSet( roomIT->second->mNumber );
 
 		mMemory[ mRoomPtr ] |= byte_8C0;
 
@@ -452,7 +452,7 @@ void cBuilder::mapRoomsDraw( size_t pArrowRoom ) {
 		mapRoomDraw();
 
 		if( roomIT->second->mNumber == pArrowRoom ) {
-			SetRoomPtr( roomIT->second->mNumber );
+			roomPtrSet( roomIT->second->mNumber );
 			mapArrowDraw( 0 );
 		}
 	}

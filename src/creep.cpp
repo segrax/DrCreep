@@ -375,7 +375,7 @@ void cCreep::start( int pStartLevel, bool pUnlimited ) {
       */
 	// 0x091B
 	//copyProtection();
-	optionMenuPrepare();
+	optionsMenuPrepare();
 
 	if( mMemory[ 0x839 ] != 1 ) {
 
@@ -395,7 +395,7 @@ void cCreep::start( int pStartLevel, bool pUnlimited ) {
 }
 
 // 0x7572
-void cCreep::optionMenuPrepare() {
+void cCreep::optionsMenuPrepare() {
 	word byte_30;
 
 	byte_30 = 0x400;
@@ -743,7 +743,7 @@ void cCreep::roomLoad() {
 	else
 		A = mMemory[ 0x7809 + X ];
 
-	SetRoomPtr( A );
+	roomPtrSet( A );
 	
 	// Room Color
 	graphicRoomColorsSet( mMemory[mRoomPtr] & 0xF );
@@ -928,7 +928,7 @@ bool cCreep::Intro() {
 
 		if( mMenuScreenTimer != 0 ) {
 			++mMenuScreenCount;
-			SetRoomPtr( mMenuScreenCount );
+			roomPtrSet( mMenuScreenCount );
 
 			if( ((*level( mRoomPtr )) & 0x40) )
 				mMenuScreenCount = 0;
@@ -2990,7 +2990,7 @@ void cCreep::obj_Forcefield_Execute( byte pSpriteNumber ) {
 }
 
 // 5FD9
-void cCreep::SetRoomPtr( byte pRoomNumber ) {
+void cCreep::roomPtrSet( byte pRoomNumber ) {
 
 	mRoomPtr = pRoomNumber << 3;
 	mRoomPtr += 0x7900;
@@ -3247,7 +3247,7 @@ bool cCreep::mapDisplay() {
 
 			// Mark Room as visible on map
 			byte A = mMemory[ 0x7809 + X ];
-			SetRoomPtr( A );
+			roomPtrSet( A );
 			mMemory[ mRoomPtr ] |= byte_8C0;
 			
 			// 
@@ -5271,7 +5271,7 @@ void cCreep::obj_Door_Img_Execute( byte pSpriteNumber ) {
 		mMemory[ word_40 + 2 ] |= 0x80;
 		byte A = mMemory[ word_40 + 4 ];
 
-		SetRoomPtr( mMemory[ word_40 + 3 ] );
+		roomPtrSet( mMemory[ word_40 + 3 ] );
 		sub_6009( A );
 		mMemory[ word_40 + 2 ] |= 0x80;
 	}
@@ -5337,7 +5337,7 @@ void cCreep::obj_Door_InFront( byte pSpriteNumber, byte pY ) {
 
 	//40DD
 	word word_41D6 = readLEWord( &mMemory[ word_40 + 3 ] );
-	SetRoomPtr( (word_41D6 & 0xFF) );
+	roomPtrSet( (word_41D6 & 0xFF) );
 	
 	mMemory[ mRoomPtr ] |= byte_8C0;
 
@@ -5758,7 +5758,7 @@ void cCreep::obj_Door_Prepare() {
 		mRoomObjects[X].objNumber = count;
 		mRoomAnim[X].mFuncID = 0;
 
-		SetRoomPtr( *level( word_3E + 3 ) );
+		roomPtrSet( *level( word_3E + 3 ) );
 		
 		byte A =  (*level( mRoomPtr ) & 0xF);
 
