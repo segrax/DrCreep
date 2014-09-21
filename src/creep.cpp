@@ -1630,7 +1630,7 @@ void cCreep::obj_Actions( ) {
 	byte  A;
 	byte w30 = 0;
 
-	for(byte spriteNumber = 0 ; spriteNumber != MAX_SPRITES; ++spriteNumber ) {
+	for(byte spriteNumber = 0 ; spriteNumber < MAX_SPRITES; ++spriteNumber ) {
 
 		A = mRoomSprites[spriteNumber].state;
 
@@ -4167,7 +4167,7 @@ void cCreep::mapRoomDraw() {
 		if( mMemory[ mRoomPtr ] & byte_8C0 ) {
 			//1224
 			
-			mMemory[ 0x63E7 ] = mMemory[ mRoomPtr ] & 0xF;	// color
+			mMemory[ 0x63E7 ] = mMemory[ mRoomPtr ] & 0xF;		// color
 			roomX		= mMemory[ mRoomPtr + 1 ];				// top left x
 			roomY		= mMemory[ mRoomPtr + 2 ];				// top left y
 			roomWidth	= mMemory[ mRoomPtr + 3 ] & 7;			// width

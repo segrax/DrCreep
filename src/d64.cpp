@@ -437,10 +437,8 @@ bool cD64::diskTest() {
 	
 	// TODO 
 	// Check for cross linked files
-	for( linkIT = mCrossLinked.begin(); linkIT != mCrossLinked.end(); ++linkIT ) {
-		
-
-	}
+	//for( linkIT = mCrossLinked.begin(); linkIT != mCrossLinked.end(); ++linkIT ) {
+	//}
 
 	return true;
 }
