@@ -424,6 +424,7 @@ bool cD64::bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrac
 	return bamTrackSectorFree( pTrack, pSector );
 }
 
+// Check a disk for errors
 bool cD64::diskTest() {
 	vector< sD64Chain >::iterator			 linkIT;
 	if(!bamTest()) {
@@ -443,6 +444,7 @@ bool cD64::diskTest() {
 	return true;
 }
 
+// Load an entry
 sD64File *cD64::directoryEntryLoad( byte *pBuffer ) {
 	sD64File *file = new sD64File();
 			
@@ -470,6 +472,7 @@ sD64File *cD64::directoryEntryLoad( byte *pBuffer ) {
 	return file;
 }
 
+// Load the disk directory
 void cD64::directoryLoad() {
 	// Directory starts at Track 18, sector 1
 	size_t   currentTrack = 0x12, currentSector = 1;
@@ -501,6 +504,7 @@ void cD64::directoryLoad() {
 	}
 }
 
+// Set the directory entry in the buffer
 bool cD64::directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer ) {
 	if( pFile->mName.size() > 0x0F )
 		return false;
@@ -529,6 +533,7 @@ bool cD64::directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer ) {
 	return true;
 }
 
+// Add file to directory
 bool cD64::directoryAdd( sD64File *pFile ) {
 	
 	// Directory starts at Track 18, sector 1
@@ -587,6 +592,7 @@ bool cD64::directoryAdd( sD64File *pFile ) {
 	return false;
 }
 
+// Memory Cleanup
 void cD64::filesCleanup() {
 	vector< sD64File * >::iterator		fileIT;
 
@@ -597,6 +603,7 @@ void cD64::filesCleanup() {
 	mFiles.clear();
 }
 
+// Load a file from the disk
 bool cD64::fileLoad( sD64File *pFile ) {
 	size_t bytesCopied = 0, copySize = 0xFE;
 	size_t currentTrack = pFile->mTrack, currentSector = pFile->mSector;
@@ -770,6 +777,7 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 	return diskWrite();
 }
 
+// Obtain pointer to 'pTrack'/'pSector' in the disk buffer
 byte *cD64::sectorPtr( size_t pTrack, size_t pSector ) {
 	size_t	currentTrack, currentRange;
 	dword	offset = 0;
@@ -807,6 +815,7 @@ byte *cD64::sectorPtr( size_t pTrack, size_t pSector ) {
 	return 0;
 }
 
+// Write the buffer to the D64
 bool cD64::diskWrite() {
 	
 	// Dont save if the disk was opened read only, or the last operation failed
@@ -819,6 +828,7 @@ bool cD64::diskWrite() {
 	return local_FileSave( mFilename, mPath, mDataSave, mBuffer, mBufferSize );
 }
 
+// Get a file
 sD64File *cD64::fileGet( string pFilename ) {
 	vector< sD64File* >::iterator fileIT;
 	
@@ -835,6 +845,7 @@ sD64File *cD64::fileGet( string pFilename ) {
 	return 0;
 }
 
+// Get a file list, with all files starting with 'pFind'
 vector< sD64File* > cD64::directoryGet( string pFind ) {
 	vector< sD64File* > result;
 	vector< sD64File* >::iterator	fileIT;

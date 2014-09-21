@@ -108,14 +108,14 @@ private:
 	bool						 bamTrackSectorFree( size_t &pTrack, size_t &pSector );								// Check for free sectors in a track
 	bool						 bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrack = 0x12 );	// Check for free sectors on the disk
 
-	bool						 bamTest( );															// Test the BAM against the real one
+	bool						 bamTest( );																		// Test the BAM against the real one
 
-	void						 directoryLoad();														// Load the disk directory
-	sD64File					*directoryEntryLoad( byte *pBuffer );									// Load an entry
-	bool						 directoryAdd( sD64File *pFile );										// Add file to directory
-	bool						 directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer );	// Set the directory entry in the buffer
+	void						 directoryLoad();																	// Load the disk directory
+	sD64File					*directoryEntryLoad( byte *pBuffer );												// Load an entry
+	bool						 directoryAdd( sD64File *pFile );													// Add file to directory
+	bool						 directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer );				// Set the directory entry in the buffer
 	
-	void						 filesCleanup();
+	void						 filesCleanup();										// Memory Cleanup
 	bool						 fileLoad( sD64File *pFile );							// Load a file from the disk
 
 	byte						*sectorPtr( size_t pTrack, size_t pSector );			// Obtain pointer to 'pTrack'/'pSector' in the disk buffer
