@@ -4346,6 +4346,7 @@ void cCreep::obj_MultiDraw() {
 
 		--gfxRepeat;
 
+		// Draw an object a number of times,starting at a certain X/Y and repeating every X/Y
 		for( ; gfxRepeat >= 0; --gfxRepeat ) {
 		
 			screenDraw( 0, gfxCurrentID, gfxPosX, gfxPosY );
