@@ -2082,39 +2082,37 @@ s2FE9:;
 // Originally this was not a function, but its too big to bother
 // implementing in the original location
 void cCreep::obj_Actions_Execute( byte pSpriteNumber ) {
+
 	//2ED5
-	byte Y =  mRoomSprites[pSpriteNumber].Sprite_field_0 << 3;
-	word func = readLEWord( &mMemory[ 0x88F + Y ]);
+	switch( mRoomSprites[pSpriteNumber].Sprite_field_0 ) {
 
-	switch(func) {
-
-		case 0x31F6:
+		case 0:
 			obj_Player_Execute( pSpriteNumber );
 			break;
-		
-		case 0x3639:
+
+		case 1:
 			obj_Lightning_Execute( pSpriteNumber );
 			break;
 
-		case 0x36B3:
+		case 2:
 			obj_Forcefield_Execute( pSpriteNumber );
 			break;
 		
-		case 0x379A:
+		case 3:
 			obj_Mummy_Execute( pSpriteNumber );
 			break;
 
-		case 0x3A08:
+		case 4:
 			obj_RayGun_Laser_Execute( pSpriteNumber );
 			break;
 
-		case 0x3AEB:
+		case 5:
 			obj_Frankie_Execute( pSpriteNumber );
 			break;
 
 		default:
 			cout << "obj_Actions_Execute: 0x";
-			cout << std::hex << func << "\n";
+			cout << std::hex << mRoomSprites[pSpriteNumber].Sprite_field_0 << "\n";
 			break;
 	}
 
@@ -2827,27 +2825,35 @@ void cCreep::anim_Execute() {
 				case 0:
 					mRoomAnim[X].mFlags ^= ITM_EXECUTE;
 					break;
+				//case 0:
 				case 0x3FD5:
 					obj_Door_Img_Execute( X );
 					break;
+				//case 2:
 				case 0x42AD:
 					obj_Lightning_Img_Execute( X );
 					break;
+				//case 4:
 				case 0x45E0:	
 					obj_Forcefield_Img_Timer_Execute( X );
 					break;
+				//case 5:
 				case 0x475E:
 					obj_Mummy_Img_Execute( X );
 					break;
+				//case 8:
 				case 0x4B1A:
 					obj_RayGun_Img_Execute( X );
 					break;
+				//case 0x0A:
 				case 0x4E32:
 					obj_Teleport_Img_Execute( X );
 					break;
+				//case 0x0B:
 				case 0x50D2:
 					obj_TrapDoor_Switch_Img_Execute( X );
 					break;
+				//case 0x0D:
 				case 0x538B:
 					obj_Conveyor_Img_Execute( X );
 					break;
@@ -5379,7 +5385,7 @@ void cCreep::obj_Teleport_Prepare() {
 	
 	anim_Update( 0x70, gfxPosX, gfxPosY, 0, X );
 
-	obj_Teleport_unk( (mMemory[ word_3E + 2 ] + 2), X );
+	obj_Teleport_SetColour( (mMemory[ word_3E + 2 ] + 2), X );
 	
 	byte A = 0x20;
 
@@ -5586,7 +5592,7 @@ void cCreep::obj_Teleport_Img_Execute( byte pX ) {
 	else
 		A = mRoomObjects[pX].Object_field_2;
 
-	obj_Teleport_unk(A, pX);
+	obj_Teleport_SetColour(A, pX);
 	if( mEngine_Ticks & 3 )
 		return;
 	
@@ -7154,7 +7160,7 @@ void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 		A = mMemory[ word_40 + 2 ] + 2;
 
 		byte_50CE = pX;
-		obj_Teleport_unk( A, byte_50CF );
+		obj_Teleport_SetColour( A, byte_50CF );
 		pX = byte_50CE;
 		
 		return;
@@ -7205,7 +7211,7 @@ void cCreep::obj_RayGun_Control_Update( byte pA ) {
 }
 
 // 505C: 
-void cCreep::obj_Teleport_unk( byte pA, byte pX ) {
+void cCreep::obj_Teleport_SetColour( byte pA, byte pX ) {
 
 	byte A =  (pA << 4) | 0x0A;
 
@@ -7222,6 +7228,7 @@ void cCreep::obj_Teleport_unk( byte pA, byte pX ) {
 
 	mMemory[ 0x6E73 ] = mMemory[ 0x6E74 ] = mMemory[ 0x6E75 ] = 1;
 	screenDraw( 0, 0x71, gfxPosX, gfxPosY, 0 );
+
 	gfxPosY += 0x08;
 	screenDraw( 0, 0x71, gfxPosX, gfxPosY, 0 );
 }
@@ -7336,18 +7343,10 @@ void cCreep::obj_Conveyor_InFront( byte pX, byte pY ) {
 		A = 0x01;
 
 	// 54E2
-	byte byte_564A = A;
-	
-	if( mRoomSprites[pX].Sprite_field_0 == 0 ) {
-		A = mEngine_Ticks & 7;
-		if( A )
-			goto s54F4;
-	}
-	
-	byte_564A <<= 1;
-s54F4:;
+	if( !(mRoomSprites[pX].Sprite_field_0 == 0 && (mEngine_Ticks & 7) ))
+		A <<= 1;
 
-	mRoomSprites[pX].mX += byte_564A;
+	mRoomSprites[pX].mX += A;
 }
 
 // 5611: In Front Conveyor Control

@@ -372,7 +372,7 @@ public:
 		void	 convertTimeToNumber( byte pA, byte pY );
 		void	 obj_Mummy_Hit_Player( byte pX, byte pY );
 		void	 obj_Laser_Collision( byte pX, byte pY );
-		void	 obj_Teleport_unk( byte pA, byte pX );
+		void	 obj_Teleport_SetColour( byte pA, byte pX );
 		void	 obj_TrapDoor_PlaySound( byte pA );
 		void	 sub_526F( char &pA );
 		void	 roomAnim_Disable( byte pSpriteNumber );			// Redraw floor piece?
