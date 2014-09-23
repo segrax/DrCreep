@@ -2822,41 +2822,42 @@ void cCreep::anim_Execute() {
 			word func = readLEWord( &mMemory[ 0x842 + (mRoomAnim[X].mFuncID << 2) ] );
 		
 			switch( func ) {
-				case 0:
+				case eAnimNone:
 					mRoomAnim[X].mFlags ^= ITM_EXECUTE;
 					break;
-				//case 0:
-				case 0x3FD5:
+
+				case eAnimDoor:
 					obj_Door_Img_Execute( X );
 					break;
-				//case 2:
-				case 0x42AD:
+
+				case eAnimLightning:
 					obj_Lightning_Img_Execute( X );
 					break;
-				//case 4:
-				case 0x45E0:	
+
+				case eAnimForceFieldTimer:	
 					obj_Forcefield_Img_Timer_Execute( X );
 					break;
-				//case 5:
-				case 0x475E:
+
+				case eAnimMummy:
 					obj_Mummy_Img_Execute( X );
 					break;
-				//case 8:
-				case 0x4B1A:
+
+				case eAnimRayGun:
 					obj_RayGun_Img_Execute( X );
 					break;
-				//case 0x0A:
-				case 0x4E32:
+
+				case eAnimTeleport:
 					obj_Teleport_Img_Execute( X );
 					break;
-				//case 0x0B:
-				case 0x50D2:
+
+				case eAnimTrapDoorSwitch:
 					obj_TrapDoor_Switch_Img_Execute( X );
 					break;
-				//case 0x0D:
-				case 0x538B:
+
+				case eAnimConveyor:
 					obj_Conveyor_Img_Execute( X );
 					break;
+
 				default:
 					cout << "anim_Execute: 0x";
 					cout << std::hex << func << "\n";

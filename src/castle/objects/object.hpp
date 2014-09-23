@@ -47,6 +47,18 @@ enum eRoomObjects {
 	eObjectNone	= 0x0000,
 };
 
+enum eRoomAnimation {
+	eAnimDoor				= 0x3FD5,
+	eAnimLightning			= 0x42AD,
+	eAnimForceFieldTimer	= 0x45E0,
+	eAnimMummy				= 0x475E,
+	eAnimRayGun				= 0x4B1A,
+	eAnimTeleport			= 0x4E32,
+	eAnimTrapDoorSwitch		= 0x50D2,
+	eAnimConveyor			= 0x538B,
+	eAnimNone				= 0x0000,
+};
+
 enum eDirection {
 	eDirectionUp	 = 0,
 	eDirectionRight	 = 1,
