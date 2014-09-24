@@ -31,6 +31,19 @@ class cSound;
 class cDebug;
 class cBuilder;
 
+struct sObjectData {
+	word mFuncExecId;
+	word mFuncHitId;
+	word mFuncColId;
+	byte mFlashData;
+	byte mHitData;
+};
+
+struct sObjectImgData {
+	word mFuncExecId;
+	word mFuncInfrontId;
+};
+
 enum {
 	SPR_ACTION_CREATED	= 0x80,	// Just Created
 	SPR_ACTION_FLASH	= 0x40,	// Die

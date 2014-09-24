@@ -49,6 +49,31 @@
 	#include <sys/timeb.h>
 #endif
 
+sObjectData mObjectFuncData[6] = {	0x31F6, 0x3534, 0x34EF, 0x01, 0x00,
+									0x3639, 0x3682, 0x0000, 0x00, 0x04,
+									0x36B3, 0x374F, 0x0000, 0x00, 0x03,
+									0x379A, 0x3940, 0x38CE, 0x01, 0x02,
+									0x3A08, 0x0000, 0x3A60, 0x00, 0x04,
+									0x3AEB, 0x3DDE, 0x3D6E, 0x00, 0x00 
+								 };
+
+sObjectImgData mObjectImageData[16] = { 0x3FD5, 0x4075,		// Door
+										0x0000, 0x41D8,		// Door Button
+										0x42AD, 0x0000,		// Lightning
+										0x0000, 0x44E7,		// Lightning Switch
+										0x45E0, 0x4647,		// Forcefield Timer
+										0x475E, 0x47A7,		// Mummy
+										0x0000, 0x4990,		// Key
+										0x0000, 0x4A68,		// Door Lock
+										0x4B1A, 0x0000,		// Ray Gun
+										0x0000, 0x4D70,		// Ray Gun Control
+										0x4E32, 0x4EA8,		// Teleport
+										0x50D2, 0x0000,		// Trapdoor Switch
+										0x0000, 0x0000,		// 
+										0x538B, 0x548B,		// Conveyor
+										0x0000, 0x5611,		// Conveyor Control
+										0x0000, 0x0000		//
+									  };
 cCreep::cCreep() {
 	size_t romSize;
 	mWindowTitle = "The Castles of Dr. Creep";
@@ -1801,8 +1826,8 @@ void cCreep::obj_OverlapCheck( byte pSpriteNumber ) {
 }
 
 bool cCreep::obj_Actions_Collision( byte pSpriteNumber, byte pFunctionId ) {
-	word func = readLEWord( &mMemory[ 0x893 + (pFunctionId << 3)]);
-	
+	word func = mObjectFuncData[pFunctionId].mFuncColId;
+
 	switch( func ) {
 		case 0:
 			return false;
@@ -1838,8 +1863,8 @@ bool cCreep::obj_Actions_Collision( byte pSpriteNumber, byte pFunctionId ) {
 }
 
 bool cCreep::obj_Actions_InFront( byte pSpriteNumber, byte pFunctionId ) {
-	word func = readLEWord( &mMemory[ 0x844 + (pFunctionId << 2) ] );
-	
+	word func = mObjectImageData[ pFunctionId ].mFuncInfrontId;
+
 	switch( func ) {
 		case 0:
 			return false;
@@ -1909,8 +1934,7 @@ void cCreep::obj_Actions_Hit( byte pSpriteNumber, byte pY ) {
 	byte_311D = 1;
 	mMemory[ 0x311C ] = pY;
 	
-	byte Y = mRoomSprites[pSpriteNumber].Sprite_field_0 << 3;
-	word func = readLEWord( &mMemory[ 0x891 + Y ] );
+	word func = mObjectFuncData[mRoomSprites[pSpriteNumber].Sprite_field_0].mFuncHitId;
 
 	switch( func ) {
 		case 0:
@@ -1953,8 +1977,8 @@ void cCreep::obj_Actions_Hit( byte pSpriteNumber, byte pY ) {
 void cCreep::obj_CheckCollisions( byte pSpriteNumber ) {
 	byte SpriteY_Bottom, byte_311B, SpriteX, SpriteX_Right, SpriteY;
 
-	byte A = mMemory[ 0x895 + (mRoomSprites[pSpriteNumber].Sprite_field_0 << 3) ];
-	
+	byte A = mObjectFuncData[mRoomSprites[pSpriteNumber].Sprite_field_0].mHitData;
+
 	if(!(A & 0x80)) {
 		byte_311B = A;
 		SpriteX = mRoomSprites[pSpriteNumber].mX;
@@ -2033,8 +2057,7 @@ void cCreep::sprite_FlashOnOff( byte pSpriteNumber ) {
 
 		mRoomSprites[pSpriteNumber].state = state;
 
-		Y = mRoomSprites[pSpriteNumber].Sprite_field_0 << 3;
-		byte A = mMemory[ 0x896 + Y ];
+		byte A = mObjectFuncData[mRoomSprites[pSpriteNumber].Sprite_field_0].mFlashData;
 
 		// 
 		if(!(A & SPRITE_FLASH_UNK))
@@ -2083,30 +2106,32 @@ s2FE9:;
 // implementing in the original location
 void cCreep::obj_Actions_Execute( byte pSpriteNumber ) {
 
-	//2ED5
-	switch( mRoomSprites[pSpriteNumber].Sprite_field_0 ) {
+	word func = mObjectFuncData[mRoomSprites[pSpriteNumber].Sprite_field_0].mFuncExecId;
 
-		case 0:
+	//2ED5
+	switch( func ) {
+
+		case 0x31F6:
 			obj_Player_Execute( pSpriteNumber );
 			break;
 
-		case 1:
+		case 0x3639:
 			obj_Lightning_Execute( pSpriteNumber );
 			break;
 
-		case 2:
+		case 0x36B3:
 			obj_Forcefield_Execute( pSpriteNumber );
 			break;
 		
-		case 3:
+		case 0x379A:
 			obj_Mummy_Execute( pSpriteNumber );
 			break;
 
-		case 4:
+		case 0x3A08:
 			obj_RayGun_Laser_Execute( pSpriteNumber );
 			break;
 
-		case 5:
+		case 0x3AEB:
 			obj_Frankie_Execute( pSpriteNumber );
 			break;
 
@@ -2819,8 +2844,8 @@ void cCreep::anim_Execute() {
 		byte A = mRoomAnim[X].mFlags;
 		if(A & ITM_EXECUTE) {
 
-			word func = readLEWord( &mMemory[ 0x842 + (mRoomAnim[X].mFuncID << 2) ] );
-		
+			word func = mObjectImageData[ mRoomAnim[X].mFuncID ].mFuncExecId;
+
 			switch( func ) {
 				case eAnimNone:
 					mRoomAnim[X].mFlags ^= ITM_EXECUTE;

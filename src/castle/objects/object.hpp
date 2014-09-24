@@ -35,6 +35,7 @@ enum eRoomObjects {
 	eObjectMummy		= 0x0818,
 	eObjectKey			= 0x081B,
 	eObjectLock			= 0x081E,
+	eObjectMultiDraw	= 0x0821,
 	eObjectRayGun		= 0x0824,
 	eObjectTeleport		= 0x0827,
 	eObjectTrapDoor		= 0x082A,
@@ -42,9 +43,8 @@ enum eRoomObjects {
 	eObjectFrankenstein = 0x0830,
 	eObjectText			= 0x0833,
 	eObjectImage		= 0x0836,
-	eObjectMultiDraw	= 0x0821,
 
-	eObjectNone	= 0x0000,
+	eObjectNone			= 0x0000,
 };
 
 enum eRoomAnimation {
