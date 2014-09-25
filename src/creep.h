@@ -402,8 +402,8 @@ public:
 
 		// object Handling Functions
 		void	 obj_Actions( );
-		bool	 obj_Actions_Collision( byte pSpriteNumber, byte pFunctionId );
-		bool	 obj_Actions_InFront( byte pSpriteNumber, byte pFunctionId );
+		bool	 obj_Actions_Collision( byte pSpriteNumber );
+		bool	 obj_Actions_InFront( byte pSpriteNumber);
 		void	 obj_Actions_Hit( byte pSpriteNumber, byte pY );
 		void	 obj_Actions_Execute( byte pSpriteNumber );
 		void	 obj_CheckCollisions( byte pSpriteNumber );

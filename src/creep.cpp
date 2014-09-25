@@ -49,31 +49,31 @@
 	#include <sys/timeb.h>
 #endif
 
-sObjectData mObjectFuncData[6] = {	0x31F6, 0x3534, 0x34EF, 0x01, 0x00,
-									0x3639, 0x3682, 0x0000, 0x00, 0x04,
-									0x36B3, 0x374F, 0x0000, 0x00, 0x03,
-									0x379A, 0x3940, 0x38CE, 0x01, 0x02,
-									0x3A08, 0x0000, 0x3A60, 0x00, 0x04,
-									0x3AEB, 0x3DDE, 0x3D6E, 0x00, 0x00 
+sObjectData mObjectFuncData[6] = {	0x31F6, 0x3534, 0x34EF, 0x01, 0x00,	// Player
+									0x3639, 0x3682, 0x0000, 0x00, 0x04, // Lightning
+									0x36B3, 0x374F, 0x0000, 0x00, 0x03, // Forcefield
+									0x379A, 0x3940, 0x38CE, 0x01, 0x02, // Mummy
+									0x3A08, 0x0000, 0x3A60, 0x00, 0x04, // RayGun Laser
+									0x3AEB, 0x3DDE, 0x3D6E, 0x01, 0x00  // Frankie
 								 };
 
-sObjectImgData mObjectImageData[16] = { 0x3FD5, 0x4075,		// Door
-										0x0000, 0x41D8,		// Door Button
-										0x42AD, 0x0000,		// Lightning
-										0x0000, 0x44E7,		// Lightning Switch
-										0x45E0, 0x4647,		// Forcefield Timer
-										0x475E, 0x47A7,		// Mummy
-										0x0000, 0x4990,		// Key
-										0x0000, 0x4A68,		// Door Lock
-										0x4B1A, 0x0000,		// Ray Gun
-										0x0000, 0x4D70,		// Ray Gun Control
-										0x4E32, 0x4EA8,		// Teleport
-										0x50D2, 0x0000,		// Trapdoor Switch
-										0x0000, 0x0000,		// 
-										0x538B, 0x548B,		// Conveyor
-										0x0000, 0x5611,		// Conveyor Control
-										0x0000, 0x0000		//
-									  };
+sObjectImgData mObjectImageFuncData[16] = { 0x3FD5, 0x4075,		// Door
+											0x0000, 0x41D8,		// Door Button
+											0x42AD, 0x0000,		// Lightning
+											0x0000, 0x44E7,		// Lightning Switch
+											0x45E0, 0x4647,		// Forcefield Timer
+											0x475E, 0x47A7,		// Mummy
+											0x0000, 0x4990,		// Key
+											0x0000, 0x4A68,		// Door Lock
+											0x4B1A, 0x0000,		// Ray Gun
+											0x0000, 0x4D70,		// Ray Gun Control
+											0x4E32, 0x4EA8,		// Teleport
+											0x50D2, 0x0000,		// Trapdoor Switch
+											0x0000, 0x0000,		// 
+											0x538B, 0x548B,		// Conveyor
+											0x0000, 0x5611,		// Conveyor Control
+											0x0000, 0x0000		//
+										  };
 cCreep::cCreep() {
 	size_t romSize;
 	mWindowTitle = "The Castles of Dr. Creep";
@@ -1809,15 +1809,14 @@ void cCreep::obj_OverlapCheck( byte pSpriteNumber ) {
 						if( !(mRoomAnim[Y].mY + mRoomAnim[Y].mHeight < byte_31F3) ) {
 						//318C
 							byte_31F5 = 1;
-							Y = mRoomSprites[pSpriteNumber].Sprite_field_0;
 
-							if( obj_Actions_Collision( pSpriteNumber, Y ) == true ) {
+							if( obj_Actions_Collision( pSpriteNumber ) == true ) {
 
 								if( byte_31F5 == 1 ) 
 									mRoomSprites[pSpriteNumber].state |= SPR_ACTION_FLASH;
 							}
 
-							obj_Actions_InFront( pSpriteNumber, mRoomAnim[mObjectNumber].mFuncID );
+							obj_Actions_InFront( pSpriteNumber );
 						} 
 		
 		Y = mObjectNumber + 1;
@@ -1825,8 +1824,8 @@ void cCreep::obj_OverlapCheck( byte pSpriteNumber ) {
 	} while(Y != byte_31EF);
 }
 
-bool cCreep::obj_Actions_Collision( byte pSpriteNumber, byte pFunctionId ) {
-	word func = mObjectFuncData[pFunctionId].mFuncColId;
+bool cCreep::obj_Actions_Collision( byte pSpriteNumber ) {
+	word func = mObjectFuncData[ mRoomSprites[pSpriteNumber].Sprite_field_0 ].mFuncColId;
 
 	switch( func ) {
 		case 0:
@@ -1862,8 +1861,9 @@ bool cCreep::obj_Actions_Collision( byte pSpriteNumber, byte pFunctionId ) {
 	return true;
 }
 
-bool cCreep::obj_Actions_InFront( byte pSpriteNumber, byte pFunctionId ) {
-	word func = mObjectImageData[ pFunctionId ].mFuncInfrontId;
+bool cCreep::obj_Actions_InFront( byte pSpriteNumber ) {
+
+	word func = mObjectImageFuncData[ mRoomAnim[mObjectNumber].mFuncID ].mFuncInfrontId;
 
 	switch( func ) {
 		case 0:
@@ -2844,7 +2844,7 @@ void cCreep::anim_Execute() {
 		byte A = mRoomAnim[X].mFlags;
 		if(A & ITM_EXECUTE) {
 
-			word func = mObjectImageData[ mRoomAnim[X].mFuncID ].mFuncExecId;
+			word func = mObjectImageFuncData[ mRoomAnim[X].mFuncID ].mFuncExecId;
 
 			switch( func ) {
 				case eAnimNone:
