@@ -147,10 +147,12 @@ cCreep::cCreep() {
 	byte_5646 = 0x04;
 	byte_5647 = 0x02;
 	byte_5648 = 0x01;
+
+	byte_574C = 0x80;
 	byte_574D = 0x04;
 	byte_574E = 0x02;
 	byte_574F = 0x01;	
-	byte_574C = 0x80;
+
 
 	mBuilder = 0;
 	mCastle = 0;
@@ -4791,14 +4793,7 @@ void cCreep::obj_Walkway_Prepare() {
 	byte CurrentY, CurrentX, Height;
 	byte gfxCurrentID, gfxPosX, gfxPosY;
 
-	for(;;) {
-		
-		Height = mMemory[ word_3E ];
-
-		if( ! Height ) {
-			++word_3E;
-			return;
-		}
+	while( (Height = mMemory[ word_3E ]) ) {
 		
 		gfxPosX = mMemory[ word_3E + 1 ];
 		gfxPosY = mMemory[ word_3E + 2 ];
@@ -4865,6 +4860,7 @@ void cCreep::obj_Walkway_Prepare() {
 		word_3E += 3;
 	}
 
+	++word_3E;
 }
 
 void cCreep::roomAnim_Disable( byte pSpriteNumber ) {
@@ -5635,11 +5631,7 @@ void cCreep::obj_RayGun_Prepare() {
 	word_4D5B = word_3E;
 	byte_4D5D = 0;
 
-	for(;;) {
-		if( mMemory[ word_3E ] & byte_4D60 ) {
-			++word_3E;
-			break;
-		}
+	do {
 		// 4C7E
 
 		mMemory[ word_3E ] &=( 0xFF ^ byte_4D61);
@@ -5699,7 +5691,10 @@ void cCreep::obj_RayGun_Prepare() {
 
 		word_3E += 0x07;
 		byte_4D5D += 0x07;
-	}
+
+	} while( !(mMemory[ word_3E ] & byte_4D60) );
+
+	++word_3E;
 }
 
 // 49F8: Load the rooms' Keys
@@ -5708,11 +5703,7 @@ void cCreep::obj_Key_Load() {
 
 	mCurrentKeyID = 0;
 	
-	for(;;) {
-		if( mMemory[ word_3E ] == 0 ) {
-			++word_3E;
-			break;
-		}
+	do {
 
 		if( mMemory[ word_3E + 1 ] != 0 ) {
 			byte X;
@@ -5732,8 +5723,10 @@ void cCreep::obj_Key_Load() {
 		// 4A47
 		mCurrentKeyID += 0x04;
 		word_3E += 0x04;
-	}
 
+	} while( mMemory[ word_3E ] != 0 );
+
+	++word_3E;
 }
 
 void cCreep::obj_Door_Lock_Prepare() {
