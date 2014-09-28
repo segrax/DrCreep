@@ -208,7 +208,7 @@ protected:
 	byte		 byte_2E02;
 
 	byte		 mEngine_Ticks;
-	char		 byte_2232;					// Conveyor
+	char		 mPlayingSound;					
 
 	byte		 byte_311D;
 

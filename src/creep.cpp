@@ -122,7 +122,7 @@ cCreep::cCreep() {
 	mRestorePressed = false;
 
 	byte_20DE = 0x00;
-	byte_2232 = -1;
+	mPlayingSound = -1;
 	byte_24FD = 0x00;
 	mEngine_Ticks = 0xA0;
 
@@ -702,7 +702,7 @@ void cCreep::sub_95F() {
 
 	interruptWait( 2 );
 
-	byte_2232 = -1;
+	mPlayingSound = -1;
 }
 
 // 0B84
@@ -1206,7 +1206,7 @@ musicUpdate:;
 	}	// for
 	
 	if( !mIntro ) {
-		byte_2232 = -1;
+		mPlayingSound = -1;
 		mMusicBuffer = 0;
 		
 	} else {
@@ -4696,10 +4696,9 @@ void cCreep::gameHighScores( ) {
 
 	// 1DAD
 	for(;;) {
-		mMemory[ 0xB889 ] = 0;
 		mTextYPos = 0x38;
 		
-		for(;;) {
+		for( mMemory[ 0xB889 ] = 0; mMemory[ 0xB889 ] < 0x0A; ++mMemory[ 0xB889 ]) {
 			
 			Y = mMemory[ 0xB889 ];
 			mTextColor = mMemory[ 0x1E85 + Y ];
@@ -4730,9 +4729,6 @@ void cCreep::gameHighScores( ) {
 			// 1E20
 			mTextYPos += 0x08;
 			X += 0x06;
-			++mMemory[ 0xB889 ];
-			if( mMemory[ 0xB889 ] >= 0x0A )
-				break;
 		}
 		
 		// 1E3B
@@ -4750,7 +4746,6 @@ void cCreep::gameHighScores( ) {
 
 // 21C8
 void cCreep::sound_PlayEffect( char pA ) {
-	char byte_2231 = pA;
 
 	if( mIntro )
 		return;
@@ -4758,12 +4753,12 @@ void cCreep::sound_PlayEffect( char pA ) {
 	if( byte_839 == 1 )
 		return;
 
-	if( byte_2232 >= 0 )
+	if( mPlayingSound >= 0 )
 		return;
 
-	byte_2232 = byte_2231;
+	mPlayingSound = pA;
 
-	byte Y = byte_2232 << 1;
+	byte Y = mPlayingSound << 1;
 	word_44 = readLEWord( &mMemory[ 0x7572 + Y ] );
 
 	mSound->sidWrite( 0x04, 0 );
