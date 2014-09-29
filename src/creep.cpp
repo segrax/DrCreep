@@ -5462,9 +5462,9 @@ void cCreep::obj_RayGun_Img_Execute( byte pX ) {
 		if(!(mMemory[ word_40 ] & byte_4D62) ) {
 			byte_4D5D = 0xFF;
 			byte_4D5E = 0x00;
-			byte_4D5F = 0x01;
+			
 
-			for(;;) {
+			for(byte_4D5F = 0x01; ((char) byte_4D5F) > 0; --byte_4D5F) {
 
 				if( mMemory[ 0x780D + byte_4D5F ] == 0 ) {
 					byte Y = mMemory[ 0x34D1 + byte_4D5F ];
@@ -5485,9 +5485,6 @@ void cCreep::obj_RayGun_Img_Execute( byte pX ) {
 					}
 				}
 				//4B9C
-				--byte_4D5F;
-				if( (char) byte_4D5F < 0 )
-					break;
 			}
 			// 4BA1
 			A = 0xFF;
