@@ -4639,9 +4639,6 @@ s1BE7:;
 	mMemory[ 0x28D2 ] = mMemory[ 0xBA03 + X ];
 	mMemory[ 0x28D1 ] = 2;
 	
-	// TODO
-	//1CE3 20 20 29                    JSR     InterruptDisableAndReInit
-
 	// Save highscores
 	mCastleManager->scoresSave( mCastle->nameGet(), readLEWord( memory( 0xB800 ) ), memory( 0xB800 ) );
 
@@ -5209,13 +5206,7 @@ void cCreep::obj_SlidingPole_Prepare() {
 void cCreep::obj_Ladder_Prepare() {
 	byte byte_18E3, gfxPosX, gfxPosY;
 	
-	for(;;) {
-	
-		byte_18E3 = mMemory[ word_3E ];
-		if( byte_18E3 == 0 ) {
-			++word_3E;
-			return;
-		}
+	while( (byte_18E3 = mMemory[ word_3E ]) ) {
 
 		// 1800
 		gfxPosX = mMemory[ word_3E + 1 ];
@@ -5276,6 +5267,7 @@ void cCreep::obj_Ladder_Prepare() {
 		}
 	}
 
+	++word_3E;
 }
 
 // 3FD5: Door Opening
