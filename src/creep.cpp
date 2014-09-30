@@ -2727,7 +2727,7 @@ void cCreep::obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 
 	} else {
 		// 3DA1
-		word_40 = word_5387 + mRoomObjects[pObjectNumber].objNumber;
+		word_40 = mRoomTrapDoorPtr + mRoomObjects[pObjectNumber].objNumber;
 
 		if( !(mMemory[ word_40 ] & byte_538A) ) {
 			byte_31F5 = 0;
@@ -3517,7 +3517,7 @@ void cCreep::obj_Player_Add( ) {
 	
 	byte A = mMemory[ 0x780B + Y ];
 	A <<= 3;
-	word_40 = A + mRoomDoorDataPtr;
+	word_40 = A + mRoomDoorPtr;
 	
 	// 35C0
 	if( mMemory[ word_40 + 2 ] & 0x80 ) {
@@ -5158,14 +5158,7 @@ void cCreep::obj_SlidingPole_Prepare() {
 	byte byte_17ED;
 	byte A, gfxPosX, gfxPosY;
 
-	for(;;) {
-	
-		byte_17ED = mMemory[ word_3E ];
-
-		if( ! byte_17ED ) {
-			++word_3E;
-			return;
-		}
+	while( (byte_17ED = mMemory[ word_3E ]) ) {
 
 		gfxPosX = mMemory[ word_3E + 1 ];
 		gfxPosY = mMemory[ word_3E + 2 ];
@@ -5201,6 +5194,8 @@ void cCreep::obj_SlidingPole_Prepare() {
 			word_3C += 0x50;
 		}
 	}
+
+	++word_3E;
 }
 
 void cCreep::obj_Ladder_Prepare() {
@@ -5277,7 +5272,7 @@ void cCreep::obj_Door_Img_Execute( byte pSpriteNumber ) {
 		mRoomObjects[pSpriteNumber].Object_field_1 = 1;
 		mRoomObjects[pSpriteNumber].Object_field_2 = 0x0E;
 
-		word_40 = (mRoomObjects[pSpriteNumber].objNumber << 3) + mRoomDoorDataPtr;
+		word_40 = (mRoomObjects[pSpriteNumber].objNumber << 3) + mRoomDoorPtr;
 		
 		mMemory[ word_40 + 2 ] |= 0x80;
 		byte A = mMemory[ word_40 + 4 ];
@@ -5337,7 +5332,7 @@ void cCreep::obj_Door_InFront( byte pSpriteNumber, byte pY ) {
 	A = mRoomObjects[byte_41D5].objNumber;
 	A <<= 3;
 
-	word_40 = mRoomDoorDataPtr + A;
+	word_40 = mRoomDoorPtr + A;
 
 	// 40BB
 
@@ -5451,7 +5446,7 @@ void cCreep::obj_RayGun_Img_Execute( byte pX ) {
 	if( mEngine_Ticks & 3 )
 		return;
 
-	word_40 = word_4D5B + mRoomObjects[pX].objNumber;
+	word_40 = mRoomRayGunPtr + mRoomObjects[pX].objNumber;
 
 	byte A = mRoomAnim[pX].mFlags;
 	if(!( A & ITM_DISABLE )) {
@@ -5464,7 +5459,7 @@ void cCreep::obj_RayGun_Img_Execute( byte pX ) {
 			byte_4D5E = 0x00;
 			
 
-			for(byte_4D5F = 0x01; ((char) byte_4D5F) > 0; --byte_4D5F) {
+			for(byte_4D5F = 0x01; ((char) byte_4D5F) >= 0; --byte_4D5F) {
 
 				if( mMemory[ 0x780D + byte_4D5F ] == 0 ) {
 					byte Y = mMemory[ 0x34D1 + byte_4D5F ];
@@ -5612,7 +5607,7 @@ void cCreep::obj_Teleport_Img_Execute( byte pX ) {
 // 4C58: Load the rooms' Ray Guns
 void cCreep::obj_RayGun_Prepare() {
 
-	word_4D5B = word_3E;
+	mRoomRayGunPtr = word_3E;
 	byte_4D5D = 0;
 
 	do {
@@ -5683,7 +5678,7 @@ void cCreep::obj_RayGun_Prepare() {
 
 // 49F8: Load the rooms' Keys
 void cCreep::obj_Key_Load() {
-	word_4A65 = word_3E;
+	mRoomKeyPtr = word_3E;
 
 	mCurrentKeyID = 0;
 	
@@ -5741,7 +5736,7 @@ void cCreep::obj_Door_Lock_Prepare() {
 
 void cCreep::obj_Door_Prepare() {
 	byte DoorCount = *level(word_3E++);
-	mRoomDoorDataPtr = word_3E;
+	mRoomDoorPtr = word_3E;
 	
 	byte X, gfxCurrentID, gfxPosX, gfxPosY;
 
@@ -5799,7 +5794,7 @@ void cCreep::obj_Lightning_Img_Execute( byte pX ) {
 	byte gfxPosX, gfxPosY;
 
 	byte byte_43E2, byte_43E3;
-	word_40 = word_45DB + mRoomObjects[pX].objNumber;
+	word_40 = mRoomLightningPtr + mRoomObjects[pX].objNumber;
 	byte Y = 0;
 
 	if( mRoomObjects[pX].Object_field_1 != 1 ) {
@@ -5941,7 +5936,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pX, byte pY ) {
 
 	// 4507
 	
-	word_30 = word_45DB + mRoomObjects[pY].objNumber;
+	word_30 = mRoomLightningPtr + mRoomObjects[pY].objNumber;
 	byte byte_45D8 = pY;
 
 	if( !(mMemory[ word_30 ] & byte_45DE )) {
@@ -5962,7 +5957,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pX, byte pY ) {
 
 		// 4553
 		byte byte_45DA = A;
-		word_32 = word_45DB + A;
+		word_32 = mRoomLightningPtr + A;
 		
 		mMemory[ word_32 ] ^= byte_45DE;
 		byte Y;
@@ -6032,7 +6027,7 @@ void cCreep::obj_Forcefield_Img_Timer_Execute( byte pSpriteNumber ) {
 void cCreep::obj_Lightning_Prepare() {
 	byte	byte_44E5, byte_44E6, gfxPosX, gfxPosY;
 
-	word_45DB = word_3E;
+	mRoomLightningPtr = word_3E;
 	byte_44E5 = 0;
 
 	byte X = 0, A;
@@ -6144,7 +6139,7 @@ void cCreep::obj_Mummy_Prepare( ) {
 	byte	X;
 	byte	gfxCurrentID;
 
-	word_498B = word_3E;
+	mRoomMummyPtr = word_3E;
 
 	do {
 		object_Create( X );
@@ -6211,7 +6206,7 @@ void cCreep::obj_Mummy_Prepare( ) {
 // 517F : Load the rooms' Trapdoors
 void cCreep::obj_TrapDoor_Prepare( ) {
 	byte	byte_5381;
-	word_5387 = word_3E;
+	mRoomTrapDoorPtr = word_3E;
 
 	byte X;
 
@@ -6271,7 +6266,7 @@ void cCreep::obj_TrapDoor_Prepare( ) {
 // 50D2: Floor Switch
 void cCreep::obj_TrapDoor_Switch_Img_Execute( byte pX ) {
 	
-	word_40 = word_5387 + mRoomObjects[pX].objNumber;
+	word_40 = mRoomTrapDoorPtr + mRoomObjects[pX].objNumber;
 	if( mRoomObjects[pX].Object_field_1 ) {
 		mTxtX_0 = mMemory[ word_40 + 1 ];
 		mTxtY_0 = mMemory[ word_40 + 2 ];
@@ -6407,7 +6402,7 @@ void cCreep::obj_Mummy_Infront( byte pSpriteNumber, byte pY ) {
 	if( A >= 8 )
 		return;
 
-	word_40 = word_498B + mRoomObjects[pY].objNumber;
+	word_40 = mRoomMummyPtr + mRoomObjects[pY].objNumber;
 
 	// 47D1
 	if( mMemory[ word_40 ] != 1 )
@@ -6596,11 +6591,11 @@ void cCreep::obj_Mummy_Collision( byte pSpriteNumber, byte pY ) {
 		A -= mRoomAnim[pY].mX;
 		if( A < 4 ) {
 			
-			word_40 = word_5387 + mRoomObjects[pY].objNumber;
+			word_40 = mRoomTrapDoorPtr + mRoomObjects[pY].objNumber;
 			// 38F7
 			if( mMemory[ word_40 ] & byte_538A ) {
 				// 3900
-				word_40 = word_498B + mRoomSprites[pSpriteNumber].mButtonState;
+				word_40 = mRoomMummyPtr + mRoomSprites[pSpriteNumber].mButtonState;
 				mMemory[ word_40 ] = 3;
 				return;
 			}
@@ -6629,7 +6624,7 @@ void cCreep::obj_Mummy_Hit_Player( byte pSpriteNumber, byte pY ) {
 		return;
 	}
 
-	word_40 = word_498B + mRoomSprites[pSpriteNumber].mButtonState;
+	word_40 = mRoomMummyPtr + mRoomSprites[pSpriteNumber].mButtonState;
 
 	mMemory[ word_40 ] = 3;
 }
@@ -6696,7 +6691,7 @@ void cCreep::obj_Mummy_Add( byte pA, byte pX ) {
 	mRoomSprites[ sprite ].playerNumber = 0xFF;
 	mRoomSprites[ sprite ].mButtonState = mRoomObjects[Y].objNumber;
 	
-	word_40 = word_498B + mRoomSprites[ sprite ].mButtonState;
+	word_40 = mRoomMummyPtr + mRoomSprites[ sprite ].mButtonState;
 	//3998
 
 	mRoomSprites[ sprite ].mWidth = 5;
@@ -6747,7 +6742,7 @@ void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
 	// 37D5
 	mRoomSprites[pSpriteNumber].Sprite_field_1B = AA;
 	mRoomSprites[pSpriteNumber].playerNumber = 0xFF;
-	word_40 = word_498B + mRoomSprites[pSpriteNumber].mButtonState;
+	word_40 = mRoomMummyPtr + mRoomSprites[pSpriteNumber].mButtonState;
 	if( mRoomSprites[pSpriteNumber].Sprite_field_1E == 0 ) {
 		++mRoomSprites[pSpriteNumber].Sprite_field_1F;
 		byte Y = mRoomSprites[pSpriteNumber].Sprite_field_1F;
@@ -6846,7 +6841,7 @@ void cCreep::obj_RayGun_Laser_Execute( byte pSpriteNumber ) {
 		A |= SPR_ACTION_FREE;
 		mRoomSprites[pSpriteNumber].state = A;
 		
-		word_40 = word_4D5B + mRoomSprites[pSpriteNumber].Sprite_field_1E;
+		word_40 = mRoomRayGunPtr + mRoomSprites[pSpriteNumber].Sprite_field_1E;
 		mMemory[ word_40 ] = (0xFF ^ byte_4D61) & mMemory[ word_40 ];
 
 		return;
@@ -7000,7 +6995,7 @@ void cCreep::obj_Key_Infront( byte pX, byte pY ) {
 	sound_PlayEffect( 0x0C );
 	mRoomAnim[pY].mFlags |= ITM_PICKED;
 
-	word_40 = word_4A65 + mRoomObjects[pY].objNumber;
+	word_40 = mRoomKeyPtr + mRoomObjects[pY].objNumber;
 
 	mMemory[ word_40 + 1 ] = 0;
 	mCurrentKeyID = mMemory[ word_40 ];
@@ -7090,7 +7085,7 @@ void cCreep::obj_RayGun_Control_InFront( byte pX, byte pY ) {
 
 	pY = byte_4E30;
 
-	word_40 = word_4D5B + mRoomObjects[pY].objNumber;
+	word_40 = mRoomRayGunPtr + mRoomObjects[pY].objNumber;
 	A = 0xFF;
 	A ^= byte_4D65;
 	A ^= byte_4D66;
@@ -7254,7 +7249,7 @@ void cCreep::sub_526F( char &pA ) {
 	word_5383 = word_40;
 	word_5385 = word_3C;
 
-	word_40 = word_5387 + byte_5382;
+	word_40 = mRoomTrapDoorPtr + byte_5382;
 	// 529B
 	mMemory[ word_40 ] ^= byte_538A;
 	byte X;

@@ -213,21 +213,21 @@ protected:
 	byte		 byte_311D;
 
 	byte		 mPlayerExecutingSpriteNumber, byte_3638;
-	word		 mRoomDoorDataPtr;
+	word		 mRoomDoorPtr;
 
-	word		 word_4A65;											// Keys
+	word		 mRoomKeyPtr;											// Keys
 	byte		 mCurrentKeyID;
 
-	word		 word_498B;											// Mummys
+	word		 mRoomMummyPtr;											// Mummys
 
-	word		 word_4D5B;											// RayGuns	
+	word		 mRoomRayGunPtr;											// RayGuns	
 	byte		 byte_4D5D;
 	byte		 byte_4D5E, byte_4D5F;
 	byte		 byte_574C, byte_4D60, byte_4D61;
 	byte		 byte_4D62, byte_4D63, byte_4D64;
 	byte		 byte_4D65, byte_4D66, byte_4D67;
 
-	word		 word_5387;											// Trap Door
+	word		 mRoomTrapDoorPtr;											// Trap Door
 	byte		 byte_5389, byte_538A;
 
 	word		 word_5748;											// Frankenstein
@@ -236,7 +236,7 @@ protected:
 	byte		 byte_31EF, mObjectNumber, byte_31F1, byte_31F2;
 	byte		 byte_31F3, byte_31F4, byte_31F5;
 
-	word		 word_45DB;											// Lightning
+	word		 mRoomLightningPtr;											// Lightning
 	byte		 byte_44E5;											// Lightning
 	byte		 byte_474F;
 	
