@@ -4782,10 +4782,10 @@ void cCreep::sound_PlayEffect( char pA ) {
 }
 
 void cCreep::obj_Walkway_Prepare() {
-	byte CurrentY, CurrentX, Height;
+	byte CurrentX, Width, Length;
 	byte gfxCurrentID, gfxPosX, gfxPosY;
 
-	while( (Height = mMemory[ mObjectPtr ]) ) {
+	while( (Length = mMemory[ mObjectPtr ]) ) {
 		
 		gfxPosX = mMemory[ mObjectPtr + 1 ];
 		gfxPosY = mMemory[ mObjectPtr + 2 ];
@@ -4798,11 +4798,11 @@ void cCreep::obj_Walkway_Prepare() {
 
 		// 16A9
 		
-		for( CurrentY = 1; CurrentY <= Height; ++CurrentY ) {
+		for( CurrentX = 1; CurrentX <= Length; ++CurrentX ) {
 			byte A;
 
-			if( CurrentY != 1 ) {
-				if( CurrentY != Height )
+			if( CurrentX != 1 ) {
+				if( CurrentX != Length )
 					A = 0x1C;
 				else
 					A = 0x1D;
@@ -4814,16 +4814,16 @@ void cCreep::obj_Walkway_Prepare() {
 			screenDraw( 0, gfxCurrentID, gfxPosX, gfxPosY );
 			
 			// 16D1
-			for( CurrentX = 1; CurrentX <= mGfxWidth; ++CurrentX ) {
+			for( Width = 1; Width <= mGfxWidth; ++Width ) {
 				
-				if( CurrentY != 1 ) {
+				if( CurrentX != 1 ) {
 					
-					if( CurrentY != Height )
+					if( CurrentX != Length )
 						A = 0x44;
 
 					else {
 						// 16EE
-						if( CurrentX == mGfxWidth )
+						if( Width == mGfxWidth )
 							A = 0x40;
 						else
 							A = 0x44;
@@ -4831,7 +4831,7 @@ void cCreep::obj_Walkway_Prepare() {
 
 				} else {
 					// 16E2
-					if( CurrentX == 1 )
+					if( Width == 1 )
 						A = 0x04;
 					else
 						A = 0x44;
