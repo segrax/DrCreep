@@ -5155,10 +5155,10 @@ void cCreep::word_3C_Calculate() {
 }
 
 void cCreep::obj_SlidingPole_Prepare() {
-	byte byte_17ED;
+	byte Height;
 	byte A, gfxPosX, gfxPosY;
 
-	while( (byte_17ED = mMemory[ mObjectPtr ]) ) {
+	while( (Height = mMemory[ mObjectPtr ]) ) {
 
 		gfxPosX = mMemory[ mObjectPtr + 1 ];
 		gfxPosY = mMemory[ mObjectPtr + 2 ];
@@ -5184,8 +5184,8 @@ void cCreep::obj_SlidingPole_Prepare() {
 			A |= 0x10;
 			mMemory[ word_3C ] = A;
 
-			--byte_17ED;
-			if( !byte_17ED ) {
+			--Height;
+			if( !Height ) {
 				mObjectPtr += 0x03;
 				break;
 			}
@@ -5199,9 +5199,9 @@ void cCreep::obj_SlidingPole_Prepare() {
 }
 
 void cCreep::obj_Ladder_Prepare() {
-	byte byte_18E3, gfxPosX, gfxPosY;
+	byte Height, gfxPosX, gfxPosY;
 	
-	while( (byte_18E3 = mMemory[ mObjectPtr ]) ) {
+	while( (Height = mMemory[ mObjectPtr ]) ) {
 
 		// 1800
 		gfxPosX = mMemory[ mObjectPtr + 1 ];
@@ -5221,7 +5221,7 @@ void cCreep::obj_Ladder_Prepare() {
 			if( (mMemory[ word_3C ] & 0x44) == 0 ) {
 				byte  gfxCurrentID;
 
-				if( byte_18E3 != 1 ) 
+				if( Height != 1 ) 
 					gfxCurrentID = 0x28;
 				else
 					gfxCurrentID = 0x2B;
@@ -5230,7 +5230,7 @@ void cCreep::obj_Ladder_Prepare() {
 
 			} else {
 				// 184C
-				if( byte_18E3 == 1 ) {
+				if( Height == 1 ) {
 					mTxtX_0 = gfxPosX;
 					mTxtY_0 = gfxPosY;
 
@@ -5245,11 +5245,11 @@ void cCreep::obj_Ladder_Prepare() {
 				}
 			}
 			// 189C
-			if( byte_18E3 != mMemory[ mObjectPtr ] )
+			if( Height != mMemory[ mObjectPtr ] )
 				mMemory[ word_3C ] = ( mMemory[ word_3C ] | 1);
 			
-			--byte_18E3;
-			if( !byte_18E3 ) { 
+			--Height;
+			if( !Height ) { 
 				mObjectPtr += 3;
 				break;
 			}
