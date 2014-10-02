@@ -5249,8 +5249,7 @@ void cCreep::obj_Ladder_Prepare() {
 				mMemory[ word_3C ] = ( mMemory[ word_3C ] | 1);
 			
 			--byte_18E3;
-			if( byte_18E3 == 0 ) { 
-			
+			if( !byte_18E3 ) { 
 				word_3E += 3;
 				break;
 			}
@@ -6156,43 +6155,39 @@ void cCreep::obj_Mummy_Prepare( ) {
 			mMemory[ 0x68F0 + Y ] = 0x66;
 
 		anim_Update( gfxCurrentID, gfxPosX, gfxPosY, 0, X );
-		byte_498E = 3;
+		
 		gfxPosY = mMemory[ word_3E + 4 ];
 		gfxCurrentID = 0x42;
 
-		while(byte_498E) {
-			byte_498F = 5;
+		for( byte_498E = 3; byte_498E; --byte_498E ) {
+			
 			gfxPosX = mMemory[ word_3E + 3 ];
 
-			while(byte_498F) {
+			for( byte_498F = 5; byte_498F; --byte_498F ) {
 				screenDraw( 0, gfxCurrentID, gfxPosX, gfxPosY, 0 );
 				gfxPosX += 4;
-				--byte_498F;
 			}
 
 			gfxPosY += 8;
-			--byte_498E;
 		}
 
 		if( mMemory[ word_3E ] != 1 ) {
 			// 4911
 			mTxtX_0 = mMemory[ word_3E + 3 ] + 4;
 			mTxtY_0 = mMemory[ word_3E + 4 ] + 8;
-			byte_498E = 3;
+			
 
-			while( byte_498E ) {
+			for( byte_498E = 3; byte_498E; --byte_498E ) {
 				screenDraw( 1, gfxCurrentID, gfxPosX, gfxPosY, 0x42 );
 				mTxtX_0 += 4;
-				--byte_498E;
 			}
 			
 			gfxPosX = mTxtX_0 - 0x0C;
 			gfxPosY = mTxtY_0;
 			screenDraw( 0, 0x43, gfxPosX, gfxPosY, 0x42 );
 			
-			if( mMemory[ word_3E ] == 2 ) {
+			if( mMemory[ word_3E ] == 2 )
 				obj_Mummy_Add(0xFF, X);
-			}
 		}
 		// 496E
 		word_3E += 0x07;
