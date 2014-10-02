@@ -103,7 +103,7 @@ void cBuilder::objectStringPrint( sString pString ) {
 
 	mMemory[ 0xBB03 +  pString.mString.size() ] |= 0x80;
 
-	word_3E = 0xBB00;
+	mObjectPtr = 0xBB00;
 	obj_stringPrint();
 
 	obj_Actions();
@@ -305,7 +305,7 @@ void cBuilder::roomChange( int pNumber ) {
 	if( pNumber == -1) {
 
 		screenClear();
-		word_3E = readLEWord( &mMemory[ 0x785F ] );
+		mObjectPtr = readLEWord( &mMemory[ 0x785F ] );
 		roomPrepare();
 
 	} else {
@@ -393,7 +393,7 @@ void cBuilder::castlePrepare( ) {
 	// Final Room?
 	if( (char) mCurrentRoom->mNumber == -1) {
 		screenClear();
-		word_3E = readLEWord( &mMemory[ 0x785F ] );
+		mObjectPtr = readLEWord( &mMemory[ 0x785F ] );
 		roomPrepare();
 
 	} else {

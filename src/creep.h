@@ -258,7 +258,7 @@ protected:
 	byte		 mGfxWidth, mGfxHeight;
 	byte		 mCount;
 	 
-	word		 word_30, word_32, word_34, word_3C, word_3E, word_40, mRoomPtr, word_44;
+	word		 word_30, word_32, word_34, word_3C, mObjectPtr, word_40, mRoomPtr, word_44;
 
 	bool		 mMenuReturn, mNoInput;
 
