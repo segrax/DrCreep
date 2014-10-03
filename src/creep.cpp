@@ -2465,7 +2465,7 @@ void cCreep::obj_Frankie_Execute( byte pSpriteNumber ) {
 	if( A & SPR_ACTION_CREATED ) 
 		mRoomSprites[pSpriteNumber].state ^= SPR_ACTION_CREATED;
 
-	word_40 = word_5748 + mRoomSprites[pSpriteNumber].Sprite_field_1F;
+	word_40 = mFrankiePtr + mRoomSprites[pSpriteNumber].Sprite_field_1F;
 	
 	if( !(mRoomSprites[pSpriteNumber].Sprite_field_1E & byte_574E) ) {
 		if( mIntro == 1 )
@@ -2734,7 +2734,7 @@ void cCreep::obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 			return;
 		}
 		
-		word_40 = word_5748 + mRoomSprites[pSpriteNumber].Sprite_field_1F;
+		word_40 = mFrankiePtr + mRoomSprites[pSpriteNumber].Sprite_field_1F;
 
 		A = (byte_574E ^ 0xFF) & mMemory[ word_40 ];
 		A |= byte_574D;
@@ -2752,7 +2752,7 @@ void cCreep::obj_Frankie_Hit(byte pSpriteNumber, byte pY) {
 			// 3DF3
 			if( A != 5 ) {
 			
-				word_40 = word_5748 + mRoomSprites[pSpriteNumber].Sprite_field_1F;
+				word_40 = mFrankiePtr + mRoomSprites[pSpriteNumber].Sprite_field_1F;
 				mMemory[ word_40 ] = ((byte_574E ^ 0xFF) & mMemory[ word_40 ]) | byte_574D;
 				return;
 
@@ -6299,7 +6299,7 @@ void cCreep::obj_TrapDoor_Switch_Img_Execute( byte pX ) {
 // 538B: Conveyor
 void cCreep::obj_Conveyor_Img_Execute( byte pX ) {
 	
-	word_40 = word_564B + mRoomObjects[pX].objNumber;
+	word_40 = mConveyorPtr + mRoomObjects[pX].objNumber;
 	byte A = mMemory[ word_40 ];
 
 	// 539F
@@ -6386,8 +6386,7 @@ void cCreep::obj_Conveyor_Img_Execute( byte pX ) {
 
 // 47A7: In Front Mummy Release
 void cCreep::obj_Mummy_Infront( byte pSpriteNumber, byte pY ) {
-	byte byte_4870 = pY;
-	
+
 	if( mRoomSprites[pSpriteNumber].Sprite_field_0 )
 		return;
 
@@ -6426,13 +6425,12 @@ void cCreep::obj_Mummy_Infront( byte pSpriteNumber, byte pY ) {
 	byte gfxPosY = mTxtY_0;
 
 	screenDraw( 0, 0x43, gfxPosX, gfxPosY, 0 );
-	obj_Mummy_Add(0, byte_4870 );
+	obj_Mummy_Add(0, pY );
 }
 
 // 564E: Load the rooms' frankensteins
 void cCreep::obj_Frankie_Load() {
-	word_5748 = mObjectPtr;
-	byte byte_574B;
+	mFrankiePtr = mObjectPtr;
 
 	byte_574A = 0;
 
@@ -6455,10 +6453,8 @@ void cCreep::obj_Frankie_Load() {
 			A = 0xBF;
 
 		// 56C4
-		byte_574B = A;
-		
 		for( signed char Y = 4; Y >= 0; Y -= 2 ) {
-			mMemory[ word_3C + Y ] &= byte_574B;
+			mMemory[ word_3C + Y ] &= A;
 		}
 		byte X;
 		object_Create(X);
@@ -6490,7 +6486,7 @@ void cCreep::obj_Frankie_Load() {
 
 // 5501: Load the rooms' Conveyors
 void cCreep::obj_Conveyor_Prepare() {
-	word_564B = mObjectPtr;
+	mConveyorPtr = mObjectPtr;
 
 	byte byte_5649 = 0, gfxPosX = 0, gfxPosY = 0;
 	
@@ -7302,10 +7298,8 @@ void cCreep::sub_526F( char &pA ) {
 
 // 548B: In Front Conveyor
 void cCreep::obj_Conveyor_InFront( byte pX, byte pY ) {
-	byte byte_564D;
-	word_40 = word_564B + mRoomObjects[pY].objNumber;
 
-	byte_564D = pY;
+	word_40 = mConveyorPtr + mRoomObjects[pY].objNumber;
 
 	if( !(mMemory[ word_40 ] & byte_5648 ))
 		return;
@@ -7323,10 +7317,10 @@ void cCreep::obj_Conveyor_InFront( byte pX, byte pY ) {
 	
 	// 54BE
 	A = mRoomSprites[pX].mX + mRoomSprites[pX].mWidth;
-	if( (char) A >= 0 && ((char) (A - mRoomAnim[byte_564D].mX)) < 0 )
+	if( (char) A >= 0 && ((char) (A - mRoomAnim[pY].mX)) < 0 )
 		return;
 
-	A -= mRoomAnim[byte_564D].mX;
+	A -= mRoomAnim[pY].mX;
 	if( A >= 0x20 )
 		return;
 
@@ -7350,7 +7344,7 @@ void cCreep::obj_Conveyor_Control_InFront( byte pSpriteNumber, byte pY ) {
 	if( !mRoomSprites[pSpriteNumber].mButtonState )
 		return;
 
-	word_40 = word_564B + mRoomObjects[pY].objNumber;
+	word_40 = mConveyorPtr + mRoomObjects[pY].objNumber;
 	byte A;
 
 	if( mRoomSprites[pSpriteNumber].playerNumber )

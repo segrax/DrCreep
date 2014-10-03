@@ -230,7 +230,7 @@ protected:
 	word		 mRoomTrapDoorPtr;											// Trap Door
 	byte		 byte_5389, byte_538A;
 
-	word		 word_5748;											// Frankenstein
+	word		 mFrankiePtr;											// Frankenstein
 	char		 byte_574A, byte_574D, byte_574E, byte_574F;
 	
 	byte		 byte_31EF, mObjectNumber, byte_31F1, byte_31F2;
@@ -240,7 +240,7 @@ protected:
 	byte		 byte_44E5;											// Lightning
 	byte		 byte_474F;
 	
-	word		 word_564B;													// Conveyor
+	word		 mConveyorPtr;													// Conveyor
 	byte		 byte_5642, byte_5643, byte_5644, byte_5645, byte_5646;		// Conveyor
 	byte		 byte_5647, byte_5648, byte_5F58, mJoyButtonState, byte_5F56;
 
