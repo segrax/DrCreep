@@ -387,7 +387,7 @@ public:
 		void	 obj_Laser_Collision( byte pX, byte pY );
 		void	 obj_Teleport_SetColour( byte pA, byte pX );
 		void	 obj_TrapDoor_PlaySound( byte pA );
-		void	 sub_526F( char &pA );
+		void	 sub_526F( byte pA );
 		void	 roomAnim_Disable( byte pSpriteNumber );			// Redraw floor piece?
 		bool	 obj_Key_NotFound( byte pObjectNumber, byte pSpriteNumber );
 		void	 positionCalculate( byte pSpriteNumber );

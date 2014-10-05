@@ -7231,16 +7231,13 @@ void cCreep::obj_TrapDoor_PlaySound( byte pA ) {
 }
 
 // 526F: 
-void cCreep::sub_526F( char &pA ) {
-	byte byte_5382;
-	word word_5383, word_5385;
+void cCreep::sub_526F( byte pA ) {
+	word SavedWord40, SavedWord3C;
 
-	byte_5382 = (byte) pA;
+	SavedWord40 = word_40;
+	SavedWord3C = word_3C;
 
-	word_5383 = word_40;
-	word_5385 = word_3C;
-
-	word_40 = mRoomTrapDoorPtr + byte_5382;
+	word_40 = mRoomTrapDoorPtr + pA;
 	// 529B
 	mMemory[ word_40 ] ^= byte_538A;
 	byte X;
@@ -7248,7 +7245,7 @@ void cCreep::sub_526F( char &pA ) {
 	for( X = 0 ;;++X) {
 		if( mRoomAnim[X].mFuncID != 0x0B )
 			continue;
-		if( mRoomObjects[X].objNumber == byte_5382 )
+		if( mRoomObjects[X].objNumber == pA )
 			break;
 	}
 
@@ -7292,8 +7289,8 @@ void cCreep::sub_526F( char &pA ) {
 
 	screenDraw( 0, 0x7A, gfxPosX, gfxPosY, 0 );
 
-	word_40 = word_5383;
-	word_3C = word_5385;
+	word_40 = SavedWord40;
+	word_3C = SavedWord3C;
 }
 
 // 548B: In Front Conveyor
