@@ -5936,7 +5936,6 @@ void cCreep::obj_Lightning_Switch_InFront( byte pX, byte pY ) {
 	// 4507
 	
 	word_30 = mRoomLightningPtr + mRoomObjects[pY].objNumber;
-	byte byte_45D8 = pY;
 
 	if( !(mMemory[ word_30 ] & byte_45DE )) {
 		if( mRoomSprites[pX].Sprite_field_1E )
@@ -5985,7 +5984,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pX, byte pY ) {
 		A = 0x37;
 	}
 
-	anim_Update( A, mRoomAnim[byte_45D8].mX, mRoomAnim[byte_45D8].mY, 0, byte_45D8 );
+	anim_Update( A, mRoomAnim[pY].mX, mRoomAnim[pY].mY, 0, pY );
 
 	sound_PlayEffect(0x06);
 }
@@ -6024,7 +6023,7 @@ void cCreep::obj_Forcefield_Img_Timer_Execute( byte pSpriteNumber ) {
 
 // Lightning Machine Setup
 void cCreep::obj_Lightning_Prepare() {
-	byte	byte_44E5, byte_44E6, gfxPosX, gfxPosY;
+	byte	byte_44E5, gfxPosX, gfxPosY;
 
 	mRoomLightningPtr = mObjectPtr;
 	byte_44E5 = 0;
@@ -6063,7 +6062,7 @@ void cCreep::obj_Lightning_Prepare() {
 			
 			mRoomObjects[X].color = mMemory[ mObjectPtr + 3 ];
 
-			for( byte_44E6 = mMemory[ mObjectPtr + 3 ]; byte_44E6; --byte_44E6) {
+			for( byte byte_44E6 = mMemory[ mObjectPtr + 3 ]; byte_44E6; --byte_44E6) {
 
 				screenDraw( 0, 0x32, gfxPosX, gfxPosY, 0 );
 				gfxPosY += 0x08;
@@ -6609,8 +6608,9 @@ void cCreep::obj_Mummy_Collision( byte pSpriteNumber, byte pY ) {
 
 // 3940: 
 void cCreep::obj_Mummy_Hit_Player( byte pSpriteNumber, byte pY ) {
-	byte A = mRoomSprites[pY].Sprite_field_0;
-	if( A == 0 || A == 5 ) {
+
+	if( mRoomSprites[pY].Sprite_field_0 == 0 
+	 || mRoomSprites[pY].Sprite_field_0 == 5 ) {
 		byte_311D = 0;
 		return;
 	}
@@ -6622,15 +6622,13 @@ void cCreep::obj_Mummy_Hit_Player( byte pSpriteNumber, byte pY ) {
 
 // 3A60:  
 void cCreep::obj_Laser_Collision( byte pSpriteNumber, byte pY ) {
-	byte A = mRoomAnim[pY].mFuncID ;
-	
-	if( A == 2 )
+	if( mRoomAnim[pY].mFuncID == 2 )
 		return;
 
-	if( A == 0x0F )
+	if( mRoomAnim[pY].mFuncID == 0x0F )
 		return;
 
-	if( A == 8 ) {
+	if( mRoomAnim[pY].mFuncID == 8 ) {
 		if( mRoomSprites[pSpriteNumber].Sprite_field_1E != mRoomObjects[pY].objNumber )
 			return;
 	}
@@ -6639,9 +6637,7 @@ void cCreep::obj_Laser_Collision( byte pSpriteNumber, byte pY ) {
 }
 
 void cCreep::obj_RayGun_Laser_Add( byte pX ) {
-	byte Y = pX;
-
-	byte A = mRoomObjects[Y].objNumber + 0x07;
+	byte A = mRoomObjects[pX].objNumber + 0x07;
 	A |= 0xF8;
 	A >>= 1;
 	A += 0x2C;
@@ -6653,10 +6649,10 @@ void cCreep::obj_RayGun_Laser_Add( byte pX ) {
 	byte X = sprite_CreepFindFree( );
 
 	mRoomSprites[X].Sprite_field_0 = 4;
-	mRoomSprites[X].mX= mRoomAnim[Y].mX;
-	mRoomSprites[X].mY= mRoomAnim[Y].mY + 0x05;
+	mRoomSprites[X].mX= mRoomAnim[pX].mX;
+	mRoomSprites[X].mY= mRoomAnim[pX].mY + 0x05;
 	mRoomSprites[X].spriteImageID= 0x6C;
-	mRoomSprites[X].Sprite_field_1E = mRoomObjects[Y].objNumber;
+	mRoomSprites[X].Sprite_field_1E = mRoomObjects[pX].objNumber;
 
 	if( mMemory[ word_40 ] & byte_4D67 ) {
 		mRoomSprites[X].mX-= 0x08;
@@ -6672,15 +6668,12 @@ void cCreep::obj_RayGun_Laser_Add( byte pX ) {
 
 // 396A: 
 void cCreep::obj_Mummy_Add( byte pA, byte pX ) {
-	byte byte_39EE = pA;
-	byte Y = pX;
-
 	byte sprite = sprite_CreepFindFree( );
 	
 	mRoomSprites[ sprite ].Sprite_field_0 = 3;
 	mRoomSprites[ sprite ].Sprite_field_1B = 0xFF;
 	mRoomSprites[ sprite ].playerNumber = 0xFF;
-	mRoomSprites[ sprite ].mButtonState = mRoomObjects[Y].objNumber;
+	mRoomSprites[ sprite ].mButtonState = mRoomObjects[pX].objNumber;
 	
 	word_40 = mRoomMummyPtr + mRoomSprites[ sprite ].mButtonState;
 	//3998
@@ -6688,7 +6681,7 @@ void cCreep::obj_Mummy_Add( byte pA, byte pX ) {
 	mRoomSprites[ sprite ].mWidth = 5;
 	mRoomSprites[ sprite ].mHeight = 0x11;
 	mRoomSprites[ sprite ].spriteImageID= 0xFF;
-	if( byte_39EE == 0 ) {
+	if( pA == 0 ) {
 		mRoomSprites[ sprite ].Sprite_field_1E = 0;
 		mRoomSprites[ sprite ].Sprite_field_1F = 0xFF;
 		mRoomSprites[ sprite ].Sprite_field_6 = 4;
@@ -7183,8 +7176,7 @@ void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 
 // 4DE9: 
 void cCreep::obj_RayGun_Control_Update( byte pA ) {
-	byte byte_4E31 = pA;
-	
+
 	mMemory[ 0x6DBF ] = pA;
 	mMemory[ 0x6DC0 ] = pA;
 
@@ -7192,8 +7184,8 @@ void cCreep::obj_RayGun_Control_Update( byte pA ) {
 	byte gfxPosY = mMemory[ word_40 + 6 ];
 
 	screenDraw( 0, 0x6E, gfxPosX, gfxPosY, 0 );
-	mMemory[ 0x6DBF ] = byte_4E31 << 4;
-	mMemory[ 0x6DC0 ] = byte_4E31 << 4;
+	mMemory[ 0x6DBF ] = pA << 4;
+	mMemory[ 0x6DC0 ] = pA << 4;
 
 	gfxPosY += 0x10;
 	screenDraw( 0, 0x6E, gfxPosX, gfxPosY, 0 );
