@@ -5305,8 +5305,6 @@ void cCreep::obj_Door_Img_Execute( byte pSpriteNumber ) {
 
 // 4075: In Front Door
 void cCreep::obj_Door_InFront( byte pSpriteNumber, byte pY ) {
-	byte byte_41D5 = pY;
-
 	if( mRoomObjects[pY].Object_field_1 == 0 )
 		return;
 
@@ -5317,18 +5315,17 @@ void cCreep::obj_Door_InFront( byte pSpriteNumber, byte pY ) {
 	if( mRoomSprites[pSpriteNumber].Sprite_field_1E != 1 )
 		return;
 	
-	pY = mRoomSprites[pSpriteNumber].playerNumber;
+	byte playerNumber = mRoomSprites[pSpriteNumber].playerNumber;
 
-	byte A = mMemory[ 0x780D + pY ];
-	if( A != 0 )
+	if( mMemory[ 0x780D + playerNumber ] != 0 )
 		return;
 
 	// Enter the door
-	mMemory[ 0x780D + pY ] = 6;
+	mMemory[ 0x780D + playerNumber ] = 6;
 	mRoomSprites[pSpriteNumber].Sprite_field_1B = 0;
 	mRoomSprites[pSpriteNumber].Sprite_field_6 = 3;
 	
-	A = mRoomObjects[byte_41D5].objNumber;
+	byte A = mRoomObjects[pY].objNumber;
 	A <<= 3;
 
 	word_40 = mRoomDoorPtr + A;
@@ -5346,11 +5343,11 @@ void cCreep::obj_Door_InFront( byte pSpriteNumber, byte pY ) {
 	
 	mMemory[ mRoomPtr ] |= byte_8C0;
 
-	pY = mRoomSprites[pSpriteNumber].playerNumber;
+	playerNumber = mRoomSprites[pSpriteNumber].playerNumber;
 
 	// Set player room / door
-	mMemory[ 0x7809 + pY ] = word_41D6 & 0xFF;
-	mMemory[ 0x780B + pY ] = (word_41D6 & 0xFF00) >> 8;
+	mMemory[ 0x7809 + playerNumber ] = word_41D6 & 0xFF;
+	mMemory[ 0x780B + playerNumber ] = (word_41D6 & 0xFF00) >> 8;
 }
 
 // 4F5C: Load the rooms' Teleports
@@ -5882,10 +5879,9 @@ void cCreep::obj_Lightning_Img_Execute( byte pX ) {
 
 void cCreep::obj_Door_Button_Prepare() {
 	byte gfxCurrentID, gfxPosX, gfxPosY;
-	byte byte_42AB;
 	byte X = 0;
 
-	for( byte_42AB = mMemory[ mObjectPtr++ ]; byte_42AB; --byte_42AB) {
+	for( byte byte_42AB = mMemory[ mObjectPtr++ ]; byte_42AB; --byte_42AB) {
 
 		object_Create(X);
 		mRoomAnim[X].mFuncID = 1;
