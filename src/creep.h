@@ -234,7 +234,7 @@ protected:
 	char		 byte_574A, byte_574D, byte_574E, byte_574F;
 	
 	byte		 byte_31EF, mObjectNumber, byte_31F1, byte_31F2;
-	byte		 byte_31F3, byte_31F4, byte_31F5;
+	byte		 byte_31F3, byte_31F4, mStartSpriteFlash;
 
 	word		 mRoomLightningPtr;											// Lightning
 	byte		 byte_44E5;											// Lightning
