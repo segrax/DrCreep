@@ -6808,7 +6808,7 @@ void cCreep::obj_RayGun_Laser_Execute( byte pSpriteNumber ) {
 		mRoomSprites[pSpriteNumber].mX = A;
 
 		// Edge of screen?
-		if( A < 0xB0 || A >= 8 )
+		if( A >= 8 || A < 0xB0 )
 			return;
 		
 		// Reached edge
@@ -6852,8 +6852,7 @@ void cCreep::anim_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCu
 	//5783
 	byte gfxDecodeMode;
 
-	byte A = mRoomAnim[pX].mFlags;
-	if( !(A & ITM_DISABLE) ) {
+	if( !(mRoomAnim[pX].mFlags & ITM_DISABLE) ) {
 		gfxDecodeMode = 2;
 		mTxtX_0 = mRoomAnim[pX].mX;
 		mTxtY_0 = mRoomAnim[pX].mY;
