@@ -3623,16 +3623,14 @@ s15B4:;
 	}
 }
 
-void cCreep::sub_6009( byte pA ) {
-	byte_603A = pA;
-
+byte cCreep::sub_6009( byte pA ) {
 	word_40 = readLEWord( &mMemory[ mRoomPtr + 4] );
 	
-	byte A2 = mMemory[ word_40 ];
+	byte A = mMemory[ word_40 ];
 	
-	word_40 += (byte_603A << 3) + 1;
+	word_40 += (pA << 3) + 1;
 
-	byte_603A = A2;	
+	return A;	
 }
 
 // 2AA9
@@ -4096,23 +4094,17 @@ noCarry2:;
 	word_30 = videoPtr0;
 	word_30 += (0xCC + videoPtr1) << 8;
 
+	byte Y = 0;
+
 	// 5BBC
 	for( ;; ) {
-		if( gfxCurrentPosY < 0x19 ) {
-			gfxCurPos = gfxDestX2;
-		
-			byte Y = 0;
 
-			for( ;; ) {
+		if( gfxCurrentPosY < 0x19 ) {
+			
+			for( Y = 0, gfxCurPos = gfxDestX2; gfxCurPos <= gfxPosRightX; ++gfxCurPos, ++Y ) {
 			
 				if( gfxCurPos < 0x28 )
 					mMemory[ word_30 + Y ] = mMemory[ word_32 + Y ];
-			
-				++Y;
-				if( gfxCurPos == gfxPosRightX )
-					break;
-
-				++gfxCurPos;
 			}
 		}
 
@@ -4153,11 +4145,8 @@ noCarry2:;
 	for( ;; ) {
 		
 		if( gfxCurrentPosY < 0x19 ) {
-			
-			
-			byte Y = 0;
 
-			for(gfxCurPos = gfxDestX2; gfxCurPos <= gfxPosRightX; ++gfxCurPos, ++Y) {
+			for(Y = 0, gfxCurPos = gfxDestX2; gfxCurPos <= gfxPosRightX; ++gfxCurPos, ++Y) {
 
 				if( gfxCurPos < 0x28 ) 
 					mMemory[ word_30 + Y ] = mMemory[ word_32 + Y ];
@@ -4265,8 +4254,7 @@ void cCreep::mapRoomDraw() {
 			}
 
 			// 133E
-			sub_6009( 0 );
-			byte_13EA = byte_603A;
+			byte_13EA = sub_6009( 0 );
 s1349:;
 			if( byte_13EA )
 				break;

@@ -246,7 +246,7 @@ protected:
 
 	byte		 byte_D10, byte_D12;
 	byte		 byte_839, mObjectCount, byte_8C0, byte_8C1, byte_5CE2;
-	byte		 byte_603A, byte_5FD7;
+	byte		 byte_5FD7;
 	byte		 byte_5FD5, byte_5FD6, byte_5FD8;
 
 	bool		 mRestorePressed;
@@ -392,7 +392,7 @@ public:
 		bool	 obj_Key_NotFound( byte pObjectNumber, byte pSpriteNumber );
 		void	 positionCalculate( byte pSpriteNumber );
 		void	 word_3C_Calculate();
-		void	 sub_6009( byte pA );
+		byte	 sub_6009( byte pA );
 		
 		// Image Handling Functions
 		void	 anim_Execute( );
