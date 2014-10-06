@@ -6676,17 +6676,17 @@ void cCreep::obj_Mummy_Add( byte pA, byte pX ) {
 
 // 379A: Mummy
 void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
-	byte A = mRoomSprites[pSpriteNumber].state;
 
-	if( A & SPR_ACTION_DESTROY ) {
+	if( mRoomSprites[pSpriteNumber].state & SPR_ACTION_DESTROY ) {
 		mRoomSprites[pSpriteNumber].state ^= SPR_ACTION_DESTROY;
 		mRoomSprites[pSpriteNumber].state |= SPR_ACTION_FREE;
 		return;
 	}
 
-	if( A & SPR_ACTION_CREATED ) {
-		A ^= SPR_ACTION_CREATED;
-		mRoomSprites[pSpriteNumber].state = A;
+	if( mRoomSprites[pSpriteNumber].state & SPR_ACTION_CREATED ) {
+
+		mRoomSprites[pSpriteNumber].state ^= SPR_ACTION_CREATED;
+
 		if( mRoomSprites[pSpriteNumber].Sprite_field_1E ) {
 			mRoomSprites[pSpriteNumber].spriteImageID = 0x4B;
 			hw_SpritePrepare( pSpriteNumber );
@@ -6705,7 +6705,7 @@ void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
 	if( mRoomSprites[pSpriteNumber].Sprite_field_1E == 0 ) {
 		++mRoomSprites[pSpriteNumber].Sprite_field_1F;
 		byte Y = mRoomSprites[pSpriteNumber].Sprite_field_1F;
-		A = mMemory[ 0x39EF + Y ];
+		byte A = mMemory[ 0x39EF + Y ];
 
 		if( A != 0xFF ) {
 			mRoomSprites[pSpriteNumber].spriteImageID = A;
@@ -6762,8 +6762,7 @@ void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
 		
 		// 3889
 		++mRoomSprites[pSpriteNumber].mX;
-		A = mRoomSprites[pSpriteNumber].spriteImageID;
-		if( A < 0x4E || A >= 0x51 )
+		if( mRoomSprites[pSpriteNumber].spriteImageID < 0x4E || mRoomSprites[pSpriteNumber].spriteImageID >= 0x51 )
 				mRoomSprites[pSpriteNumber].spriteImageID = 0x4E;
 	
 	} else {
@@ -6773,8 +6772,7 @@ void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
 			return;
 
 		--mRoomSprites[pSpriteNumber].mX;
-		A = mRoomSprites[pSpriteNumber].spriteImageID;
-		if( A < 0x4B || A >= 0x4E)
+		if( mRoomSprites[pSpriteNumber].spriteImageID < 0x4B || mRoomSprites[pSpriteNumber].spriteImageID >= 0x4E)
 			mRoomSprites[pSpriteNumber].spriteImageID = 0x4B;
 	}
 
@@ -6787,35 +6785,31 @@ void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
 
 // 3A08
 void cCreep::obj_RayGun_Laser_Execute( byte pSpriteNumber ) {
-	byte A = mRoomSprites[pSpriteNumber].state;
-	
 	if( mNoInput )
 		return;
-
+		
 	mScreen->spriteRedrawSet();
 
-	if( A & SPR_ACTION_DESTROY ) {
+	if( mRoomSprites[pSpriteNumber].state & SPR_ACTION_DESTROY ) {
 
-		A ^= SPR_ACTION_DESTROY;
-		A |= SPR_ACTION_FREE;
-		mRoomSprites[pSpriteNumber].state = A;
+		mRoomSprites[pSpriteNumber].state ^= SPR_ACTION_DESTROY;
+		mRoomSprites[pSpriteNumber].state |= SPR_ACTION_FREE;
 		
 		word_40 = mRoomRayGunPtr + mRoomSprites[pSpriteNumber].Sprite_field_1E;
 		mMemory[ word_40 ] = (0xFF ^ byte_4D61) & mMemory[ word_40 ];
 
 		return;
 	} else {
-		if( A & SPR_ACTION_CREATED )
-			mRoomSprites[pSpriteNumber].state = A ^ SPR_ACTION_CREATED;
+		if( mRoomSprites[pSpriteNumber].state & SPR_ACTION_CREATED )
+			mRoomSprites[pSpriteNumber].state ^= SPR_ACTION_CREATED;
 
 		// 3A42
-		A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].Sprite_field_1F;
+		byte A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].Sprite_field_1F;
 		mRoomSprites[pSpriteNumber].mX = A;
 
 		// Edge of screen?
-		if( A < 0xB0 )
-			if( A >= 8 )
-				return;
+		if( A < 0xB0 || A >= 8 )
+			return;
 		
 		// Reached edge
 		mRoomSprites[pSpriteNumber].state |= SPR_ACTION_DESTROY;
