@@ -6798,7 +6798,6 @@ void cCreep::obj_RayGun_Laser_Execute( byte pSpriteNumber ) {
 		word_40 = mRoomRayGunPtr + mRoomSprites[pSpriteNumber].Sprite_field_1E;
 		mMemory[ word_40 ] = (0xFF ^ byte_4D61) & mMemory[ word_40 ];
 
-		return;
 	} else {
 		if( mRoomSprites[pSpriteNumber].state & SPR_ACTION_CREATED )
 			mRoomSprites[pSpriteNumber].state ^= SPR_ACTION_CREATED;
@@ -6808,8 +6807,9 @@ void cCreep::obj_RayGun_Laser_Execute( byte pSpriteNumber ) {
 		mRoomSprites[pSpriteNumber].mX = A;
 
 		// Edge of screen?
-		if( A >= 8 || A < 0xB0 )
-			return;
+		if( A < 0xB0 )
+			if( A >= 8 )
+				return;
 		
 		// Reached edge
 		mRoomSprites[pSpriteNumber].state |= SPR_ACTION_DESTROY;
@@ -7021,7 +7021,6 @@ bool cCreep::obj_Key_NotFound( byte pObjectNumber, byte pSpriteNumber ) {
 
 // 4D70: In Front RayGun Control
 void cCreep::obj_RayGun_Control_InFront( byte pX, byte pY ) {
-	byte byte_4E30 = pY;
 
 	if(mRoomSprites[pX].Sprite_field_0)
 		return;
@@ -7035,22 +7034,19 @@ void cCreep::obj_RayGun_Control_InFront( byte pX, byte pY ) {
 	if( mMemory[ 0x780D + mRoomSprites[pX].playerNumber ] != 0)
 		return;
 
-	pY = byte_4E30;
-
 	word_40 = mRoomRayGunPtr + mRoomObjects[pY].objNumber;
 	A = 0xFF;
 	A ^= byte_4D65;
 	A ^= byte_4D66;
 	A &= mMemory[ word_40 ];
 
-	pY = mRoomSprites[pX].Sprite_field_1E;
-	if( !pY ) 
+	if( !mRoomSprites[pX].Sprite_field_1E ) 
 		A |= byte_4D65;
 	else {
-		if( pY == 4 )
+		if( mRoomSprites[pX].Sprite_field_1E == 4 )
 			A |= byte_4D66;
 		else
-			if(pY != 0x80 )
+			if(mRoomSprites[pX].Sprite_field_1E != 0x80 )
 				return;
 	}
 
@@ -7069,8 +7065,7 @@ void cCreep::obj_RayGun_Control_InFront( byte pX, byte pY ) {
 
 // 4EA8: Teleport?
 void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
-	byte byte_50CE, byte_50CF;
-	
+
 	if( mRoomAnim[pY].mFlags & ITM_EXECUTE )
 		return;
 
@@ -7078,7 +7073,6 @@ void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 		return;
 
 	// 4EB5
-	byte_50CF = pY;
 	if( mMemory[ 0x780D + mRoomSprites[pX].playerNumber ] != 0 )
 		return;
 
@@ -7098,9 +7092,8 @@ void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 		mMemory[ word_40 + 2 ] = A;
 		A <<= 1;
 		A += 3;
-		pY = A;
 
-		if( !(mMemory[ word_40 + pY ]) )
+		if( !(mMemory[ word_40 + A ]) )
 			mMemory[ word_40 + 2 ] = 0;
 
 		// 4EF7
@@ -7109,15 +7102,12 @@ void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 		sound_PlayEffect(5);
 		A = mMemory[ word_40 + 2 ] + 2;
 
-		byte_50CE = pX;
-		obj_Teleport_SetColour( A, byte_50CF );
-		pX = byte_50CE;
+		obj_Teleport_SetColour( A, pY );
 		
 		return;
 	} else {
 		// 4F1A
 		// Use Teleport
-		pY = byte_50CF;
 		mRoomAnim[pY].mFlags |= ITM_EXECUTE;
 		mRoomObjects[pY].color = 8;
 		
@@ -7127,15 +7117,13 @@ void cCreep::obj_Teleport_InFront( byte pX, byte pY ) {
 
 		A = mMemory[ word_40 + 2 ] << 1;
 		A += 0x03;
-		pY = A;
 
-		byte A2 = mMemory[ word_40 + pY ];
-		++pY;
+		byte A2 = mMemory[ word_40 + A ];
+		++A;
 		//4F44
-		mRoomObjects[byte_50CF].Object_field_5 = mMemory[ word_40 + pY ];
+		mRoomObjects[pY].Object_field_5 = mMemory[ word_40 + A ];
 
 		// Set player new X/Y
-		pY = byte_50CF;
 		mRoomSprites[pX].mY =mRoomObjects[pY].Object_field_5 + 0x07;
 		mRoomObjects[pY].Object_field_4 = mRoomSprites[pX].mX = A2;
 	}
