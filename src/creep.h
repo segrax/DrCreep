@@ -418,11 +418,11 @@ public:
 		void	 obj_Conveyor_Prepare( );
 		void	 obj_Conveyor_InFront( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Conveyor_Control_InFront( byte pSpriteNumber, byte pObjectNumber );
-		void	 obj_Conveyor_Img_Execute( byte pX );
+		void	 obj_Conveyor_Execute( byte pObjectNumber );
 
 		void	 obj_Door_Prepare( );
 		void	 obj_Door_InFront( byte pSpriteNumber, byte pObjectNumber );
-		void	 obj_Door_Img_Execute( byte pObjectNumber );
+		void	 obj_Door_Execute( byte pObjectNumber );
 
 		void	 obj_Door_Button_Prepare( );
 		void	 obj_Door_Button_InFront( byte pSpriteNumber, byte pObjectNumber );
@@ -433,13 +433,13 @@ public:
 		void	 obj_Forcefield_Prepare( );
 		void	 obj_Forcefield_Execute( byte pSpriteNumber );
 		void	 obj_Forcefield_Create( );
-		void	 obj_Forcefield_Img_Timer_Execute( byte pObjectNumber );
+		void	 obj_Forcefield_Timer_Execute( byte pObjectNumber );
 		void	 obj_Forcefield_Timer_InFront( byte pSpriteNumber, byte pObjectNumber );
 		
-		void	 obj_Frankie_Add( );
+		void	 obj_Frankie_Sprite_Create( );
 		void	 obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Frankie_Load();
-		void	 obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pY );
+		void	 obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
 		void	 obj_Frankie_Execute( byte pSpriteNumber );
 
 		void	 obj_Image_Draw();
@@ -451,17 +451,17 @@ public:
 		void	 obj_Ladder_Prepare();
 
 		void	 obj_Lightning_Prepare( );
-		void	 obj_Lightning_Create_Sprite( byte pObjectNumber );
-		void	 obj_Lightning_Execute( byte pX );
-		void	 obj_Lightning_Img_Execute( byte pObjectNumber );
-		void	 obj_Lightning_Switch_InFront( byte pX, byte pY );
+		void	 obj_Lightning_Sprite_Create( byte pObjectNumber );
+		void	 obj_Lightning_Execute( byte pObjectNumber );
+		void	 obj_Lightning_Pole_Execute( byte pObjectNumber );
+		void	 obj_Lightning_Switch_InFront( byte pSpriteNumber, byte pObjectNumber );
 		
 		void	 obj_Mummy_Prepare( );
-		void	 obj_Mummy_Add( byte pA, byte pX );
+		void	 obj_Mummy_Sprite_Create( byte pA, byte pObjectNumber );
 		void	 obj_Mummy_Collision( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Mummy_Execute( byte pObjectNumber );
 		void	 obj_Mummy_Infront( byte pSpriteNumber, byte pObjectNumber );
-		void	 obj_Mummy_Img_Execute( byte pObjectNumber );
+		void	 obj_Mummy_Tomb_Execute( byte pObjectNumber );
 		void	 obj_Mummy_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
 
 		void	 obj_Player_Add( );
@@ -473,19 +473,19 @@ public:
 		void	 obj_SlidingPole_Prepare( );
 
 		void	 obj_Teleport_Prepare( );
-		void	 obj_Teleport_Img_Execute( byte pObjectNumber );
+		void	 obj_Teleport_Execute( byte pObjectNumber );
 		void	 obj_Teleport_InFront( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Teleport_SetColour( byte pColor, byte pObjectNumber );
 		
 		void	 obj_TrapDoor_PlaySound( byte pA );
 		void	 obj_TrapDoor_Prepare();
-		void	 obj_TrapDoor_Switch_Img_Execute( byte pObjectNumber );
+		void	 obj_TrapDoor_Switch_Execute( byte pObjectNumber );
 
 		void	 obj_RayGun_Prepare( );
-		void	 obj_RayGun_Laser_Add( byte pObjectNumber );
+		void	 obj_RayGun_Laser_Sprite_Create( byte pObjectNumber );
 		void	 obj_RayGun_Laser_Collision( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_RayGun_Laser_Execute( byte pObjectNumber );
-		void	 obj_RayGun_Img_Execute( byte pObjectNumber );
+		void	 obj_RayGun_Execute( byte pObjectNumber );
 		void	 obj_RayGun_Control_InFront( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_RayGun_Control_Update( byte pA );
 
