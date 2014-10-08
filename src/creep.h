@@ -210,7 +210,7 @@ protected:
 	byte		 mEngine_Ticks;
 	char		 mPlayingSound;					
 
-	byte		 byte_311D;
+	byte		 mStartSpriteFlash2;
 
 	byte		 mPlayerExecutingSpriteNumber, byte_3638;
 	word		 mRoomDoorPtr;
@@ -383,9 +383,9 @@ public:
 		void	 sub_2973();
 		void	 convertTimerToTime();
 		void	 convertTimeToNumber( byte pA, byte pY );
-		void	 obj_Mummy_Hit_Player( byte pX, byte pY );
-		void	 obj_Laser_Collision( byte pX, byte pY );
-		void	 obj_Teleport_SetColour( byte pA, byte pX );
+		void	 obj_Mummy_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
+		void	 obj_Laser_Collision( byte pSpriteNumber, byte pObjectNumber );
+		void	 obj_Teleport_SetColour( byte pColor, byte pObjectNumber );
 		void	 obj_TrapDoor_PlaySound( byte pA );
 		void	 sub_526F( byte pA );
 		void	 roomAnim_Disable( byte pSpriteNumber );			// Redraw floor piece?
@@ -396,7 +396,7 @@ public:
 		
 		// Image Handling Functions
 		void	 anim_Execute( );
-		void	 anim_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pX );
+		void	 anim_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pObjectNumber );
 		
 		bool	 object_Create( byte &pX );
 
@@ -404,7 +404,7 @@ public:
 		void	 obj_Actions( );
 		bool	 obj_Actions_Collision( byte pSpriteNumber );
 		bool	 obj_Actions_InFront( byte pSpriteNumber);
-		void	 obj_Actions_Hit( byte pSpriteNumber, byte pY );
+		void	 Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
 		void	 obj_Actions_Execute( byte pSpriteNumber );
 		void	 obj_CheckCollisions( byte pSpriteNumber );
 		void	 obj_CollisionSet();
@@ -442,7 +442,7 @@ public:
 		void	 obj_Frankie_Add( );
 		void	 obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Frankie_Load();
-		void	 obj_Frankie_Hit( byte pSpriteNumber, byte pY );
+		void	 obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pY );
 		void	 obj_Frankie_Execute( byte pSpriteNumber );
 
 		void	 obj_Key_Infront( byte pSpriteNumber, byte pObjectNumber );
@@ -458,14 +458,14 @@ public:
 		
 		void	 obj_Mummy_Prepare( );
 		void	 obj_Mummy_Add( byte pA, byte pX );
-		void	 obj_Mummy_Collision( byte pSpriteNumber, byte pY );
+		void	 obj_Mummy_Collision( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Mummy_Execute( byte pObjectNumber );
-		void	 obj_Mummy_Infront( byte pSpriteNumber, byte pY );
+		void	 obj_Mummy_Infront( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Mummy_Img_Execute( byte pObjectNumber );
 
 		void	 obj_Player_Add( );
-		void	 obj_Player_Collision( byte pSpriteNumber, byte pY );
-		void	 obj_Player_Hit( byte pSpriteNumber, byte pY );
+		void	 obj_Player_Collision( byte pSpriteNumber, byte pObjectNumber );
+		void	 obj_Player_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
 		void	 obj_Player_Execute( byte pObjectNumber );
 		void	 obj_Player_Color_Set( byte pSpriteNumber );
 		
@@ -473,7 +473,7 @@ public:
 
 		void	 obj_Teleport_Prepare( );
 		void	 obj_Teleport_Img_Execute( byte pObjectNumber );
-		void	 obj_Teleport_InFront( byte pSpriteNumber, byte pY );
+		void	 obj_Teleport_InFront( byte pSpriteNumber, byte pObjectNumber );
 
 		void	 obj_TrapDoor_Prepare();
 		void	 obj_TrapDoor_Switch_Img_Execute( byte pObjectNumber );
