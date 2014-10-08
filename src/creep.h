@@ -373,7 +373,7 @@ public:
 		void	 roomPrepare( word pAddress = 0);
 		
 		void	 sub_95F();
-		void	 obj_Image_Draw();
+
 		void	 gameHighScoresHandle();
 		void	 sound_PlayEffect( char pA );
 		
@@ -383,36 +383,33 @@ public:
 		void	 sub_2973();
 		void	 convertTimerToTime();
 		void	 convertTimeToNumber( byte pA, byte pY );
-		void	 obj_Mummy_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
-		void	 obj_Laser_Collision( byte pSpriteNumber, byte pObjectNumber );
-		void	 obj_Teleport_SetColour( byte pColor, byte pObjectNumber );
-		void	 obj_TrapDoor_PlaySound( byte pA );
+
 		void	 sub_526F( byte pA );
 		void	 roomAnim_Disable( byte pSpriteNumber );			// Redraw floor piece?
-		bool	 obj_Key_NotFound( byte pObjectNumber, byte pSpriteNumber );
+
 		void	 positionCalculate( byte pSpriteNumber );
 		void	 word_3C_Calculate();
 		byte	 sub_6009( byte pA );
 		
 		// Image Handling Functions
-		void	 anim_Execute( );
+		void	 obj_Execute( );
 		void	 anim_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pObjectNumber );
 		
 		bool	 object_Create( byte &pX );
 
 		// object Handling Functions
-		void	 obj_Actions( );
-		bool	 obj_Actions_Collision( byte pSpriteNumber );
-		bool	 obj_Actions_InFront( byte pSpriteNumber);
+		void	 Sprite_Execute( );
+		void	 Sprite_Execute_Action( byte pSpriteNumber );
 		void	 Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
-		void	 obj_Actions_Execute( byte pSpriteNumber );
-		void	 obj_CheckCollisions( byte pSpriteNumber );
-		void	 obj_CollisionSet();
+		void	 Sprite_Collision_Check( byte pSpriteNumber );
+		void	 Sprite_Collision_Set();
+		bool	 Sprite_Object_Collision( byte pSpriteNumber, byte pObjectNumber );
+		bool	 Sprite_Object_Infront_Execute( byte pSpriteNumber, byte pObjectNumber );
 		
 		int		 sprite_CreepFindFree( );
 		sCreepSprite *sprite_CreepGetFree( );
 
-		void	 obj_OverlapCheck( byte pSpriteNumber );
+		void	 Sprite_Object_Collision_Check( byte pSpriteNumber );
 
 		void	 obj_MultiDraw();					// Draw multiple objects
 		void	 obj_stringPrint(  );				// Draw a string
@@ -445,8 +442,11 @@ public:
 		void	 obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pY );
 		void	 obj_Frankie_Execute( byte pSpriteNumber );
 
+		void	 obj_Image_Draw();
+
 		void	 obj_Key_Infront( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Key_Load( );
+		bool	 obj_Key_NotFound( byte pObjectNumber, byte pSpriteNumber );
 
 		void	 obj_Ladder_Prepare();
 
@@ -462,6 +462,7 @@ public:
 		void	 obj_Mummy_Execute( byte pObjectNumber );
 		void	 obj_Mummy_Infront( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Mummy_Img_Execute( byte pObjectNumber );
+		void	 obj_Mummy_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
 
 		void	 obj_Player_Add( );
 		void	 obj_Player_Collision( byte pSpriteNumber, byte pObjectNumber );
@@ -474,12 +475,15 @@ public:
 		void	 obj_Teleport_Prepare( );
 		void	 obj_Teleport_Img_Execute( byte pObjectNumber );
 		void	 obj_Teleport_InFront( byte pSpriteNumber, byte pObjectNumber );
-
+		void	 obj_Teleport_SetColour( byte pColor, byte pObjectNumber );
+		
+		void	 obj_TrapDoor_PlaySound( byte pA );
 		void	 obj_TrapDoor_Prepare();
 		void	 obj_TrapDoor_Switch_Img_Execute( byte pObjectNumber );
 
 		void	 obj_RayGun_Prepare( );
 		void	 obj_RayGun_Laser_Add( byte pObjectNumber );
+		void	 obj_RayGun_Laser_Collision( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_RayGun_Laser_Execute( byte pObjectNumber );
 		void	 obj_RayGun_Img_Execute( byte pObjectNumber );
 		void	 obj_RayGun_Control_InFront( byte pSpriteNumber, byte pObjectNumber );

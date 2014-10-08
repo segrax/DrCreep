@@ -106,8 +106,8 @@ void cBuilder::objectStringPrint( sString pString ) {
 	mObjectPtr = 0xBB00;
 	obj_stringPrint();
 
-	obj_Actions();
-	anim_Execute();
+	Sprite_Execute();
+	obj_Execute();
 
 	hw_Update();
 }
@@ -270,8 +270,8 @@ void cBuilder::mainLoop() {
 		interruptWait( 2 );
 
 		// Draw
-		obj_Actions();
-		anim_Execute();
+		Sprite_Execute();
+		obj_Execute();
 
 		// Redraw screen
 		hw_Update();
@@ -406,8 +406,8 @@ void cBuilder::castlePrepare( ) {
 	objectStringsPrint();
 
 	// Force draw of sprites
-	obj_Actions();
-	anim_Execute();
+	Sprite_Execute();
+	obj_Execute();
 
 	playerDraw();
 }

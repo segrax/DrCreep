@@ -1541,14 +1541,14 @@ void cCreep::events_Execute() {
 	interruptWait( 2 );
 
 	// Get collisions from the hardware, and set them in the objects
-	obj_CollisionSet();
+	Sprite_Collision_Set();
 
 	// Check for any actions to execute, 
 	// including collisions, movement, general checks
-	obj_Actions();
+	Sprite_Execute();
 
 	// Check for any other 'background' actions to execute
-	anim_Execute();
+	obj_Execute();
 
 	++mEngine_Ticks;
 }
@@ -1600,7 +1600,7 @@ void cCreep::convertTimeToNumber( byte pA, byte pY ) {
 }
 
 // 2E37: 
-void cCreep::obj_CollisionSet() {
+void cCreep::Sprite_Collision_Set() {
 	byte gfxSpriteCollision = 0, gfxBackgroundCollision = 0;
 
 	vector< sScreenPiece *>				*collisions = mScreen->collisionsGet();
@@ -1651,7 +1651,7 @@ void cCreep::obj_CollisionSet() {
 }
 
 // 2E79: Execute any objects with actions / collisions, enable their sprites
-void cCreep::obj_Actions( ) {
+void cCreep::Sprite_Execute( ) {
 	byte  A;
 	byte w30 = 0;
 
@@ -1668,7 +1668,7 @@ void cCreep::obj_Actions( ) {
 
 					if( mRoomSprites[spriteNumber].Sprite_field_5 != 0 ) {
 						if(A & SPR_FLAG_COLLIDES) {
-							obj_CheckCollisions(spriteNumber);
+							Sprite_Collision_Check(spriteNumber);
 							A = mRoomSprites[spriteNumber].state;
 							if((A & SPR_ACTION_FLASH))
 								goto s2EF3;
@@ -1681,7 +1681,7 @@ void cCreep::obj_Actions( ) {
 							goto s2EF3;
 
 						if(A & SPR_FLAG_OVERLAPS) {
-							obj_OverlapCheck( spriteNumber );
+							Sprite_Object_Collision_Check( spriteNumber );
 							if( mRoomSprites[spriteNumber].state & SPR_ACTION_FLASH)
 								goto s2EF3;
 						}
@@ -1689,7 +1689,7 @@ void cCreep::obj_Actions( ) {
 						if(!(mRoomSprites[spriteNumber].state & SPR_FLAG_COLLIDES))
 							goto s2ED5;
 
-						obj_CheckCollisions( spriteNumber );
+						Sprite_Collision_Check( spriteNumber );
 						if( mRoomSprites[spriteNumber].state & SPR_ACTION_FLASH)
 							goto s2EF3;
 
@@ -1705,7 +1705,7 @@ s2EF3:
 			} else {
 				// 2ED5
 s2ED5:
-				obj_Actions_Execute( spriteNumber );
+				Sprite_Execute_Action( spriteNumber );
 				if( mRoomSprites[spriteNumber].state & SPR_ACTION_FLASH )
 					goto s2EF3;
 			}
@@ -1771,7 +1771,7 @@ s2F51:;
 }
 
 // 311E
-void cCreep::obj_OverlapCheck( byte pSpriteNumber ) {
+void cCreep::Sprite_Object_Collision_Check( byte pSpriteNumber ) {
 
 	byte_31F1 = mRoomSprites[pSpriteNumber].mX;
 	byte_31F2 = byte_31F1 + mRoomSprites[pSpriteNumber].mCollisionWidth;
@@ -1789,35 +1789,29 @@ void cCreep::obj_OverlapCheck( byte pSpriteNumber ) {
 
 	byte_31EF = mObjectCount;
 
-	byte Y = 0;
+	for( byte ObjectNumber = 0; ObjectNumber != byte_31EF; ++ObjectNumber ) {
 
-	do {
-		mObjectNumber = Y;
-
-		if( !(mRoomAnim[Y].mFlags & ITM_DISABLE ))
-
-			if( !(byte_31F2 < mRoomAnim[Y].mX ))
-				if( !(mRoomAnim[Y].mX + mRoomAnim[Y].mWidth < byte_31F1))
-					if( !(byte_31F4 < mRoomAnim[Y].mY) )
-						if( !(mRoomAnim[Y].mY + mRoomAnim[Y].mHeight < byte_31F3) ) {
+		if( !(mRoomAnim[ObjectNumber].mFlags & ITM_DISABLE ))
+			if( !(byte_31F2 < mRoomAnim[ObjectNumber].mX ))
+				if( !(mRoomAnim[ObjectNumber].mX + mRoomAnim[ObjectNumber].mWidth < byte_31F1))
+					if( !(byte_31F4 < mRoomAnim[ObjectNumber].mY) )
+						if( !(mRoomAnim[ObjectNumber].mY + mRoomAnim[ObjectNumber].mHeight < byte_31F3) ) {
 						//318C
 							mStartSpriteFlash = 1;
 
-							if( obj_Actions_Collision( pSpriteNumber ) == true ) {
+							if( Sprite_Object_Collision( pSpriteNumber, ObjectNumber ) == true ) {
 
 								if( mStartSpriteFlash == 1 ) 
 									mRoomSprites[pSpriteNumber].state |= SPR_ACTION_FLASH;
 							}
 
-							obj_Actions_InFront( pSpriteNumber );
+							Sprite_Object_Infront_Execute( pSpriteNumber, ObjectNumber );
 						} 
-		
-		Y = mObjectNumber + 1;
 
-	} while(Y != byte_31EF);
+	}
 }
 
-bool cCreep::obj_Actions_Collision( byte pSpriteNumber ) {
+bool cCreep::Sprite_Object_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 	word func = mObjectFuncData[ mRoomSprites[pSpriteNumber].Sprite_field_0 ].mFuncColId;
 
 	switch( func ) {
@@ -1825,23 +1819,23 @@ bool cCreep::obj_Actions_Collision( byte pSpriteNumber ) {
 			return false;
 
 		case 0x34EF:		// Player In Front
-			obj_Player_Collision( pSpriteNumber, mObjectNumber );
+			obj_Player_Collision( pSpriteNumber, pObjectNumber );
 			break;
 
 		case 0x38CE:		// Mummy
-			obj_Mummy_Collision( pSpriteNumber, mObjectNumber );
+			obj_Mummy_Collision( pSpriteNumber, pObjectNumber );
 			break;
 
 		case 0x3A60:		// Laser
-			obj_Laser_Collision( pSpriteNumber, mObjectNumber );
+			obj_RayGun_Laser_Collision( pSpriteNumber, pObjectNumber );
 			break;
 
 		case 0x3D6E:		// Frankie
-			obj_Frankie_Collision( pSpriteNumber, mObjectNumber );
+			obj_Frankie_Collision( pSpriteNumber, pObjectNumber );
 			break;
 
 		default:
-			cout << "obj_Actions_Collision: 0x";
+			cout << "Sprite_Object_Collision: 0x";
 			cout << std::hex << func << "\n";
 			break;
 
@@ -1850,9 +1844,9 @@ bool cCreep::obj_Actions_Collision( byte pSpriteNumber ) {
 	return true;
 }
 
-bool cCreep::obj_Actions_InFront( byte pSpriteNumber ) {
+bool cCreep::Sprite_Object_Infront_Execute( byte pSpriteNumber, byte pObjectNumber ) {
 
-	word func = mObjectImageFuncData[ mRoomAnim[mObjectNumber].mFuncID ].mFuncInfrontId;
+	word func = mObjectImageFuncData[ mRoomAnim[pObjectNumber].mFuncID ].mFuncInfrontId;
 
 	switch( func ) {
 		case 0:
@@ -1860,51 +1854,51 @@ bool cCreep::obj_Actions_InFront( byte pSpriteNumber ) {
 			break;
 		
 		case 0x4075:		// In Front Door
-			obj_Door_InFront( pSpriteNumber, mObjectNumber );
+			obj_Door_InFront( pSpriteNumber, pObjectNumber );
 			break;
 
 		case 0x41D8:		// In Front Button
-			obj_Door_Button_InFront( pSpriteNumber, mObjectNumber );
+			obj_Door_Button_InFront( pSpriteNumber, pObjectNumber );
 			break;
 		
 		case 0x44E7:		// In Front Lightning Switch
-			obj_Lightning_Switch_InFront( pSpriteNumber, mObjectNumber );
+			obj_Lightning_Switch_InFront( pSpriteNumber, pObjectNumber );
 			break;
 
 		case 0x4647:		// In Front Forcefield Timer
-			obj_Forcefield_Timer_InFront( pSpriteNumber, mObjectNumber );
+			obj_Forcefield_Timer_InFront( pSpriteNumber, pObjectNumber );
 			break;
 
 		case 0x47A7:		// In Front Mummy Release
-			obj_Mummy_Infront( pSpriteNumber, mObjectNumber );
+			obj_Mummy_Infront( pSpriteNumber, pObjectNumber );
 			break;
 
 		case 0x4990:		// In Front Key
-			obj_Key_Infront( pSpriteNumber, mObjectNumber );
+			obj_Key_Infront( pSpriteNumber, pObjectNumber );
 			break;
 
 		case 0x4A68:		// In Front Lock
-			obj_Door_Lock_InFront( pSpriteNumber, mObjectNumber );
+			obj_Door_Lock_InFront( pSpriteNumber, pObjectNumber );
 			break;
 		
 		case 0x4D70:		// In Front RayGun Control
-			obj_RayGun_Control_InFront( pSpriteNumber, mObjectNumber );
+			obj_RayGun_Control_InFront( pSpriteNumber, pObjectNumber );
 			break;
 
 		case 0x4EA8:		// In Front Teleport
-			obj_Teleport_InFront( pSpriteNumber, mObjectNumber );
+			obj_Teleport_InFront( pSpriteNumber, pObjectNumber );
 			break;
 		
 		case 0x548B:		// In Front Conveyor
-			obj_Conveyor_InFront( pSpriteNumber, mObjectNumber );
+			obj_Conveyor_InFront( pSpriteNumber, pObjectNumber );
 			break;
 
 		case 0x5611:		// In Front Conveyor Control
-			obj_Conveyor_Control_InFront( pSpriteNumber, mObjectNumber );
+			obj_Conveyor_Control_InFront( pSpriteNumber, pObjectNumber );
 			break;
 
 		default:
-			cout << "obj_Actions_InFront: 0x";
+			cout << "Sprite_Object_Infront_Execute: 0x";
 			cout << std::hex << func << "\n";
 
 			break;
@@ -1963,7 +1957,7 @@ void cCreep::Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 }
 
 // 3026
-void cCreep::obj_CheckCollisions( byte pSpriteNumber ) {
+void cCreep::Sprite_Collision_Check( byte pSpriteNumber ) {
 	byte SpriteY_Bottom, byte_311B, SpriteX, SpriteX_Right, SpriteY;
 
 	byte A = mObjectFuncData[mRoomSprites[pSpriteNumber].Sprite_field_0].mHitData;
@@ -2093,7 +2087,7 @@ s2FE9:;
 
 // Originally this was not a function, but its too big to bother
 // implementing in the original location
-void cCreep::obj_Actions_Execute( byte pSpriteNumber ) {
+void cCreep::Sprite_Execute_Action( byte pSpriteNumber ) {
 
 	word func = mObjectFuncData[mRoomSprites[pSpriteNumber].Sprite_field_0].mFuncExecId;
 
@@ -2125,7 +2119,7 @@ void cCreep::obj_Actions_Execute( byte pSpriteNumber ) {
 			break;
 
 		default:
-			cout << "obj_Actions_Execute: 0x";
+			cout << "Sprite_Execute_Action: 0x";
 			cout << std::hex << mRoomSprites[pSpriteNumber].Sprite_field_0 << "\n";
 			break;
 	}
@@ -2826,7 +2820,7 @@ void cCreep::obj_Frankie_Add() {
 	mRoomSprites[X].Sprite_field_5 = 2;
 }
 
-void cCreep::anim_Execute() {
+void cCreep::obj_Execute() {
 
 	for(byte X = 0; X < mObjectCount; ++X ) {
 		
@@ -2873,7 +2867,7 @@ void cCreep::anim_Execute() {
 					break;
 
 				default:
-					cout << "anim_Execute: 0x";
+					cout << "obj_Execute: 0x";
 					cout << std::hex << func << "\n";
 					break;
 			}
@@ -6590,7 +6584,7 @@ void cCreep::obj_Mummy_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2
 }
 
 // 3A60:  
-void cCreep::obj_Laser_Collision( byte pSpriteNumber, byte pObjectNumber ) {
+void cCreep::obj_RayGun_Laser_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 	if( mRoomAnim[pObjectNumber].mFuncID == 2 )
 		return;
 
