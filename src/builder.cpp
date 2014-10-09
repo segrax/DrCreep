@@ -107,7 +107,7 @@ void cBuilder::objectStringPrint( sString pString ) {
 	obj_stringPrint();
 
 	Sprite_Execute();
-	obj_Execute();
+	object_Execute();
 
 	hw_Update();
 }
@@ -128,12 +128,12 @@ void cBuilder::playerDraw() {
 	mMemory[ 0x780C ] = mMemory[ 0x7806 ];	// Player2 Start Door
 
 	if( mCastle->mStart_Room_Player1Get() == mCurrentRoom->mNumber ) {
-		byte_3638 = 0;
+		mCurrentPlayer = 0;
 		obj_Player_Add();
 	}
 
 	if( mCastle->mStart_Room_Player2Get() == mCurrentRoom->mNumber ) {
-		byte_3638 = 1;
+		mCurrentPlayer = 1;
 		obj_Player_Add();
 	}
 }
@@ -271,7 +271,7 @@ void cBuilder::mainLoop() {
 
 		// Draw
 		Sprite_Execute();
-		obj_Execute();
+		object_Execute();
 
 		// Redraw screen
 		hw_Update();
@@ -407,7 +407,7 @@ void cBuilder::castlePrepare( ) {
 
 	// Force draw of sprites
 	Sprite_Execute();
-	obj_Execute();
+	object_Execute();
 
 	playerDraw();
 }

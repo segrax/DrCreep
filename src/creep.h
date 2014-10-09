@@ -136,11 +136,9 @@ struct sCreepObject {		// 0xBE
 	byte color;
 	byte Object_field_4;
 	byte Object_field_5;
-	byte Object_field_6;
-	byte Object_field_7;
 
 	void clear() {
-		objNumber = Object_field_1 = Object_field_2 = color = Object_field_4 = Object_field_5 = Object_field_6 = Object_field_7 = 0;
+		objNumber = Object_field_1 = Object_field_2 = color = Object_field_4 = Object_field_5 = 0;
 	}
 
 };
@@ -153,10 +151,9 @@ struct sCreepAnim {		// 0xBF
 	byte mFlags;
 	byte mWidth;
 	byte mHeight;
-	byte Anim_field_7;
 
 	void clear() {
-		mFuncID = mX = mY = mGfxID = mFlags = mWidth = mHeight = Anim_field_7 = 0;
+		mFuncID = mX = mY = mGfxID = mFlags = mWidth = mHeight = 0;
 	}
 };
 
@@ -204,23 +201,17 @@ protected:
 
 	byte		 mStrLength;
 
-	byte		 byte_20DE, byte_24FD;
-	byte		 byte_2E02;
+	byte		 mMusicPlaying, mSaveGameLoaded;
 
 	byte		 mEngine_Ticks;
 	char		 mPlayingSound;					
 
 	byte		 mStartSpriteFlash2;
 
-	byte		 mPlayerExecutingSpriteNumber, byte_3638;
-	word		 mRoomDoorPtr;
+	byte		 mPlayerExecutingSpriteNumber, mCurrentPlayer;
 
-	word		 mRoomKeyPtr;											// Keys
-	byte		 mCurrentKeyID;
+	word		 mRoomDoorPtr,mRoomKeyPtr,mRoomMummyPtr,mRoomRayGunPtr;		// Room Level Data Pointers
 
-	word		 mRoomMummyPtr;											// Mummys
-
-	word		 mRoomRayGunPtr;											// RayGuns	
 	byte		 byte_4D5D;
 	byte		 byte_4D5E, byte_4D5F;
 	byte		 byte_574C, byte_4D60, byte_4D61;
@@ -244,8 +235,8 @@ protected:
 	byte		 byte_5642, byte_5643, byte_5644, byte_5645, byte_5646;		// Conveyor
 	byte		 byte_5647, byte_5648, byte_5F58, mJoyButtonState, byte_5F56;
 
-	byte		 byte_D10, byte_D12;
-	byte		 byte_839, mObjectCount, byte_8C0, byte_8C1, byte_5CE2;
+	byte		 byte_D10;
+	byte		 mDisableSoundEffects, mObjectCount, byte_8C0, byte_8C1;
 	byte		 byte_5FD7;
 	byte		 byte_5FD5, byte_5FD6, byte_5FD8;
 
@@ -258,7 +249,7 @@ protected:
 	byte		 mGfxWidth, mGfxHeight;
 	byte		 mCount;
 	 
-	word		 word_30, word_32, word_34, word_3C, mObjectPtr, word_40, mRoomPtr, word_44;
+	word		 word_30, word_32, word_3C, mObjectPtr, word_40, mRoomPtr;
 
 	bool		 mMenuReturn, mNoInput;
 
@@ -392,8 +383,8 @@ public:
 		byte	 sub_6009( byte pA );
 		
 		// Image Handling Functions
-		void	 obj_Execute( );
-		void	 anim_Update( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pObjectNumber );
+		void	 object_Execute( );
+		void	 Draw_RoomAnimObject( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byte pTxtCurrentID, byte pObjectNumber );
 		
 		bool	 object_Create( byte &pX );
 
