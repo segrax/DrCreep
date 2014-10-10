@@ -5417,7 +5417,7 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 
 		// 4B46
 		if(!(mMemory[ word_40 ] & byte_4D62) ) {
-			byte_4D5D = 0xFF;
+			mRaygunCount = 0xFF;
 			byte_4D5E = 0x00;
 			
 
@@ -5430,8 +5430,8 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 					if( A < 0 )
 						A = (A ^ 0xFF) + 1;
 
-					if( A < byte_4D5D ) {
-						byte_4D5D = A;
+					if( A < mRaygunCount ) {
+						mRaygunCount = A;
 						byte A = mRoomSprites[Y].mY;
 
 						if( A >= 0xC8 || A < mRoomAnim[pObjectNumber].mY ) {
@@ -5512,7 +5512,7 @@ s4C27:;
 			return;
 	} else {
 		// 4C3D
-		if( byte_4D5D >= 5 )
+		if( mRaygunCount >= 5 )
 			return;
 	}
 
@@ -5570,7 +5570,7 @@ void cCreep::obj_Teleport_Execute( byte pObjectNumber ) {
 void cCreep::obj_RayGun_Prepare() {
 
 	mRoomRayGunPtr = mObjectPtr;
-	byte_4D5D = 0;
+	mRaygunCount = 0;
 
 	do {
 		// 4C7E
@@ -5599,7 +5599,7 @@ void cCreep::obj_RayGun_Prepare() {
 			object_Create( X );
 			
 			mRoomAnim[X].mFuncID = 8;
-			mRoomObjects[X].objNumber = byte_4D5D;
+			mRoomObjects[X].objNumber = mRaygunCount;
 			mRoomAnim[X].mFlags |= ITM_EXECUTE;
 			
 			byte A = mMemory[ mObjectPtr + 3 ];
@@ -5628,10 +5628,10 @@ void cCreep::obj_RayGun_Prepare() {
 
 		Draw_RoomAnimObject( 0x6D, gfxPosX, gfxPosY, 0, X );
 
-		mRoomObjects[X].objNumber = byte_4D5D;
+		mRoomObjects[X].objNumber = mRaygunCount;
 
 		mObjectPtr += 0x07;
-		byte_4D5D += 0x07;
+		mRaygunCount += 0x07;
 
 	} while( !(mMemory[ mObjectPtr ] & byte_4D60) );
 
