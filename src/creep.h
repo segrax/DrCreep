@@ -213,7 +213,7 @@ protected:
 	word		 mRoomDoorPtr,mRoomKeyPtr,mRoomMummyPtr,mRoomRayGunPtr;		// Room Level Data Pointers
 
 	byte		 mRaygunCount;
-	byte		 byte_4D5E, byte_4D5F;
+	byte		 mRaygunMoveDirection, byte_4D5F;
 	byte		 byte_574C, byte_4D60, byte_4D61;
 	byte		 byte_4D62, byte_4D63, byte_4D64;
 	byte		 byte_4D65, byte_4D66, byte_4D67;

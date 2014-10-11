@@ -5418,9 +5418,8 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 		// 4B46
 		if(!(mMemory[ word_40 ] & byte_4D62) ) {
 			mRaygunCount = 0xFF;
-			byte_4D5E = 0x00;
+			mRaygunMoveDirection = 0x00;
 			
-
 			for(byte_4D5F = 0x01; ((char) byte_4D5F) >= 0; --byte_4D5F) {
 
 				if( mMemory[ 0x780D + byte_4D5F ] == 0 ) {
@@ -5435,9 +5434,9 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 						byte A = mRoomSprites[Y].mY;
 
 						if( A >= 0xC8 || A < mRoomAnim[pObjectNumber].mY ) {
-							byte_4D5E = byte_4D65;	// Will Move Up
+							mRaygunMoveDirection = byte_4D65;	// Will Move Up
 						} else {
-							byte_4D5E = byte_4D66;	// Will Move Down
+							mRaygunMoveDirection = byte_4D66;	// Will Move Down
 						}
 					}
 				}
@@ -5449,7 +5448,7 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 			A ^= byte_4D66;
 
 			A &= mMemory[ word_40 ];
-			A |= byte_4D5E;
+			A |= mRaygunMoveDirection;
 			mMemory[ word_40 ] = A;
 		}
 		//4BB2
@@ -5494,9 +5493,9 @@ s4BD9:;
 	else
 		A = 0;
 
-	byte_4D5E = A;
+	mRaygunMoveDirection = A;
 	Y = mMemory[ word_40 + 4 ] & 3;
-	Y |= byte_4D5E;
+	Y |= mRaygunMoveDirection;
 
 	// Draw the ray gun
 	Draw_RoomAnimObject( mMemory[ 0x4D68 + Y ], gfxPosX, gfxPosY, 0, pObjectNumber );
@@ -5586,7 +5585,7 @@ void cCreep::obj_RayGun_Prepare() {
 			gfxCurrentID = 0x60;
 
 		// Length
-		for( byte_4D5E = mMemory[ mObjectPtr + 3 ]; byte_4D5E; --byte_4D5E ) {
+		for( mRaygunMoveDirection = mMemory[ mObjectPtr + 3 ]; mRaygunMoveDirection; --mRaygunMoveDirection ) {
 			
 			screenDraw( 0, gfxCurrentID, gfxPosX, gfxPosY, 0 );
 			gfxPosY += 0x08;
