@@ -128,15 +128,6 @@ cCreep::cCreep() {
 
 	mCurrentPlayer = 0xBA;
 
-	byte_4D60 = 0x80;
-	byte_4D61 = 0x40;
-	byte_4D62 = 0x20;
-	byte_4D63 = 0x10;
-	byte_4D64 = 0x08;
-	byte_4D65 = 0x04;
-	byte_4D66 = 0x02;
-	byte_4D67 = 0x01;
-
 	byte_5389 = 0x80;
 	byte_538A = 0x01;
 
@@ -5416,7 +5407,7 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 			return;
 
 		// 4B46
-		if(!(mMemory[ word_40 ] & byte_4D62) ) {
+		if(!(mMemory[ word_40 ] & RAYGUN_UNK2) ) {
 			mRaygunCount = 0xFF;
 			mRaygunMoveDirection = 0x00;
 			
@@ -5434,9 +5425,9 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 						byte A = mRoomSprites[Y].mY;
 
 						if( A >= 0xC8 || A < mRoomAnim[pObjectNumber].mY ) {
-							mRaygunMoveDirection = byte_4D65;	// Will Move Up
+							mRaygunMoveDirection = RAYGUN_MOVE_UP;	// Will Move Up
 						} else {
-							mRaygunMoveDirection = byte_4D66;	// Will Move Down
+							mRaygunMoveDirection = RAYGUN_MOVE_DOWN;	// Will Move Down
 						}
 					}
 				}
@@ -5444,8 +5435,8 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 			}
 			// 4BA1
 			A = 0xFF;
-			A ^= byte_4D65;
-			A ^= byte_4D66;
+			A ^= RAYGUN_MOVE_UP;
+			A ^= RAYGUN_MOVE_DOWN;
 
 			A &= mMemory[ word_40 ];
 			A |= mRaygunMoveDirection;
@@ -5454,7 +5445,7 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 		//4BB2
 		A = mMemory[ word_40 ];
 
-		if( A & byte_4D65 ) {
+		if( A & RAYGUN_MOVE_UP ) {
 
 			A = mMemory[ word_40 + 4 ];
 
@@ -5467,7 +5458,7 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 
 		} else {
 			// 4BD4
-			if( !(A & byte_4D66) ) {
+			if( !(A & RAYGUN_MOVE_DOWN) ) {
 s4BD9:;
 				obj_RayGun_Control_Update( 0xCC );
 				goto s4C27;
@@ -5488,7 +5479,7 @@ s4BD9:;
 	gfxPosY = mMemory[ word_40 + 4 ];
 
 	A = mMemory[ word_40 ];
-	if( A & byte_4D67 )
+	if( A & RAYGUN_UNK5 )
 		A = 4;
 	else
 		A = 0;
@@ -5503,11 +5494,11 @@ s4BD9:;
 s4C27:;
 	A = mMemory[ word_40 ];
 
-	if( A & byte_4D62 ) {
-		A ^= byte_4D62;
+	if( A & RAYGUN_UNK2 ) {
+		A ^= RAYGUN_UNK2;
 		mMemory[ word_40 ] = A;
 
-		if( !(A & byte_4D64 ))
+		if( !(A & RAYGUN_UNK4 ))
 			return;
 	} else {
 		// 4C3D
@@ -5519,12 +5510,12 @@ s4C27:;
 
 	// 4C44
 	A = mMemory[ word_40 ];
-	if( (A & byte_4D61) )
+	if( (A & RAYGUN_DONT_FIRE) )
 		return;
 
 	obj_RayGun_Laser_Sprite_Create( pObjectNumber );
 
-	A |= byte_4D61;
+	A |= RAYGUN_DONT_FIRE;
 	mMemory[ word_40 ] = A;
 }
 
@@ -5574,12 +5565,12 @@ void cCreep::obj_RayGun_Prepare() {
 	do {
 		// 4C7E
 
-		mMemory[ mObjectPtr ] &=( 0xFF ^ byte_4D61);
+		mMemory[ mObjectPtr ] &=( 0xFF ^ RAYGUN_DONT_FIRE);
 		byte gfxPosX = mMemory[ mObjectPtr + 1 ];
 		byte gfxPosY = mMemory[ mObjectPtr + 2 ];
 		byte gfxCurrentID;
 
-		if( mMemory[ mObjectPtr ] & byte_4D67 )
+		if( mMemory[ mObjectPtr ] & RAYGUN_UNK5 )
 			gfxCurrentID = 0x5F;
 		else
 			gfxCurrentID = 0x60;
@@ -5592,7 +5583,7 @@ void cCreep::obj_RayGun_Prepare() {
 		}
 
 		// 4CCB
-		if(!( mMemory[ mObjectPtr ] & byte_4D63 )) {
+		if(!( mMemory[ mObjectPtr ] & RAYGUN_UNK3 )) {
 			byte X;
 
 			object_Create( X );
@@ -5607,7 +5598,7 @@ void cCreep::obj_RayGun_Prepare() {
 			A -= 0x0B;
 			mRoomObjects[X].Object_field_1 = A;
 			// 4D01
-			if( !(mMemory[ mObjectPtr ] & byte_4D67) ) {
+			if( !(mMemory[ mObjectPtr ] & RAYGUN_UNK5) ) {
 				A = mMemory[ mObjectPtr + 1 ];
 				A += 4;
 			} else {
@@ -5632,7 +5623,7 @@ void cCreep::obj_RayGun_Prepare() {
 		mObjectPtr += 0x07;
 		mRaygunCount += 0x07;
 
-	} while( !(mMemory[ mObjectPtr ] & byte_4D60) );
+	} while( !(mMemory[ mObjectPtr ] & RAYGUN_END_MARKER) );
 
 	++mObjectPtr;
 }
@@ -6613,7 +6604,7 @@ void cCreep::obj_RayGun_Laser_Sprite_Create( byte pObjectNumber ) {
 	mRoomSprites[X].spriteImageID= 0x6C;
 	mRoomSprites[X].Sprite_field_1E = mRoomObjects[pObjectNumber].objNumber;
 
-	if( mMemory[ word_40 ] & byte_4D67 ) {
+	if( mMemory[ word_40 ] & RAYGUN_UNK5 ) {
 		mRoomSprites[X].mX-= 0x08;
 		mRoomSprites[X].Sprite_field_1F = 0xFC;
 	} else {
@@ -6780,7 +6771,7 @@ void cCreep::obj_RayGun_Laser_Execute( byte pSpriteNumber ) {
 		mRoomSprites[pSpriteNumber].state |= SPR_ACTION_FREE;
 		
 		word_40 = mRoomRayGunPtr + mRoomSprites[pSpriteNumber].Sprite_field_1E;
-		mMemory[ word_40 ] = (0xFF ^ byte_4D61) & mMemory[ word_40 ];
+		mMemory[ word_40 ] = (0xFF ^ RAYGUN_DONT_FIRE) & mMemory[ word_40 ];
 
 	} else {
 		if( mRoomSprites[pSpriteNumber].state & SPR_ACTION_CREATED )
@@ -7020,28 +7011,28 @@ void cCreep::obj_RayGun_Control_InFront( byte pSpriteNumber, byte pObjectNumber 
 
 	word_40 = mRoomRayGunPtr + mRoomObjects[pObjectNumber].objNumber;
 	A = 0xFF;
-	A ^= byte_4D65;
-	A ^= byte_4D66;
+	A ^= RAYGUN_MOVE_UP;
+	A ^= RAYGUN_MOVE_DOWN;
 	A &= mMemory[ word_40 ];
 
 	if( !mRoomSprites[pSpriteNumber].Sprite_field_1E ) 
-		A |= byte_4D65;
+		A |= RAYGUN_MOVE_UP;
 	else {
 		if( mRoomSprites[pSpriteNumber].Sprite_field_1E == 4 )
-			A |= byte_4D66;
+			A |= RAYGUN_MOVE_DOWN;
 		else
 			if(mRoomSprites[pSpriteNumber].Sprite_field_1E != 0x80 )
 				return;
 	}
 
 	// 4DC9
-	A |= byte_4D62;
+	A |= RAYGUN_UNK2;
 
 	mMemory[ word_40 ] = A;
 	if( mRoomSprites[pSpriteNumber].mButtonState )
-		A = mMemory[ word_40 ] | byte_4D64;
+		A = mMemory[ word_40 ] | RAYGUN_UNK4;
 	else
-		A = (0xFF ^ byte_4D64) & mMemory[ word_40 ];
+		A = (0xFF ^ RAYGUN_UNK4) & mMemory[ word_40 ];
 
 	mMemory[ word_40 ] = A;
 }

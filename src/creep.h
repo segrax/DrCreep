@@ -71,6 +71,17 @@ enum {
 };
 
 enum {
+	RAYGUN_END_MARKER	= 0x80,
+	RAYGUN_DONT_FIRE	= 0x40,
+	RAYGUN_UNK2			= 0x20,
+	RAYGUN_UNK3			= 0x10,
+	RAYGUN_UNK4			= 0x08,
+	RAYGUN_MOVE_UP		= 0x04,
+	RAYGUN_MOVE_DOWN	= 0x02,
+	RAYGUN_UNK5			= 0x01
+};
+
+enum {
 	byte_45DD = 0x80,
 	byte_45DE = 0x40,
 	byte_45DF = 0x20
@@ -214,9 +225,7 @@ protected:
 
 	byte		 mRaygunCount;
 	byte		 mRaygunMoveDirection, byte_4D5F;
-	byte		 byte_574C, byte_4D60, byte_4D61;
-	byte		 byte_4D62, byte_4D63, byte_4D64;
-	byte		 byte_4D65, byte_4D66, byte_4D67;
+	byte		 byte_574C;
 
 	word		 mRoomTrapDoorPtr;											// Trap Door
 	byte		 byte_5389, byte_538A;
