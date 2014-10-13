@@ -6495,7 +6495,7 @@ void cCreep::obj_Conveyor_Prepare() {
 		byte_5649 += 0x05;
 		mObjectPtr += 0x05;
 
-	} while( !(mMemory[ mObjectPtr ] & CONVEYOR_UNK1) );
+	} while( !(mMemory[ mObjectPtr ] & CONVEYOR_END_MARKER) );
 
 	++mObjectPtr;
 }
