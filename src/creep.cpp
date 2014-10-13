@@ -5756,7 +5756,7 @@ void cCreep::obj_Lightning_Pole_Execute( byte pObjectNumber ) {
 
 	} else {
 		// 42CF
-		if( !(mMemory[ word_40 + Y ] & byte_45DE )) {
+		if( !(mMemory[ word_40 + Y ] & LIGHTNING_UNK2 )) {
 			// 42D8
 			mRoomObjects[pObjectNumber].Object_field_1 = 0;
 			mRoomAnim[pObjectNumber].mFlags ^= ITM_EXECUTE;
@@ -5889,7 +5889,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pSpriteNumber, byte pObjectNumbe
 	
 	word_30 = mRoomLightningPtr + mRoomObjects[pObjectNumber].objNumber;
 
-	if( !(mMemory[ word_30 ] & byte_45DE )) {
+	if( !(mMemory[ word_30 ] & LIGHTNING_UNK2 )) {
 		if( mRoomSprites[pSpriteNumber].Sprite_field_1E )
 			return;
 	} else {
@@ -5898,7 +5898,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pSpriteNumber, byte pObjectNumbe
 	}
 	
 	// 4535
-	mMemory[ word_30 ] ^= byte_45DE;
+	mMemory[ word_30 ] ^= LIGHTNING_UNK2;
 	for(byte byte_45D7 = 0; byte_45D7 < 4; ++byte_45D7) {
 
 		byte A = mMemory[ word_30 + (byte_45D7 + 4) ];
@@ -5909,7 +5909,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pSpriteNumber, byte pObjectNumbe
 		byte byte_45DA = A;
 		word_32 = mRoomLightningPtr + A;
 		
-		mMemory[ word_32 ] ^= byte_45DE;
+		mMemory[ word_32 ] ^= LIGHTNING_UNK2;
 		byte Y;
 
 		for( Y = 0; Y < MAX_OBJECTS; ++Y ) {
@@ -5928,7 +5928,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pSpriteNumber, byte pObjectNumbe
 	byte A;
 
 	// 4594
-	if( !(mMemory[ word_30 ] & byte_45DE )) {
+	if( !(mMemory[ word_30 ] & LIGHTNING_UNK2 )) {
 		mMemory[ 0x75E7 ] = 0x2F;
 		A = 0x38;
 	} else {
@@ -5989,7 +5989,7 @@ void cCreep::obj_Lightning_Prepare() {
 		mRoomObjects[X].objNumber = byte_44E5;
 
 		// Is Switch On?
-		if( mMemory[ mObjectPtr ] & byte_45DD ) {
+		if( mMemory[ mObjectPtr ] & LIGHTNING_UNK1 ) {
 			// 441C
 			gfxPosX = mMemory[ mObjectPtr + 1 ];
 			gfxPosY = mMemory[ mObjectPtr + 2 ];
@@ -5999,7 +5999,7 @@ void cCreep::obj_Lightning_Prepare() {
 			gfxPosY += 0x08;
 
 			mRoomAnim[X].mFuncID = 3;
-			if( mMemory[ mObjectPtr ] & byte_45DE )
+			if( mMemory[ mObjectPtr ] & LIGHTNING_UNK2 )
 				A = 0x37;
 			else
 				A = 0x38;
@@ -6023,7 +6023,7 @@ void cCreep::obj_Lightning_Prepare() {
 			gfxPosX -= 0x04;
 
 			Draw_RoomAnimObject( 0x33, gfxPosX, gfxPosY, 0, X );
-			if( mMemory[ mObjectPtr ] & byte_45DE )
+			if( mMemory[ mObjectPtr ] & LIGHTNING_UNK2 )
 				mRoomAnim[X].mFlags |= ITM_EXECUTE;
 		}
 
@@ -6031,7 +6031,7 @@ void cCreep::obj_Lightning_Prepare() {
 		byte_44E5 += 0x08;
 		mObjectPtr += 0x08;
 
-	} while ( !(mMemory[ mObjectPtr ] & byte_45DF) );
+	} while ( !(mMemory[ mObjectPtr ] & LIGHTNING_UNK3) );
 
 	++mObjectPtr;
 }

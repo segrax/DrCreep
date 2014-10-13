@@ -82,9 +82,9 @@ enum {
 };
 
 enum {
-	byte_45DD = 0x80,
-	byte_45DE = 0x40,
-	byte_45DF = 0x20
+	LIGHTNING_UNK1 = 0x80,
+	LIGHTNING_UNK2 = 0x40,
+	LIGHTNING_UNK3 = 0x20
 };
 
 class sCreepSprite {
