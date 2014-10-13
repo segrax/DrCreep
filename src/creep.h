@@ -87,6 +87,16 @@ enum {
 	LIGHTNING_UNK3 = 0x20
 };
 
+enum {
+	CONVEYOR_UNK1 = 0x80,
+	CONVEYOR_UNK2 = 0x20,
+	CONVEYOR_UNK3 = 0x10,
+	CONVEYOR_UNK4 = 0x08,
+	CONVEYOR_UNK5 = 0x04,
+	CONVEYOR_UNK6 = 0x02,
+	CONVEYOR_UNK7 = 0x01
+};
+
 class sCreepSprite {
 public:
 	byte Sprite_field_0;			// 0
@@ -230,19 +240,18 @@ protected:
 	word		 mRoomTrapDoorPtr;											// Trap Door
 	byte		 byte_5389, byte_538A;
 
-	word		 mFrankiePtr;											// Frankenstein
-	char		 byte_574A, byte_574D, byte_574E, byte_574F;
+	word		 mFrankiePtr;												// Frankenstein
+	char		 mFrankieCount, byte_574D, byte_574E, byte_574F;
 	
 	byte		 byte_31EF, mObjectNumber, byte_31F1, byte_31F2;
 	byte		 byte_31F3, byte_31F4, mStartSpriteFlash;
 
 	word		 mRoomLightningPtr;											// Lightning
-	byte		 byte_44E5;											// Lightning
+	byte		 byte_44E5;													// Lightning
 	byte		 byte_474F;
 	
-	word		 mConveyorPtr;													// Conveyor
-	byte		 byte_5642, byte_5643, byte_5644, byte_5645, byte_5646;		// Conveyor
-	byte		 byte_5647, byte_5648, byte_5F58, mJoyButtonState, byte_5F56;
+	word		 mConveyorPtr;												// Conveyor
+	byte		 mJoyButtonState, byte_5F56;
 
 	byte		 byte_D10;
 	byte		 mDisableSoundEffects, mObjectCount, byte_8C0, byte_8C1;

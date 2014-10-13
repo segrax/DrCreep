@@ -131,14 +131,6 @@ cCreep::cCreep() {
 	byte_5389 = 0x80;
 	byte_538A = 0x01;
 
-	byte_5642 = 0x80;
-	byte_5643 = 0x20;
-	byte_5644 = 0x10;
-	byte_5645 = 0x08;
-	byte_5646 = 0x04;
-	byte_5647 = 0x02;
-	byte_5648 = 0x01;
-
 	byte_574C = 0x80;
 	byte_574D = 0x04;
 	byte_574E = 0x02;
@@ -1473,7 +1465,6 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	if(mNoInput)
 		return;
 
-	byte_5F58 = pA;
 	mRunStopPressed = false;
 
 	sPlayerInput *input = mInput->inputGet( pA );
@@ -2785,7 +2776,7 @@ void cCreep::obj_Frankie_Sprite_Create() {
 	byte X = sprite_CreepFindFree();
 
 	mRoomSprites[X].Sprite_field_0 = 5;
-	mRoomSprites[X].Sprite_field_1F = byte_574A;
+	mRoomSprites[X].Sprite_field_1F = mFrankieCount;
 	mRoomSprites[X].Sprite_field_1E = mMemory[ mObjectPtr ];
 
 	if( !(mMemory[ mObjectPtr ] & byte_574E) ) {
@@ -6254,13 +6245,13 @@ void cCreep::obj_Conveyor_Execute( byte pObjectNumber ) {
 	byte A = mMemory[ word_40 ];
 
 	// 539F
-	if( (A & byte_5646) && !(A & byte_5644) ||
-		(A & byte_5645) && !(A & byte_5643) ) {
+	if( (A & CONVEYOR_UNK5) && !(A & CONVEYOR_UNK3) ||
+		(A & CONVEYOR_UNK4) && !(A & CONVEYOR_UNK2) ) {
 
-			if( A & byte_5648 ) {
+			if( A & CONVEYOR_UNK7 ) {
 				
-				A ^= byte_5648;
-				A ^= byte_5647;
+				A ^= CONVEYOR_UNK7;
+				A ^= CONVEYOR_UNK6;
 
 				mMemory[ word_40 ] = A;
 				mMemory[ 0x70A8 ] = mMemory[ 0x70A6 ] = 0xC0;
@@ -6268,9 +6259,9 @@ void cCreep::obj_Conveyor_Execute( byte pObjectNumber ) {
 
 			} else {
 				// 53D0
-				A |= byte_5648;
+				A |= CONVEYOR_UNK7;
 				mMemory[ word_40 ] = A;
-				if( A & byte_5647 ) {
+				if( A & CONVEYOR_UNK6 ) {
 					mMemory[ 0x70A6 ] = 0x50;
 					mMemory[ 0x70A8 ] = 0xC0;
 					mMemory[ 0x7624 ] = 0x18;
@@ -6293,29 +6284,29 @@ void cCreep::obj_Conveyor_Execute( byte pObjectNumber ) {
 	// 541B
 	A = 0xFF;
 
-	A ^= byte_5644;
-	A ^= byte_5643;
+	A ^= CONVEYOR_UNK3;
+	A ^= CONVEYOR_UNK2;
 	A &= mMemory[ word_40 ];
 	// 5427
-	if( A & byte_5646 ) {
-		A |= byte_5644;
-		A ^= byte_5646;
+	if( A & CONVEYOR_UNK5 ) {
+		A |= CONVEYOR_UNK3;
+		A ^= CONVEYOR_UNK5;
 	}
-	if( A & byte_5645 ) {
-		A |= byte_5643;
-		A ^= byte_5645;
+	if( A & CONVEYOR_UNK4 ) {
+		A |= CONVEYOR_UNK2;
+		A ^= CONVEYOR_UNK4;
 	}
 
 	mMemory[ word_40 ] = A;
 	// 543F
-	if( A & byte_5648 ) {
+	if( A & CONVEYOR_UNK7 ) {
 		A = mEngine_Ticks & 1;
 		if( A )
 			return;
 
 		byte gfxCurrentID = mRoomAnim[pObjectNumber].mGfxID;
 
-		if( !(mMemory[ word_40 ] & byte_5647) ) {
+		if( !(mMemory[ word_40 ] & CONVEYOR_UNK6) ) {
 			// 5458
 			++gfxCurrentID;
 			if( gfxCurrentID >= 0x82 )
@@ -6383,7 +6374,7 @@ void cCreep::obj_Mummy_Infront( byte pSpriteNumber, byte pObjectNumber ) {
 void cCreep::obj_Frankie_Load() {
 	mFrankiePtr = mObjectPtr;
 
-	byte_574A = 0;
+	mFrankieCount = 0;
 
 	do {
 
@@ -6428,7 +6419,7 @@ void cCreep::obj_Frankie_Load() {
 		obj_Frankie_Sprite_Create();
 
 		mObjectPtr += 0x07;
-		byte_574A += 0x07;
+		mFrankieCount += 0x07;
 
 	} while( !(mMemory[ mObjectPtr ] & byte_574C) );
 
@@ -6448,10 +6439,10 @@ void cCreep::obj_Conveyor_Prepare() {
 		//5527
 		A = 0xFF;
 
-		A ^= byte_5646;
-		A ^= byte_5645;
-		A ^= byte_5644;
-		A ^= byte_5643;
+		A ^= CONVEYOR_UNK5;
+		A ^= CONVEYOR_UNK4;
+		A ^= CONVEYOR_UNK3;
+		A ^= CONVEYOR_UNK2;
 
 		A &= mMemory[ mObjectPtr ];
 		mMemory[ mObjectPtr ] = A;
@@ -6481,11 +6472,11 @@ void cCreep::obj_Conveyor_Prepare() {
 		byte gfxCurrentID = 0x82;
 		byte gfxDecodeMode = 0;
 
-		if( (mMemory[ mObjectPtr ] & byte_5648) == 0 ) {
+		if( (mMemory[ mObjectPtr ] & CONVEYOR_UNK7) == 0 ) {
 			mMemory[ 0x70A6 ] = 0xC0;
 			mMemory[ 0x70A8 ] = 0xC0;
 		} else {
-			if( (mMemory[ mObjectPtr ] & byte_5647) == 0 ) {
+			if( (mMemory[ mObjectPtr ] & CONVEYOR_UNK6) == 0 ) {
 				// 55BE
 				mMemory[ 0x70A6 ] = 0xC0;
 				mMemory[ 0x70A8 ] = 0x20;
@@ -6504,7 +6495,7 @@ void cCreep::obj_Conveyor_Prepare() {
 		byte_5649 += 0x05;
 		mObjectPtr += 0x05;
 
-	} while( !(mMemory[ mObjectPtr ] & byte_5642) );
+	} while( !(mMemory[ mObjectPtr ] & CONVEYOR_UNK1) );
 
 	++mObjectPtr;
 }
@@ -7221,7 +7212,7 @@ void cCreep::obj_Conveyor_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 
 	word_40 = mConveyorPtr + mRoomObjects[pObjectNumber].objNumber;
 
-	if( !(mMemory[ word_40 ] & byte_5648 ))
+	if( !(mMemory[ word_40 ] & CONVEYOR_UNK7 ))
 		return;
 	
 	byte A = mRoomSprites[pSpriteNumber].Sprite_field_0;
@@ -7244,7 +7235,7 @@ void cCreep::obj_Conveyor_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 	if( A >= 0x20 )
 		return;
 
-	if( mMemory[ word_40 ] & byte_5647 )
+	if( mMemory[ word_40 ] & CONVEYOR_UNK6 )
 		A = 0xFF;
 	else
 		A = 0x01;
@@ -7268,9 +7259,9 @@ void cCreep::obj_Conveyor_Control_InFront( byte pSpriteNumber, byte pObjectNumbe
 	byte A;
 
 	if( mRoomSprites[pSpriteNumber].playerNumber )
-		A = byte_5645;
+		A = CONVEYOR_UNK4;
 	else
-		A = byte_5646;
+		A = CONVEYOR_UNK5;
 
 	mMemory[ word_40 ] |= A;
 }
