@@ -131,12 +131,6 @@ cCreep::cCreep() {
 	byte_5389 = 0x80;
 	byte_538A = 0x01;
 
-	byte_574C = 0x80;
-	byte_574D = 0x04;
-	byte_574E = 0x02;
-	byte_574F = 0x01;	
-
-
 	mBuilder = 0;
 	mCastle = 0;
 	mJoyButtonState = 0xA0;
@@ -2430,7 +2424,7 @@ void cCreep::obj_Frankie_Execute( byte pSpriteNumber ) {
 
 	word_40 = mFrankiePtr + mRoomSprites[pSpriteNumber].Sprite_field_1F;
 	
-	if( !(mRoomSprites[pSpriteNumber].Sprite_field_1E & byte_574E) ) {
+	if( !(mRoomSprites[pSpriteNumber].Sprite_field_1E & FRANKIE_UNK2) ) {
 		if( mIntro == 1 )
 			return;
 
@@ -2456,7 +2450,7 @@ void cCreep::obj_Frankie_Execute( byte pSpriteNumber ) {
 			if( !(distance < 0)) {
 				// We are behind frank
 
-				if( !(mRoomSprites[pSpriteNumber].Sprite_field_1E & byte_574F) )
+				if( !(mRoomSprites[pSpriteNumber].Sprite_field_1E & FRANKIE_UNK3) )
 					continue;
 				else
 					goto s3B6E;
@@ -2464,9 +2458,9 @@ void cCreep::obj_Frankie_Execute( byte pSpriteNumber ) {
 
 			// 3B5E
 			A = mRoomSprites[pSpriteNumber].Sprite_field_1E;
-			if( !(A & byte_574F)) {
+			if( !(A & FRANKIE_UNK3)) {
 s3B6E:
-				A |= byte_574E;
+				A |= FRANKIE_UNK2;
 				mRoomSprites[pSpriteNumber].Sprite_field_1E = A;
 				mMemory[ word_40 ] = A;
 				mRoomSprites[pSpriteNumber].mButtonState = 0x80;
@@ -2698,8 +2692,8 @@ void cCreep::obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 		
 		word_40 = mFrankiePtr + mRoomSprites[pSpriteNumber].Sprite_field_1F;
 
-		A = (byte_574E ^ 0xFF) & mMemory[ word_40 ];
-		A |= byte_574D;
+		A = (FRANKIE_UNK2 ^ 0xFF) & mMemory[ word_40 ];
+		A |= FRANKIE_UNK1;
 		mMemory[ word_40 ] = A;
 		mRoomSprites[pSpriteNumber].Sprite_field_1E = A;
 	}
@@ -2707,7 +2701,7 @@ void cCreep::obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 
 // 3DDE: Franky Hit 
 void cCreep::obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
-	if( mRoomSprites[pSpriteNumber].Sprite_field_1E & byte_574E ) {
+	if( mRoomSprites[pSpriteNumber].Sprite_field_1E & FRANKIE_UNK2 ) {
 		byte A = mRoomSprites[pSpriteNumber2].Sprite_field_0;
 
 		if( A && A != 2 && A != 3 ) {
@@ -2715,7 +2709,7 @@ void cCreep::obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumbe
 			if( A != 5 ) {
 			
 				word_40 = mFrankiePtr + mRoomSprites[pSpriteNumber].Sprite_field_1F;
-				mMemory[ word_40 ] = ((byte_574E ^ 0xFF) & mMemory[ word_40 ]) | byte_574D;
+				mMemory[ word_40 ] = ((FRANKIE_UNK2 ^ 0xFF) & mMemory[ word_40 ]) | FRANKIE_UNK1;
 				return;
 
 			} else {
@@ -2770,7 +2764,7 @@ void cCreep::obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumbe
 
 // 3E87: 
 void cCreep::obj_Frankie_Sprite_Create() {
-	if( mMemory[ mObjectPtr ] & byte_574D )
+	if( mMemory[ mObjectPtr ] & FRANKIE_UNK1 )
 		return;
 
 	byte X = sprite_CreepFindFree();
@@ -2779,7 +2773,7 @@ void cCreep::obj_Frankie_Sprite_Create() {
 	mRoomSprites[X].Sprite_field_1F = mFrankieCount;
 	mRoomSprites[X].Sprite_field_1E = mMemory[ mObjectPtr ];
 
-	if( !(mMemory[ mObjectPtr ] & byte_574E) ) {
+	if( !(mMemory[ mObjectPtr ] & FRANKIE_UNK2) ) {
 		mRoomSprites[X].mX= mMemory[ mObjectPtr + 1 ];
 		mRoomSprites[X].mY= mMemory[ mObjectPtr + 2 ] + 7;
 		mRoomSprites[X].spriteImageID= 0x8F;
@@ -5980,7 +5974,7 @@ void cCreep::obj_Lightning_Prepare() {
 		mRoomObjects[X].objNumber = byte_44E5;
 
 		// Is Switch On?
-		if( mMemory[ mObjectPtr ] & LIGHTNING_UNK1 ) {
+		if( mMemory[ mObjectPtr ] & LIGHTNING_END_MARKER ) {
 			// 441C
 			gfxPosX = mMemory[ mObjectPtr + 1 ];
 			gfxPosY = mMemory[ mObjectPtr + 2 ];
@@ -6388,7 +6382,7 @@ void cCreep::obj_Frankie_Load() {
 		word_3C_Calculate();
 		byte A;
 
-		if( ( mMemory[ mObjectPtr ] & byte_574F )) {
+		if( ( mMemory[ mObjectPtr ] & FRANKIE_UNK3 )) {
 			word_3C -= 2;
 			A = 0xFB;
 		} else
@@ -6403,7 +6397,7 @@ void cCreep::obj_Frankie_Load() {
 		mRoomAnim[X].mFuncID = 0x0F;
 		byte gfxPosX = mMemory[ mObjectPtr + 1 ];
 		byte gfxPosY = mMemory[ mObjectPtr + 2 ];
-		if( !(mMemory[ mObjectPtr ] & byte_574F ))
+		if( !(mMemory[ mObjectPtr ] & FRANKIE_UNK3 ))
 			A = 0x90;
 		else
 			A = 0x91;
@@ -6411,7 +6405,7 @@ void cCreep::obj_Frankie_Load() {
 		Draw_RoomAnimObject( A, gfxPosX, gfxPosY, 0, X );
 
 		//5700
-		if(!( mMemory[ mObjectPtr ]  & byte_574F )) {
+		if(!( mMemory[ mObjectPtr ]  & FRANKIE_UNK3 )) {
 			gfxPosX += 4;
 			gfxPosY += 0x18;
 			screenDraw( 0, 0x1C, gfxPosX, gfxPosY, 0 );
@@ -6421,7 +6415,7 @@ void cCreep::obj_Frankie_Load() {
 		mObjectPtr += 0x07;
 		mFrankieCount += 0x07;
 
-	} while( !(mMemory[ mObjectPtr ] & byte_574C) );
+	} while( !(mMemory[ mObjectPtr ] & FRANKIE_END_MARKER) );
 
 	++mObjectPtr;
 }

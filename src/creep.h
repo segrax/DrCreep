@@ -82,7 +82,7 @@ enum {
 };
 
 enum {
-	LIGHTNING_UNK1 = 0x80,
+	LIGHTNING_END_MARKER = 0x80,
 	LIGHTNING_UNK2 = 0x40,
 	LIGHTNING_UNK3 = 0x20
 };
@@ -95,6 +95,13 @@ enum {
 	CONVEYOR_UNK5 = 0x04,
 	CONVEYOR_UNK6 = 0x02,
 	CONVEYOR_UNK7 = 0x01
+};
+
+enum {
+	FRANKIE_END_MARKER = 0x80,
+	FRANKIE_UNK1 = 0x04,
+	FRANKIE_UNK2 = 0x02,
+	FRANKIE_UNK3 = 0x01
 };
 
 class sCreepSprite {
@@ -235,13 +242,12 @@ protected:
 
 	byte		 mRaygunCount;
 	byte		 mRaygunMoveDirection, byte_4D5F;
-	byte		 byte_574C;
 
 	word		 mRoomTrapDoorPtr;											// Trap Door
 	byte		 byte_5389, byte_538A;
 
 	word		 mFrankiePtr;												// Frankenstein
-	char		 mFrankieCount, byte_574D, byte_574E, byte_574F;
+	char		 mFrankieCount;
 	
 	byte		 byte_31EF, mObjectNumber, byte_31F1, byte_31F2;
 	byte		 byte_31F3, byte_31F4, mStartSpriteFlash;
