@@ -104,6 +104,11 @@ enum {
 	FRANKIE_UNK3 = 0x01
 };
 
+enum {
+	TRAPDOOR_END_MARKER = 0x80,
+	TRAPDOOR_OPEN = 0x01
+};
+
 class sCreepSprite {
 public:
 	byte Sprite_field_0;			// 0
@@ -244,7 +249,6 @@ protected:
 	byte		 mRaygunMoveDirection, byte_4D5F;
 
 	word		 mRoomTrapDoorPtr;											// Trap Door
-	byte		 byte_5389, byte_538A;
 
 	word		 mFrankiePtr;												// Frankenstein
 	char		 mFrankieCount;

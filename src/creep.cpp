@@ -128,9 +128,6 @@ cCreep::cCreep() {
 
 	mCurrentPlayer = 0xBA;
 
-	byte_5389 = 0x80;
-	byte_538A = 0x01;
-
 	mBuilder = 0;
 	mCastle = 0;
 	mJoyButtonState = 0xA0;
@@ -2685,7 +2682,7 @@ void cCreep::obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 		// 3DA1
 		word_40 = mRoomTrapDoorPtr + mRoomObjects[pObjectNumber].objNumber;
 
-		if( !(mMemory[ word_40 ] & byte_538A) ) {
+		if( !(mMemory[ word_40 ] & TRAPDOOR_OPEN) ) {
 			mStartSpriteFlash = 0;
 			return;
 		}
@@ -6147,7 +6144,7 @@ void cCreep::obj_TrapDoor_Prepare( ) {
 		object_Create( X );
 		mRoomAnim[X].mFuncID = 0x0B;
 		mRoomObjects[X].objNumber = byte_5381;
-		if( !(mMemory[ mObjectPtr ] & byte_538A) ) {
+		if( !(mMemory[ mObjectPtr ] & TRAPDOOR_OPEN) ) {
 			// 51BC
 			mMemory[ 0x6F2E ] = 0xC0;
 			mMemory[ 0x6F30 ] = 0x55;
@@ -6189,7 +6186,7 @@ void cCreep::obj_TrapDoor_Prepare( ) {
 		byte_5381 += 0x05;
 		mObjectPtr += 0x05;
 
-	} while( !(mMemory[ mObjectPtr ] & byte_5389) );
+	} while( !(mMemory[ mObjectPtr ] & TRAPDOOR_END_MARKER) );
 
 	++mObjectPtr;
 }
@@ -6519,7 +6516,7 @@ void cCreep::obj_Mummy_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 			
 			word_40 = mRoomTrapDoorPtr + mRoomObjects[pObjectNumber].objNumber;
 			// 38F7
-			if( mMemory[ word_40 ] & byte_538A ) {
+			if( mMemory[ word_40 ] & TRAPDOOR_OPEN ) {
 				// 3900
 				word_40 = mRoomMummyPtr + mRoomSprites[pSpriteNumber].mButtonState;
 				mMemory[ word_40 ] = 3;
@@ -7147,7 +7144,7 @@ void cCreep::sub_526F( byte pA ) {
 
 	word_40 = mRoomTrapDoorPtr + pA;
 	// 529B
-	mMemory[ word_40 ] ^= byte_538A;
+	mMemory[ word_40 ] ^= TRAPDOOR_OPEN;
 	byte X;
 
 	for( X = 0 ;;++X) {
@@ -7160,7 +7157,7 @@ void cCreep::sub_526F( byte pA ) {
 	//52bd
 	mRoomAnim[X].mFlags |= ITM_EXECUTE;
 	
-	if( !(mMemory[ word_40 ] & byte_538A) ) {
+	if( !(mMemory[ word_40 ] & TRAPDOOR_OPEN) ) {
 		// 52cf
 		mRoomObjects[X].Object_field_1 = 0;
 		mRoomObjects[X].Object_field_2 = 0x78;
