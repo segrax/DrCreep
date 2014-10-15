@@ -2235,7 +2235,7 @@ s32DB:;
 	char a = A;
 	if( A != 0xFF )
 		if( A != mRoomSprites[pSpriteNumber].Sprite_field_19 ) {
-			sub_526F( a );
+			obj_Trapdoor_Switch_Check( a );
 			A = a;
 		}
 
@@ -2478,7 +2478,7 @@ s3B6E:
 
 	if( (byte) A != 0xFF )
 		if( A != mRoomSprites[pSpriteNumber].Sprite_field_1A ) {
-			sub_526F(A);
+			obj_Trapdoor_Switch_Check( A );
 		}
 
 	mRoomSprites[pSpriteNumber].Sprite_field_1A = A;
@@ -2671,10 +2671,11 @@ void cCreep::obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 	}
 	
 	// 3d85
-	if( mRoomAnim[pObjectNumber].mFuncID != 0x0B ) {
+	if( mRoomAnim[pObjectNumber].mFuncID != OBJECT_FUNCID_TRAPDOOR_PANEL ) {
 		mStartSpriteFlash = 0;
-		if( mRoomAnim[pObjectNumber].mFuncID != 0x0C )
+		if( mRoomAnim[pObjectNumber].mFuncID != OBJECT_FUNCID_TRAPDOOR_SWITCH )
 			return;
+
 		mRoomSprites[pSpriteNumber].Sprite_field_1B = mRoomObjects[pObjectNumber].objNumber;
 		return;
 
@@ -3390,7 +3391,7 @@ s10EB:;
 // 34EF
 void cCreep::obj_Player_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 	byte A;
-	if( mRoomAnim[pObjectNumber].mFuncID == 0x0B ) {
+	if( mRoomAnim[pObjectNumber].mFuncID == OBJECT_FUNCID_TRAPDOOR_PANEL ) {
 		
 		A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].mWidth;
 		A -= mRoomAnim[pObjectNumber].mX;
@@ -3403,7 +3404,7 @@ void cCreep::obj_Player_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 	} 
 	// 3505
 	mStartSpriteFlash = 0;
-	if( mRoomAnim[pObjectNumber].mFuncID != 0x0C ) 
+	if( mRoomAnim[pObjectNumber].mFuncID != OBJECT_FUNCID_TRAPDOOR_SWITCH ) 
 		return;
 
 	A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].mWidth;
@@ -5315,7 +5316,7 @@ void cCreep::obj_Teleport_Prepare() {
 	byte X;
 	object_Create( X );
 	
-	mRoomAnim[X].mFuncID = 0x0A;
+	mRoomAnim[X].mFuncID = OBJECT_FUNCID_TELEPORTER;
 	gfxPosX = mMemory[ mObjectPtr ] + 4;
 	gfxPosY = mMemory[ mObjectPtr + 1 ] + 0x18;
 
@@ -5622,7 +5623,7 @@ void cCreep::obj_Key_Load() {
 			byte X;
 			
 			object_Create( X );
-			mRoomAnim[X].mFuncID = 6;
+			mRoomAnim[X].mFuncID = OBJECT_FUNCID_KEY;
 
 			byte gfxPosX = mMemory[ mObjectPtr + 2 ];
 			byte gfxPosY = mMemory[ mObjectPtr + 3 ];
@@ -5957,10 +5958,10 @@ void cCreep::obj_Forcefield_Timer_Execute( byte pObjectNumber ) {
 
 // Lightning Machine Setup
 void cCreep::obj_Lightning_Prepare() {
-	byte	byte_44E5, gfxPosX, gfxPosY;
+	byte	LightningCount, gfxPosX, gfxPosY;
 
 	mRoomLightningPtr = mObjectPtr;
-	byte_44E5 = 0;
+	LightningCount = 0;
 
 	byte X = 0, A;
 
@@ -5968,10 +5969,10 @@ void cCreep::obj_Lightning_Prepare() {
 
 		object_Create( X );
 
-		mRoomObjects[X].objNumber = byte_44E5;
+		mRoomObjects[X].objNumber = LightningCount;
 
 		// Is Switch On?
-		if( mMemory[ mObjectPtr ] & LIGHTNING_END_MARKER ) {
+		if( mMemory[ mObjectPtr ] & LIGHTNING_UNK3 ) {
 			// 441C
 			gfxPosX = mMemory[ mObjectPtr + 1 ];
 			gfxPosY = mMemory[ mObjectPtr + 2 ];
@@ -6010,10 +6011,10 @@ void cCreep::obj_Lightning_Prepare() {
 		}
 
 		// 44C8
-		byte_44E5 += 0x08;
+		LightningCount += 0x08;
 		mObjectPtr += 0x08;
 
-	} while ( !(mMemory[ mObjectPtr ] & LIGHTNING_UNK3) );
+	} while ( !(mMemory[ mObjectPtr ] & LIGHTNING_END_MARKER) );
 
 	++mObjectPtr;
 }
@@ -6023,7 +6024,7 @@ void cCreep::obj_Forcefield_Prepare() {
 	byte X = 0;
 	byte gfxPosX, gfxPosY;
 
-	byte_474F = 0;
+	byte ForcefieldCount = 0;
 	
 	do {
 
@@ -6047,10 +6048,10 @@ void cCreep::obj_Forcefield_Prepare() {
 		// Draw inside of timer
 		Draw_RoomAnimObject( 0x40, gfxPosX, gfxPosY, 0, X );
 
-		mRoomObjects[X].objNumber = byte_474F;
-		mMemory[ 0x4750 + byte_474F ] = 1;
+		mRoomObjects[X].objNumber = ForcefieldCount;
+		mMemory[ 0x4750 + ForcefieldCount ] = 1;
 
-		obj_Forcefield_Create( );
+		obj_Forcefield_Create( ForcefieldCount );
 
 		gfxPosX = mMemory[ mObjectPtr + 2 ];
 		gfxPosY = mMemory[ mObjectPtr + 3 ];
@@ -6058,7 +6059,7 @@ void cCreep::obj_Forcefield_Prepare() {
 		// Draw top of forcefield
 		screenDraw( 0, 0x3E, gfxPosX, gfxPosY, 0 );
 		
-		++byte_474F;
+		++ForcefieldCount;
 		mObjectPtr += 0x04;
 	} while( mMemory[ mObjectPtr ] );
 
@@ -6142,7 +6143,7 @@ void cCreep::obj_TrapDoor_Prepare( ) {
 	do {
 		
 		object_Create( X );
-		mRoomAnim[X].mFuncID = 0x0B;
+		mRoomAnim[X].mFuncID = OBJECT_FUNCID_TRAPDOOR_PANEL;
 		mRoomObjects[X].objNumber = byte_5381;
 		if( !(mMemory[ mObjectPtr ] & TRAPDOOR_OPEN) ) {
 			// 51BC
@@ -6175,7 +6176,7 @@ void cCreep::obj_TrapDoor_Prepare( ) {
 
 		// 522E
 		object_Create( X );
-		mRoomAnim[X].mFuncID = 0x0C;
+		mRoomAnim[X].mFuncID = OBJECT_FUNCID_TRAPDOOR_SWITCH;
 		
 		byte gfxPosX = mMemory[ mObjectPtr + 3 ];
 		byte gfxPosY = mMemory[ mObjectPtr + 4 ];
@@ -6391,7 +6392,7 @@ void cCreep::obj_Frankie_Load() {
 		}
 		byte X;
 		object_Create( X );
-		mRoomAnim[X].mFuncID = 0x0F;
+		mRoomAnim[X].mFuncID = OBJECT_FUNCID_FRANKIE;
 		byte gfxPosX = mMemory[ mObjectPtr + 1 ];
 		byte gfxPosY = mMemory[ mObjectPtr + 2 ];
 		if( !(mMemory[ mObjectPtr ] & FRANKIE_UNK3 ))
@@ -6491,7 +6492,7 @@ void cCreep::obj_Conveyor_Prepare() {
 	++mObjectPtr;
 }
 
-void cCreep::obj_Forcefield_Create() {
+void cCreep::obj_Forcefield_Create( byte pObjectNumber ) {
 	sCreepSprite *sprite = sprite_CreepGetFree();
 
 	sprite->Sprite_field_0 = 2;
@@ -6499,7 +6500,7 @@ void cCreep::obj_Forcefield_Create() {
 	sprite->mY = mMemory[ mObjectPtr + 3 ] + 2;
 	sprite->spriteImageID= 0x35;
 
-	sprite->Sprite_field_1F = byte_474F;
+	sprite->Sprite_field_1F = pObjectNumber;
 	sprite->Sprite_field_1E = 0;
 	sprite->Sprite_field_6 = 4;
 	sprite->mWidth = 2;
@@ -6508,7 +6509,7 @@ void cCreep::obj_Forcefield_Create() {
 
 // 38CE: Mummy ?
 void cCreep::obj_Mummy_Collision( byte pSpriteNumber, byte pObjectNumber ) {
-	if( mRoomAnim[pObjectNumber].mFuncID == 0x0B ) {
+	if( mRoomAnim[pObjectNumber].mFuncID == OBJECT_FUNCID_TRAPDOOR_PANEL ) {
 		
 		char A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].mWidth;
 		A -= mRoomAnim[pObjectNumber].mX;
@@ -6527,7 +6528,7 @@ void cCreep::obj_Mummy_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 
 	// 3919
 	mStartSpriteFlash = 0;
-	if( mRoomAnim[pObjectNumber].mFuncID != 0x0C )
+	if( mRoomAnim[pObjectNumber].mFuncID != OBJECT_FUNCID_TRAPDOOR_SWITCH )
 		return;
 
 	char A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].mWidth;
@@ -6557,7 +6558,7 @@ void cCreep::obj_RayGun_Laser_Collision( byte pSpriteNumber, byte pObjectNumber 
 	if( mRoomAnim[pObjectNumber].mFuncID == 2 )
 		return;
 
-	if( mRoomAnim[pObjectNumber].mFuncID == 0x0F )
+	if( mRoomAnim[pObjectNumber].mFuncID == OBJECT_FUNCID_FRANKIE )
 		return;
 
 	if( mRoomAnim[pObjectNumber].mFuncID == 8 ) {
@@ -6653,7 +6654,7 @@ void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
 	char AA = mRoomSprites[pSpriteNumber].playerNumber;
 	if( AA != -1 ) {
 		if( AA != mRoomSprites[pSpriteNumber].Sprite_field_1B )
-			sub_526F( AA );
+			obj_Trapdoor_Switch_Check( AA );
 	}
 	// 37D5
 	mRoomSprites[pSpriteNumber].Sprite_field_1B = AA;
@@ -7136,7 +7137,7 @@ void cCreep::obj_TrapDoor_PlaySound( byte pA ) {
 }
 
 // 526F: 
-void cCreep::sub_526F( byte pA ) {
+void cCreep::obj_Trapdoor_Switch_Check( byte pA ) {
 	word SavedWord40, SavedWord3C;
 
 	SavedWord40 = word_40;
@@ -7148,7 +7149,7 @@ void cCreep::sub_526F( byte pA ) {
 	byte X;
 
 	for( X = 0 ;;++X) {
-		if( mRoomAnim[X].mFuncID != 0x0B )
+		if( mRoomAnim[X].mFuncID != OBJECT_FUNCID_TRAPDOOR_PANEL )
 			continue;
 		if( mRoomObjects[X].objNumber == pA )
 			break;

@@ -82,9 +82,9 @@ enum {
 };
 
 enum {
-	LIGHTNING_END_MARKER = 0x80,
+	LIGHTNING_UNK3 = 0x80,
 	LIGHTNING_UNK2 = 0x40,
-	LIGHTNING_UNK3 = 0x20
+	LIGHTNING_END_MARKER = 0x20
 };
 
 enum {
@@ -107,6 +107,16 @@ enum {
 enum {
 	TRAPDOOR_END_MARKER = 0x80,
 	TRAPDOOR_OPEN = 0x01
+};
+
+enum {
+	OBJECT_FUNCID_KEY			  = 0x06,
+
+	OBJECT_FUNCID_TELEPORTER	  = 0x0A,
+	OBJECT_FUNCID_TRAPDOOR_PANEL  = 0x0B,
+	OBJECT_FUNCID_TRAPDOOR_SWITCH = 0x0C,
+
+	OBJECT_FUNCID_FRANKIE		  = 0x0F
 };
 
 class sCreepSprite {
@@ -257,8 +267,6 @@ protected:
 	byte		 byte_31F3, byte_31F4, mStartSpriteFlash;
 
 	word		 mRoomLightningPtr;											// Lightning
-	byte		 byte_44E5;													// Lightning
-	byte		 byte_474F;
 	
 	word		 mConveyorPtr;												// Conveyor
 	byte		 mJoyButtonState, byte_5F56;
@@ -403,7 +411,7 @@ public:
 		void	 convertTimerToTime();
 		void	 convertTimeToNumber( byte pA, byte pY );
 
-		void	 sub_526F( byte pA );
+		void	 obj_Trapdoor_Switch_Check( byte pA );
 		void	 roomAnim_Disable( byte pSpriteNumber );			// Redraw floor piece?
 
 		void	 positionCalculate( byte pSpriteNumber );
@@ -451,7 +459,7 @@ public:
 		
 		void	 obj_Forcefield_Prepare( );
 		void	 obj_Forcefield_Execute( byte pSpriteNumber );
-		void	 obj_Forcefield_Create( );
+		void	 obj_Forcefield_Create( byte pObjectNumber );
 		void	 obj_Forcefield_Timer_Execute( byte pObjectNumber );
 		void	 obj_Forcefield_Timer_InFront( byte pSpriteNumber, byte pObjectNumber );
 		
