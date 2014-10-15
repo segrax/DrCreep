@@ -6240,10 +6240,10 @@ void cCreep::obj_Conveyor_Execute( byte pObjectNumber ) {
 	if( (A & CONVEYOR_UNK5) && !(A & CONVEYOR_UNK3) ||
 		(A & CONVEYOR_UNK4) && !(A & CONVEYOR_UNK2) ) {
 
-			if( A & CONVEYOR_UNK7 ) {
+			if( A & CONVEYOR_TURNED_ON ) {
 				
-				A ^= CONVEYOR_UNK7;
-				A ^= CONVEYOR_UNK6;
+				A ^= CONVEYOR_TURNED_ON;
+				A ^= CONVEYOR_MOVING_RIGHT;
 
 				mMemory[ word_40 ] = A;
 				mMemory[ 0x70A8 ] = mMemory[ 0x70A6 ] = 0xC0;
@@ -6251,9 +6251,9 @@ void cCreep::obj_Conveyor_Execute( byte pObjectNumber ) {
 
 			} else {
 				// 53D0
-				A |= CONVEYOR_UNK7;
+				A |= CONVEYOR_TURNED_ON;
 				mMemory[ word_40 ] = A;
-				if( A & CONVEYOR_UNK6 ) {
+				if( A & CONVEYOR_MOVING_RIGHT ) {
 					mMemory[ 0x70A6 ] = 0x50;
 					mMemory[ 0x70A8 ] = 0xC0;
 					mMemory[ 0x7624 ] = 0x18;
@@ -6291,14 +6291,14 @@ void cCreep::obj_Conveyor_Execute( byte pObjectNumber ) {
 
 	mMemory[ word_40 ] = A;
 	// 543F
-	if( A & CONVEYOR_UNK7 ) {
+	if( A & CONVEYOR_TURNED_ON ) {
 		A = mEngine_Ticks & 1;
 		if( A )
 			return;
 
 		byte gfxCurrentID = mRoomAnim[pObjectNumber].mGfxID;
 
-		if( !(mMemory[ word_40 ] & CONVEYOR_UNK6) ) {
+		if( !(mMemory[ word_40 ] & CONVEYOR_MOVING_RIGHT) ) {
 			// 5458
 			++gfxCurrentID;
 			if( gfxCurrentID >= 0x82 )
@@ -6464,11 +6464,11 @@ void cCreep::obj_Conveyor_Prepare() {
 		byte gfxCurrentID = 0x82;
 		byte gfxDecodeMode = 0;
 
-		if( (mMemory[ mObjectPtr ] & CONVEYOR_UNK7) == 0 ) {
+		if( (mMemory[ mObjectPtr ] & CONVEYOR_TURNED_ON) == 0 ) {
 			mMemory[ 0x70A6 ] = 0xC0;
 			mMemory[ 0x70A8 ] = 0xC0;
 		} else {
-			if( (mMemory[ mObjectPtr ] & CONVEYOR_UNK6) == 0 ) {
+			if( (mMemory[ mObjectPtr ] & CONVEYOR_MOVING_RIGHT) == 0 ) {
 				// 55BE
 				mMemory[ 0x70A6 ] = 0xC0;
 				mMemory[ 0x70A8 ] = 0x20;
@@ -7204,7 +7204,7 @@ void cCreep::obj_Conveyor_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 
 	word_40 = mConveyorPtr + mRoomObjects[pObjectNumber].objNumber;
 
-	if( !(mMemory[ word_40 ] & CONVEYOR_UNK7 ))
+	if( !(mMemory[ word_40 ] & CONVEYOR_TURNED_ON ))
 		return;
 	
 	byte A = mRoomSprites[pSpriteNumber].Sprite_field_0;
@@ -7227,7 +7227,7 @@ void cCreep::obj_Conveyor_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 	if( A >= 0x20 )
 		return;
 
-	if( mMemory[ word_40 ] & CONVEYOR_UNK6 )
+	if( mMemory[ word_40 ] & CONVEYOR_MOVING_RIGHT )
 		A = 0xFF;
 	else
 		A = 0x01;
