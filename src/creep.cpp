@@ -5571,7 +5571,7 @@ void cCreep::obj_RayGun_Prepare() {
 
 			object_Create( X );
 			
-			mRoomAnim[X].mFuncID = 8;
+			mRoomAnim[X].mFuncID = OBJECT_FUNCID_RAYGUN_LASER;
 			mRoomObjects[X].objNumber = mRaygunCount;
 			mRoomAnim[X].mFlags |= ITM_EXECUTE;
 			
@@ -5595,7 +5595,7 @@ void cCreep::obj_RayGun_Prepare() {
 		byte X;
 
 		object_Create( X );
-		mRoomAnim[X].mFuncID = 9;
+		mRoomAnim[X].mFuncID = OBJECT_FUNCID_RAYGUN_CONTROL;
 		gfxPosX = mMemory[ mObjectPtr + 5 ];
 		gfxPosY = mMemory[ mObjectPtr + 6 ];
 
@@ -5651,7 +5651,7 @@ void cCreep::obj_Door_Lock_Prepare() {
 		
 		object_Create( X );
 		
-		mRoomAnim[X].mFuncID = 7;
+		mRoomAnim[X].mFuncID = OBJECT_FUNCID_DOOR_LOCK;
 		gfxPosX = mMemory[ mObjectPtr + 3 ];
 		gfxPosY = mMemory[ mObjectPtr + 4 ];
 		
@@ -5691,7 +5691,7 @@ void cCreep::obj_Door_Prepare() {
 		gfxPosY += 0x10;
 
 		mRoomObjects[X].objNumber = count;
-		mRoomAnim[X].mFuncID = 0;
+		mRoomAnim[X].mFuncID = OBJECT_FUNCID_DOOR;
 
 		roomPtrSet( *level( mObjectPtr + 3 ) );
 		
@@ -5823,7 +5823,7 @@ void cCreep::obj_Door_Button_Prepare() {
 	for( byte byte_42AB = mMemory[ mObjectPtr++ ]; byte_42AB; --byte_42AB) {
 
 		object_Create( X );
-		mRoomAnim[X].mFuncID = 1;
+		mRoomAnim[X].mFuncID = OBJECT_FUNCID_DOOR_BUTTON;
 
 		gfxPosX = mMemory[mObjectPtr];
 		gfxPosY = mMemory[mObjectPtr+1];
@@ -5834,7 +5834,7 @@ void cCreep::obj_Door_Button_Prepare() {
 
 		// Find the colour of the door this button connects to
 		for( unsigned char Y = 0; Y < MAX_OBJECTS; ++Y ) {
-			if( mRoomAnim[Y].mFuncID == 0 ) {
+			if( mRoomAnim[Y].mFuncID == OBJECT_FUNCID_DOOR ) {
 
 				if( mRoomObjects[Y].objNumber == mRoomObjects[X].objNumber ) {
 					A = mRoomObjects[Y].color;
@@ -6030,7 +6030,7 @@ void cCreep::obj_Forcefield_Prepare() {
 
 		object_Create( X );
 
-		mRoomAnim[X].mFuncID = 4;
+		mRoomAnim[X].mFuncID = OBJECT_FUNCID_FORCEFIELD;
 
 		gfxPosX = mMemory[ mObjectPtr ];
 		gfxPosY = mMemory[ mObjectPtr + 1 ];
@@ -6561,7 +6561,7 @@ void cCreep::obj_RayGun_Laser_Collision( byte pSpriteNumber, byte pObjectNumber 
 	if( mRoomAnim[pObjectNumber].mFuncID == OBJECT_FUNCID_FRANKIE )
 		return;
 
-	if( mRoomAnim[pObjectNumber].mFuncID == 8 ) {
+	if( mRoomAnim[pObjectNumber].mFuncID == OBJECT_FUNCID_RAYGUN_LASER ) {
 		if( mRoomSprites[pSpriteNumber].Sprite_field_1E != mRoomObjects[pObjectNumber].objNumber )
 			return;
 	}
