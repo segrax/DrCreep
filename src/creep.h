@@ -89,12 +89,12 @@ enum {
 
 enum {
 	CONVEYOR_END_MARKER = 0x80,
-	CONVEYOR_UNK2 = 0x20,
-	CONVEYOR_UNK3 = 0x10,
-	CONVEYOR_UNK4 = 0x08,
-	CONVEYOR_UNK5 = 0x04,
-	CONVEYOR_MOVING_RIGHT = 0x02,
-	CONVEYOR_TURNED_ON = 0x01
+	CONVEYOR_PLAYER2_ENABLEDIT = 0x20,		// Player2 turned it on
+	CONVEYOR_PLAYER1_ENABLEDIT = 0x10,		// Player1 turned it on
+	CONVEYOR_PLAYER2_SWITCHED = 0x08,		// Player2 just flicked the switch
+	CONVEYOR_PLAYER1_SWITCHED = 0x04,		// Player1 just flicked the switch
+	CONVEYOR_MOVING_RIGHT = 0x02,			// Conveyor is moving to the right
+	CONVEYOR_TURNED_ON = 0x01				// Conveyor is moving
 };
 
 enum {

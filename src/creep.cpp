@@ -6237,8 +6237,8 @@ void cCreep::obj_Conveyor_Execute( byte pObjectNumber ) {
 	byte A = mMemory[ word_40 ];
 
 	// 539F
-	if( (A & CONVEYOR_UNK5) && !(A & CONVEYOR_UNK3) ||
-		(A & CONVEYOR_UNK4) && !(A & CONVEYOR_UNK2) ) {
+	if( (A & CONVEYOR_PLAYER1_SWITCHED) && !(A & CONVEYOR_PLAYER1_ENABLEDIT) ||
+		(A & CONVEYOR_PLAYER2_SWITCHED) && !(A & CONVEYOR_PLAYER2_ENABLEDIT) ) {
 
 			if( A & CONVEYOR_TURNED_ON ) {
 				
@@ -6276,17 +6276,17 @@ void cCreep::obj_Conveyor_Execute( byte pObjectNumber ) {
 	// 541B
 	A = 0xFF;
 
-	A ^= CONVEYOR_UNK3;
-	A ^= CONVEYOR_UNK2;
+	A ^= CONVEYOR_PLAYER1_ENABLEDIT;
+	A ^= CONVEYOR_PLAYER2_ENABLEDIT;
 	A &= mMemory[ word_40 ];
 	// 5427
-	if( A & CONVEYOR_UNK5 ) {
-		A |= CONVEYOR_UNK3;
-		A ^= CONVEYOR_UNK5;
+	if( A & CONVEYOR_PLAYER1_SWITCHED ) {
+		A |= CONVEYOR_PLAYER1_ENABLEDIT;
+		A ^= CONVEYOR_PLAYER1_SWITCHED;
 	}
-	if( A & CONVEYOR_UNK4 ) {
-		A |= CONVEYOR_UNK2;
-		A ^= CONVEYOR_UNK4;
+	if( A & CONVEYOR_PLAYER2_SWITCHED ) {
+		A |= CONVEYOR_PLAYER2_ENABLEDIT;
+		A ^= CONVEYOR_PLAYER2_SWITCHED;
 	}
 
 	mMemory[ word_40 ] = A;
@@ -6431,10 +6431,10 @@ void cCreep::obj_Conveyor_Prepare() {
 		//5527
 		A = 0xFF;
 
-		A ^= CONVEYOR_UNK5;
-		A ^= CONVEYOR_UNK4;
-		A ^= CONVEYOR_UNK3;
-		A ^= CONVEYOR_UNK2;
+		A ^= CONVEYOR_PLAYER1_SWITCHED;
+		A ^= CONVEYOR_PLAYER2_SWITCHED;
+		A ^= CONVEYOR_PLAYER1_ENABLEDIT;
+		A ^= CONVEYOR_PLAYER2_ENABLEDIT;
 
 		A &= mMemory[ mObjectPtr ];
 		mMemory[ mObjectPtr ] = A;
@@ -7251,9 +7251,9 @@ void cCreep::obj_Conveyor_Control_InFront( byte pSpriteNumber, byte pObjectNumbe
 	byte A;
 
 	if( mRoomSprites[pSpriteNumber].playerNumber )
-		A = CONVEYOR_UNK4;
+		A = CONVEYOR_PLAYER2_SWITCHED;
 	else
-		A = CONVEYOR_UNK5;
+		A = CONVEYOR_PLAYER1_SWITCHED;
 
 	mMemory[ word_40 ] |= A;
 }
