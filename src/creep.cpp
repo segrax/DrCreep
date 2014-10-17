@@ -2421,7 +2421,7 @@ void cCreep::obj_Frankie_Execute( byte pSpriteNumber ) {
 
 	word_40 = mFrankiePtr + mRoomSprites[pSpriteNumber].Sprite_field_1F;
 	
-	if( !(mRoomSprites[pSpriteNumber].Sprite_field_1E & FRANKIE_UNK2) ) {
+	if( !(mRoomSprites[pSpriteNumber].Sprite_field_1E & FRANKIE_AWAKE) ) {
 		if( mIntro == 1 )
 			return;
 
@@ -2447,7 +2447,7 @@ void cCreep::obj_Frankie_Execute( byte pSpriteNumber ) {
 			if( !(distance < 0)) {
 				// We are behind frank
 
-				if( !(mRoomSprites[pSpriteNumber].Sprite_field_1E & FRANKIE_UNK3) )
+				if( !(mRoomSprites[pSpriteNumber].Sprite_field_1E & FRANKIE_POINTING_LEFT) )
 					continue;
 				else
 					goto s3B6E;
@@ -2455,9 +2455,9 @@ void cCreep::obj_Frankie_Execute( byte pSpriteNumber ) {
 
 			// 3B5E
 			A = mRoomSprites[pSpriteNumber].Sprite_field_1E;
-			if( !(A & FRANKIE_UNK3)) {
+			if( !(A & FRANKIE_POINTING_LEFT)) {
 s3B6E:
-				A |= FRANKIE_UNK2;
+				A |= FRANKIE_AWAKE;
 				mRoomSprites[pSpriteNumber].Sprite_field_1E = A;
 				mMemory[ word_40 ] = A;
 				mRoomSprites[pSpriteNumber].mButtonState = 0x80;
@@ -2690,7 +2690,7 @@ void cCreep::obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 		
 		word_40 = mFrankiePtr + mRoomSprites[pSpriteNumber].Sprite_field_1F;
 
-		A = (FRANKIE_UNK2 ^ 0xFF) & mMemory[ word_40 ];
+		A = (FRANKIE_AWAKE ^ 0xFF) & mMemory[ word_40 ];
 		A |= FRANKIE_UNK1;
 		mMemory[ word_40 ] = A;
 		mRoomSprites[pSpriteNumber].Sprite_field_1E = A;
@@ -2699,7 +2699,7 @@ void cCreep::obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 
 // 3DDE: Franky Hit 
 void cCreep::obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
-	if( mRoomSprites[pSpriteNumber].Sprite_field_1E & FRANKIE_UNK2 ) {
+	if( mRoomSprites[pSpriteNumber].Sprite_field_1E & FRANKIE_AWAKE ) {
 		byte A = mRoomSprites[pSpriteNumber2].Sprite_field_0;
 
 		if( A && A != 2 && A != 3 ) {
@@ -2707,7 +2707,7 @@ void cCreep::obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumbe
 			if( A != 5 ) {
 			
 				word_40 = mFrankiePtr + mRoomSprites[pSpriteNumber].Sprite_field_1F;
-				mMemory[ word_40 ] = ((FRANKIE_UNK2 ^ 0xFF) & mMemory[ word_40 ]) | FRANKIE_UNK1;
+				mMemory[ word_40 ] = ((FRANKIE_AWAKE ^ 0xFF) & mMemory[ word_40 ]) | FRANKIE_UNK1;
 				return;
 
 			} else {
@@ -2771,7 +2771,7 @@ void cCreep::obj_Frankie_Sprite_Create() {
 	mRoomSprites[X].Sprite_field_1F = mFrankieCount;
 	mRoomSprites[X].Sprite_field_1E = mMemory[ mObjectPtr ];
 
-	if( !(mMemory[ mObjectPtr ] & FRANKIE_UNK2) ) {
+	if( !(mMemory[ mObjectPtr ] & FRANKIE_AWAKE) ) {
 		mRoomSprites[X].mX= mMemory[ mObjectPtr + 1 ];
 		mRoomSprites[X].mY= mMemory[ mObjectPtr + 2 ] + 7;
 		mRoomSprites[X].spriteImageID= 0x8F;
@@ -6380,7 +6380,7 @@ void cCreep::obj_Frankie_Load() {
 		word_3C_Calculate();
 		byte A;
 
-		if( ( mMemory[ mObjectPtr ] & FRANKIE_UNK3 )) {
+		if( ( mMemory[ mObjectPtr ] & FRANKIE_POINTING_LEFT )) {
 			word_3C -= 2;
 			A = 0xFB;
 		} else
@@ -6395,7 +6395,7 @@ void cCreep::obj_Frankie_Load() {
 		mRoomAnim[X].mFuncID = OBJECT_FUNCID_FRANKIE;
 		byte gfxPosX = mMemory[ mObjectPtr + 1 ];
 		byte gfxPosY = mMemory[ mObjectPtr + 2 ];
-		if( !(mMemory[ mObjectPtr ] & FRANKIE_UNK3 ))
+		if( !(mMemory[ mObjectPtr ] & FRANKIE_POINTING_LEFT ))
 			A = 0x90;
 		else
 			A = 0x91;
@@ -6403,7 +6403,7 @@ void cCreep::obj_Frankie_Load() {
 		Draw_RoomAnimObject( A, gfxPosX, gfxPosY, 0, X );
 
 		//5700
-		if(!( mMemory[ mObjectPtr ]  & FRANKIE_UNK3 )) {
+		if(!( mMemory[ mObjectPtr ]  & FRANKIE_POINTING_LEFT )) {
 			gfxPosX += 4;
 			gfxPosY += 0x18;
 			screenDraw( 0, 0x1C, gfxPosX, gfxPosY, 0 );
