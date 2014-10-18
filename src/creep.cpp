@@ -2465,12 +2465,10 @@ s3B6E:
 				sound_PlayEffect(0x07);
 				break;
 			}
-
 		}
 	
 		if(byte_3F0A < 0 )
 			return;
-
 	}
 	
 	// 3B82
@@ -5109,7 +5107,7 @@ void cCreep::obj_SlidingPole_Prepare() {
 		word_3C_Calculate();
 
 		//1781
-		for(;;) {
+		for( ; Height; --Height, gfxPosY += 0x08, word_3C += 0x50) {
 			if (mMemory[ word_3C ]  & 0x44) {
 				mTxtX_0 = gfxPosX - 4;
 				mTxtY_0 = gfxPosY;
@@ -5123,16 +5121,9 @@ void cCreep::obj_SlidingPole_Prepare() {
 			A = mMemory[ word_3C ];
 			A |= 0x10;
 			mMemory[ word_3C ] = A;
-
-			--Height;
-			if( !Height ) {
-				mObjectPtr += 0x03;
-				break;
-			}
-			
-			gfxPosY += 0x08;
-			word_3C += 0x50;
 		}
+
+		mObjectPtr += 0x03;
 	}
 
 	++mObjectPtr;
