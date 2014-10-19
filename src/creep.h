@@ -39,9 +39,23 @@ struct sObjectData {
 	byte mHitData;
 };
 
-struct sObjectImgData {
-	word mFuncExecId;
-	word mFuncInfrontId;
+enum {
+	OBJECT_FUNCID_DOOR				= 0x00,
+	OBJECT_FUNCID_DOOR_BUTTON		= 0x01,
+	OBJECT_FUNCID_LIGHTNING_MACHINE	= 0x02,
+	OBJECT_FUNCID_LIGHTNING_CONTROL	= 0x03,
+	OBJECT_FUNCID_FORCEFIELD		= 0x04,
+	OBJECT_FUNCID_MUMMY				= 0x05,
+	OBJECT_FUNCID_KEY				= 0x06,
+	OBJECT_FUNCID_DOOR_LOCK			= 0x07,
+	OBJECT_FUNCID_RAYGUN_LASER		= 0x08,
+	OBJECT_FUNCID_RAYGUN_CONTROL	= 0x09,
+	OBJECT_FUNCID_TELEPORTER		= 0x0A,
+	OBJECT_FUNCID_TRAPDOOR_PANEL	= 0x0B,
+	OBJECT_FUNCID_TRAPDOOR_SWITCH	= 0x0C,
+	OBJECT_FUNCID_CONVEYOR_CONTROL	= 0x0D,
+	OBJECT_FUNCID_CONVEYOR_BELT		= 0x0E,
+	OBJECT_FUNCID_FRANKIE			= 0x0F
 };
 
 enum {
@@ -109,32 +123,9 @@ enum {
 	TRAPDOOR_OPEN		= 0x01
 };
 
-enum {
-	OBJECT_FUNCID_DOOR			  = 0x00,
-	OBJECT_FUNCID_DOOR_BUTTON	  = 0x01,
-	OBJECT_FUNCID_LIGHTNING_BALL  = 0x02,
-	OBJECT_FUNCID_LIGHTNING_SWITCH= 0x03,
-	OBJECT_FUNCID_FORCEFIELD	  = 0x04,
-	OBJECT_FUNCID_MUMMY			  = 0x05,
-	OBJECT_FUNCID_KEY			  = 0x06,
-	OBJECT_FUNCID_DOOR_LOCK		  = 0x07,
-
-	OBJECT_FUNCID_RAYGUN_LASER	  = 0x08,
-	OBJECT_FUNCID_RAYGUN_CONTROL  = 0x09,
-
-	OBJECT_FUNCID_TELEPORTER	  = 0x0A,
-	OBJECT_FUNCID_TRAPDOOR_PANEL  = 0x0B,
-	OBJECT_FUNCID_TRAPDOOR_SWITCH = 0x0C,
-
-	OBJECT_FUNCID_CONVEYOR_CONTROL = 0x0D,
-	OBJECT_FUNCID_CONVEYOR_BELT	   = 0x0E,
-
-	OBJECT_FUNCID_FRANKIE		   = 0x0F
-};
-
 class sCreepSprite {
 public:
-	byte Sprite_field_0;			// 0
+	byte mSpriteType;			// 0
 	byte mX;						// 1	
 	byte mY;						// 2
 	byte spriteImageID;				// 3
@@ -172,7 +163,7 @@ public:
 	}
 
 	void clear() {
-		Sprite_field_0 = mX = mY = spriteImageID = 0;
+		mSpriteType = mX = mY = spriteImageID = 0;
 		state = Sprite_field_5 = Sprite_field_6 = Sprite_field_7 = Sprite_field_8 = 0;
 		spriteFlags = 0;
 		mCollisionWidth = mCollisionHeight = 0;
@@ -200,7 +191,7 @@ struct sCreepObject {		// 0xBE
 };
 
 struct sCreepAnim {		// 0xBF
-	byte mFuncID;
+	byte mObjectType;
 	byte mX;
 	byte mY;
 	byte mGfxID;
@@ -209,7 +200,7 @@ struct sCreepAnim {		// 0xBF
 	byte mHeight;
 
 	void clear() {
-		mFuncID = mX = mY = mGfxID = mFlags = mWidth = mHeight = 0;
+		mObjectType = mX = mY = mGfxID = mFlags = mWidth = mHeight = 0;
 	}
 };
 
