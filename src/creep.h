@@ -138,23 +138,12 @@ public:
 	byte state;						// 4
 	byte Sprite_field_5;			// 5
 	byte Sprite_field_6;			// 6
-	byte Sprite_field_7;			// 7
 	byte Sprite_field_8;			// 8
 	byte spriteFlags;				// 9
 	byte mCollisionWidth;			// A
 	byte mCollisionHeight;			// B
 	byte mWidth;					// C
 	byte mHeight;					// D
-	byte Sprite_field_E;			// E
-	byte Sprite_field_F;			// F
-	byte Sprite_field_10;			// 10
-	byte Sprite_field_11;			// 11
-	byte Sprite_field_12;			// 12
-	byte Sprite_field_13;			// 13
-	byte Sprite_field_14;			// 14
-	byte Sprite_field_15;			// 15
-	byte Sprite_field_16;			// 16
-	byte Sprite_field_17;			// 17
 	byte Sprite_field_18;			// 18
 	byte Sprite_field_19;			// 19
 	byte Sprite_field_1A;			// 1A
@@ -170,12 +159,11 @@ public:
 
 	void clear() {
 		mSpriteType = mX = mY = spriteImageID = 0;
-		state = Sprite_field_5 = Sprite_field_6 = Sprite_field_7 = Sprite_field_8 = 0;
+		state = Sprite_field_5 = Sprite_field_6 = Sprite_field_8 = 0;
 		spriteFlags = 0;
 		mCollisionWidth = mCollisionHeight = 0;
 		mHeight = mHeight = 0;
-		Sprite_field_E = Sprite_field_F = Sprite_field_10 = Sprite_field_11 = Sprite_field_12 = Sprite_field_13 = Sprite_field_14 = Sprite_field_15 = Sprite_field_16 = 0;
-		Sprite_field_17 = Sprite_field_18 = Sprite_field_19 = Sprite_field_1A = Sprite_field_1B = 0;
+		Sprite_field_18 = Sprite_field_19 = Sprite_field_1A = Sprite_field_1B = 0;
 		playerNumber = 0;
 		mButtonState = Sprite_field_1E = Sprite_field_1F = 0;
 	}
