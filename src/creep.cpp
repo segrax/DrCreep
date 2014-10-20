@@ -49,13 +49,13 @@
 	#include <sys/timeb.h>
 #endif
 
-sObjectData mObjectFuncData[6] = {	0x31F6, 0x3534, 0x34EF, 0x01, 0x00,	// Player
-									0x3639, 0x3682, 0x0000, 0x00, 0x04, // Lightning
-									0x36B3, 0x374F, 0x0000, 0x00, 0x03, // Forcefield
-									0x379A, 0x3940, 0x38CE, 0x01, 0x02, // Mummy
-									0x3A08, 0x0000, 0x3A60, 0x00, 0x04, // RayGun Laser
-									0x3AEB, 0x3DDE, 0x3D6E, 0x01, 0x00  // Frankie
-								 };
+sObjectData mObjectCollisionData[6] = {	0x01, 0x00,	// Player
+										0x00, 0x04, // Lightning
+										0x00, 0x03, // Forcefield
+										0x01, 0x02, // Mummy
+										0x00, 0x04, // RayGun Laser
+										0x01, 0x00  // Frankie
+									};
 
 cCreep::cCreep() {
 	size_t romSize;
@@ -1768,31 +1768,31 @@ void cCreep::Sprite_Object_Collision_Check( byte pSpriteNumber ) {
 }
 
 bool cCreep::Sprite_Object_Collision( byte pSpriteNumber, byte pObjectNumber ) {
-	word func = mObjectFuncData[ mRoomSprites[pSpriteNumber].mSpriteType ].mFuncColId;
 
-	switch( func ) {
-		case 0:
+	switch( mRoomSprites[pSpriteNumber].mSpriteType ) {
+		case SPRITE_TYPE_LIGHTNING:
+		case SPRITE_TYPE_FORCEFIELD:
 			return false;
 
-		case 0x34EF:		// Player In Front
+		case SPRITE_TYPE_PLAYER:
 			obj_Player_Collision( pSpriteNumber, pObjectNumber );
 			break;
 
-		case 0x38CE:		// Mummy
+		case SPRITE_TYPE_MUMMY:
 			obj_Mummy_Collision( pSpriteNumber, pObjectNumber );
 			break;
 
-		case 0x3A60:		// Laser
+		case SPRITE_TYPE_LASER:
 			obj_RayGun_Laser_Collision( pSpriteNumber, pObjectNumber );
 			break;
 
-		case 0x3D6E:		// Frankie
+		case SPRITE_TYPE_FRANKIE:
 			obj_Frankie_Collision( pSpriteNumber, pObjectNumber );
 			break;
 
 		default:
-			cout << "Sprite_Object_Collision: 0x";
-			cout << std::hex << func << "\n";
+			cout << "Sprite_Object_Collision: SpriteType 0x";
+			cout << std::hex << mRoomSprites[pSpriteNumber].mSpriteType << "\n";
 			break;
 
 	}
@@ -1862,36 +1862,35 @@ void cCreep::Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 
 	mStartSpriteFlash2 = 1;
 	mMemory[ 0x311C ] = pSpriteNumber2;
-	
-	word func = mObjectFuncData[mRoomSprites[pSpriteNumber].mSpriteType].mFuncHitId;
 
-	switch( func ) {
-		case 0:
+	switch( mRoomSprites[pSpriteNumber].mSpriteType ) {
+
+		case SPRITE_TYPE_LASER:
 			break;
 
-		case 0x3534:				//  Hit Player
+		case SPRITE_TYPE_PLAYER:			//  Hit Player
 			obj_Player_Sprite_Collision( pSpriteNumber, pSpriteNumber2 );
 			break;
 
-		case 0x3682:
+		case SPRITE_TYPE_LIGHTNING:
 			mStartSpriteFlash2 = 0;
 			break;
 
-		case 0x374F:
+		case SPRITE_TYPE_FORCEFIELD:
 			mStartSpriteFlash2 = 0;
 			return;
 		
-		case 0x3940:				// Hit Mummy
+		case SPRITE_TYPE_MUMMY:				// Hit Mummy
 			obj_Mummy_Sprite_Collision( pSpriteNumber, pSpriteNumber2 );
 			break;
 
-		case 0x3DDE:				//  Hit Frankie
+		case SPRITE_TYPE_FRANKIE:			//  Hit Frankie
 			obj_Frankie_Sprite_Collision( pSpriteNumber, pSpriteNumber2 );
 			break;
 
 		default:
-			cout << "Sprite_Collision: 0x";
-			cout << std::hex << func << "\n";
+			cout << "Sprite_Collision: SpriteType 0x";
+			cout << std::hex << mRoomSprites[pSpriteNumber].mSpriteType << "\n";
 			break;
 	}
 
@@ -1906,7 +1905,7 @@ void cCreep::Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 void cCreep::Sprite_Collision_Check( byte pSpriteNumber ) {
 	byte SpriteY_Bottom, byte_311B, SpriteX, SpriteX_Right, SpriteY;
 
-	byte A = mObjectFuncData[mRoomSprites[pSpriteNumber].mSpriteType].mHitData;
+	byte A = mObjectCollisionData[mRoomSprites[pSpriteNumber].mSpriteType].mHitData;
 
 	if(!(A & 0x80)) {
 		byte_311B = A;
@@ -1986,7 +1985,7 @@ void cCreep::sprite_FlashOnOff( byte pSpriteNumber ) {
 
 		mRoomSprites[pSpriteNumber].state = state;
 
-		byte A = mObjectFuncData[mRoomSprites[pSpriteNumber].mSpriteType].mFlashData;
+		byte A = mObjectCollisionData[mRoomSprites[pSpriteNumber].mSpriteType].mFlashData;
 
 		// 
 		if(!(A & SPRITE_FLASH_UNK))
@@ -2035,32 +2034,30 @@ s2FE9:;
 // implementing in the original location
 void cCreep::Sprite_Execute_Action( byte pSpriteNumber ) {
 
-	word func = mObjectFuncData[mRoomSprites[pSpriteNumber].mSpriteType].mFuncExecId;
-
 	//2ED5
-	switch( func ) {
+	switch( mRoomSprites[pSpriteNumber].mSpriteType ) {
 
-		case 0x31F6:
+		case SPRITE_TYPE_PLAYER:
 			obj_Player_Execute( pSpriteNumber );
 			break;
 
-		case 0x3639:
+		case SPRITE_TYPE_LIGHTNING:
 			obj_Lightning_Execute( pSpriteNumber );
 			break;
 
-		case 0x36B3:
+		case SPRITE_TYPE_FORCEFIELD:
 			obj_Forcefield_Execute( pSpriteNumber );
 			break;
 		
-		case 0x379A:
+		case SPRITE_TYPE_MUMMY:
 			obj_Mummy_Execute( pSpriteNumber );
 			break;
 
-		case 0x3A08:
+		case SPRITE_TYPE_LASER:
 			obj_RayGun_Laser_Execute( pSpriteNumber );
 			break;
 
-		case 0x3AEB:
+		case SPRITE_TYPE_FRANKIE:
 			obj_Frankie_Execute( pSpriteNumber );
 			break;
 
@@ -2673,9 +2670,11 @@ void cCreep::obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumbe
 	if( mRoomSprites[pSpriteNumber].Sprite_field_1E & FRANKIE_AWAKE ) {
 		byte A = mRoomSprites[pSpriteNumber2].mSpriteType;
 
-		if( A && A != 2 && A != 3 ) {
+		if( A != SPRITE_TYPE_PLAYER && A != SPRITE_TYPE_FORCEFIELD && A != SPRITE_TYPE_MUMMY ) {
+
 			// 3DF3
-			if( A != 5 ) {
+			// If Frankie hits Lightning, or a laser.. he dies
+			if( A != SPRITE_TYPE_FRANKIE ) {
 			
 				word_40 = mFrankiePtr + mRoomSprites[pSpriteNumber].Sprite_field_1F;
 				mMemory[ word_40 ] = ((FRANKIE_AWAKE ^ 0xFF) & mMemory[ word_40 ]) | FRANKIE_DEATH;
@@ -2738,7 +2737,7 @@ void cCreep::obj_Frankie_Sprite_Create() {
 
 	byte X = sprite_CreepFindFree();
 
-	mRoomSprites[X].mSpriteType = 5;
+	mRoomSprites[X].mSpriteType = SPRITE_TYPE_FRANKIE;
 	mRoomSprites[X].Sprite_field_1F = mFrankieCount;
 	mRoomSprites[X].Sprite_field_1E = mMemory[ mObjectPtr ];
 
@@ -2872,7 +2871,7 @@ void cCreep::obj_Lightning_Execute( byte pSpriteNumber ) {
 void cCreep::obj_Lightning_Sprite_Create( byte pObjectNumber  ) {
 	sCreepSprite *sprite = sprite_CreepGetFree();
 
-	sprite->mSpriteType = 1;
+	sprite->mSpriteType = SPRITE_TYPE_LIGHTNING;
 
 	sprite->mX = mRoomAnim[pObjectNumber].mX;
 	sprite->mY = mRoomAnim[pObjectNumber].mY + 8;
@@ -3451,6 +3450,7 @@ void cCreep::obj_Player_Add( ) {
 	}
 
 	// 360D
+	mRoomSprites[spriteNumber].mSpriteType = SPRITE_TYPE_PLAYER;
 	mRoomSprites[spriteNumber].mWidth = 3;
 	mRoomSprites[spriteNumber].mHeight = 0x11;
 	mRoomSprites[spriteNumber].Sprite_field_1F = 0x80;
@@ -5205,7 +5205,7 @@ void cCreep::obj_Door_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 	if( mRoomObjects[pObjectNumber].Object_field_1 == 0 )
 		return;
 
-	if( mRoomSprites[pSpriteNumber].mSpriteType )
+	if( mRoomSprites[pSpriteNumber].mSpriteType != SPRITE_TYPE_PLAYER )
 		return;
 
 	// 4085
@@ -5714,7 +5714,7 @@ void cCreep::obj_Lightning_Pole_Execute( byte pObjectNumber ) {
 			// 4326
 			for( Y = 0; ;Y++ ) {
 
-				if( mRoomSprites[Y].mSpriteType == 1 ) {
+				if( mRoomSprites[Y].mSpriteType == SPRITE_TYPE_LIGHTNING ) {
 					if( !(mRoomSprites[Y].state & SPR_FLAG_FREE) )
 						if( mRoomSprites[Y].Sprite_field_1F == mRoomObjects[pObjectNumber].objNumber )
 							break;
@@ -5816,7 +5816,7 @@ void cCreep::obj_Door_Button_Prepare() {
 
 // 44E7: Lightning Switch
 void cCreep::obj_Lightning_Switch_InFront( byte pSpriteNumber, byte pObjectNumber ) {
-	if( mRoomSprites[pSpriteNumber].mSpriteType )
+	if( mRoomSprites[pSpriteNumber].mSpriteType != SPRITE_TYPE_PLAYER )
 		return;
 
 	if( (mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].mWidth) - mRoomAnim[pObjectNumber].mX >= 4 )
@@ -6278,7 +6278,7 @@ void cCreep::obj_Conveyor_Execute( byte pObjectNumber ) {
 // 47A7: In Front Mummy Release
 void cCreep::obj_Mummy_Infront( byte pSpriteNumber, byte pObjectNumber ) {
 
-	if( mRoomSprites[pSpriteNumber].mSpriteType )
+	if( mRoomSprites[pSpriteNumber].mSpriteType != SPRITE_TYPE_PLAYER )
 		return;
 
 	byte A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].mWidth;
@@ -6452,7 +6452,7 @@ void cCreep::obj_Conveyor_Prepare() {
 void cCreep::obj_Forcefield_Create( byte pObjectNumber ) {
 	sCreepSprite *sprite = sprite_CreepGetFree();
 
-	sprite->mSpriteType = 2;
+	sprite->mSpriteType = SPRITE_TYPE_FORCEFIELD;
 	sprite->mX = mMemory[ mObjectPtr + 2 ];
 	sprite->mY = mMemory[ mObjectPtr + 3 ] + 2;
 	sprite->spriteImageID= 0x35;
@@ -6499,8 +6499,8 @@ void cCreep::obj_Mummy_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 // 3940: 
 void cCreep::obj_Mummy_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 
-	if( mRoomSprites[pSpriteNumber2].mSpriteType == 0 
-	 || mRoomSprites[pSpriteNumber2].mSpriteType == 5 ) {
+	if( mRoomSprites[pSpriteNumber2].mSpriteType == SPRITE_TYPE_PLAYER 
+	 || mRoomSprites[pSpriteNumber2].mSpriteType == SPRITE_TYPE_FRANKIE ) {
 		mStartSpriteFlash2 = 0;
 		return;
 	}
@@ -6538,7 +6538,7 @@ void cCreep::obj_RayGun_Laser_Sprite_Create( byte pObjectNumber ) {
 
 	byte X = sprite_CreepFindFree( );
 
-	mRoomSprites[X].mSpriteType = 4;
+	mRoomSprites[X].mSpriteType = SPRITE_TYPE_LASER;
 	mRoomSprites[X].mX= mRoomAnim[pObjectNumber].mX;
 	mRoomSprites[X].mY= mRoomAnim[pObjectNumber].mY + 0x05;
 	mRoomSprites[X].spriteImageID= 0x6C;
@@ -6560,7 +6560,7 @@ void cCreep::obj_RayGun_Laser_Sprite_Create( byte pObjectNumber ) {
 void cCreep::obj_Mummy_Sprite_Create( byte pA, byte pObjectNumber ) {
 	byte sprite = sprite_CreepFindFree( );
 	
-	mRoomSprites[ sprite ].mSpriteType = 3;
+	mRoomSprites[ sprite ].mSpriteType = SPRITE_TYPE_MUMMY;
 	mRoomSprites[ sprite ].Sprite_field_1B = 0xFF;
 	mRoomSprites[ sprite ].playerNumber = 0xFF;
 	mRoomSprites[ sprite ].mButtonState = mRoomObjects[pObjectNumber].objNumber;
@@ -6791,7 +6791,7 @@ void cCreep::Draw_RoomAnimObject( byte pGfxID, byte pGfxPosX, byte pGfxPosY, byt
 // 41D8: In Front Button?
 void cCreep::obj_Door_Button_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 
-	if( mRoomSprites[pSpriteNumber].mSpriteType )
+	if( mRoomSprites[pSpriteNumber].mSpriteType != SPRITE_TYPE_PLAYER )
 		return;
 
 	if( mRoomSprites[pSpriteNumber].mButtonState == 0 )
@@ -6824,7 +6824,7 @@ void cCreep::obj_Door_Button_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 
 // 4647: In Front Forcefield Timer
 void cCreep::obj_Forcefield_Timer_InFront( byte pSpriteNumber, byte pObjectNumber ) {
-	if(mRoomSprites[pSpriteNumber].mSpriteType)
+	if(mRoomSprites[pSpriteNumber].mSpriteType != SPRITE_TYPE_PLAYER )
 		return;
 
 	if(!mRoomSprites[pSpriteNumber].mButtonState)
@@ -6850,7 +6850,7 @@ void cCreep::obj_Forcefield_Timer_InFront( byte pSpriteNumber, byte pObjectNumbe
 // 4990: In front of key
 void cCreep::obj_Key_Infront( byte pSpriteNumber, byte pObjectNumber ) {
 
-	if( mRoomSprites[pSpriteNumber].mSpriteType )
+	if( mRoomSprites[pSpriteNumber].mSpriteType != SPRITE_TYPE_PLAYER )
 		return;
 
 	if( mMemory[ 0x780D + mRoomSprites[pSpriteNumber].playerNumber ] != 0 )
@@ -6881,7 +6881,7 @@ void cCreep::obj_Key_Infront( byte pSpriteNumber, byte pObjectNumber ) {
 // 4A68: In Front Lock
 void cCreep::obj_Door_Lock_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 
-	if( mRoomSprites[pSpriteNumber].mSpriteType )
+	if( mRoomSprites[pSpriteNumber].mSpriteType != SPRITE_TYPE_PLAYER )
 		return;
 
 	if( mMemory[ 0x780D + mRoomSprites[pSpriteNumber].playerNumber ] != 0 )
@@ -6937,7 +6937,7 @@ bool cCreep::obj_Key_NotFound( byte pObjectNumber, byte pSpriteNumber ) {
 // 4D70: In Front RayGun Control
 void cCreep::obj_RayGun_Control_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 
-	if( mRoomSprites[pSpriteNumber].mSpriteType )
+	if( mRoomSprites[pSpriteNumber].mSpriteType != SPRITE_TYPE_PLAYER )
 		return;
 
 	byte A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].mWidth;
@@ -6984,7 +6984,7 @@ void cCreep::obj_Teleport_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 	if( mRoomAnim[pObjectNumber].mFlags & ITM_EXECUTE )
 		return;
 
-	if( mRoomSprites[pSpriteNumber].mSpriteType )
+	if( mRoomSprites[pSpriteNumber].mSpriteType != SPRITE_TYPE_PLAYER )
 		return;
 
 	// 4EB5
@@ -7190,7 +7190,7 @@ void cCreep::obj_Conveyor_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 		A = 0x01;
 
 	// 54E2
-	if( !(mRoomSprites[pSpriteNumber].mSpriteType == 0 && (mEngine_Ticks & 7) ))
+	if( !(mRoomSprites[pSpriteNumber].mSpriteType == SPRITE_TYPE_PLAYER && (mEngine_Ticks & 7) ))
 		A <<= 1;
 
 	mRoomSprites[pSpriteNumber].mX += A;
@@ -7198,7 +7198,7 @@ void cCreep::obj_Conveyor_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 
 // 5611: In Front Conveyor Control
 void cCreep::obj_Conveyor_Control_InFront( byte pSpriteNumber, byte pObjectNumber ) {
-	if( mRoomSprites[pSpriteNumber].mSpriteType )
+	if( mRoomSprites[pSpriteNumber].mSpriteType != SPRITE_TYPE_PLAYER)
 		return;
 
 	if( !mRoomSprites[pSpriteNumber].mButtonState )

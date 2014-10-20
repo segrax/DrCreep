@@ -32,9 +32,6 @@ class cDebug;
 class cBuilder;
 
 struct sObjectData {
-	word mFuncExecId;
-	word mFuncHitId;
-	word mFuncColId;
 	byte mFlashData;
 	byte mHitData;
 };
@@ -57,6 +54,15 @@ enum {
 	OBJECT_FUNCID_CONVEYOR_BELT		= 0x0E,
 	OBJECT_FUNCID_FRANKIE			= 0x0F
 };
+
+enum {
+	SPRITE_TYPE_PLAYER = 0x00,
+	SPRITE_TYPE_LIGHTNING = 0x01,
+	SPRITE_TYPE_FORCEFIELD = 0x02,
+	SPRITE_TYPE_MUMMY = 0x03,
+	SPRITE_TYPE_LASER = 0x04,
+	SPRITE_TYPE_FRANKIE = 0x05,
+	};
 
 enum {
 	SPR_ACTION_CREATED	= 0x80,	// Just Created
