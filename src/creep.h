@@ -397,7 +397,7 @@ public:
 		void	 roomLoad();
 		void	 roomPrepare( word pAddress = 0);
 		
-		void	 sub_95F();
+		void	 DisableSpritesAndStopSound();
 
 		void	 gameHighScoresHandle();
 		void	 sound_PlayEffect( char pA );
@@ -405,7 +405,6 @@ public:
 		void	 textPrintCharacter();
 		byte	 textGetKeyFromUser();
 
-		void	 sub_2973();
 		void	 convertTimerToTime();
 		void	 convertTimeToNumber( byte pA, byte pY );
 

@@ -530,7 +530,7 @@ void cCreep::optionsMenuPrepare() {
 	mMemory[ 0x239A ] = mFileListingNamePtr - 4;
 
 	mFileListingNamePtr = 0x08;
-	sub_2973();
+	DisableSpritesAndStopSound();
 }
 
 // 268F: 
@@ -635,15 +635,8 @@ byte cCreep::textGetKeyFromUser() {
 	return toupper( key );
 }
 
-// 2973: 
-void cCreep::sub_2973() {
-
-	// Removed sleep loop
-	sub_95F();
-}
-
 // 95F: 
-void cCreep::sub_95F() {
+void cCreep::DisableSpritesAndStopSound() {
 	byte A = 0x20;
 
 	// Sprite??
@@ -967,7 +960,7 @@ bool cCreep::Intro() {
 
 			// Display Highscores on F3
 			if( mInput->f3Get() ) {
-				sub_95F();
+				DisableSpritesAndStopSound();
 				gameHighScores();
 
 				mObjectPtr = 0x239C;
@@ -994,20 +987,17 @@ bool cCreep::Intro() {
 
 	// 0CDD
 	mMusicPlaying = 0;
-	mIntro = 0;
+	mIntro = false;
 	mMusicBuffer = 0;
 
 	// Disable music playback
 	mSound->playback( false );
 
-	signed char X = 0x0E;
+	for(signed char X = 0x0E; X >= 0; X -= 0x07) {
 
-	while(X >= 0) {
 		mMemory[ 0x20EF + X ] &= 0xFE;
 		mMemory[ 0xD404 + X ] = mMemory[ 0x20EF + X ];
 		mSound->sidWrite(0x04 + X, mMemory[ 0x20EF + X ]);
-
-		X -= 0x07;
 	}
 
 	mInput->inputCheck(true);
@@ -1264,7 +1254,7 @@ s2238:
 			if( mRestorePressed ) {
 				mRestorePressed = false;
 
-				sub_95F();
+				DisableSpritesAndStopSound();
 				return;
 			}
 
@@ -1351,7 +1341,7 @@ s2238:
                 case 1:{
                 default:
                    //inputWait();
-				    sub_95F();
+				    DisableSpritesAndStopSound();
 				    return;
                        }
 
@@ -1374,7 +1364,7 @@ s2238:
                     if( mMemory[ 0x2399 ] == 0xFF )
 						continue;
 
-					sub_95F();
+					DisableSpritesAndStopSound();
 					gameHighScores();
 
 					// Draw 'Press Enter to exit'
@@ -1397,21 +1387,21 @@ s2238:
 }
 
 void cCreep::menuUpdate( size_t pCastleNumber ) {
-	byte X = pCastleNumber;
-	if(mMemory[ 0x2399 ] == X)
+
+	if(mMemory[ 0x2399 ] == pCastleNumber)
 		return;
 
-	byte Y = mMemory[ 0xBA01 + X ];
+	byte Y = mMemory[ 0xBA01 + pCastleNumber ];
 	word_30 = mMemory[ 0x5CE6 + Y ];
 	word_30 |= ((mMemory[ 0x5D06 + Y ] | 4) << 8);
 
-	word_30 += mMemory[ 0xBA00 + X ];
+	word_30 += mMemory[ 0xBA00 + pCastleNumber ];
 
-	mMemory[ 0x24A6 ] = X;
+	mMemory[ 0x24A6 ] = pCastleNumber;
 
 	// 2466
 
-	X = mMemory[ 0x2399 ];
+	byte X = mMemory[ 0x2399 ];
 	
 	Y = mMemory[ 0xBA01 + X ];
 	word_32 = mMemory[ 0x5CE6 + Y ];
@@ -2392,7 +2382,7 @@ void cCreep::obj_Frankie_Execute( byte pSpriteNumber ) {
 	word_40 = mFrankiePtr + mRoomSprites[pSpriteNumber].Sprite_field_1F;
 	
 	if( !(mRoomSprites[pSpriteNumber].Sprite_field_1E & FRANKIE_AWAKE) ) {
-		if( mIntro == 1 )
+		if( mIntro )
 			return;
 
 		// 3B31
@@ -4547,7 +4537,7 @@ s1BE7:;
 	// Save highscores
 	mCastleManager->scoresSave( mCastle->nameGet(), readLEWord( memory( 0xB800 ) ), memory( 0xB800 ) );
 
-	sub_2973();
+	DisableSpritesAndStopSound();
 }
 
 // 1D42: Display Highscores for this Castle
@@ -4993,7 +4983,7 @@ void cCreep::gamePositionLoad() {
 	if( mCastleManager->positionLoad( filename, memory( 0x7800 ) ) == true)
 		mSaveGameLoaded = 1;
 
-	sub_2973();
+	DisableSpritesAndStopSound();
 }
 
 // 24FF: Save a game, or a castle
@@ -5028,7 +5018,7 @@ void cCreep::gamePositionSave( bool pCastleSave ) {
 		hw_Update();
 		hw_IntSleep(0x23);
 	} else
-		sub_2973();
+		DisableSpritesAndStopSound();
 
 }
 
@@ -5343,7 +5333,7 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 
 	byte A = mRoomAnim[pObjectNumber].mFlags;
 	if(!( A & ITM_DISABLE )) {
-		if( mIntro == 1 || mNoInput )
+		if( mIntro || mNoInput )
 			return;
 
 		// 4B46

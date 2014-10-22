@@ -77,7 +77,7 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 			for( signed char Y = 0x77; Y >= 0; --Y )
 				*gCreep->memory( 0xB802 + Y ) = 0xFF;
 
-			gCreep->sub_2973();
+			gCreep->DisableSpritesAndStopSound();
 		}
 	} else {
 		mBuffer = mCreep->memory( 0x7800 );
