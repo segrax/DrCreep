@@ -129,6 +129,11 @@ enum {
 	TRAPDOOR_OPEN		= 0x01
 };
 
+enum {
+	MAP_ROOM_STOP_DRAW	 = 0x40,
+	MAP_ROOM_VISIBLE = 0x80
+};
+
 class sCreepSprite {
 public:
 	byte mSpriteType;				// 0
@@ -254,7 +259,7 @@ protected:
 	word		 mRoomDoorPtr,mRoomKeyPtr,mRoomMummyPtr,mRoomRayGunPtr;		// Room Level Data Pointers
 
 	byte		 mRaygunCount;
-	byte		 mRaygunMoveDirection, byte_4D5F;
+	byte		 mRaygunMoveDirection;
 
 	word		 mRoomTrapDoorPtr;											// Trap Door
 
@@ -270,7 +275,7 @@ protected:
 	byte		 mJoyButtonState, byte_5F56;
 
 	byte		 byte_D10;
-	byte		 mDisableSoundEffects, mObjectCount, byte_8C0, byte_8C1;
+	byte		 mDisableSoundEffects, mObjectCount;
 	byte		 byte_5FD7;
 	byte		 byte_5FD5, byte_5FD6, byte_5FD8;
 

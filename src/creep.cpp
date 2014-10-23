@@ -99,9 +99,6 @@ cCreep::cCreep() {
 
 	mDisableSoundEffects = 0;
 
-	byte_8C0 = 0x80;
-	byte_8C1 = 0x40;
-
 	mRestorePressed = false;
 
 	mMusicPlaying = 0x00;
@@ -3184,7 +3181,7 @@ bool cCreep::mapDisplay() {
 			// Mark Room as visible on map
 			byte A = mMemory[ 0x7809 + X ];
 			roomPtrSet( A );
-			mMemory[ mRoomPtr ] |= byte_8C0;
+			mMemory[ mRoomPtr ] |= MAP_ROOM_VISIBLE;
 			
 			// 
 			mapArrowDraw( X );
@@ -4080,7 +4077,7 @@ noCarry2:;
 
 // 1203: 
 void cCreep::mapRoomDraw() {
-	byte byte_13EA, byte_13EB, roomX;
+	byte byte_13EA, roomX;
 	byte roomY, roomHeight, roomWidth;
 
 	mRoomPtr = 0x7900;
@@ -4091,10 +4088,10 @@ void cCreep::mapRoomDraw() {
 	//1210
 	for(;;) {
 		
-		if( mMemory[ mRoomPtr ] & byte_8C1 )
+		if( mMemory[ mRoomPtr ] & MAP_ROOM_STOP_DRAW )
 			return;
 		
-		if( mMemory[ mRoomPtr ] & byte_8C0 ) {
+		if( mMemory[ mRoomPtr ] & MAP_ROOM_VISIBLE ) {
 			//1224
 			
 			mMemory[ 0x63E7 ] = mMemory[ mRoomPtr ] & 0xF;		// color
@@ -4107,7 +4104,7 @@ void cCreep::mapRoomDraw() {
 			
 			// Draw Room Floor Square
 			// 1260
-			for( byte_13EB = roomWidth; byte_13EB ; --byte_13EB) {
+			for( byte CurrentX = roomWidth; CurrentX ; --CurrentX) {
 				
 				gfxPosX = roomX;
 				
@@ -5228,7 +5225,7 @@ void cCreep::obj_Door_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 	word word_41D6 = readLEWord( &mMemory[ word_40 + 3 ] );
 	roomPtrSet( (word_41D6 & 0xFF) );
 	
-	mMemory[ mRoomPtr ] |= byte_8C0;
+	mMemory[ mRoomPtr ] |= MAP_ROOM_VISIBLE;
 
 	playerNumber = mRoomSprites[pSpriteNumber].playerNumber;
 
@@ -5341,7 +5338,7 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 			mRaygunCount = 0xFF;
 			mRaygunMoveDirection = 0x00;
 			
-			for(byte_4D5F = 0x01; ((char) byte_4D5F) >= 0; --byte_4D5F) {
+			for(byte byte_4D5F = 0x01; ((char) byte_4D5F) >= 0; --byte_4D5F) {
 
 				if( mMemory[ 0x780D + byte_4D5F ] == 0 ) {
 					byte Y = mMemory[ 0x34D1 + byte_4D5F ];

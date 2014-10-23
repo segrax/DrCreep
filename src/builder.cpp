@@ -446,7 +446,7 @@ void cBuilder::mapRoomsDraw( size_t pArrowRoom ) {
 
 		roomPtrSet( roomIT->second->mNumber );
 
-		mMemory[ mRoomPtr ] |= byte_8C0;
+		mMemory[ mRoomPtr ] |= MAP_ROOM_VISIBLE;
 
 		// Draw the room
 		mapRoomDraw();
