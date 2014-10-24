@@ -429,18 +429,14 @@ void cCreep::optionsMenuPrepare() {
 
 		
 		//0x75E1
-		Y = 0;
 		byte_3E += 3;
 		
-		for(;;) {
-			A = mMemory[ byte_3E + Y] & 0x3F;
-			mMemory[ byte_30 + Y ] = (byte) A;
-			A = mMemory[ byte_3E + Y];
+		for( Y = 0; ; ++Y ) {
 
-			if( A & 0x80 )
+			mMemory[ byte_30 + Y ] = (byte) mMemory[ byte_3E + Y] & 0x3F;
+
+			if( mMemory[ byte_3E + Y] & 0x80 )
 				break;
-			else
-				++Y;
 		}
 
 		// 75FC
@@ -499,7 +495,6 @@ void cCreep::optionsMenuPrepare() {
 
         // 
 		X = mMemory[ 0x775E ];
-		X -= 0;
 		
         // 
 		X += word_32 & 0xFF;
@@ -540,16 +535,12 @@ void cCreep::textShow() {
 	mTextYPos = mMemory[ 0x2789 ];
 
 	mMemory[ 0x27A2 ] = 0x2D;
-	byte X = mMemory[ 0x278C ];
-	
-	while( X ) {
+
+	for( mStrLength = mMemory[ 0x278C ]; mStrLength; --mStrLength ) {
 		
 		textPrintCharacter();
-		--X;
 		mTextXPos += 0x08;
 	}
-	
-	mStrLength = X;
 
 	// 26D0
 	for(;;) {
@@ -558,7 +549,7 @@ void cCreep::textShow() {
 		if( mStrLength != mMemory[ 0x278C ] ) {
 			++mMemory[ 0x27A3 ];
 
-			X = mMemory[ 0x27A3 ] & 3;
+			byte X = mMemory[ 0x27A3 ] & 3;
 			mMemory[ 0x27A2 ] = mMemory[ 0x27A4 + X ];
 			mTextXPos = (mStrLength << 3) + mMemory[ 0x2788 ];
 			textPrintCharacter();
@@ -831,7 +822,7 @@ void cCreep::roomPrepare( word pAddress ) {
 				break;
 
 			case eObjectKey:				// Key
-				obj_Key_Load( );
+				obj_Key_Prepare( );
 				break;
 
 			case eObjectLock:				// Lock
@@ -855,7 +846,7 @@ void cCreep::roomPrepare( word pAddress ) {
 				break;
 
 			case eObjectFrankenstein:		// Frankenstein
-				obj_Frankie_Load( );
+				obj_Frankie_Prepare( );
 				break;
 
 			case eObjectText:		// String Print
@@ -5556,7 +5547,7 @@ void cCreep::obj_RayGun_Prepare() {
 }
 
 // 49F8: Load the rooms' Keys
-void cCreep::obj_Key_Load() {
+void cCreep::obj_Key_Prepare() {
 	mRoomKeyPtr = mObjectPtr;
 
 	byte KeyID = 0;
@@ -6307,7 +6298,7 @@ void cCreep::obj_Mummy_Infront( byte pSpriteNumber, byte pObjectNumber ) {
 }
 
 // 564E: Load the rooms' frankensteins
-void cCreep::obj_Frankie_Load() {
+void cCreep::obj_Frankie_Prepare() {
 	mFrankiePtr = mObjectPtr;
 
 	mFrankieCount = 0;

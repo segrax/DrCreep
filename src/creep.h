@@ -467,14 +467,14 @@ public:
 		
 		void	 obj_Frankie_Sprite_Create( );
 		void	 obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber );
-		void	 obj_Frankie_Load();
+		void	 obj_Frankie_Prepare();
 		void	 obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
 		void	 obj_Frankie_Execute( byte pSpriteNumber );
 
 		void	 obj_Image_Draw();
 
 		void	 obj_Key_Infront( byte pSpriteNumber, byte pObjectNumber );
-		void	 obj_Key_Load( );
+		void	 obj_Key_Prepare( );
 		bool	 obj_Key_NotFound( byte pObjectNumber, byte pSpriteNumber );
 
 		void	 obj_Ladder_Prepare();
