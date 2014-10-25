@@ -1706,31 +1706,29 @@ s2F51:;
 
 // 311E
 void cCreep::Sprite_Object_Collision_Check( byte pSpriteNumber ) {
-	byte byte_31F1, byte_31F2, byte_31F3, byte_31F4, byte_31EF;
+	byte SpriteX_Start, SpriteX_Finish, SpriteY_Start, SpriteY_Finish;
 
-	byte_31F1 = mRoomSprites[pSpriteNumber].mX;
-	byte_31F2 = byte_31F1 + mRoomSprites[pSpriteNumber].mCollisionWidth;
+	SpriteX_Start = mRoomSprites[pSpriteNumber].mX;
+	SpriteX_Finish = SpriteX_Start + mRoomSprites[pSpriteNumber].mCollisionWidth;
 	if( (mRoomSprites[pSpriteNumber].mX +  mRoomSprites[pSpriteNumber].mCollisionWidth) > 0xFF )
-		byte_31F1 = 0;
+		SpriteX_Start = 0;
 
-	byte_31F3 = mRoomSprites[pSpriteNumber].mY;
-	byte_31F4 = byte_31F3 + mRoomSprites[pSpriteNumber].mCollisionHeight;
+	SpriteY_Start = mRoomSprites[pSpriteNumber].mY;
+	SpriteY_Finish = SpriteY_Start + mRoomSprites[pSpriteNumber].mCollisionHeight;
 	if( (mRoomSprites[pSpriteNumber].mY +  mRoomSprites[pSpriteNumber].mCollisionHeight) > 0xFF )
-		byte_31F3 = 0;
+		SpriteY_Start = 0;
 
 	// 3149
 	if( !mObjectCount )
 		return;
 
-	byte_31EF = mObjectCount;
-
-	for( byte ObjectNumber = 0; ObjectNumber != byte_31EF; ++ObjectNumber ) {
+	for( byte ObjectNumber = 0; ObjectNumber < mObjectCount; ++ObjectNumber ) {
 
 		if( !(mRoomAnim[ObjectNumber].mFlags & ITM_DISABLE ))
-			if( !(byte_31F2 < mRoomAnim[ObjectNumber].mX ))
-				if( !(mRoomAnim[ObjectNumber].mX + mRoomAnim[ObjectNumber].mWidth < byte_31F1))
-					if( !(byte_31F4 < mRoomAnim[ObjectNumber].mY) )
-						if( !(mRoomAnim[ObjectNumber].mY + mRoomAnim[ObjectNumber].mHeight < byte_31F3) ) {
+			if( !(SpriteX_Finish < mRoomAnim[ObjectNumber].mX ))
+				if( !(mRoomAnim[ObjectNumber].mX + mRoomAnim[ObjectNumber].mWidth < SpriteX_Start))
+					if( !(SpriteY_Finish < mRoomAnim[ObjectNumber].mY) )
+						if( !(mRoomAnim[ObjectNumber].mY + mRoomAnim[ObjectNumber].mHeight < SpriteY_Start) ) {
 							//318C
 							if( Sprite_Object_Collision( pSpriteNumber, ObjectNumber ) == true )
 								mRoomSprites[pSpriteNumber].state |= SPR_ACTION_FLASH;
