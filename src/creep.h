@@ -267,7 +267,7 @@ protected:
 	char		 mFrankieCount;
 	
 	byte		 byte_31EF, mObjectNumber, byte_31F1, byte_31F2;
-	byte		 byte_31F3, byte_31F4, mStartSpriteFlash;
+	byte		 byte_31F3, byte_31F4;
 
 	word		 mRoomLightningPtr;											// Lightning
 	
@@ -466,7 +466,7 @@ public:
 		void	 obj_Forcefield_Timer_InFront( byte pSpriteNumber, byte pObjectNumber );
 		
 		void	 obj_Frankie_Sprite_Create( );
-		void	 obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber );
+		bool	 obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Frankie_Prepare();
 		void	 obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
 		void	 obj_Frankie_Execute( byte pSpriteNumber );
@@ -487,14 +487,14 @@ public:
 		
 		void	 obj_Mummy_Prepare( );
 		void	 obj_Mummy_Sprite_Create( byte pA, byte pObjectNumber );
-		void	 obj_Mummy_Collision( byte pSpriteNumber, byte pObjectNumber );
+		bool	 obj_Mummy_Collision( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Mummy_Execute( byte pObjectNumber );
 		void	 obj_Mummy_Infront( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Mummy_Tomb_Execute( byte pObjectNumber );
 		void	 obj_Mummy_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
 
 		void	 obj_Player_Add( );
-		void	 obj_Player_Collision( byte pSpriteNumber, byte pObjectNumber );
+		bool	 obj_Player_Collision( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Player_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
 		void	 obj_Player_Execute( byte pObjectNumber );
 		void	 obj_Player_Color_Set( byte pSpriteNumber );
@@ -512,7 +512,7 @@ public:
 
 		void	 obj_RayGun_Prepare( );
 		void	 obj_RayGun_Laser_Sprite_Create( byte pObjectNumber );
-		void	 obj_RayGun_Laser_Collision( byte pSpriteNumber, byte pObjectNumber );
+		bool	 obj_RayGun_Laser_Collision( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_RayGun_Laser_Execute( byte pObjectNumber );
 		void	 obj_RayGun_Execute( byte pObjectNumber );
 		void	 obj_RayGun_Control_InFront( byte pSpriteNumber, byte pObjectNumber );

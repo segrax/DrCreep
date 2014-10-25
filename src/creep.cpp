@@ -1730,14 +1730,10 @@ void cCreep::Sprite_Object_Collision_Check( byte pSpriteNumber ) {
 				if( !(mRoomAnim[ObjectNumber].mX + mRoomAnim[ObjectNumber].mWidth < byte_31F1))
 					if( !(byte_31F4 < mRoomAnim[ObjectNumber].mY) )
 						if( !(mRoomAnim[ObjectNumber].mY + mRoomAnim[ObjectNumber].mHeight < byte_31F3) ) {
-						//318C
-							mStartSpriteFlash = 1;
-
-							if( Sprite_Object_Collision( pSpriteNumber, ObjectNumber ) == true ) {
-
-								if( mStartSpriteFlash == 1 ) 
-									mRoomSprites[pSpriteNumber].state |= SPR_ACTION_FLASH;
-							}
+							//318C
+							if( Sprite_Object_Collision( pSpriteNumber, ObjectNumber ) == true )
+								mRoomSprites[pSpriteNumber].state |= SPR_ACTION_FLASH;
+							
 
 							Sprite_Object_Infront_Execute( pSpriteNumber, ObjectNumber );
 						} 
@@ -1753,20 +1749,17 @@ bool cCreep::Sprite_Object_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 			return false;
 
 		case SPRITE_TYPE_PLAYER:
-			obj_Player_Collision( pSpriteNumber, pObjectNumber );
-			break;
+			return obj_Player_Collision( pSpriteNumber, pObjectNumber );
 
 		case SPRITE_TYPE_MUMMY:
-			obj_Mummy_Collision( pSpriteNumber, pObjectNumber );
-			break;
+			return obj_Mummy_Collision( pSpriteNumber, pObjectNumber );
 
 		case SPRITE_TYPE_LASER:
-			obj_RayGun_Laser_Collision( pSpriteNumber, pObjectNumber );
-			break;
+			return obj_RayGun_Laser_Collision( pSpriteNumber, pObjectNumber );
 
 		case SPRITE_TYPE_FRANKIE:
-			obj_Frankie_Collision( pSpriteNumber, pObjectNumber );
-			break;
+			return obj_Frankie_Collision( pSpriteNumber, pObjectNumber );
+
 
 		default:
 			cout << "Sprite_Object_Collision: SpriteType 0x";
@@ -2606,33 +2599,28 @@ s3D4F:;
 }
 
 // 3D6E: Frankie?
-void cCreep::obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber ) {
+bool cCreep::obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 
 	char A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].mWidth;
 	A -= mRoomAnim[pObjectNumber].mX;
 
-	if( A >= 4 ) {
-		mStartSpriteFlash = 0;
-		return;
-	}
+	if( A >= 4 )
+		return false;
 	
 	// 3d85
 	if( mRoomAnim[pObjectNumber].mObjectType != OBJECT_TYPE_TRAPDOOR_PANEL ) {
-		mStartSpriteFlash = 0;
 		if( mRoomAnim[pObjectNumber].mObjectType != OBJECT_TYPE_TRAPDOOR_SWITCH )
-			return;
+			return false;
 
 		mRoomSprites[pSpriteNumber].Sprite_field_1B = mRoomObjects[pObjectNumber].objNumber;
-		return;
+		return false;
 
 	} else {
 		// 3DA1
 		word_40 = mRoomTrapDoorPtr + mRoomObjects[pObjectNumber].objNumber;
 
-		if( !(mMemory[ word_40 ] & TRAPDOOR_OPEN) ) {
-			mStartSpriteFlash = 0;
-			return;
-		}
+		if( !(mMemory[ word_40 ] & TRAPDOOR_OPEN) )
+			return false;
 		
 		word_40 = mFrankiePtr + mRoomSprites[pSpriteNumber].Sprite_field_1F;
 
@@ -2641,6 +2629,8 @@ void cCreep::obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 		mMemory[ word_40 ] = A;
 		mRoomSprites[pSpriteNumber].Sprite_field_1E = A;
 	}
+
+	return true;
 }
 
 // 3DDE: Franky Hit 
@@ -3330,7 +3320,7 @@ s10EB:;
 }
 
 // 34EF
-void cCreep::obj_Player_Collision( byte pSpriteNumber, byte pObjectNumber ) {
+bool cCreep::obj_Player_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 	byte A;
 	if( mRoomAnim[pObjectNumber].mObjectType == OBJECT_TYPE_TRAPDOOR_PANEL ) {
 		
@@ -3339,23 +3329,22 @@ void cCreep::obj_Player_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 
 		if( A < 4 ) {
 			mMemory[ 0x780D + mRoomSprites[pSpriteNumber].playerNumber ] = 2;
-			return;
+			return true;
 		}
 
 	} 
 	// 3505
-	mStartSpriteFlash = 0;
 	if( mRoomAnim[pObjectNumber].mObjectType != OBJECT_TYPE_TRAPDOOR_SWITCH ) 
-		return;
+		return false;
 
 	A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].mWidth;
 	A -= mRoomAnim[pObjectNumber].mX;
 
 	if( A >= 4 )
-		return;
+		return false;
 
 	mRoomSprites[pSpriteNumber].Sprite_field_1A = mRoomObjects[pObjectNumber].objNumber;
-	return;
+	return false;
 }
 
 // 3534: Hit Player
@@ -6443,7 +6432,7 @@ void cCreep::obj_Forcefield_Create( byte pObjectNumber ) {
 }
 
 // 38CE: Mummy ?
-void cCreep::obj_Mummy_Collision( byte pSpriteNumber, byte pObjectNumber ) {
+bool cCreep::obj_Mummy_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 	if( mRoomAnim[pObjectNumber].mObjectType == OBJECT_TYPE_TRAPDOOR_PANEL ) {
 		
 		char A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].mWidth;
@@ -6456,22 +6445,22 @@ void cCreep::obj_Mummy_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 				// 3900
 				word_40 = mRoomMummyPtr + mRoomSprites[pSpriteNumber].mButtonState;
 				mMemory[ word_40 ] = 3;
-				return;
+				return true;
 			}
 		}
 	} 
 
 	// 3919
-	mStartSpriteFlash = 0;
 	if( mRoomAnim[pObjectNumber].mObjectType != OBJECT_TYPE_TRAPDOOR_SWITCH )
-		return;
+		return false;
 
 	char A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].mWidth;
 	A -= mRoomAnim[pObjectNumber].mX;
 	if( A >= 4 )
-		return;
+		return false;
 
 	mRoomSprites[pSpriteNumber].playerNumber = mRoomObjects[pObjectNumber].objNumber;
+	return false;
 }
 
 // 3940: 
@@ -6489,19 +6478,19 @@ void cCreep::obj_Mummy_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2
 }
 
 // 3A60:  
-void cCreep::obj_RayGun_Laser_Collision( byte pSpriteNumber, byte pObjectNumber ) {
+bool cCreep::obj_RayGun_Laser_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 	if( mRoomAnim[pObjectNumber].mObjectType == OBJECT_TYPE_LIGHTNING_MACHINE )
-		return;
+		return true;
 
 	if( mRoomAnim[pObjectNumber].mObjectType == OBJECT_TYPE_FRANKIE )
-		return;
+		return true;
 
 	if( mRoomAnim[pObjectNumber].mObjectType == OBJECT_TYPE_RAYGUN_LASER ) {
 		if( mRoomSprites[pSpriteNumber].Sprite_field_1E != mRoomObjects[pObjectNumber].objNumber )
-			return;
+			return true;
 	}
 
-	mStartSpriteFlash = 0;
+	return false;
 }
 
 void cCreep::obj_RayGun_Laser_Sprite_Create( byte pObjectNumber ) {
