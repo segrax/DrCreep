@@ -265,9 +265,6 @@ protected:
 
 	word		 mFrankiePtr;												// Frankenstein
 	char		 mFrankieCount;
-	
-	byte		 byte_31EF, mObjectNumber, byte_31F1, byte_31F2;
-	byte		 byte_31F3, byte_31F4;
 
 	word		 mRoomLightningPtr;											// Lightning
 	

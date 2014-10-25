@@ -1706,6 +1706,7 @@ s2F51:;
 
 // 311E
 void cCreep::Sprite_Object_Collision_Check( byte pSpriteNumber ) {
+	byte byte_31F1, byte_31F2, byte_31F3, byte_31F4, byte_31EF;
 
 	byte_31F1 = mRoomSprites[pSpriteNumber].mX;
 	byte_31F2 = byte_31F1 + mRoomSprites[pSpriteNumber].mCollisionWidth;
