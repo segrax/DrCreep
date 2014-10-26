@@ -1830,32 +1830,27 @@ void cCreep::Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 	if( mRoomSprites[pSpriteNumber].state & SPR_ACTION_DIEING )
 		return;
 
-	mStartSpriteFlash2 = 1;
-	mMemory[ 0x311C ] = pSpriteNumber2;
+	bool StartSpriteFlash = true;
 
 	switch( mRoomSprites[pSpriteNumber].mSpriteType ) {
 
 		case SPRITE_TYPE_LASER:
 			break;
 
-		case SPRITE_TYPE_PLAYER:			//  Hit Player
-			obj_Player_Sprite_Collision( pSpriteNumber, pSpriteNumber2 );
-			break;
-
 		case SPRITE_TYPE_LIGHTNING:
-			mStartSpriteFlash2 = 0;
+		case SPRITE_TYPE_FORCEFIELD:
+			return;
+
+		case SPRITE_TYPE_PLAYER:			//  Hit Player
+			StartSpriteFlash = obj_Player_Sprite_Collision( pSpriteNumber, pSpriteNumber2 );
 			break;
 
-		case SPRITE_TYPE_FORCEFIELD:
-			mStartSpriteFlash2 = 0;
-			return;
-		
 		case SPRITE_TYPE_MUMMY:				// Hit Mummy
-			obj_Mummy_Sprite_Collision( pSpriteNumber, pSpriteNumber2 );
+			StartSpriteFlash = obj_Mummy_Sprite_Collision( pSpriteNumber, pSpriteNumber2 );
 			break;
 
 		case SPRITE_TYPE_FRANKIE:			//  Hit Frankie
-			obj_Frankie_Sprite_Collision( pSpriteNumber, pSpriteNumber2 );
+			StartSpriteFlash = obj_Frankie_Sprite_Collision( pSpriteNumber, pSpriteNumber2 );
 			break;
 
 		default:
@@ -1865,7 +1860,7 @@ void cCreep::Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 	}
 
 	// 3104
-	if( mStartSpriteFlash2 != 1 )
+	if( StartSpriteFlash == false )
 		return;
 
 	mRoomSprites[pSpriteNumber].state |= SPR_ACTION_FLASH;
@@ -2633,7 +2628,7 @@ bool cCreep::obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 }
 
 // 3DDE: Franky Hit 
-void cCreep::obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
+bool cCreep::obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 	if( mRoomSprites[pSpriteNumber].Sprite_field_1E & FRANKIE_AWAKE ) {
 		byte A = mRoomSprites[pSpriteNumber2].mSpriteType;
 
@@ -2645,7 +2640,7 @@ void cCreep::obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumbe
 			
 				word_40 = mFrankiePtr + mRoomSprites[pSpriteNumber].Sprite_field_1F;
 				mMemory[ word_40 ] = ((FRANKIE_AWAKE ^ 0xFF) & mMemory[ word_40 ]) | FRANKIE_DEATH;
-				return;
+				return true;
 
 			} else {
 				// 3E18
@@ -2654,23 +2649,19 @@ void cCreep::obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumbe
 					// 3E23
 					A = mRoomSprites[pSpriteNumber2].spriteImageID;
 					if( A < 0x8A || A >= 0x8F ) {
-						mStartSpriteFlash2 = 0;
-						return;
+						return false;
 					}
 					// 3E2E
 					if( mRoomSprites[pSpriteNumber].mY == mRoomSprites[pSpriteNumber2].mY ) {
-						mStartSpriteFlash2 = 0;
-						return;
+						return false;
 					}
 					if( mRoomSprites[pSpriteNumber].mY < mRoomSprites[pSpriteNumber2].mY ) {
 						mRoomSprites[pSpriteNumber].playerNumber &= 0xEF;
-						mStartSpriteFlash2 = 0;
-						return;
+						return false;
 					}
 					// 3E43
 					mRoomSprites[pSpriteNumber].playerNumber &= 0xFE;
-					mStartSpriteFlash2 = 0;
-					return;
+					return false;
 				}
 				// 3E4E
 				byte A =  mRoomSprites[pSpriteNumber].spriteImageID;
@@ -2678,13 +2669,11 @@ void cCreep::obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumbe
 
 				// 3E51
 				if( A < 0x84 || A >= 0x8A || B < 0x84 || B >= 0x8A ) {
-					mStartSpriteFlash2 = 0;
-					return;
+					return false;
 				}
 				if( mRoomSprites[pSpriteNumber].mX < mRoomSprites[pSpriteNumber2].mX ) {
 					mRoomSprites[pSpriteNumber].playerNumber &= 0xFB;
-					mStartSpriteFlash2 = 0;
-					return;
+					return false;
 				}
 				// 3E77
 				mRoomSprites[pSpriteNumber].playerNumber &= 0xBF;
@@ -2693,8 +2682,7 @@ void cCreep::obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumbe
 	}
 
 	// 3E4B
-	mStartSpriteFlash2 = 0;
-	return;
+	return false;
 }			
 
 // 3E87: 
@@ -3347,46 +3335,39 @@ bool cCreep::obj_Player_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 }
 
 // 3534: Hit Player
-void cCreep::obj_Player_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
+bool cCreep::obj_Player_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 	byte A = mRoomSprites[pSpriteNumber2].mSpriteType;
 
-	if( A == 2 ) {
-		mStartSpriteFlash2 = 0;
-		return;
-	}
+	if( A == 2 )
+		return false;
 
 	if( A != 0 ) {
 		// 358C
 		if( mMemory[ 0x780D + mRoomSprites[pSpriteNumber].playerNumber ] != 0 ) {
-			mStartSpriteFlash2 = 0;
-			return;
+			return false;
 		}
 
 		mMemory[ 0x780D + mRoomSprites[pSpriteNumber].playerNumber ] = 2;
-		return;
+		return true;
 	}
 	// 353F
 
 	A = mRoomSprites[pSpriteNumber2].spriteImageID;
 
 	if( A == 0x2E || A == 0x2F || A == 0x30 || A == 0x31 || A == 0x26 ) {
-		mStartSpriteFlash2 = 0;
-		return;
+		return false;
 	} 
 	
 	if( mRoomSprites[pSpriteNumber2].mY == mRoomSprites[pSpriteNumber].mY ) {
-		mStartSpriteFlash2 = 0;
-		return;
+		return false;
 	}
 	if( mRoomSprites[pSpriteNumber2].mY >= mRoomSprites[pSpriteNumber].mY ) {
 		mRoomSprites[pSpriteNumber].Sprite_field_18 = 0xEF;
-		mStartSpriteFlash2 = 0;
-		return;
+		return false;
 	}
 
 	mRoomSprites[pSpriteNumber].Sprite_field_18 = 0xFE;
-	mStartSpriteFlash2 = 0;
-	return;
+	return false;
 }
 
 // 359E
@@ -6463,17 +6444,17 @@ bool cCreep::obj_Mummy_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 }
 
 // 3940: 
-void cCreep::obj_Mummy_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
+bool cCreep::obj_Mummy_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 
 	if( mRoomSprites[pSpriteNumber2].mSpriteType == SPRITE_TYPE_PLAYER 
 	 || mRoomSprites[pSpriteNumber2].mSpriteType == SPRITE_TYPE_FRANKIE ) {
-		mStartSpriteFlash2 = 0;
-		return;
+		return false;
 	}
 
 	word_40 = mRoomMummyPtr + mRoomSprites[pSpriteNumber].mButtonState;
 
 	mMemory[ word_40 ] = 3;
+	return true;
 }
 
 // 3A60:  

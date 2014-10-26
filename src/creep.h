@@ -252,8 +252,6 @@ protected:
 	byte		 mEngine_Ticks;
 	char		 mPlayingSound;					
 
-	byte		 mStartSpriteFlash2;
-
 	byte		 mPlayerExecutingSpriteNumber, mCurrentPlayer;
 
 	word		 mRoomDoorPtr,mRoomKeyPtr,mRoomMummyPtr,mRoomRayGunPtr;		// Room Level Data Pointers
@@ -465,7 +463,7 @@ public:
 		void	 obj_Frankie_Sprite_Create( );
 		bool	 obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Frankie_Prepare();
-		void	 obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
+		bool	 obj_Frankie_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
 		void	 obj_Frankie_Execute( byte pSpriteNumber );
 
 		void	 obj_Image_Draw();
@@ -488,11 +486,11 @@ public:
 		void	 obj_Mummy_Execute( byte pObjectNumber );
 		void	 obj_Mummy_Infront( byte pSpriteNumber, byte pObjectNumber );
 		void	 obj_Mummy_Tomb_Execute( byte pObjectNumber );
-		void	 obj_Mummy_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
+		bool	 obj_Mummy_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
 
 		void	 obj_Player_Add( );
 		bool	 obj_Player_Collision( byte pSpriteNumber, byte pObjectNumber );
-		void	 obj_Player_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
+		bool	 obj_Player_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 );
 		void	 obj_Player_Execute( byte pObjectNumber );
 		void	 obj_Player_Color_Set( byte pSpriteNumber );
 		
