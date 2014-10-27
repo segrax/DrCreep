@@ -709,7 +709,7 @@ void cCreep::roomLoad() {
 	roomPtrSet( A );
 	
 	// Room Color
-	graphicRoomColorsSet( mMemory[mRoomPtr] & 0xF );
+	roomSetColours( mMemory[mRoomPtr] & 0xF );
 
 	//14AC
 	// Ptr to start of room data
@@ -722,7 +722,7 @@ void cCreep::roomLoad() {
 	roomPrepare( );
 }
 
-void cCreep::graphicRoomColorsSet( byte pRoomColor ) {
+void cCreep::roomSetColours( byte pRoomColor ) {
 	// Set floor colours
 	// 1438
 	*memory( 0x6481 )= pRoomColor;
@@ -1633,7 +1633,7 @@ void cCreep::Sprite_Execute( ) {
 				} else {
 					// 2EF3
 s2EF3:
-					sprite_FlashOnOff( spriteNumber );
+					Sprite_FlashOnOff( spriteNumber );
 				}
 
 			} else {
@@ -1927,7 +1927,7 @@ void cCreep::Sprite_Collision_Check( byte pSpriteNumber ) {
 }
 
 //2F8A
-void cCreep::sprite_FlashOnOff( byte pSpriteNumber ) {
+void cCreep::Sprite_FlashOnOff( byte pSpriteNumber ) {
 	byte state = mRoomSprites[pSpriteNumber].state;
 	byte Y = 0;
 
@@ -1968,7 +1968,6 @@ s2FC4:;
 	Y = pSpriteNumber;
 
 	// Sprite multicolor mode
-	mSprite_Multicolor_Enable = (mMemory[ 0x2F82 + Y ] ^ 0xFF) & mSprite_Multicolor_Enable;
 	sprite->_rMultiColored = false;
 	
 	mRoomSprites[pSpriteNumber].state |= SPR_ACTION_DIEING;
@@ -2170,7 +2169,7 @@ s32DB:;
 	char a = A;
 	if( A != 0xFF )
 		if( A != mRoomSprites[pSpriteNumber].Sprite_field_19 ) {
-			obj_Trapdoor_Switch_Check( a );
+			obj_TrapDoor_Switch_Check( a );
 			A = a;
 		}
 
@@ -2411,7 +2410,7 @@ s3B6E:
 
 	if( (byte) A != 0xFF )
 		if( A != mRoomSprites[pSpriteNumber].Sprite_field_1A ) {
-			obj_Trapdoor_Switch_Check( A );
+			obj_TrapDoor_Switch_Check( A );
 		}
 
 	mRoomSprites[pSpriteNumber].Sprite_field_1A = A;
@@ -2836,23 +2835,19 @@ void cCreep::obj_Lightning_Sprite_Create( byte pObjectNumber  ) {
 
 // 36B3: Forcefield
 void cCreep::obj_Forcefield_Execute( byte pSpriteNumber ) {
-	byte A = mRoomSprites[pSpriteNumber].state;
-	byte Y;
 
-	if(A & SPR_ACTION_DESTROY ) {
-		A ^= SPR_ACTION_DESTROY;
+	if(mRoomSprites[pSpriteNumber].state & SPR_ACTION_DESTROY ) {
+		mRoomSprites[pSpriteNumber].state ^= SPR_ACTION_DESTROY;
 
-		A |= SPR_ACTION_FREE;
-		mRoomSprites[pSpriteNumber].state = A;
+		mRoomSprites[pSpriteNumber].state |= SPR_ACTION_FREE;
+		mRoomSprites[pSpriteNumber].state = mRoomSprites[pSpriteNumber].state;
 		return;
 	}
 
-	if(A & SPR_ACTION_CREATED ) 
-		mRoomSprites[pSpriteNumber].state = (A ^ SPR_ACTION_CREATED);
+	if(mRoomSprites[pSpriteNumber].state & SPR_ACTION_CREATED ) 
+		mRoomSprites[pSpriteNumber].state = (mRoomSprites[pSpriteNumber].state ^ SPR_ACTION_CREATED);
 
-	Y = mRoomSprites[pSpriteNumber].Sprite_field_1F;
-
-	if( mMemory[ 0x4750 + Y ] == 1 ) {
+	if( mMemory[ 0x4750 + mRoomSprites[pSpriteNumber].Sprite_field_1F ] == 1 ) {
 
 		if( mRoomSprites[pSpriteNumber].Sprite_field_1E != 1 ) {
 			mRoomSprites[pSpriteNumber].Sprite_field_1E = 1;
@@ -2862,13 +2857,13 @@ void cCreep::obj_Forcefield_Execute( byte pSpriteNumber ) {
 			mMemory[ word_3C + 0 ] = mMemory[ word_3C + 0 ] & 0xFB;
 			mMemory[ word_3C + 4 ] = mMemory[ word_3C + 4 ] & 0xBF;
 
-			A = 0x35;
+			mRoomSprites[pSpriteNumber].spriteImageID = 0x35;
 		} else {
 			// 3709
 			if( mRoomSprites[pSpriteNumber].spriteImageID == 0x35 )
-				A = 0x3D;
+				mRoomSprites[pSpriteNumber].spriteImageID = 0x3D;
 			else
-				A = 0x35;
+				mRoomSprites[pSpriteNumber].spriteImageID = 0x35;
 		}
 
 	} else {
@@ -2882,12 +2877,10 @@ void cCreep::obj_Forcefield_Execute( byte pSpriteNumber ) {
 		word_3C -= 2;
 		mMemory[ word_3C + 0 ] |= 4;
 		mMemory[ word_3C + 4 ] |= 0x40;
-		A = 0x41;
+		mRoomSprites[pSpriteNumber].spriteImageID = 0x41;
 	}
 
 	// 3746
-	mRoomSprites[pSpriteNumber].spriteImageID = A;
-
 	// Draw the forcefield
 	hw_SpritePrepare( pSpriteNumber );
 }
@@ -4763,38 +4756,37 @@ byte cCreep::seedGet() {
 
 // 5D26: Prepare sprites
 void cCreep::hw_SpritePrepare( byte pSpriteNumber ) {
-	byte byte_5E8C, byte_5E8D;
+	byte tmpHeight, tmpWidth;
 	byte A;
 
 	word word_38 = mRoomSprites[pSpriteNumber].spriteImageID;
 	word_38 <<= 1;
-
 	word_38 += 0x603B;
 	
+	// read sprite pointer
 	word_30 = readLEWord( &mMemory[ word_38 ] );
 	
 	mRoomSprites[pSpriteNumber].spriteFlags = mMemory[ word_30 + 2 ];
 	
-	byte_5E8D = mMemory[ word_30 ];
-	mRoomSprites[pSpriteNumber].mCollisionWidth = byte_5E8D << 2;
+	tmpWidth = mMemory[ word_30 ];
+	mRoomSprites[pSpriteNumber].mCollisionWidth = tmpWidth << 2;
 	mRoomSprites[pSpriteNumber].mCollisionHeight = mMemory[ word_30 + 1 ];
 	
-	byte Y = pSpriteNumber;
 	// 5D72
 	
-	word_32 = mMemory[ 0x26 + Y ] ^ 8;
+	word_32 = mMemory[ 0x26 + pSpriteNumber ] ^ 8;
 	word_32 <<= 6;
 	word_32 += 0xC000;
 
 	word_30 += 0x03;
-	byte_5E8C = 0;
+	tmpHeight = 0;
 	
 	// 5DB2
 	for(;;) {
 
-		for(Y = 0; Y < 3; ++Y ) {
+		for(byte Y = 0; Y < 3; ++Y ) {
 			
-			if( Y < byte_5E8D )
+			if( Y < tmpWidth )
 				A = mMemory[ word_30 + Y ];
 			else
 				A = 0;
@@ -4802,12 +4794,12 @@ void cCreep::hw_SpritePrepare( byte pSpriteNumber ) {
 			mMemory[ word_32 + Y ] = A;
 		}
 
-		++byte_5E8C;
-		if( byte_5E8C == 0x15 )
+		++tmpHeight;
+		if( tmpHeight == 0x15 )
 			break;
 
-		if( byte_5E8C < mRoomSprites[pSpriteNumber].mCollisionHeight ) 
-			word_30 += byte_5E8D;
+		if( tmpHeight < mRoomSprites[pSpriteNumber].mCollisionHeight ) 
+			word_30 += tmpWidth;
 		else 
 			word_30 = 0x5E89;
 		
@@ -4816,67 +4808,46 @@ void cCreep::hw_SpritePrepare( byte pSpriteNumber ) {
 	}
 
 	// 5DFB
-	Y = pSpriteNumber;
-	
 	cSprite *sprite = mScreen->spriteGet(pSpriteNumber);
 
-	word dataSrc = mMemory[ 0x26 + Y ] ^ 8;
+	word dataSrc = mMemory[ 0x26 + pSpriteNumber ] ^ 8;
 	dataSrc <<= 6;
 	dataSrc += 0xC000;
 
-	mMemory[ 0x26 + Y ] = mMemory[ 0x26 + Y ] ^ 8;
+	mMemory[ 0x26 + pSpriteNumber ] = mMemory[ 0x26 + pSpriteNumber ] ^ 8;
 
 	// Sprite Color
 	sprite->_color = mRoomSprites[pSpriteNumber].spriteFlags & 0x0F;
 
 	if( !(mRoomSprites[pSpriteNumber].spriteFlags & SPRITE_DOUBLEWIDTH )) {
-		A = (mMemory[ 0x2F82 + Y ] ^ 0xFF) & mSprite_X_Expansion;
 		sprite->_rDoubleWidth = false;
 	} else {
-		A = (mSprite_X_Expansion | mMemory[ 0x2F82 + Y ]);
 		mRoomSprites[pSpriteNumber].mCollisionWidth <<= 1;
 		sprite->_rDoubleWidth = true;
 	}
 
-	// Sprite X Expansion
-	mSprite_X_Expansion = A;
-	
 	// 5E2D
 	if( !(mRoomSprites[pSpriteNumber].spriteFlags & SPRITE_DOUBLEHEIGHT )) {
-		A = (mMemory[ 0x2F82 + Y ] ^ 0xFF) & mSprite_Y_Expansion;
 		sprite->_rDoubleHeight = false;
 	} else {
-		A = (mSprite_Y_Expansion | mMemory[ 0x2F82 + Y ]);
 		mRoomSprites[pSpriteNumber].mCollisionHeight <<= 1;
 		sprite->_rDoubleHeight = true;
 	}
 
-	// Sprite Y Expansion
-	mSprite_Y_Expansion = A;
-
 	// 5E4C
 	if( !(mRoomSprites[pSpriteNumber].spriteFlags & SPRITE_PRIORITY )) {
-		A = mSprite_DataPriority | mMemory[ 0x2F82 + Y ];
 		sprite->_rPriority = true;
 	} else {
-		A = (mMemory[ 0x2F82 + Y ] ^ 0xFF) & mSprite_DataPriority; 
 		sprite->_rPriority = false;
 	}
 
-	// Sprite data priority
-	mSprite_DataPriority = A;
 
 	// 5E68
 	if(! (mRoomSprites[pSpriteNumber].spriteFlags & SPRITE_MULTICOLOR )) {
-		A = mSprite_Multicolor_Enable | mMemory[ 0x2F82 + Y ];
 		sprite->_rMultiColored = true;
 	} else {
-		A = (mMemory[ 0x2F82 + Y ] ^ 0xFF) & mSprite_Multicolor_Enable;
 		sprite->_rMultiColored = false;
 	}
-		
-	// MultiColor Enable
-	mSprite_Multicolor_Enable = A;
 
 	sprite->streamLoad( &mMemory[ dataSrc ] );
 	mScreen->spriteRedrawSet();
@@ -6558,7 +6529,7 @@ void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
 	char AA = mRoomSprites[pSpriteNumber].playerNumber;
 	if( AA != -1 ) {
 		if( AA != mRoomSprites[pSpriteNumber].Sprite_field_1B )
-			obj_Trapdoor_Switch_Check( AA );
+			obj_TrapDoor_Switch_Check( AA );
 	}
 	// 37D5
 	mRoomSprites[pSpriteNumber].Sprite_field_1B = AA;
@@ -7041,7 +7012,7 @@ void cCreep::obj_TrapDoor_PlaySound( byte pA ) {
 }
 
 // 526F: 
-void cCreep::obj_Trapdoor_Switch_Check( byte pA ) {
+void cCreep::obj_TrapDoor_Switch_Check( byte pA ) {
 	word SavedWord40, SavedWord3C;
 
 	SavedWord40 = word_40;

@@ -287,9 +287,6 @@ protected:
 
 	bool		 mMenuReturn, mNoInput;
 
-	// HW Sprite Registers
-	byte		 mSprite_Multicolor_Enable, mSprite_DataPriority, mSprite_Y_Expansion, mSprite_X_Expansion;
-
 public:
 	int			 mStartCastle;
 
@@ -361,7 +358,7 @@ public:
 
 		void	 stringSet( byte pPosX, byte pPosY, byte pColor, string pMessage );
 
-		void	 graphicRoomColorsSet( byte pRoomColor );
+		void	 roomSetColours( byte pRoomColor );
 
 		void	 hw_Update();							// 
 		void	 hw_IntSleep( byte pA );				// hardware interrupt wait loop
@@ -388,7 +385,7 @@ public:
 		
 		byte	 seedGet( );
 
-		void	 sprite_FlashOnOff( byte pSpriteNumber );// Flash a sprite on and off
+		void	 Sprite_FlashOnOff( byte pSpriteNumber );// Flash a sprite on and off
 		void	 stringDraw( );							// Draw a string
 
 		void	 textShow();
@@ -408,7 +405,7 @@ public:
 		void	 convertTimerToTime();
 		void	 convertTimeToNumber( byte pA, byte pY );
 
-		void	 obj_Trapdoor_Switch_Check( byte pA );
+		void	 obj_TrapDoor_Switch_Check( byte pA );
 		void	 roomAnim_Disable( byte pSpriteNumber );			// Redraw floor piece?
 
 		void	 positionCalculate( byte pSpriteNumber );
