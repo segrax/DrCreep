@@ -427,8 +427,8 @@ public:
 		bool	 Sprite_Object_Collision( byte pSpriteNumber, byte pObjectNumber );
 		bool	 Sprite_Object_Infront_Execute( byte pSpriteNumber, byte pObjectNumber );
 		
-		int		 sprite_CreepFindFree( );
-		sCreepSprite *sprite_CreepGetFree( );
+		int		 Sprite_CreepFindFree( );
+		sCreepSprite *Sprite_CreepGetFree( );
 
 		void	 Sprite_Object_Collision_Check( byte pSpriteNumber );
 

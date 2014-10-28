@@ -1560,27 +1560,24 @@ void cCreep::Sprite_Collision_Set() {
 	//gfxSpriteCollision = mMemory[ 0xD01E ];
 	//gfxBackgroundCollision = mMemory[ 0xD01F ];
 
-	
+
 	for( byte spriteNumber = 0; spriteNumber != MAX_SPRITES; ++spriteNumber) {
 		
 		byte A = mRoomSprites[spriteNumber].state;
-		if( A & SPR_UNUSED ) {
-			gfxSpriteCollision >>= 1;
-			gfxBackgroundCollision >>= 1;
-
-		} else {
+		if( !(A & SPR_UNUSED) ) {
 
 			A &= 0xF9;
 			if( gfxSpriteCollision & 0x01 )
 				A |= SPR_COLLIDE_SPRITE;
-			gfxSpriteCollision >>= 1;
 			
 			if( gfxBackgroundCollision & 0x01 )
 				A |= SPR_COLLIDE_BACKGROUND;
-			gfxBackgroundCollision >>= 1;
 
 			mRoomSprites[spriteNumber].state = A;
 		}
+
+		gfxSpriteCollision >>= 1;
+		gfxBackgroundCollision >>= 1;
 	}
 }
 
@@ -2689,7 +2686,7 @@ void cCreep::obj_Frankie_Sprite_Create() {
 	if( mMemory[ mObjectPtr ] & FRANKIE_DEATH )
 		return;
 
-	byte X = sprite_CreepFindFree();
+	byte X = Sprite_CreepFindFree();
 
 	mRoomSprites[X].mSpriteType = SPRITE_TYPE_FRANKIE;
 	mRoomSprites[X].Sprite_field_1F = mFrankieCount;
@@ -2823,7 +2820,7 @@ void cCreep::obj_Lightning_Execute( byte pSpriteNumber ) {
 
 // 368A
 void cCreep::obj_Lightning_Sprite_Create( byte pObjectNumber  ) {
-	sCreepSprite *sprite = sprite_CreepGetFree();
+	sCreepSprite *sprite = Sprite_CreepGetFree();
 
 	sprite->mSpriteType = SPRITE_TYPE_LIGHTNING;
 
@@ -3083,7 +3080,7 @@ void cCreep::mapArrowDraw( byte pPlayer ) {
 	mMemory[ 0x11D9 ] = mMemory[ word_40 + 2 ] & 3;
 	
 	// Object Number (saved as sprite number)
-	pPlayer = sprite_CreepFindFree( );
+	pPlayer = Sprite_CreepFindFree( );
 	mMemory[ 0x11D8 ] = pPlayer;
 
 	cSprite *sprite = mScreen->spriteGet( pPlayer );
@@ -3365,7 +3362,7 @@ bool cCreep::obj_Player_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber
 
 // 359E
 void cCreep::obj_Player_Add( ) {
-	byte spriteNumber = sprite_CreepFindFree();
+	byte spriteNumber = Sprite_CreepFindFree();
 	
 	byte Y = mCurrentPlayer;
 	mMemory[ 0x34D1 + Y ] = spriteNumber;		// Set player object number
@@ -6368,7 +6365,7 @@ void cCreep::obj_Conveyor_Prepare() {
 }
 
 void cCreep::obj_Forcefield_Create( byte pObjectNumber ) {
-	sCreepSprite *sprite = sprite_CreepGetFree();
+	sCreepSprite *sprite = Sprite_CreepGetFree();
 
 	sprite->mSpriteType = SPRITE_TYPE_FORCEFIELD;
 	sprite->mX = mMemory[ mObjectPtr + 2 ];
@@ -6454,7 +6451,7 @@ void cCreep::obj_RayGun_Laser_Sprite_Create( byte pObjectNumber ) {
 
 	sound_PlayEffect( 0 );
 
-	byte X = sprite_CreepFindFree( );
+	byte X = Sprite_CreepFindFree( );
 
 	mRoomSprites[X].mSpriteType = SPRITE_TYPE_LASER;
 	mRoomSprites[X].mX= mRoomAnim[pObjectNumber].mX;
@@ -6476,7 +6473,7 @@ void cCreep::obj_RayGun_Laser_Sprite_Create( byte pObjectNumber ) {
 
 // 396A: 
 void cCreep::obj_Mummy_Sprite_Create( byte pA, byte pObjectNumber ) {
-	byte sprite = sprite_CreepFindFree( );
+	byte sprite = Sprite_CreepFindFree( );
 	
 	mRoomSprites[ sprite ].mSpriteType = SPRITE_TYPE_MUMMY;
 	mRoomSprites[ sprite ].Sprite_field_1B = 0xFF;
@@ -6649,7 +6646,7 @@ void cCreep::obj_RayGun_Laser_Execute( byte pSpriteNumber ) {
 }
 
 // 3F14: Find a free object position, and clear it
-int cCreep::sprite_CreepFindFree( ) {
+int cCreep::Sprite_CreepFindFree( ) {
 
 	for( int number = 0 ; number < MAX_SPRITES; ++number ) {
 		sCreepSprite *sprite = &mRoomSprites[number];
@@ -6670,8 +6667,8 @@ int cCreep::sprite_CreepFindFree( ) {
 	return -1;
 }
 
-sCreepSprite *cCreep::sprite_CreepGetFree( ) {
-	int number = sprite_CreepFindFree();
+sCreepSprite *cCreep::Sprite_CreepGetFree( ) {
+	int number = Sprite_CreepFindFree();
 	sCreepSprite *sprite = 0;
 
 	if( number != -1 )
