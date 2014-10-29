@@ -1556,11 +1556,7 @@ void cCreep::Sprite_Collision_Set() {
 
 	}
 
-	// Original
-	//gfxSpriteCollision = mMemory[ 0xD01E ];
-	//gfxBackgroundCollision = mMemory[ 0xD01F ];
-
-
+	// loop each sprite, marking it with a collision, if one occured
 	for( byte spriteNumber = 0; spriteNumber != MAX_SPRITES; ++spriteNumber) {
 		
 		byte A = mRoomSprites[spriteNumber].state;
@@ -1600,6 +1596,7 @@ void cCreep::Sprite_Execute( ) {
 					if( mRoomSprites[spriteNumber].Sprite_field_5 != 0 ) {
 						if(A & SPR_COLLIDE_SPRITE) {
 							Sprite_Collision_Check(spriteNumber);
+
 							A = mRoomSprites[spriteNumber].state;
 							if((A & SPR_ACTION_FLASH))
 								goto s2EF3;
@@ -1689,7 +1686,6 @@ s2F51:;
 				}
 
 				// 2F69
-				// Enabled Sprites
 				mRoomSprites[spriteNumber].Sprite_field_5 = mRoomSprites[spriteNumber].Sprite_field_6;
 
                 mScreen->spriteRedrawSet();
@@ -1865,12 +1861,11 @@ void cCreep::Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 
 // 3026
 void cCreep::Sprite_Collision_Check( byte pSpriteNumber ) {
-	byte SpriteY_Bottom, byte_311B, SpriteX, SpriteX_Right, SpriteY;
+	byte SpriteY_Bottom, SpriteX, SpriteX_Right, SpriteY;
 
-	byte A = mObjectCollisionData[mRoomSprites[pSpriteNumber].mSpriteType].mHitData;
+	byte HitData = mObjectCollisionData[mRoomSprites[pSpriteNumber].mSpriteType].mHitData;
 
-	if(!(A & 0x80)) {
-		byte_311B = A;
+	if(!(HitData & 0x80)) {
 		SpriteX = mRoomSprites[pSpriteNumber].mX;
 		SpriteX_Right = SpriteX + mRoomSprites[pSpriteNumber].mCollisionWidth;
 		if( (SpriteX + mRoomSprites[pSpriteNumber].mCollisionWidth) > 0x100 )
@@ -1887,15 +1882,13 @@ void cCreep::Sprite_Collision_Check( byte pSpriteNumber ) {
 			if( pSpriteNumber == SpriteNumber )
 				continue;
 
-			A = mRoomSprites[SpriteNumber].state;
-
-			if( !(A & SPR_UNUSED) ) {
+			if( !(mRoomSprites[SpriteNumber].state & SPR_UNUSED) ) {
 					
-				if( (A & SPR_COLLIDE_SPRITE) ) {
-					A = mMemory[ 0x895 + (mRoomSprites[SpriteNumber].mSpriteType << 3) ];
+				if( (mRoomSprites[SpriteNumber].state & SPR_COLLIDE_SPRITE) ) {
+					byte A = mMemory[ 0x895 + (mRoomSprites[SpriteNumber].mSpriteType << 3) ];
 
 					if( !(A & 0x80 )) {
-						if(! (A & byte_311B )) {
+						if(! (A & HitData )) {
 
 							// 308E
 							if( SpriteX_Right >= mRoomSprites[SpriteNumber].mX ) {
@@ -1926,7 +1919,6 @@ void cCreep::Sprite_Collision_Check( byte pSpriteNumber ) {
 //2F8A
 void cCreep::Sprite_FlashOnOff( byte pSpriteNumber ) {
 	byte state = mRoomSprites[pSpriteNumber].state;
-	byte Y = 0;
 
 	mScreen->spriteRedrawSet();
 	cSprite *sprite = mScreen->spriteGet( pSpriteNumber );
@@ -1962,7 +1954,6 @@ void cCreep::Sprite_FlashOnOff( byte pSpriteNumber ) {
 
 s2FC4:;
 	mRoomSprites[pSpriteNumber].Sprite_field_8 = 8;
-	Y = pSpriteNumber;
 
 	// Sprite multicolor mode
 	sprite->_rMultiColored = false;
