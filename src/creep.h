@@ -257,7 +257,7 @@ protected:
 	word		 mRoomDoorPtr,mRoomKeyPtr,mRoomMummyPtr,mRoomRayGunPtr;		// Room Level Data Pointers
 
 	byte		 mRaygunCount;
-	byte		 mRaygunMoveDirection;
+	byte		 mRaygunTmpVar;
 
 	word		 mRoomTrapDoorPtr;											// Trap Door
 

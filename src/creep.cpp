@@ -1939,10 +1939,8 @@ void cCreep::Sprite_FlashOnOff( byte pSpriteNumber ) {
 
 		mRoomSprites[pSpriteNumber].state = state;
 
-		byte A = mObjectCollisionData[mRoomSprites[pSpriteNumber].mSpriteType].mFlashData;
-
 		// 
-		if(!(A & SPRITE_FLASH_UNK))
+		if(!( mObjectCollisionData[mRoomSprites[pSpriteNumber].mSpriteType].mFlashData & SPRITE_FLASH_UNK))
 			state = mRoomSprites[pSpriteNumber].state;
 		else
 			goto s2FC4;
@@ -5255,7 +5253,7 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 		// 4B46
 		if(!(mMemory[ word_40 ] & RAYGUN_PLAYER_CONTROLLING) ) {
 			mRaygunCount = 0xFF;
-			mRaygunMoveDirection = 0x00;
+			mRaygunTmpVar = 0x00;
 			
 			for(byte byte_4D5F = 0x01; ((char) byte_4D5F) >= 0; --byte_4D5F) {
 
@@ -5271,9 +5269,9 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 						byte A = mRoomSprites[Y].mY;
 
 						if( A >= 0xC8 || A < mRoomAnim[pObjectNumber].mY ) {
-							mRaygunMoveDirection = RAYGUN_MOVE_UP;	// Will Move Up
+							mRaygunTmpVar = RAYGUN_MOVE_UP;	// Will Move Up
 						} else {
-							mRaygunMoveDirection = RAYGUN_MOVE_DOWN;	// Will Move Down
+							mRaygunTmpVar = RAYGUN_MOVE_DOWN;	// Will Move Down
 						}
 					}
 				}
@@ -5285,7 +5283,7 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 			A ^= RAYGUN_MOVE_DOWN;
 
 			A &= mMemory[ word_40 ];
-			A |= mRaygunMoveDirection;
+			A |= mRaygunTmpVar;
 			mMemory[ word_40 ] = A;
 		}
 		//4BB2
@@ -5330,9 +5328,9 @@ s4BD9:;
 	else
 		A = 0;
 
-	mRaygunMoveDirection = A;
+	mRaygunTmpVar = A;
 	Y = mMemory[ word_40 + 4 ] & 3;
-	Y |= mRaygunMoveDirection;
+	Y |= mRaygunTmpVar;
 
 	// Draw the ray gun
 	Draw_RoomAnimObject( mMemory[ 0x4D68 + Y ], gfxPosX, gfxPosY, 0, pObjectNumber );
@@ -5410,7 +5408,6 @@ void cCreep::obj_RayGun_Prepare() {
 
 	do {
 		// 4C7E
-
 		mMemory[ mObjectPtr ] &=( 0xFF ^ RAYGUN_DONT_FIRE);
 		byte gfxPosX = mMemory[ mObjectPtr + 1 ];
 		byte gfxPosY = mMemory[ mObjectPtr + 2 ];
@@ -5422,7 +5419,7 @@ void cCreep::obj_RayGun_Prepare() {
 			gfxCurrentID = 0x60;
 
 		// Length
-		for( mRaygunMoveDirection = mMemory[ mObjectPtr + 3 ]; mRaygunMoveDirection; --mRaygunMoveDirection ) {
+		for( mRaygunTmpVar = mMemory[ mObjectPtr + 3 ]; mRaygunTmpVar; --mRaygunTmpVar ) {
 			
 			screenDraw( 0, gfxCurrentID, gfxPosX, gfxPosY, 0 );
 			gfxPosY += 0x08;
