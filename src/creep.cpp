@@ -2092,14 +2092,6 @@ void cCreep::obj_Player_Execute( byte pSpriteNumber ) {
 		if( Y == 2 )
 			ftime(&mPlayer2Time);
 
-		// Get Ptr to CIA Timer and store area
-		word_32 = readLEWord( &mMemory[ 0x34E7 + Y ] );
-		word_30 = readLEWord( &mMemory[ 0x34EB + Y ] );
-
-		// Restore CIA Timer
-		//for( Y = 3; Y >= 0; --Y ) 
-		//	mMemory[ word_32 + Y ] = mMemory[ word_30 + Y ];
-		
 		Y = mRoomSprites[ pSpriteNumber ].playerNumber;
 		A = mMemory[ 0x780D + Y ];
 		if( A != 6 ) {
@@ -6921,8 +6913,6 @@ void cCreep::obj_Teleport_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 		A = mMemory[ word_40 + 2 ] + 2;
 
 		obj_Teleport_SetColour( A, pObjectNumber );
-		
-		return;
 	} else {
 		// 4F1A
 		// Use Teleport
@@ -6993,12 +6983,12 @@ void cCreep::obj_TrapDoor_PlaySound( byte pA ) {
 	
 	mMemory[ 0x759F ] = pA - 0x48;
 	sound_PlayEffect(1);
-
 }
 
 // 526F: 
 void cCreep::obj_TrapDoor_Switch_Check( byte pA ) {
 	word SavedWord40, SavedWord3C;
+	byte X;
 
 	SavedWord40 = word_40;
 	SavedWord3C = word_3C;
@@ -7006,7 +6996,6 @@ void cCreep::obj_TrapDoor_Switch_Check( byte pA ) {
 	word_40 = mRoomTrapDoorPtr + pA;
 	// 529B
 	mMemory[ word_40 ] ^= TRAPDOOR_OPEN;
-	byte X;
 
 	for( X = 0 ;;++X) {
 		if( mRoomAnim[X].mObjectType != OBJECT_TYPE_TRAPDOOR_PANEL )
