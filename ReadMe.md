@@ -14,7 +14,7 @@ About:
 Enjoy,
   
 Robert Crossfield
-
+robcrossfield @gmail.com
 
 History:
 --------
@@ -128,16 +128,16 @@ Game Controls:
    Player 1:
    ---------
 
-     Right Ctrl = Button 
-     Spacebar   = Button  (MACOSX Version)
-     Arrows = Left/Right/Up/Down   (NOT the numpad)
+	Right Ctrl = Button 
+	Spacebar   = Button  (MACOSX Version)
+	Arrows = Left/Right/Up/Down   (NOT the numpad)
 
 
    Player 2:
    ---------
  
-     Numpad 0 = Button
-     Numpad Arrows = Left/Right/Up/Down
+	Numpad 0 = Button
+	Numpad Arrows = Left/Right/Up/Down
 
 
 
