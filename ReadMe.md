@@ -3,8 +3,8 @@ The Castles of Dr. Creep
 
 [![Build Status](https://travis-ci.org/segrax/DrCreep.svg?branch=master)](https://travis-ci.org/segrax/DrCreep)
 
-About:
-------
+####About
+
  The Castles of Dr. Creep is an open source reimplementation of the 
   original 1984 Commodore 64 game by Ed Hobbs.
  Now with a built in castle Builder, allowing the player to create their
@@ -13,11 +13,9 @@ About:
 
 Enjoy,
   
-Robert Crossfield
-robcrossfield @gmail.com
+Robert Crossfield <robcrossfield@gmail.com>
 
-History:
---------
+####History
  
 " As a programmer, I appreciate the difficulty of reverse-engineering the 6502 object code to C++.  
  When I wrote the game, the C-64 assembler was very primitive (it couldn’t handle programs larger than 16 kb), 
@@ -40,102 +38,86 @@ History:
 - Ed Hobbs 2012
 
 
-Required To Play:
------------------ 
+####Required To Play
  Commodore 64 Disk Image (D64) of "The Castles of Dr. Creep", 
   which should be placed inside the game 'data' folder. 
  
  This file may have any name, but the 'D64' extension must remain.
 
 
-Whats Added:
-------------
+####Whats Added
  *Castle Builder: Editing of existing castles, or creation of new ones
 
 
-Whats Broken:
--------------
+####Whats Broken
  *sound is not perfect
  
 
 
-Save Game Support:
-------------------
+####Save Game Support
+
  D64s will be created in the data\save folder, and all save games will be stored in these files.
  These files are compatible with the original Commodore64 game, and in return the original save games are supported.
 
 
-Wii Version:
-------------
+####Wii Version
 
- Required:
- ---------
+#####Required
  
  SD Card with folder '/apps/drcreep/data' containing your Dr.Creep D64 and CHAR.ROM
  
 
 
-  Controls:
-  ---------
-  Hold WiiMote on its side,
-  
-  In-Game:
+####Controls
+    Hold WiiMote on its side,
+    
+#####In-Game
     DPAD 	= Movement
     Button 2 	= Fire Button
     Button A 	= Self Kill
 
-  Intro:	
+#####Intro	
     Button Plus = Option Menu
     Button 1 	= HighScores
+    
 
+####Game Controls
 
-
-
-####Game Controls:
-
-#####General:
- 
+#####General
     F4  = Start Builder using current castle
     F5  = Start Builder with empty castle
     F6  = Enable Player 1 Joystick 
     F7  = Enable Player 2 Joystick
     F10 = Fullscreen Toggle
 
-#####Intro:
-  
+#####Intro
     F1 = Options
     F3 = Display Highscores
  
 
-#####In Map Screen:
-  
+#####In Map Screen
     F1 = Save Game
     F2 = Load Game
 
 
-#####In Game:
-  
+#####In Game
     Escape = Self Kill
     F1  = Restore Key (Pause/Resume)
 
-
-######Player 1:
-
+######Player 1
     Right Ctrl = Button
     Spacebar   = Button  (MACOSX Version)
     Arrows = Left/Right/Up/Down   (NOT the numpad)
 
-######Player 2:
-
+######Player 2
     Numpad 0 = Button
     Numpad Arrows = Left/Right/Up/Down
 
 
 
-####Builder Controls:
+####Builder Controls
 
-#####General:
-
+#####General
     Escape = Quit Builder
 
     F2  = Save Castle to empty 'Castle Disk'
@@ -143,8 +125,7 @@ Wii Version:
 
     F4  = Return from Builder, in test castle mode
 
-#####Objects:
- 
+#####Objects
     q = Cursor Create Object (Rotate Up)
     a = Cursor Create Object (Rotate Down)
 
@@ -170,8 +151,7 @@ Wii Version:
     Ctrl = Place Cursor Object, Select object to link to
 
 
-#####Map Screen:
-
+#####Map Screen
     - = Previous Room
     = = Next Room
 
@@ -193,21 +173,17 @@ Wii Version:
     Cursor Keys = Move Room 
 
 
-####Playing:
+####Playing
 
-#####From the Intro,
-
+#####From the Intro
     To start a 1 player game, press the Player1 Button
     To start a 2 player game, press the Player2 Button
 
 
-#####Command Line Parameters:
-
+#####Command Line Parameters
     -u    : Unlimited Lives
     -c    : Display Console
     -l xx : Start Castle number 'xx'
-
-
 
 
 Thanks:
