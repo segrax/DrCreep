@@ -14,7 +14,7 @@ The Castles of Dr. Creep
 Enjoy,
   
 Robert Crossfield <robcrossfield@gmail.com>
-
+<br>
 ####History
  
 " As a programmer, I appreciate the difficulty of reverse-engineering the 6502 object code to C++.  
@@ -36,8 +36,7 @@ Robert Crossfield <robcrossfield@gmail.com>
  I drew the levels out on custom graph paper, and then used these drawings to hand-code the level data." 
  
 - Ed Hobbs 2012
-
-
+<br>
 ####Required To Play
  Commodore 64 Disk Image (D64) of "The Castles of Dr. Creep", 
   which should be placed inside the game 'data' folder. 
