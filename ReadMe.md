@@ -75,10 +75,10 @@ Wii Version:
  
 
 
- Controls:
- ---------
- Hold WiiMote on its side,
-
+  Controls:
+  ---------
+  Hold WiiMote on its side,
+  
   In-Game:
     DPAD 	= Movement
     Button 2 	= Fire Button
@@ -91,140 +91,121 @@ Wii Version:
 
 
 
-Game Controls:
---------------
+####Game Controls:
 
- General:
- --------
+#####General:
+ 
+    F4  = Start Builder using current castle
+    F5  = Start Builder with empty castle
+    F6  = Enable Player 1 Joystick 
+    F7  = Enable Player 2 Joystick
+    F10 = Fullscreen Toggle
 
-  F4  = Start Builder using current castle
-  F5  = Start Builder with empty castle
-  F6  = Enable Player 1 Joystick 
-  F7  = Enable Player 2 Joystick
-  F10 = Fullscreen Toggle
-
- Intro:
- ------
-
-  F1 = Options
-  F3 = Display Highscores
+#####Intro:
+  
+    F1 = Options
+    F3 = Display Highscores
  
 
- In Map Screen:
- --------------
-
-  F1 = Save Game
-  F2 = Load Game
-
-
- In Game:
- --------
-
-  Escape = Self Kill
-  F1  = Restore Key (Pause/Resume)
+#####In Map Screen:
+  
+    F1 = Save Game
+    F2 = Load Game
 
 
+#####In Game:
+  
+    Escape = Self Kill
+    F1  = Restore Key (Pause/Resume)
 
-  Player 1:
-  ---------
 
-    Right Ctrl = Button 
+######Player 1:
+
+    Right Ctrl = Button
     Spacebar   = Button  (MACOSX Version)
     Arrows = Left/Right/Up/Down   (NOT the numpad)
 
+######Player 2:
 
-  Player 2:
-  ---------
- 
     Numpad 0 = Button
     Numpad Arrows = Left/Right/Up/Down
 
 
 
-Builder Controls:
------------------
+####Builder Controls:
 
- General:
- --------
-  Escape = Quit Builder
+#####General:
 
-  F2  = Save Castle to empty 'Castle Disk'
-  F3  = Edit Map Screen
+    Escape = Quit Builder
 
-  F4  = Return from Builder, in test castle mode
+    F2  = Save Castle to empty 'Castle Disk'
+    F3  = Edit Map Screen
 
- Objects:
- --------
+    F4  = Return from Builder, in test castle mode
+
+#####Objects:
  
-  q = Cursor Create Object (Rotate Up)
-  a = Cursor Create Object (Rotate Down)
+    q = Cursor Create Object (Rotate Up)
+    a = Cursor Create Object (Rotate Down)
 
-  [ = Rotate up through Placed Objects
-  ] = Rotate down through placed objects
+    [ = Rotate up through Placed Objects
+    ] = Rotate down through placed objects
 
-  l = Link Object
+    l = Link Object
 
-  - = Previous Room
-  = = Next Room
+    - = Previous Room
+    = = Next Room
   
-  f = Switch to exit room
+    f = Switch to exit room
 
-  s = Change object state
+    s = Change object state
 
-  c = Change Key Color Down
-  v = Change Key COlor Up
+    c = Change Key Color Down
+    v = Change Key COlor Up
 
-  'Delete' = Delete selected 'placed' object
+    'Delete' = Delete selected 'placed' object
 
-  
-  Cursor Keys move the "red" square pointer
+    Cursor Keys move the "red" square pointer
 
-
-  Ctrl = Place Cursor Object, Select object to link to
+    Ctrl = Place Cursor Object, Select object to link to
 
 
- Map Screen:
- -----------
+#####Map Screen:
 
-  - = Previous Room
-  = = Next Room
+    - = Previous Room
+    = = Next Room
 
-  [ = Rotate up through doors in this room
-  ] = Rotate down through doors in this room
+    [ = Rotate up through doors in this room
+    ] = Rotate down through doors in this room
 
-  k = Increase Door X on map
-  l = Increase Door Y on map
-  d = Change Door Entry Direction
+    k = Increase Door X on map
+    = Increase Door Y on map
+    d = Change Door Entry Direction
 
-  ; = Decrease Room Width
-  ' = Increase Room width
+    ; = Decrease Room Width
+    ' = Increase Room width
 
-  . = Decrease Room Height
-  / = Increase Room Height
+    . = Decrease Room Height
+    / = Increase Room Height
 
+    c = Change room color
 
-  c = Change room color
-
-
-  Cursor Keys = Move Room 
-  
+    Cursor Keys = Move Room 
 
 
-Playing:
---------
+####Playing:
 
- From the Intro,
+#####From the Intro,
 
-  To start a 1 player game, press the Player1 Button
-  To start a 2 player game, press the Player2 Button
+    To start a 1 player game, press the Player1 Button
+    To start a 2 player game, press the Player2 Button
 
 
-Command Line Parameters:
-------------------------
+#####Command Line Parameters:
 
- -u    : Unlimited Lives
- -c    : Display Console
- -l xx : Start Castle number 'xx'
+    -u    : Unlimited Lives
+    -c    : Display Console
+    -l xx : Start Castle number 'xx'
 
 
 
