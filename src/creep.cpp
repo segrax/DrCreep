@@ -3309,10 +3309,10 @@ bool cCreep::obj_Player_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 bool cCreep::obj_Player_Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 	byte A = mRoomSprites[pSpriteNumber2].mSpriteType;
 
-	if( A == 2 )
+	if( A == SPRITE_TYPE_FORCEFIELD )
 		return false;
 
-	if( A != 0 ) {
+	if( A != SPRITE_TYPE_PLAYER ) {
 		// 358C
 		if( mMemory[ 0x780D + mRoomSprites[pSpriteNumber].playerNumber ] != 0 ) {
 			return false;
@@ -6144,8 +6144,8 @@ void cCreep::obj_Conveyor_Execute( byte pObjectNumber ) {
 	mMemory[ word_40 ] = A;
 	// 543F
 	if( A & CONVEYOR_TURNED_ON ) {
-		A = mEngine_Ticks & 1;
-		if( A )
+
+		if( mEngine_Ticks & 1 )
 			return;
 
 		byte gfxCurrentID = mRoomAnim[pObjectNumber].mGfxID;
@@ -7058,13 +7058,13 @@ void cCreep::obj_Conveyor_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 	
 	byte A = mRoomSprites[pSpriteNumber].mSpriteType;
 
-	if( !A ) {
+	if( A == SPRITE_TYPE_PLAYER ) {
 		// 54B7
 		if( mRoomSprites[pSpriteNumber].spriteImageID >= 6 )
 			return;
 
 	} else
-		if( A != 3 && A != 5 ) 
+		if( A != SPRITE_TYPE_MUMMY && A != SPRITE_TYPE_FRANKIE ) 
 			return;
 	
 	// 54BE
