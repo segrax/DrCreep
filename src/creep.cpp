@@ -6808,20 +6808,20 @@ void cCreep::obj_Door_Lock_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 }
 
 bool cCreep::obj_Key_NotFound( byte pObjectNumber, byte pSpriteNumber ) {
-	byte byte_5ED3;
+	byte KeyCount;
 	
 	if( mRoomSprites[pSpriteNumber].playerNumber != 0 ) {
-		byte_5ED3 = mMemory[ 0x7814 ];
+		KeyCount = mMemory[ 0x7814 ];
 		word_30 = 0x7835;
 	} else {
 		// 5EAA
-		byte_5ED3 = mMemory[ 0x7813 ];
+		KeyCount = mMemory[ 0x7813 ];
 		word_30 = 0x7815;
 	}
 
 	//5EB8
 	for( byte pY = 0;; ++pY ) {
-		if( pY == byte_5ED3 )
+		if( pY == KeyCount )
 			return true;
 
 		if( mMemory[ word_30 + pY ] == pObjectNumber )
