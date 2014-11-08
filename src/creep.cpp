@@ -5078,7 +5078,7 @@ void cCreep::obj_Door_Execute( byte pObjectNumber ) {
 	A -= mRoomObjects[pObjectNumber].Object_field_2;
 	mMemory[ 0x75B7 ] = A;
 
-	sound_PlayEffect( 3 );
+	sound_PlayEffect( SOUND_DOOR_OPEN );
 	A = mRoomObjects[pObjectNumber].Object_field_2;
 
 	if( A ) {
@@ -5786,7 +5786,7 @@ void cCreep::obj_Forcefield_Timer_Execute( byte pObjectNumber ) {
 	byte A = mMemory[ 0x4756 + mRoomObjects[pObjectNumber].Object_field_2 ];
 
 	mMemory[ 0x75AB ] = A;
-	sound_PlayEffect( 2 );
+	sound_PlayEffect( SOUND_FORCEFIELD_TIMER );
 
 	for( byte Y = 0; Y < 8; ++Y ) {
 		if( Y >= mRoomObjects[pObjectNumber].Object_field_2 )
@@ -6429,7 +6429,7 @@ void cCreep::obj_RayGun_Laser_Sprite_Create( byte pObjectNumber ) {
 	
 	mMemory[ 0x7591 + 2 ] = A;
 
-	sound_PlayEffect( 0 );
+	sound_PlayEffect( SOUND_LASER_FIRED );
 
 	byte X = Sprite_CreepFindFree( );
 
@@ -6726,7 +6726,7 @@ void cCreep::obj_Forcefield_Timer_InFront( byte pSpriteNumber, byte pObjectNumbe
 		return;
 
 	mMemory[ 0x75AB ] = 0x0C;
-	sound_PlayEffect( 0x02 );
+	sound_PlayEffect( SOUND_FORCEFIELD_TIMER );
 	
 	mRoomAnim[pObjectNumber].mFlags |= ITM_EXECUTE;
 	mRoomObjects[pObjectNumber].Object_field_1 = 0x1E;
@@ -6982,7 +6982,7 @@ void cCreep::obj_Teleport_SetColour( byte pColor, byte pObjectNumber ) {
 void cCreep::obj_TrapDoor_PlaySound( byte pA ) {
 	
 	mMemory[ 0x759F ] = pA - 0x48;
-	sound_PlayEffect(1);
+	sound_PlayEffect(SOUND_TRAPDOOR_SWITCHED);
 }
 
 // 526F: 

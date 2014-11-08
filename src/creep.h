@@ -134,6 +134,13 @@ enum {
 	MAP_ROOM_VISIBLE = 0x80
 };
 
+enum { 
+	SOUND_LASER_FIRED			= 0x00,
+	SOUND_TRAPDOOR_SWITCHED		= 0x01,
+	SOUND_FORCEFIELD_TIMER		= 0x02,
+	SOUND_DOOR_OPEN				= 0x03,
+};
+
 class sCreepSprite {
 public:
 	byte mSpriteType;				// 0
