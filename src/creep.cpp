@@ -2374,7 +2374,7 @@ s3B6E:
 				mMemory[ word_40 ] = A;
 				mRoomSprites[pSpriteNumber].mButtonState = 0x80;
 
-				sound_PlayEffect(0x07);
+				sound_PlayEffect( SOUND_FRANKIE );
 				break;
 			}
 		}
@@ -5364,7 +5364,7 @@ void cCreep::obj_Teleport_Execute( byte pObjectNumber ) {
 	A &= 0x3F;
 	
 	mMemory[ 0x75CD + 2 ] = A;
-	sound_PlayEffect( 0x04 );
+	sound_PlayEffect( SOUND_TELEPORT );
 	if( mEngine_Ticks & 3  )
 		A = 1;
 	else
@@ -5773,7 +5773,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pSpriteNumber, byte pObjectNumbe
 
 	Draw_RoomAnimObject( A, mRoomAnim[pObjectNumber].mX, mRoomAnim[pObjectNumber].mY, 0, pObjectNumber );
 
-	sound_PlayEffect(0x06);
+	sound_PlayEffect( SOUND_LIGHTNING_SWITCHED );
 }
 
 // 45E0: Forcefield Timer
@@ -6909,7 +6909,7 @@ void cCreep::obj_Teleport_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 		// 4EF7
 		mMemory[ 0x75DB ] = mMemory[ word_40 + 2 ] + 0x32;
 
-		sound_PlayEffect(5);
+		sound_PlayEffect( SOUND_TELEPORT_CHANGE );
 		A = mMemory[ word_40 + 2 ] + 2;
 
 		obj_Teleport_SetColour( A, pObjectNumber );
