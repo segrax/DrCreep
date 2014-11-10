@@ -1968,7 +1968,7 @@ s2FE9:;
 		--mRoomSprites[pSpriteNumber].Sprite_field_8;
 
 		mMemory[ 0x760C ] = mRoomSprites[pSpriteNumber].Sprite_field_8 << 3;
-		sound_PlayEffect(8);
+		sound_PlayEffect(SOUND_SPRITE_FLASH);
 		
 	} else {
 		// Flash Off
@@ -3272,7 +3272,7 @@ s10EB:;
 	} while( mJoyButtonState );
 		
 
-	sound_PlayEffect( 9 );
+	sound_PlayEffect( SOUND_MAP_CLOSE );
 	mMemory[ 0x11D0 ] = 0;
 	return false;
 }
@@ -6122,7 +6122,7 @@ void cCreep::obj_Conveyor_Execute( byte pObjectNumber ) {
 			byte gfxPosY = mMemory[ word_40 + 4 ];
 			screenDraw( 0, 0x82, gfxPosX, gfxPosY, 0 );
 
-			sound_PlayEffect(0xA);
+			sound_PlayEffect( SOUND_CONVEYOR_SWITCH );
 	}
 
 	// 541B
@@ -6524,7 +6524,7 @@ void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
 			mRoomSprites[pSpriteNumber].mY += mMemory[ 0x39FF + Y ];
 			
 			mMemory[ 0x7630 ] = (mRoomSprites[pSpriteNumber].Sprite_field_1F << 2) + 0x24;
-			sound_PlayEffect( 0x0B );
+			sound_PlayEffect( SOUND_MUMMY_RELEASE );
 			hw_SpritePrepare( pSpriteNumber );
 			return;
 		}
@@ -6754,7 +6754,7 @@ void cCreep::obj_Key_Infront( byte pSpriteNumber, byte pObjectNumber ) {
 	if( mRoomSprites[pSpriteNumber].mButtonState == 0 )
 		return;
 
-	sound_PlayEffect( 0x0C );
+	sound_PlayEffect( SOUND_KEY_PICKUP );
 	mRoomAnim[pObjectNumber].mFlags |= ITM_PICKED;
 
 	word_40 = mRoomKeyPtr + mRoomObjects[pObjectNumber].objNumber;
