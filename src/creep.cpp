@@ -5741,7 +5741,6 @@ void cCreep::obj_Lightning_Switch_InFront( byte pSpriteNumber, byte pObjectNumbe
 			break;
 
 		// 4553
-		byte byte_45DA = A;
 		word_32 = mRoomLightningPtr + A;
 		
 		mMemory[ word_32 ] ^= LIGHTNING_IS_ON;
@@ -5752,7 +5751,7 @@ void cCreep::obj_Lightning_Switch_InFront( byte pSpriteNumber, byte pObjectNumbe
 			if( mRoomAnim[Y].mObjectType != OBJECT_TYPE_LIGHTNING_MACHINE )
 				continue;
 
-			if( mRoomObjects[Y].objNumber == byte_45DA )
+			if( mRoomObjects[Y].objNumber == A )
 				break;
 		}
 
@@ -5848,7 +5847,7 @@ void cCreep::obj_Lightning_Prepare() {
 			
 			mRoomObjects[X].color = mMemory[ mObjectPtr + 3 ];
 
-			for( byte byte_44E6 = mMemory[ mObjectPtr + 3 ]; byte_44E6; --byte_44E6) {
+			for( byte Height = mMemory[ mObjectPtr + 3 ]; Height; --Height) {
 
 				screenDraw( 0, 0x32, gfxPosX, gfxPosY, 0 );
 				gfxPosY += 0x08;
