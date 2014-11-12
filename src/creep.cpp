@@ -5672,7 +5672,7 @@ void cCreep::obj_Door_Button_Prepare() {
 	byte gfxCurrentID, gfxPosX, gfxPosY;
 	byte X = 0;
 
-	for( byte byte_42AB = mMemory[ mObjectPtr++ ]; byte_42AB; --byte_42AB) {
+	for( byte ButtonCount = mMemory[ mObjectPtr++ ]; ButtonCount; --ButtonCount) {
 
 		object_Create( X );
 		mRoomAnim[X].mObjectType = OBJECT_TYPE_DOOR_BUTTON;
@@ -5686,12 +5686,12 @@ void cCreep::obj_Door_Button_Prepare() {
 
 		// Find the colour of the door this button connects to
 		for( unsigned char Y = 0; Y < MAX_OBJECTS; ++Y ) {
-			if( mRoomAnim[Y].mObjectType == OBJECT_TYPE_DOOR ) {
+			if( mRoomAnim[Y].mObjectType != OBJECT_TYPE_DOOR ) 
+				continue;
 
-				if( mRoomObjects[Y].objNumber == mRoomObjects[X].objNumber ) {
-					A = mRoomObjects[Y].color;
-					break;
-				}
+			if( mRoomObjects[Y].objNumber == mRoomObjects[X].objNumber ) {
+				A = mRoomObjects[Y].color;
+				break;
 			}	
 		}
 
