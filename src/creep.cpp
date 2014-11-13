@@ -893,7 +893,7 @@ bool cCreep::Intro() {
 			++mMenuScreenCount;
 			roomPtrSet( mMenuScreenCount );
 
-			if( ((*level( mRoomPtr )) & 0x40) )
+			if( ((mMemory[ mRoomPtr ]) & 0x40) )
 				mMenuScreenCount = 0;
 
 			roomLoad();
@@ -5513,8 +5513,8 @@ void cCreep::obj_Door_Lock_Prepare() {
 		for( signed char Y = 8; Y >= 0; --Y )
 			mMemory[ 0x6C53 + Y ] = A;
 
-		mRoomObjects[X].objNumber = *level( mObjectPtr );
-		mRoomObjects[X].Object_field_1 = *level( mObjectPtr + 2 );
+		mRoomObjects[X].objNumber = mMemory[ mObjectPtr ];
+		mRoomObjects[X].Object_field_1 = mMemory[ mObjectPtr + 2 ];
 		Draw_RoomAnimObject( 0x58, gfxPosX, gfxPosY, 0, X );
 	}
 
@@ -5522,17 +5522,17 @@ void cCreep::obj_Door_Lock_Prepare() {
 }
 
 void cCreep::obj_Door_Prepare() {
-	byte DoorCount = *level(mObjectPtr++);
+	byte DoorCount = mMemory[mObjectPtr++];
 	mRoomDoorPtr = mObjectPtr;
 	
 	byte X, gfxCurrentID, gfxPosX, gfxPosY;
 
 	for( byte count = 0; count != DoorCount; ++count) {
-		X = *level(mObjectPtr + 7);
+		X = mMemory[mObjectPtr + 7];
 		
 		gfxCurrentID  = mMemory[ 0x41D1 + X ];
-		gfxPosX = *level( mObjectPtr + 0 );
-		gfxPosY = *level( mObjectPtr + 1 );
+		gfxPosX = mMemory[ mObjectPtr + 0 ];
+		gfxPosY = mMemory[ mObjectPtr + 1 ];
 
 		screenDraw( 0, gfxCurrentID, gfxPosX, gfxPosY );
 		// 4159
@@ -5545,9 +5545,9 @@ void cCreep::obj_Door_Prepare() {
 		mRoomObjects[X].objNumber = count;
 		mRoomAnim[X].mObjectType = OBJECT_TYPE_DOOR;
 
-		roomPtrSet( *level( mObjectPtr + 3 ) );
+		roomPtrSet( mMemory[ mObjectPtr + 3 ] );
 		
-		byte A =  (*level( mRoomPtr ) & 0xF);
+		byte A = mMemory[ mRoomPtr ] & 0xF;
 
 		mRoomObjects[X].color = A;
 		A <<= 4;
@@ -5555,7 +5555,7 @@ void cCreep::obj_Door_Prepare() {
 		A |= mRoomObjects[X].color;
 		mRoomObjects[X].color = A;
 		
-		A = *level( mObjectPtr + 2 );
+		A = mMemory[ mObjectPtr + 2 ];
 		if(A & 0x80) {
 			mRoomObjects[X].Object_field_1 = 1;
 			A = mRoomObjects[X].color;

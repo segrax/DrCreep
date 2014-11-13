@@ -310,13 +310,6 @@ public:
 
 				 cCreep();
 				~cCreep();
-
-				inline byte	*level( word pAddress ) {
-					if(mIntro)
-						return &mMemory[pAddress];
-					else
-						return &mMemory[pAddress];
-				}
 				
 				inline byte charRom( word pAddress ) {
 					return m64CharRom[ pAddress - 0xD000 ];
