@@ -5073,13 +5073,12 @@ void cCreep::obj_Door_Execute( byte pObjectNumber ) {
 		sub_6009( A );
 		mMemory[ word_40 + 2 ] |= 0x80;
 	}
+
 	// 4017
-	byte A = 0x10;
-	A -= mRoomObjects[pObjectNumber].Object_field_2;
-	mMemory[ 0x75B7 ] = A;
+	mMemory[ 0x75B7 ] = 0x10 - mRoomObjects[pObjectNumber].Object_field_2;
 
 	sound_PlayEffect( SOUND_DOOR_OPEN );
-	A = mRoomObjects[pObjectNumber].Object_field_2;
+	byte A = mRoomObjects[pObjectNumber].Object_field_2;
 
 	if( A ) {
 		--mRoomObjects[pObjectNumber].Object_field_2;
