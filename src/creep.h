@@ -322,14 +322,6 @@ public:
 				inline byte *gameData( word pAddress ) {
 					return &mGameData[ pAddress - 0x800 ];
 				}
-
-				inline byte *gfxPtr( word pID ) {
-					word  gfxAddress  = (0x603B + (pID << 1));
-					byte *gfxTablePtr = gameData( gfxAddress );
-					byte *gfxPtr = gameData( readLEWord( gfxTablePtr ));
-						
-					return gfxPtr;
-				}
 			
 				inline byte *musicBufferGet() {
 					return mMusicBuffer;
