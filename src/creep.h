@@ -319,10 +319,6 @@ public:
 					return &mMemory[ pAddress ];
 				}
 				
-				inline byte *gameData( word pAddress ) {
-					return &mGameData[ pAddress - 0x800 ];
-				}
-			
 				inline byte *musicBufferGet() {
 					return mMusicBuffer;
 				}
