@@ -725,52 +725,52 @@ void cCreep::roomLoad() {
 void cCreep::roomSetColours( byte pRoomColor ) {
 	// Set floor colours
 	// 1438
-	*memory( 0x6481 )= pRoomColor;
+	mMemory[ 0x6481 ] = pRoomColor;
 	pRoomColor <<= 4;
-	pRoomColor |= *memory( 0x6481 );
+	pRoomColor |= mMemory[ 0x6481 ];
 
-	*memory( 0x6481 ) = pRoomColor;
-	*memory( 0x648E ) = pRoomColor;
-	*memory( 0x649B ) = pRoomColor;
-	*memory( 0x65CC ) = pRoomColor;
-	*memory( 0x65CE ) = pRoomColor;
-	*memory( 0x6EAE ) = pRoomColor;
-	*memory( 0x6EAF ) = pRoomColor;
-	*memory( 0x6EB0 ) = pRoomColor;
-	*memory( 0x6EC6 ) = pRoomColor;
-	*memory( 0x6EC7 ) = pRoomColor;
-	*memory( 0x6EC8 ) = pRoomColor;
-	*memory( 0x6EDB ) = pRoomColor;
-	*memory( 0x6EDC ) = pRoomColor;
-    *memory( 0x6EDD ) = pRoomColor;
-	*memory( 0x6EED ) = pRoomColor;
-	*memory( 0x6EEE ) = pRoomColor;
-	*memory( 0x6EEF ) = pRoomColor;
-	*memory( 0x6EFC ) = pRoomColor;
-	*memory( 0x6EFD ) = pRoomColor;
-	*memory( 0x6EFE ) = pRoomColor;
-	*memory( 0x6F08 ) = pRoomColor;
-	*memory( 0x6F09 ) = pRoomColor;
-	*memory( 0x6F0A ) = pRoomColor;
+	mMemory[ 0x6481 ] = pRoomColor;
+	mMemory[ 0x648E ] = pRoomColor;
+	mMemory[ 0x649B ] = pRoomColor;
+	mMemory[ 0x65CC ] = pRoomColor;
+	mMemory[ 0x65CE ] = pRoomColor;
+	mMemory[ 0x6EAE ] = pRoomColor;
+	mMemory[ 0x6EAF ] = pRoomColor;
+	mMemory[ 0x6EB0 ] = pRoomColor;
+	mMemory[ 0x6EC6 ] = pRoomColor;
+	mMemory[ 0x6EC7 ] = pRoomColor;
+	mMemory[ 0x6EC8 ] = pRoomColor;
+	mMemory[ 0x6EDB ] = pRoomColor;
+	mMemory[ 0x6EDC ] = pRoomColor;
+	mMemory[ 0x6EDD ] = pRoomColor;
+	mMemory[ 0x6EED ] = pRoomColor;
+	mMemory[ 0x6EEE ] = pRoomColor;
+	mMemory[ 0x6EEF ] = pRoomColor;
+	mMemory[ 0x6EFC ] = pRoomColor;
+	mMemory[ 0x6EFD ] = pRoomColor;
+	mMemory[ 0x6EFE ] = pRoomColor;
+	mMemory[ 0x6F08 ] = pRoomColor;
+	mMemory[ 0x6F09 ] = pRoomColor;
+	mMemory[ 0x6F0A ] = pRoomColor;
 
 	//1487
 
 	for( signed char Y = 7; Y >= 0; --Y ) {
-		*memory( 0x6FB2 + Y ) = pRoomColor;
-		*memory( 0x6FF5 + Y ) = pRoomColor;
-		*memory( 0x7038 + Y ) = pRoomColor;
-		*memory( 0x707B + Y ) = pRoomColor;
+		mMemory[ 0x6FB2 + Y ] = pRoomColor;
+		mMemory[ 0x6FF5 + Y ] = pRoomColor;
+		mMemory[ 0x7038 + Y ] = pRoomColor;
+		mMemory[ 0x707B + Y ] = pRoomColor;
 	}
 	
 	pRoomColor &= 0x0F;
 	pRoomColor |= 0x10;
-	*memory( 0x6584 ) = pRoomColor;
+	mMemory[ 0x6584 ] = pRoomColor;
 
-    byte A = (*memory( 0x649B ) & 0xF0);
+	byte A = (mMemory[ 0x649B ] & 0xF0);
     A |= 0x01;
 
-	*memory( 0x659B ) = A;
-    *memory( 0x65CD ) = A;
+	mMemory[ 0x659B ] = A;
+	mMemory[ 0x65CD ] = A;
 }
 
 // 15E0
