@@ -954,7 +954,7 @@ bool cCreep::Intro() {
 				mObjectPtr = 0x239C;
 				obj_stringPrint();
 
-				*memory(0x278C) = 0;
+				mMemory[0x278C] = 0;
 				textShow();
 
 				return true;
@@ -994,14 +994,14 @@ bool cCreep::Intro() {
 
 // 20A9 : 
 void cCreep::musicPtrsSet() {
-	byte X = (*memory( 0x20CB ) & 3);
+	byte X = mMemory[ 0x20CB ] & 3;
 	
 	mVoiceNum = X;
 
 	X <<= 1;
 
-	mVoice = readLEWord( memory( 0x20DF + X));
-	mVoiceTmp = readLEWord( memory( 0x20E5 + X));
+	mVoice = readLEWord( &mMemory[ 0x20DF + X]);
+	mVoiceTmp = readLEWord( &mMemory[ 0x20E5 + X]);
 }
 
 // 1F29 : Play Music Buffer
