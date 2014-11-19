@@ -1008,15 +1008,15 @@ void cCreep::musicPtrsSet() {
 bool cCreep::musicBufferFeed() {
 	bool done = false;
 	
-	if( *memory( 0x20DC ) == 0 ) {
-		if( *memory( 0x20DD ) == 0 )
+	if( mMemory[ 0x20DC ] == 0 ) {
+		if( mMemory[ 0x20DD ] == 0 )
 			goto musicUpdate;
 		
-		(*memory( 0x20DD ))--;
+		mMemory[ 0x20DD ]--;
 	}
 
-	(*memory( 0x20DC ))--;
-	if( (*memory( 0x20DC ) | *memory( 0x20DD )) )
+	mMemory[ 0x20DC ]--;
+	if( (mMemory[ 0x20DC ] | mMemory[ 0x20DD ]) )
 		return true;
 	
 musicUpdate:;
@@ -1030,37 +1030,37 @@ musicUpdate:;
 
 		byte X;
 
-		X = *memory( 0x20D2 + A );
+		X = mMemory[ 0x20D2 + A ];
 
 		for( signed char Y = X - 1; Y >= 0; --Y )
-			*memory( 0x20CB + Y ) = *(mMusicBuffer + Y);
+			mMemory[ 0x20CB + Y ] = *(mMusicBuffer + Y);
 
 		// 1F60
 
 		mMusicBuffer += X;
 
-		A = *memory( 0x20CB );
+		A = mMemory[ 0x20CB ];
 		A >>= 2;
 		switch( A ) {
 			case 0:
 				musicPtrsSet();
 				
-				X = *memory( 0x20CB ) & 3;
+				X = mMemory[ 0x20CB ] & 3;
 
-				X = *memory( 0x20CC ) + *memory( 0x2104 + X );
-				A = *memory( 0x2108 + X );
+				X = mMemory[ 0x20CC ] + mMemory[ 0x2104 + X ];
+				A = mMemory[ 0x2108 + X ];
 
 				mSound->sidWrite( (mVoiceNum * 7), A );
-				*memory( mVoiceTmp ) = A;
+				mMemory[ mVoiceTmp ] = A;
 
-				A = *memory( 0x2168 + X );
+				A = mMemory[ 0x2168 + X ];
 				mSound->sidWrite( (mVoiceNum * 7) + 1, A );
-				*memory( mVoiceTmp + 1) = A;
+				mMemory[ mVoiceTmp + 1] = A;
 			
-				A = *memory( mVoiceTmp + 4 );
+				A = mMemory[ mVoiceTmp + 4 ];
 				A |= 1;
 				mSound->sidWrite( (mVoiceNum * 7) + 4, A );
-				*memory( mVoiceTmp + 4 ) = A;
+				mMemory[ mVoiceTmp + 4 ] = A;
 
 
 				continue;
@@ -1068,20 +1068,20 @@ musicUpdate:;
 			case 1:
 				musicPtrsSet();
 				
-				A = *memory( mVoiceTmp + 4 );
+				A = mMemory[ mVoiceTmp + 4 ];
 				A &= 0xFE;
 
-				*memory( mVoiceTmp + 4 ) = A;
+				mMemory[ mVoiceTmp + 4 ] = A;
 				mSound->sidWrite( (mVoiceNum * 7) + 4, A );
 				
 				continue;
 
 			case 2:
-				*memory( 0x20DC ) = *memory( 0x20CC );
+				mMemory[ 0x20DC ] = mMemory[ 0x20CC ];
 				return true;
 
 			case 3:
-				*memory( 0x20DD ) = *memory( 0x20CC );
+				mMemory[ 0x20DD ] = mMemory[ 0x20CC ];
 				return true;
 
 			case 4:
@@ -1090,17 +1090,17 @@ musicUpdate:;
 				for( signed char Y = 2; Y < 7; ++Y ) {
 					if( Y != 4 ) {
 						// 1FDD
-						byte A = *memory( 0x20CA + Y );
+						byte A = mMemory[ 0x20CA + Y ];
 						mSound->sidWrite( (mVoiceNum * 7) + Y, A );
-						*memory( mVoiceTmp + Y ) = A;
+						mMemory[ mVoiceTmp + Y ] = A;
 
 					} else {
 						// 1FE7
-						byte A = *memory( mVoiceTmp + Y );
+						byte A = mMemory[ mVoiceTmp + Y ];
 						A &= 1;
-						A |= *memory( 0x20CA + Y );
+						A |= mMemory[ 0x20CA + Y ];
 						mSound->sidWrite( (mVoiceNum * 7) + Y, A );
-						*memory( mVoiceTmp + Y ) = A;
+						mMemory[ mVoiceTmp + Y ] = A;
 					}
 				}
 
@@ -1110,25 +1110,25 @@ musicUpdate:;
 				continue;
 
 			case 6:
-				X = *memory( 0x20CB ) & 3;
-				*memory( 0x2104 + X ) = *memory( 0x20CC );
+				X = mMemory[ 0x20CB ] & 3;
+				mMemory[ 0x2104 + X ] = mMemory[ 0x20CC ];
 
 				continue;
 
 			case 7:
-				A = (*memory(0x2103) & 0xF0) | *memory(0x20CC);
-				*memory(0x2103) = A;
+				A = (mMemory[0x2103] & 0xF0) | mMemory[0x20CC];
+				mMemory[0x2103] = A;
 				
 				mSound->sidWrite( 0x18, A );
 				continue;
 
 			case 8:
-				A = *memory(0x20CC);
-				*memory(0x2107) = A;
+				A = mMemory[0x20CC];
+				mMemory[0x2107] = A;
 				A <<= 2;
 				A |= 3;
 
-				*memory(0xDC05) = A;
+				mMemory[0xDC05] = A;
 				continue;
 
 			default:
@@ -1144,10 +1144,10 @@ musicUpdate:;
 		
 	} else {
 		mMusicBuffer = mMusicBufferStart;
-		*memory( 0x20DD ) = 0x02;
+		mMemory[ 0x20DD ] = 0x02;
 		
-		byte A = (*memory( 0x2102 ) & 0xF0);
-		*memory( 0x2102 ) = A;
+		byte A = (mMemory[ 0x2102 ] & 0xF0);
+		mMemory[ 0x2102 ] = A;
 		mSound->sidWrite( 0x17, A );
 	}
 
