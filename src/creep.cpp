@@ -1190,23 +1190,23 @@ void cCreep::musicChange() {
 
 	//0C9A
 	for( signed char X = 0x0E; X >= 0; X -= 7 ) {
-		A = *memory( 0x20EF + X );
+		A = mMemory[ 0x20EF + X ];
 
 		A &= 0xFE;
-		*memory( 0x20EF + X ) = A;
+		mMemory[ 0x20EF + X ] = A;
 		mSound->sidWrite( 0x04 + X, A );
 	}
 
-	A = *memory( 0x2102 ) & 0xF0;
+	A = mMemory[ 0x2102 ] & 0xF0;
 	mSound->sidWrite( 0x17, A );
 
-	*memory( 0x2102 ) = A;
-	*memory( 0x20DC ) = 0;
-	*memory( 0x20DD ) = 0;
-	*memory( 0x2107 ) = 0x14;
-	*memory( 0x20DE ) = 1;
+	mMemory[ 0x2102 ] = A;
+	mMemory[ 0x20DC ] = 0;
+	mMemory[ 0x20DD ] = 0;
+	mMemory[ 0x2107 ] = 0x14;
+	mMemory[ 0x20DE ] = 1;
 
-	*memory(0xDC05) = (0x14 << 2) | 3;
+	mMemory[0xDC05] = (0x14 << 2) | 3;
 
 	mSound->playback( true );
 }
