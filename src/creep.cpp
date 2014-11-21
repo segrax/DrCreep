@@ -1225,7 +1225,7 @@ s2238:
 		}
 		
 		// Decode the background as text
-		mScreen->drawStandardText( memory( 0x400 ), 0x1000, memory( 0xD800 ));
+		mScreen->drawStandardText( &mMemory[ 0x400 ], 0x1000, &mMemory[ 0xD800 ]);
 
         // 
         // 0x226E: Options Menu Loop
@@ -1369,7 +1369,7 @@ s2238:
 			}// Button Pressed
 			
 			// Decode the background as text
-			mScreen->drawStandardText( memory( 0x400 ), 0x1000, memory( 0xD800 ));
+			mScreen->drawStandardText( &mMemory[ 0x400 ], 0x1000, &mMemory[ 0xD800 ]);
 		}
 	}
 }
@@ -3815,9 +3815,9 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 	// 5A66
 	byte gfxCurrentPosY = gfxPosTopY;
 	word byte_36 = 0;
-	word byte_34 = (*memory( 0xBC00 + gfxCurrentPosY ));
+	word byte_34 = mMemory[ 0xBC00 + gfxCurrentPosY ];
 
-	word A = *memory( 0xBB00 + gfxCurrentPosY );
+	word A = mMemory[ 0xBB00 + gfxCurrentPosY ];
 
 	byte_34 |= (A << 8);
 
@@ -3884,7 +3884,7 @@ s5AED:;
 				for( byte Y = 0; ; ++Y ) {
 					// 5B2E
 					if( gfxCurPos < 0x28 )
-						*memory( byte_36 + Y ) |= mMemory[ word_32 + Y ];
+						mMemory[ byte_36 + Y ] |= mMemory[ word_32 + Y ];
 
 					if( gfxCurPos == gfxPosRightX )
 						break;
@@ -4463,7 +4463,7 @@ s1BE7:;
 	mMemory[ 0x28D1 ] = 2;
 	
 	// Save highscores
-	mCastleManager->scoresSave( mCastle->nameGet(), readLEWord( memory( 0xB800 ) ), memory( 0xB800 ) );
+	mCastleManager->scoresSave( mCastle->nameGet(), readLEWord( &mMemory[ 0xB800 ] ), &mMemory[ 0xB800 ] );
 
 	DisableSpritesAndStopSound();
 }
@@ -4526,7 +4526,7 @@ void cCreep::gameHighScores( ) {
 			if( A != 0xFF ) {
 				mMemory[ 0xB87A ] = A;
 				mMemory[ 0xB87B ] = mMemory[ 0xB803 + X ];
-				A = *memory( 0xB804 + X );
+				A = mMemory[ 0xB804 + X ];
 
 			} else {
 				// 1DD6
