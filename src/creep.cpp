@@ -4585,7 +4585,7 @@ void cCreep::sound_PlayEffect( char pA ) {
 	mSound->sidWrite( 0x12, 0 );
 	mSound->sidWrite( 0x17, 0 );
 
-	mMusicBuffer = memory( readLEWord(memory( 0x7572 + Y )) );
+	mMusicBuffer = &mMemory[ readLEWord( &mMemory[ 0x7572 + Y ]) ];
 
 	mSound->sidWrite( 0x18, 0x0F );
 
@@ -4868,11 +4868,11 @@ void cCreep::gameFilenameGet( bool pLoading, bool pCastleSave ) {
 	}
 
 	roomPrepare();
-	*memory( 0x2788 ) = 0x20;
-	*memory( 0x2789 ) = 0x48;
-	*memory( 0x278C ) = 0x10;
-	*memory( 0x278A ) = 0x01;
-	*memory( 0x278B ) = 0x02;
+	mMemory[ 0x2788 ] = 0x20;
+	mMemory[ 0x2789 ] = 0x48;
+	mMemory[ 0x278C ] = 0x10;
+	mMemory[ 0x278A ] = 0x01;
+	mMemory[ 0x278B ] = 0x02;
 
 	textShow();
 }
@@ -4886,7 +4886,7 @@ void cCreep::gamePositionLoad() {
 
 	string filename = string( (char*) &mMemory[ 0x278E ], mStrLength );
 	
-	if( mCastleManager->positionLoad( filename, memory( 0x7800 ) ) == true)
+	if( mCastleManager->positionLoad( filename, &mMemory[ 0x7800 ] ) == true)
 		mSaveGameLoaded = 1;
 
 	DisableSpritesAndStopSound();
@@ -4902,7 +4902,7 @@ void cCreep::gamePositionSave( bool pCastleSave ) {
 	string filename = string( (char*) &mMemory[ 0x278E ], mStrLength );
 	// Save from 0x7800
 
-	word saveSize = readLEWord( memory( 0x7800 ) );
+	word saveSize = readLEWord( &mMemory[ 0x7800 ] );
 	
 	// Castles save with a Z
 	if( pCastleSave )
@@ -4911,9 +4911,9 @@ void cCreep::gamePositionSave( bool pCastleSave ) {
 	bool result = false;
 
 	if( pCastleSave )
-		result = mCastleManager->castleSave( filename, saveSize, memory( 0x7800 ) );
+		result = mCastleManager->castleSave( filename, saveSize, &mMemory[ 0x7800 ] );
 	else
-		result = mCastleManager->positionSave( filename, saveSize, memory( 0x7800 ) );
+		result = mCastleManager->positionSave( filename, saveSize, &mMemory[ 0x7800 ] );
 
 	if( result == false) {
 
