@@ -4950,8 +4950,7 @@ void cCreep::word_3C_Calculate() {
 	word_3C <<= 1;
 	word_3C += 0xC000;
 
-	byte A = byte_5FD5 << 1;
-	word_3C += A;
+	word_3C += byte_5FD5 << 1;
 }
 
 void cCreep::obj_SlidingPole_Prepare() {
