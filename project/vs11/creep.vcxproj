@@ -58,6 +58,7 @@
     <ClInclude Include="..\..\src\vic-ii\bitmapMulticolor.h" />
     <ClInclude Include="..\..\src\vic-ii\screen.h" />
     <ClInclude Include="..\..\src\vic-ii\sprite.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\builder.cpp" />
@@ -128,6 +129,12 @@
     <None Include="..\..\src\resid-0.16\wave8580_PS_.dat" />
     <None Include="..\..\src\resid-0.16\wave8580_P_T.dat" />
     <None Include="..\..\src\resid-0.16\wave8580__ST.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="creep.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\icon1.ico" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D42B6739-00F8-4350-A3EE-D01924B64A50}</ProjectGuid>
