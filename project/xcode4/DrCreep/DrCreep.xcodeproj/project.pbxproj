@@ -177,9 +177,9 @@
 		CEB586A81667C5370078E8EF /* screen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = screen.h; sourceTree = "<group>"; };
 		CEB586A91667C5370078E8EF /* sprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sprite.cpp; sourceTree = "<group>"; };
 		CEB586AA1667C5370078E8EF /* sprite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sprite.h; sourceTree = "<group>"; };
-		CEB586D116697F4A0078E8EF /* AEProfiling.framework */ = {isa = PBXFileReference; lastKnownFileType = file; path = AEProfiling.framework; sourceTree = "<group>"; };
-		CEB586D216697F4A0078E8EF /* AERegistration.framework */ = {isa = PBXFileReference; lastKnownFileType = file; path = AERegistration.framework; sourceTree = "<group>"; };
-		CEB586D316697F4A0078E8EF /* AudioMixEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = file; path = AudioMixEngine.framework; sourceTree = "<group>"; };
+		CEB586D116697F4A0078E8EF /* AEProfiling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AEProfiling.framework; sourceTree = "<group>"; };
+		CEB586D216697F4A0078E8EF /* AERegistration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AERegistration.framework; sourceTree = "<group>"; };
+		CEB586D316697F4A0078E8EF /* AudioMixEngine.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AudioMixEngine.framework; sourceTree = "<group>"; };
 		CEB586D416697F4A0078E8EF /* NyxAudioAnalysis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NyxAudioAnalysis.framework; sourceTree = "<group>"; };
 		CEB586D516697F4A0078E8EF /* PluginManager.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PluginManager.framework; sourceTree = "<group>"; };
 		CEB586D616697F4A0078E8EF /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SDL.framework; sourceTree = "<group>"; };
@@ -570,6 +570,7 @@
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libstdc++";
 				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -577,7 +578,7 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					/Library/Frameworks/SDL.framework/headers,
-					/Users/User/Desktop/head/src,
+					/Users/claireroll/DrCreep/src,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -588,11 +589,12 @@
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libstdc++";
 				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_PREPROCESSOR_DEFINITIONS = _MACOSX;
 				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = _MACOSX;
 				HEADER_SEARCH_PATHS = (
 					/Library/Frameworks/SDL.framework/headers,
-					/Users/User/Desktop/head/src,
+					/Users/claireroll/DrCreep/src,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -617,6 +619,7 @@
 				CEB586311667C4F10078E8EF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

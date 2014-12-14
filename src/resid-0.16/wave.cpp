@@ -68,7 +68,7 @@ void WaveformGenerator::set_chip_model(chip_model model)
 // ----------------------------------------------------------------------------
 void WaveformGenerator::writeFREQ_LO(reg8 freq_lo)
 {
-  freq = freq & 0xff00 | freq_lo & 0x00ff;
+  freq = (freq & 0xff00) | (freq_lo & 0x00ff);
 }
 
 void WaveformGenerator::writeFREQ_HI(reg8 freq_hi)

@@ -212,7 +212,7 @@ byte *local_FileRead( string pFile, string pPath, size_t	&pFileSize, bool pDataS
 
 		// Allocate buffer, and read the file into it
 		fileBuffer = new byte[ pFileSize ];
-		if(fileStream->read( (char*) fileBuffer, pFileSize ) == false) {
+		if(fileStream->read( (char*) fileBuffer, pFileSize ) == 0) {
 			delete fileBuffer;
 			fileBuffer = 0;
 	#ifdef _WII

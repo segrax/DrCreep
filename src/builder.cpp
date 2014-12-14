@@ -432,7 +432,6 @@ void cBuilder::castleSaveToDisk() {
 
 void cBuilder::mapRoomsDraw( size_t pArrowRoom ) {
 	map< int, cRoom *>::iterator	roomIT;
-	cRoom							*room = 0;
 	map< int, cRoom *>				*rooms = mCastle->roomsGet();
 
 	screenClear();
