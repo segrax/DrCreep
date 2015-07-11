@@ -21,7 +21,6 @@ creep : main
 
 graphics :
 	$(CC) src/graphics/screenSurface.cpp src/graphics/window.cpp
-	$(CC) src/graphics/scale/scale2x.cpp src/graphics/scale/scale3x.cpp src/graphics/scale/scalebit.cpp
 
 castle :
 	$(CC) src/castle/castle.cpp  src/castle/room.cpp src/castle/objects/*.cpp 
