@@ -28,7 +28,6 @@
 #include "creep.h"
 #include "vic-ii/screen.h"
 
-#define MAX_WIIMOTES				4
 
 cPlayerInput::cPlayerInput( cCreep *pCreep ) {
 	mCreep = pCreep;
@@ -91,7 +90,6 @@ void cPlayerInput::inputCheck( bool pClearAll, cEvent pEvent ) {
 
 	mEvent = pEvent;
 
-#ifndef _WII
 		KeyboardCheck();
         if( mInput[ 0 ].mJoystick == 0 )
 		    KeyboardInputSet1( &mInput[ 0 ] );
@@ -102,94 +100,9 @@ void cPlayerInput::inputCheck( bool pClearAll, cEvent pEvent ) {
     		KeyboardInputSet2( &mInput[ 1 ] );
         else
             JoystickInputSet( &mInput[1] );
-#endif
-
-#ifdef _WII
-	wiiInputCheck();
-
-	wiiInputSet( &mInput[ 0 ], WPAD_CHAN_0 );
-	wiiInputSet( &mInput[ 1 ], WPAD_CHAN_1 );
-#endif
 
 	return;
 }
-
-#ifdef _WII
-
-void cPlayerInput::wiiInputCheck() {
-
-	WPAD_ScanPads();
-
-	u32 held = WPAD_ButtonsHeld(0); 
-	
-	held +=  WPAD_ButtonsHeld(1);
-
-	if( held & WPAD_BUTTON_HOME )
-		exit(0);
-
-	//case SDLK_F1:
-	if( held & WPAD_BUTTON_PLUS )
-		mRunStop = true;
-	else
-		mRunStop = false;
-
-	//case SDLK_F2:
-	if( held & WPAD_BUTTON_MINUS )
-		mF2 = true;
-	else
-		mF2 = false;
-
-	//case SDLK_F3:
-	if( held & WPAD_BUTTON_1 )
-		mF3 = true;
-	else
-		mF3 = false;
-
-	//case SDLK_F4:
-	if( held & WPAD_BUTTON_B )
-		mF4 = true;
-	else
-		mF4 = false;
-
-	//case SDLK_ESCAPE:
-	if( held & WPAD_BUTTON_A )
-		mRestore = true;
-	else
-		mRestore = false;
-
-}
-
-void cPlayerInput::wiiInputSet ( sPlayerInput *pInput, dword pChannel ) {
-	u32 held = WPAD_ButtonsHeld(pChannel); 
-
-	if( held & WPAD_BUTTON_2 )
-		pInput->mButton = true;
-	else
-		pInput->mButton = false;
-
-	if( held & WPAD_BUTTON_LEFT )
-		pInput->mDown = true;
-	else
-		pInput->mDown = false;
-
-	if( held & WPAD_BUTTON_RIGHT )
-		pInput->mUp = true;
-	else
-		pInput->mUp = false;
-
-	if( held & WPAD_BUTTON_UP )
-		pInput->mLeft = true;
-	else
-		pInput->mLeft = false;
-
-	if( held & WPAD_BUTTON_DOWN )
-		pInput->mRight = true;
-	else
-		pInput->mRight = false;
-}
-
-
-#endif
 
 void cPlayerInput::KeyboardCheck() {
 

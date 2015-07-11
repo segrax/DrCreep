@@ -31,12 +31,6 @@
 #include "objects/object.hpp"
 #include "room.hpp"
 
-#ifdef _WII
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <string.h>
-#endif
-
 /**
  * Constructor
  */

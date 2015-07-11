@@ -28,12 +28,6 @@
 #include "castle/castle.h"
 #include "castleManager.h"
 
-#ifdef _WII
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <string.h>
-#endif
-
 cCastleInfoD64::cCastleInfoD64( cCastleManager *pCastleManager, cD64 *pD64, sD64File *pFile ) : cCastleInfo( pCastleManager, pFile->mName ) {
 	mD64 = pD64;
 	mFile = pFile;

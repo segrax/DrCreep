@@ -32,81 +32,8 @@ const char   *VERSION = "v1.1";
 
 const char	 *gDataPath = "data/";
 const char	 *gSavePath = "data/save/";
-const char	 *wiiBasePath = "sd:/apps/drcreep/";
 
 cCreep		 *gCreep;
-
-#ifdef _WII
-#include <gccore.h>
-#include <wiiuse/wpad.h>
-#include <fat.h>
-#include <dirent.h>
-
-static void *xfb = NULL;
-static GXRModeObj *rmode = NULL;
-
-void wiiButtonWait() {
-	while(1)
-	{
-		// Call WPAD_ScanPads each loop, this reads the latest controller states
-		WPAD_ScanPads();
-
-		// WPAD_ButtonsDown tells us which buttons were pressed in this loop
-		// this is a "one shot" state which will not fire again until the button has been released
-		u32 pressed = WPAD_ButtonsDown(0);
-
-		// We return to the launcher application via exit
-		if ( pressed & WPAD_BUTTON_HOME ) exit(0);
-		if ( pressed )
-			break;
-
-		// Wait for the next frame
-		VIDEO_WaitVSync();
-	}
-}
-void wiiStart() {
-	// Initialise the video system
-	VIDEO_Init();
-	
-	// This function initialises the attached controllers
-	WPAD_Init();
-	
-	// Obtain the preferred video mode from the system
-	// This will correspond to the settings in the Wii menu
-	rmode = VIDEO_GetPreferredMode(NULL);
-
-	// Allocate memory for the display in the uncached region
-	xfb = MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
-	
-	// Initialise the console, required for printf
-	console_init(xfb,20,20,rmode->fbWidth,rmode->xfbHeight,rmode->fbWidth*VI_DISPLAY_PIX_SZ);
-	
-	// Set up the video registers with the chosen mode
-	VIDEO_Configure(rmode);
-	
-	// Tell the video hardware where our display memory is
-	VIDEO_SetNextFramebuffer(xfb);
-	
-	// Make the display visible
-	VIDEO_SetBlack(FALSE);
-
-	// Flush the video register changes to the hardware
-	VIDEO_Flush();
-
-	// Wait for Video setup to complete
-	VIDEO_WaitVSync();
-	if(rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
-
-	SDL_ShowCursor(SDL_DISABLE);
-
-	if(!fatInitDefault()) {
-		cout << "fatInitDefault() failed\n";
-		exit(1);
-	}
-
-
-}
-#endif
 
 #ifdef _MACOSX
 int SDL_main( int argc, char *argv[]) {
@@ -117,10 +44,6 @@ int	main( int argc, char *argv[] ) {
 #ifdef WIN32
 	SetConsoleTitle( L"The Castles of Dr.Creep" );
 	SetConsoleCtrlHandler( (PHANDLER_ROUTINE) CtrlHandler, TRUE );
-#endif
-
-#ifdef _WII
-	wiiStart();
 #endif
 
 #ifndef BUILDER
@@ -137,10 +60,6 @@ int	main( int argc, char *argv[] ) {
 
 string local_PathGenerate( string pFile, string pPath, bool pDataSave ) {
 	stringstream	 filePathFinal;
-
-#ifdef _WII
-		filePathFinal << wiiBasePath;
-#endif
 
 #ifdef _MACOSX
     filePathFinal << "/Applications/DrCreep/";
@@ -217,17 +136,9 @@ byte *local_FileRead( string pFile, string pPath, size_t	&pFileSize, bool pDataS
 		if (!(*fileStream)) {
 			delete fileBuffer;
 			fileBuffer = 0;
-	#ifdef _WII
-		cout << "File Read Failed" << endl;
-		wiiButtonWait();
-	#endif
 		}
-	} else {
-	#ifdef _WII
-		cout << "File Open Failed" << endl;
-		wiiButtonWait();
-	#endif
 	}
+	
 	// Close the stream
 	fileStream->close();
 	delete fileStream;
@@ -319,47 +230,6 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 // End Win32 Functions
 
 #else
-
-#ifdef _WII
-
-vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
-	vector<string> ret;
-	transform( pExtension.begin(), pExtension.end(), pExtension.begin(), ::toupper);
-	
-	string path = local_PathGenerate( "", pPath, pDataSave );
-
-	DIR* pdir = opendir(path.c_str());
-	if (pdir != NULL) {
-		
-		while(true)  {
-			struct dirent* pent = readdir(pdir);
-			if(pent == NULL) 
-				break;
-		
-			if(strcmp(".", pent->d_name) != 0 && strcmp("..", pent->d_name) != 0) {
-
-				string name = string(pent->d_name);
-				transform( name.begin(), name.end(), name.begin(), ::toupper);
-
-				if( name.find( pExtension ) != string::npos ) {
-					ret.push_back( name );
-				}
-			}
-		}
-
-		closedir(pdir);
-	}
-	return ret;
-}
-
-int ftime(timeb *nul) {
-	static long long i = 0;
-	nul->time = 0;
-	nul->millitm = i;
-	return i+=21;
-}
-
-#else
 	
 #ifndef FREEBSD
 #ifndef _MACOSX
@@ -429,5 +299,4 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 	return results;
 }
 
-#endif
 #endif

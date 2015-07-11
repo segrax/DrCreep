@@ -55,12 +55,6 @@ private:
 
     void         JoystickInputSet( sPlayerInput *pInput );
 
-#ifdef _WII	
-	void		 wiiInputCheck();
-	void		 wiiInputSet ( sPlayerInput *pInput, dword pChannel  );
-
-#endif
-
 public:
 				 cPlayerInput( cCreep *pCreep );
 				~cPlayerInput();

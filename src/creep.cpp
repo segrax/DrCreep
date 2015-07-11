@@ -41,13 +41,6 @@
 #include <io.h>
 #endif
 
-#ifdef _WII
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <string.h>
-	#include <sys/timeb.h>
-#endif
-
 sObjectData mObjectCollisionData[6] = {	{0x01, 0x00}, // Player
 										{0x00, 0x04}, // Lightning
 										{0x00, 0x03}, // Forcefield
@@ -206,8 +199,6 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	bool	playLevelSet = false;
 	bool	unlimited = false;
 
-#ifndef _WII
-
 	// Output console message
 	cout << "The Castles of Dr. Creep (" << VERSION << ")" << endl << endl;
 	cout << "http://creep.sourceforge.net/" << endl << endl ;
@@ -245,7 +236,6 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	// Level numbers begin at 1 in the list, but 0 in the actual game
 	if(playLevel)
 		--playLevel;
-#endif
 
 #ifdef _DEBUG
 	consoleShow = true;

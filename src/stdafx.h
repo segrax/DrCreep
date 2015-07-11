@@ -38,13 +38,7 @@
 
 using namespace std;
 
-#ifdef _WII
-#include <SDL/SDL.h>
-#include <wiiuse/wpad.h>
-#include "wiiuse/wiiuse.h"
-#else
 #include <SDL.h>
-#endif
 
 #include "types.h"
 #include "Singleton.hpp"
@@ -66,8 +60,6 @@ extern cCreep	  *gCreep;
 
 #ifdef _WII
 	#define ENDIAN_BIG
-	int ftime(timeb *nul);
-	void wiiButtonWait();
 #else
 	#define ENDIAN_SMALL
 #endif

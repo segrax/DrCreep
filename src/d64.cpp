@@ -28,12 +28,6 @@
 #include "stdafx.h"
 #include "d64.h"
 
-#ifdef _WII
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <string.h>
-#endif
-
 // Function to rip a string from a byte array
 string stringRip(byte *pBuffer, byte pTerminator, size_t pLengthMax) {
 	string tmpString;
