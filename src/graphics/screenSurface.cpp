@@ -24,29 +24,11 @@
  */
 
 #include "../stdafx.h"
-#include "screenSurface.h"
 
-cScreenSurface::cScreenSurface( size_t pWidth, size_t pHeight ) {
-	mWidth = pWidth; 
-	mHeight = pHeight;
-
-	// Create the screen buffer
-	mScreenSize = (mWidth * mHeight);
-	mScreenPieces = new sScreenPiece[ mScreenSize ];
-	mScreenBuffer = new dword[ mScreenSize ];
-
-	palettePrepare();
-	Wipe();
-}
-
-cScreenSurface::~cScreenSurface( ) {
-
-	delete mScreenBuffer;
-	delete mScreenPieces;
-}
+const int g_MaxColors = 16;
 
 void cScreenSurface::palettePrepare() {
-	const byte C64pal[16][3] = {
+	const byte C64pal[g_MaxColors][3] = {
 		0x00, 0x00, 0x00,
 		0xFF, 0xFF, 0xFF, 
 		0x68, 0x37, 0x2b, 
@@ -64,39 +46,107 @@ void cScreenSurface::palettePrepare() {
 		0x6c, 0x5e, 0xb5,
 		0x95, 0x95, 0x95
 	};
-	SDL_Surface *surface = SDL_CreateRGBSurface(	SDL_SWSURFACE,	1,	1,	 32, 0, 0, 0, 0);
 
 	for(int color=0; color < 16; color++)
-		mPalette[ color ] = SDL_MapRGB (	surface->format , C64pal[color][0], C64pal[color][1], C64pal[color][2] ) ;
-
-	SDL_FreeSurface( surface );
+		mPalette[ color ] = SDL_MapRGB (	mSDLSurface->format , C64pal[color][0], C64pal[color][1], C64pal[color][2] ) ;
 }
 
-void cScreenSurface::Wipe( dword pColor ) {
-	sScreenPiece *piece = &mScreenPieces[ 0 ];
-	dword		 *buffer = screenBufferGet();
+cScreenSurface::cScreenSurface( size_t pWidth, size_t pHeight ) {
+	mWidth = pWidth; 
+	mHeight = pHeight;
+	mFaded = false;
 
-	for( size_t count = 0; count < mScreenSize; ++count, ++piece, ++buffer ) {
-		*buffer = pColor;
+	// Create the screen buffer
+	mSDLSurface = SDL_CreateRGBSurface( 0, pWidth, pHeight, 32, 0xFF, 0xFF << 8, 0xFF << 16, 0 );
+	mTexture = SDL_CreateTexture(g_Window.GetRenderer(), SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, pWidth, pHeight);
+	
+	mSurfaceBuffer = new byte[ mWidth * mHeight ];
+	mSurfaceBufferSize = mWidth * mHeight;
+	mScreenPieces = new sScreenPiece[ mSurfaceBufferSize ];
+	for (int i = 0; i < mSurfaceBufferSize; ++i) {
+		mSurfaceBuffer[i] = 0;
+	}
+
+	palettePrepare();
+	Wipe();
+}
+
+cScreenSurface::~cScreenSurface() {
+	delete[] mSurfaceBuffer;
+
+	SDL_FreeSurface( mSDLSurface );
+	SDL_DestroyTexture( mTexture );
+}
+
+void cScreenSurface::Wipe( byte pColor ) {
+
+	SDL_FillRect( mSDLSurface, 0, pColor );
+
+}
+
+void cScreenSurface::WipeBuffer( byte pColor ) {
+	sScreenPiece *piece = &mScreenPieces[ 0 ];
+	memset( mSurfaceBuffer, 0, mSurfaceBufferSize );
+	
+	for( size_t count = 0; count < mSurfaceBufferSize; ++count, ++piece ) {
 		piece->mPriority = ePriority_None;
 		piece->mSprite = piece->mSprite2 = 0;
 	}
+}
 
+dword *cScreenSurface::pixelGet( word x, word y ) {
+	register dword *position = (dword*) mSDLSurface->pixels ;
+		
+	// Offset by Y
+	position +=  (y * (mSDLSurface->pitch / 4) );		// 4 Bytes per Pixel
+
+	// Offset by X
+	position +=  x;
+
+	return position;
 }
 
 void cScreenSurface::pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePriority pPriority, size_t pCount ) {
 	sScreenPiece *piece = screenPieceGet(pX,pY);
-	dword	*buffer = screenBufferGet( pX, pY );
+	byte	*buffer = screenBufferGet( pX, pY );
 
 	for( size_t count = 0; count < pCount; ++count ) {
-		if( pPaletteIndex > 15 )
-			*buffer = 0;
-		else
-			*buffer = mPalette[ pPaletteIndex ];
+
+		*buffer = pPaletteIndex;
 
 		piece->mPriority = pPriority;
 
 		++buffer;
 		++piece;
 	}
+}
+
+
+void cScreenSurface::draw( size_t pX, size_t pY ) {
+
+	Wipe();
+
+	byte *bufferCurrent = mSurfaceBuffer;
+	byte *bufferCurrentMax = (mSurfaceBuffer + mSurfaceBufferSize);
+
+	dword *bufferTarget = (dword*) pixelGet( pX, pY );
+	dword *bufferTargetMax = (dword*) (((byte*) mSDLSurface->pixels) + (mSDLSurface->h * mSDLSurface->pitch));
+
+	while( bufferTarget < bufferTargetMax ) {
+			
+		if( bufferCurrent >= bufferCurrentMax )
+			break;
+
+		if (*bufferCurrent && *bufferCurrent != 0xFF) {
+			if (*bufferCurrent < g_MaxColors)
+				*bufferTarget = mPalette[*bufferCurrent];
+			else
+				*bufferTarget = 0;
+		}
+
+		++bufferTarget; 
+		++bufferCurrent;
+	}
+
+	SDL_UpdateTexture(mTexture, NULL, mSDLSurface->pixels, mSDLSurface->pitch);
 }

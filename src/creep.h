@@ -222,7 +222,7 @@ struct sCreepAnim {		// 0xBF
 #define MAX_SPRITES 0x8
 #define MAX_OBJECTS 0x20
 
-class cCreep {
+class cCreep : public cSingleton<cCreep> {
 
 protected:
 	sCreepSprite	 mRoomSprites[ MAX_SPRITES ];	// BD00
@@ -304,6 +304,8 @@ protected:
 	bool		 mMenuReturn, mNoInput;
 
 public:
+	std::vector<cEvent>		mEvents;
+
 	int			 mStartCastle;
 
 	byte		 mTxtX_0, mTxtY_0;
@@ -311,6 +313,8 @@ public:
 				 cCreep();
 				~cCreep();
 				
+	void		eventProcess( bool pResetKeys );
+
 				inline byte charRom( word pAddress ) {
 					return m64CharRom[ pAddress - 0xD000 ];
 				}
@@ -322,6 +326,8 @@ public:
 				inline byte *musicBufferGet() {
 					return mMusicBuffer;
 				}
+
+		bool			EventAdd( cEvent pEvent );
 
 		inline cPlayerInput		*inputGet()		{ return mInput; }
 		inline cScreen			*screenGet()	{ return mScreen; }
@@ -509,3 +515,5 @@ public:
 
 		void	 obj_Walkway_Prepare( );
 };
+
+#define g_Creep cCreep::GetSingleton()

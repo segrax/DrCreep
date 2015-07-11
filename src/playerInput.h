@@ -42,7 +42,7 @@ class cCreep;
 
 class cPlayerInput {
 private:
-	SDL_Event			 mEvent;
+	cEvent				 mEvent;
 	sPlayerInput		 mInput[2];
 	cCreep				*mCreep;
 	bool				 mRunStop,	mRestore, mF2, mF3, mF4, mF5;
@@ -65,7 +65,7 @@ public:
 				 cPlayerInput( cCreep *pCreep );
 				~cPlayerInput();
 
-	void		 inputCheck( bool pClearAll = false );
+	void		 inputCheck( bool pClearAll, cEvent pEvent );
 	void		 inputClear();
 
 	sPlayerInput		*inputGet( byte pNumber ) { 

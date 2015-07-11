@@ -24,7 +24,6 @@
  */
 
 #include "stdafx.h"
-#include "graphics/screenSurface.h"
 #include "sprite.h"
 
 cSprite::cSprite( ) {
@@ -51,6 +50,9 @@ void cSprite::drawMulti( byte *pBuffer ) {
 	byte		color;
 	ePriority	priority;
 	byte		pixel;
+
+	byte*			Buffer = _surface->GetSurfaceBuffer();
+	sScreenPiece*	Priority = _surface->screenPiecesGet();
 
 	// Draw the sprite
 	for( word Y = 0; Y < currentHeight; ++Y ) {
@@ -80,6 +82,7 @@ void cSprite::drawMulti( byte *pBuffer ) {
 						color = _multiColor1;
 						break;
 				}
+
 
 				_surface->pixelDraw(X, Y, color, priority, 2);
 
@@ -141,7 +144,7 @@ void cSprite::drawSingle( byte *pBuffer ) {
 void cSprite::streamLoad( byte *pBuffer ) {
 
 	// No stream provided, then use the previous one
-	if( !pBuffer )
+	if (!pBuffer)
 		pBuffer = _buffer;
 
 	else {
@@ -153,14 +156,16 @@ void cSprite::streamLoad( byte *pBuffer ) {
 	currentWidth = _maxX;
 	currentHeight = _maxY;
 
-	if( _rDoubleHeight )
+	if (_rDoubleHeight)
 		currentHeight *= 2;
-	if( _rDoubleWidth )
+	if (_rDoubleWidth)
 		currentWidth *= 2;
 
-	delete _surface;
-	_surface = new cScreenSurface(currentWidth, currentHeight);
-	_surface->Wipe(0);
+	if (!_surface || currentWidth != _surface->GetWidth() || currentHeight != _surface->GetHeight()) {
+		delete _surface;
+		_surface = new cScreenSurface( currentWidth, currentHeight );
+	}
+	_surface->WipeBuffer(0);
 
 	if( _rMultiColored )
 		drawMulti( pBuffer );

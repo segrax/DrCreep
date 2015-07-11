@@ -24,7 +24,6 @@
  */
 
 #include "stdafx.h"
-#include "graphics/screenSurface.h"
 #include "bitmapMulticolor.h"
 
 cBitmapMulticolor::cBitmapMulticolor() {
@@ -92,4 +91,5 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 
 	}	// Y
 
+	mSurface->draw();
 }

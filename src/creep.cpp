@@ -24,7 +24,6 @@
  */
 
 #include "stdafx.h"
-#include "graphics/screenSurface.h"
 #include "vic-ii/screen.h"
 #include "vic-ii/sprite.h"
 #include "playerInput.h"
@@ -255,8 +254,6 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	if( !consoleShow )
         mDebug->consoleHide();
 
-	// Set the default screen scale
-	mScreen->scaleSet( 2 );
 	mScreen->windowTitleUpdate();
 
 	// Display the title screen
@@ -569,7 +566,7 @@ void cCreep::textShow() {
 				// Wait for restore key
 				do { 
 					interruptWait(3);
-					mInput->inputCheck( true );
+					eventProcess( true );
 
 				} while( !mInput->restoreGet() );
 				
@@ -988,7 +985,7 @@ bool cCreep::Intro() {
 		mSound->sidWrite(0x04 + X, mMemory[ 0x20EF + X ]);
 	}
 
-	mInput->inputCheck(true);
+	eventProcess( true );
 	return false;
 }
 
@@ -3106,7 +3103,7 @@ bool cCreep::mapDisplay() {
 	screenClear();
 	
 	Sleep(300);
-	mInput->inputCheck( true );
+	eventProcess( true );
 
 	// Draw both players Name/Time/Arrows
 	// FA9
@@ -3222,7 +3219,7 @@ s10EB:;
 			mRestorePressed = false;
 			mMemory[ 0x11D0 ] = 0;
 			mMenuReturn = true;
-			mInput->inputCheck(true);
+			eventProcess( true );
 			return false;
 		}
 
@@ -3380,7 +3377,7 @@ void cCreep::obj_Player_Add( ) {
 void cCreep::roomMain() {
 
 	roomLoad();
-	mInput->inputCheck( true );
+	eventProcess( true );
 
 	for(byte X = 0; X < 2; ++X ) {
 		
@@ -4218,9 +4215,55 @@ void cCreep::obj_MultiDraw() {
 	++mObjectPtr;
 }
 
+void cCreep::eventProcess( bool pResetKeys ) {
+	g_Window.EventCheck();
+
+	for (std::vector<cEvent>::iterator EventIT = mEvents.begin(); EventIT != mEvents.end(); ++EventIT) {
+
+		switch (EventIT->mType) {
+			case eEvent_KeyDown:
+				mInput->inputCheck( pResetKeys, *EventIT );
+
+				break;
+
+			case eEvent_KeyUp:
+				mInput->inputCheck( pResetKeys, *EventIT );
+				break;
+
+			case eEvent_MouseLeftDown:
+				break;
+
+			case eEvent_MouseRightDown:
+				break;
+
+			case eEvent_MouseLeftUp:
+				break;
+
+			case eEvent_MouseRightUp:
+				break;
+
+			case eEvent_MouseMove:
+				break;
+
+			case eEvent_Quit:
+				exit( 0 );
+				break;
+
+			case eEvent_Redraw:
+				mScreen->screenRedrawSet();
+				mScreen->bitmapRedrawSet();
+				break;
+		}
+
+	}
+
+	mEvents.clear();
+}
+
 void cCreep::hw_Update() {
+
 	mScreen->refresh();
-	mInput->inputCheck();
+	eventProcess( false );
 }
 
 // 1935: Sleep for X amount of interrupts
@@ -4850,7 +4893,7 @@ void cCreep::stringSet( byte pPosX, byte pPosY, byte pColor, string pMessage ) {
 void cCreep::gameFilenameGet( bool pLoading, bool pCastleSave ) {
 	
 	screenClear();
-	mInput->inputCheck(true);
+	eventProcess( true );
 
 	mObjectPtr = 0x2633;
 	roomPrepare();
@@ -7115,6 +7158,13 @@ bool cCreep::object_Create( byte &pX ) {
 	mRoomObjects[pX].clear();
 
 	mRoomAnim[pX].mFlags = ITM_DISABLE;
+
+	return true;
+}
+
+bool cCreep::EventAdd( cEvent pEvent ) {
+	
+	mEvents.push_back( pEvent );
 
 	return true;
 }

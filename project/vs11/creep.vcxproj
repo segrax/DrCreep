@@ -5,9 +5,17 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
@@ -36,12 +44,12 @@
     <ClInclude Include="..\..\src\creep.h" />
     <ClInclude Include="..\..\src\d64.h" />
     <ClInclude Include="..\..\src\debug.h" />
-    <ClInclude Include="..\..\src\graphics\scale\scale2x.h" />
-    <ClInclude Include="..\..\src\graphics\scale\scale3x.h" />
-    <ClInclude Include="..\..\src\graphics\scale\scalebit.h" />
+    <ClInclude Include="..\..\src\Dimension.hpp" />
+    <ClInclude Include="..\..\src\Event.hpp" />
     <ClInclude Include="..\..\src\graphics\screenSurface.h" />
-    <ClInclude Include="..\..\src\graphics\window.h" />
+    <ClInclude Include="..\..\src\graphics\window.hpp" />
     <ClInclude Include="..\..\src\playerInput.h" />
+    <ClInclude Include="..\..\src\Position.hpp" />
     <ClInclude Include="..\..\src\resid-0.16\envelope.h" />
     <ClInclude Include="..\..\src\resid-0.16\extfilt.h" />
     <ClInclude Include="..\..\src\resid-0.16\filter.h" />
@@ -52,6 +60,7 @@
     <ClInclude Include="..\..\src\resid-0.16\voice.h" />
     <ClInclude Include="..\..\src\resid-0.16\wave.h" />
     <ClInclude Include="..\..\src\resource.h" />
+    <ClInclude Include="..\..\src\Singleton.hpp" />
     <ClInclude Include="..\..\src\sound\sound.h" />
     <ClInclude Include="..\..\src\stdafx.h" />
     <ClInclude Include="..\..\src\types.h" />
@@ -69,9 +78,7 @@
     <ClCompile Include="..\..\src\creep.cpp" />
     <ClCompile Include="..\..\src\d64.cpp" />
     <ClCompile Include="..\..\src\debug.cpp" />
-    <ClCompile Include="..\..\src\graphics\scale\scale2x.cpp" />
-    <ClCompile Include="..\..\src\graphics\scale\scale3x.cpp" />
-    <ClCompile Include="..\..\src\graphics\scale\scalebit.cpp" />
+    <ClCompile Include="..\..\src\Event.cpp" />
     <ClCompile Include="..\..\src\graphics\screenSurface.cpp" />
     <ClCompile Include="..\..\src\graphics\window.cpp" />
     <ClCompile Include="..\..\src\playerInput.cpp" />
@@ -148,7 +155,20 @@
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
@@ -161,7 +181,13 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -172,11 +198,22 @@
     <LibraryPath>D:\Systems\Librarys\SDL-1.2.15\lib\x86;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\..\run\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_d</TargetName>
+    <IncludePath>D:\Systems\Librarys\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Systems\Librarys\SDL2-2.0.3\lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)..\..\run\</OutDir>
-    <IncludePath>D:\Systems\Librarys\SDL-1.2.15\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Systems\Librarys\SDL-1.2.15\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Systems\Librarys\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Systems\Librarys\SDL2-2.0.3\lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>D:\Systems\Librarys\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Systems\Librarys\SDL2-2.0.3\lib\x64;$(LibraryPath)</LibraryPath>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -191,6 +228,22 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>sdl.lib;sdlmain.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>msvcrt.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>sdl2.lib;sdl2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>msvcrt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -210,7 +263,26 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>sdl.lib;sdlmain.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

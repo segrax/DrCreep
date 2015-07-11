@@ -24,7 +24,6 @@
  */
 
 #include "stdafx.h"
-#include "graphics/screenSurface.h"
 #include "vic-ii/screen.h"
 #include "vic-ii/sprite.h"
 #include "playerInput.h"
@@ -717,7 +716,7 @@ void cBuilder::parseInput() {
 
 	// Button
 	if(input->mButton) {
-		mInput->inputCheck( true );
+		eventProcess( true );
 
 		if( part && part->mDrags == true ) {
 			if( mDragMode == false ) 

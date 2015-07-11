@@ -47,7 +47,12 @@ using namespace std;
 #endif
 
 #include "types.h"
-#include "graphics/scale/scalebit.h"
+#include "Singleton.hpp"
+#include "Dimension.hpp"
+#include "Position.hpp"
+#include "Event.hpp"
+#include "graphics/screenSurface.h"
+#include "graphics/window.hpp"
 
 class cCreep;
 
@@ -123,3 +128,5 @@ vector<string>	 directoryList(string pPath, string pExtension, bool pDataSave);
 byte			*local_FileRead( string pFile, string pPath, size_t	&pFileSize, bool pDataSave );
 bool			 local_FileCreate( string pFile, string pPath, bool pDataSave );
 bool			 local_FileSave( string pFile, string pPath, bool pDataSave, byte *pBuffer, size_t pBufferSize );
+
+#define g_Window cWindow::GetSingleton()

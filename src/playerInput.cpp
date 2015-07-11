@@ -84,15 +84,12 @@ void cPlayerInput::joystickSet( size_t pPlayer, int pJoystickNumber ) {
 
 }
 
-void cPlayerInput::inputCheck( bool pClearAll ) {
+void cPlayerInput::inputCheck( bool pClearAll, cEvent pEvent ) {
 
 	if(pClearAll)
 		inputClear();
 
-	while( SDL_PollEvent(&mEvent) ) {
-
-		if( mEvent.type == SDL_QUIT )
-			exit(0);
+	mEvent = pEvent;
 
 #ifndef _WII
 		KeyboardCheck();
@@ -106,7 +103,6 @@ void cPlayerInput::inputCheck( bool pClearAll ) {
         else
             JoystickInputSet( &mInput[1] );
 #endif
-	}
 
 #ifdef _WII
 	wiiInputCheck();
@@ -198,38 +194,38 @@ void cPlayerInput::wiiInputSet ( sPlayerInput *pInput, dword pChannel ) {
 void cPlayerInput::KeyboardCheck() {
 
 	// Key Released
-	if( mEvent.type == SDL_KEYUP ) {
+	if( mEvent.mType == eEvent_KeyUp ) {
 
-		switch( mEvent.key.keysym.sym ) {
-			case SDLK_F1:
+		switch( mEvent.mButton ) {
+			case SDL_SCANCODE_F1:
 				mRunStop = false;
 				break;
 
-			case SDLK_F2:
+			case SDL_SCANCODE_F2:
 				mF2 = false;
 				break;
 
-			case SDLK_F3:
+			case SDL_SCANCODE_F3:
 				mF3 = false;
 				break;
 
-			case SDLK_F4:
+			case SDL_SCANCODE_F4:
 				mF4 = false;
 				break;
 
-			case SDLK_F5:
+			case SDL_SCANCODE_F5:
 				mF5 = false;
 				break;
 
-            case SDLK_F6:
+            case SDL_SCANCODE_F6:
                 joystickSet(0, 0);
                 break;
 
-            case SDLK_F7:
+            case SDL_SCANCODE_F7:
                 joystickSet(1, 1);
                 break;
 
-			case SDLK_ESCAPE:
+			case SDL_SCANCODE_ESCAPE:
 				mRestore = false;
 				break;
 
@@ -243,40 +239,40 @@ void cPlayerInput::KeyboardCheck() {
 	}
 
 	// Key Pressed
-	if( mEvent.type == SDL_KEYDOWN ) {
+	if( mEvent.mType == eEvent_KeyDown ) {
 
-		switch( mEvent.key.keysym.sym ) {
-			case SDLK_F1:
+		switch( mEvent.mButton ) {
+			case SDL_SCANCODE_F1:
 				mRunStop = true;
 				break;
 
-			case SDLK_F2:
+			case SDL_SCANCODE_F2:
 				mF2 = true;
 				break;
 
-			case SDLK_F3:
+			case SDL_SCANCODE_F3:
 				mF3 = true;
 				break;
 			
-			case SDLK_F4:
+			case SDL_SCANCODE_F4:
 				mF4 = true;
 				break;
 
-			case SDLK_F5:
+			case SDL_SCANCODE_F5:
 				mF5 = true;
 				break;
 
-			case SDLK_ESCAPE:
+			case SDL_SCANCODE_ESCAPE:
 				mRestore = true;
 				break;
 
-			case SDLK_F10:
+			case SDL_SCANCODE_F10:
 				mCreep->screenGet()->fullscreenToggle();
 				break;
 
 			default:
-				mKeyPressed = mEvent.key.keysym.scancode;
-				mKeyPressedRaw = mEvent.key.keysym.sym;
+				mKeyPressed = mEvent.mButton;
+				mKeyPressedRaw = mEvent.mButtonRaw;
 		}
 	}
 
@@ -333,34 +329,34 @@ void cPlayerInput::KeyboardInputSet1( sPlayerInput *pInput ) {
 
     bool pressed = false;
 
-    if( mEvent.type == SDL_KEYDOWN )
+    if( mEvent.mType == eEvent_KeyDown )
         pressed = true;
 
-	switch( mEvent.key.keysym.sym ) {
+	switch( mEvent.mButton ) {
 #ifndef _MACOSX
-		case SDLK_RCTRL:
+		case SDL_SCANCODE_RCTRL:
 #else
-        case SDLK_SPACE:
+        case SDL_SCANCODE_SPACE:
 #endif
                 pInput->mButton = pressed;
 
 			break;
 
-		case SDLK_LEFT:
+		case SDL_SCANCODE_LEFT:
 				pInput->mLeft = pressed;
 
 			break;
 
-		case SDLK_RIGHT:
+		case SDL_SCANCODE_RIGHT:
 				pInput->mRight = pressed;
 
 			break;
 
-		case SDLK_DOWN:
+		case SDL_SCANCODE_DOWN:
 				pInput->mDown = pressed;
 			break;
 
-		case SDLK_UP:
+		case SDL_SCANCODE_UP:
 				pInput->mUp = pressed;
 
 			break;
@@ -371,41 +367,41 @@ void cPlayerInput::KeyboardInputSet1( sPlayerInput *pInput ) {
 }
 
 void cPlayerInput::KeyboardInputSet2( sPlayerInput *pInput ) {
-	switch( mEvent.key.keysym.sym ) {
-		case SDLK_KP0:
-			if( mEvent.type == SDL_KEYDOWN )
+	switch( mEvent.mButton ) {
+		case SDL_SCANCODE_KP_0:
+			if( mEvent.mType == eEvent_KeyDown )
 				pInput->mButton = true;
 			else
 				pInput->mButton = false;
 
 			break;
 
-		case SDLK_KP4:
+		case SDL_SCANCODE_KP_4:
 
-			if( mEvent.type == SDL_KEYDOWN )
+			if( mEvent.mType == eEvent_KeyDown )
 				pInput->mLeft = true;
 			else
 				pInput->mLeft = false;
 
 			break;
 
-		case SDLK_KP6:
-			if( mEvent.type == SDL_KEYDOWN )
+		case SDL_SCANCODE_KP_6:
+			if( mEvent.mType == eEvent_KeyDown )
 				pInput->mRight = true;
 			else
 				pInput->mRight = false;
 
 			break;
 
-		case SDLK_KP2:
-			if( mEvent.type == SDL_KEYDOWN )
+		case SDL_SCANCODE_KP_2:
+			if( mEvent.mType == eEvent_KeyDown )
 				pInput->mDown = true;
 			else
 				pInput->mDown = false;
 			break;
 
-		case SDLK_KP8:
-			if( mEvent.type == SDL_KEYDOWN )
+		case SDL_SCANCODE_KP_8:
+			if( mEvent.mType == eEvent_KeyDown )
 				pInput->mUp = true;
 			else
 				pInput->mUp = false;

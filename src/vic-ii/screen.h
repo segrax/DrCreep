@@ -24,7 +24,7 @@
  */
 
 class cCreep;
-class cVideoWindow;
+class cWindow;
 class cBitmapMulticolor;
 class cSprite;
 class cScreenSurface;
@@ -34,13 +34,11 @@ class cScreen {
 	byte					 *mBitmapBuffer, *mBitmapColorData, *mBitmapColorRam, mBitmapBackgroundColor;
 	dword					  mFPS, mFPSTotal, mFPSSeconds;
 
-	cVideoWindow			*mWindow;
+	cWindow					*mWindow;
 	cBitmapMulticolor		*mBitmap;
 	cScreenSurface			*mSurface;
 	cCreep					*mCreep;
 
-	SDL_Surface				*mSDLSurface;
-	SDL_Surface				*mSDLSurfaceScaled;
 	SDL_Surface				*mSDLCursorSurface;
 
 	vector< sScreenPiece* >  mCollisions;
@@ -58,7 +56,6 @@ class cScreen {
 	void					 blit( cSprite *pSprite, byte pSpriteNo );
 	void					 blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority, byte pSpriteNo);
 	
-	SDL_Surface				*scaleUp();
 	void					 SDLSurfaceSet();
 
 public:
@@ -76,8 +73,6 @@ public:
 
 	void					 drawStandardText(byte *pTextData, word pTextChar, byte *pColorData);
 
-	void					 scaleSet( byte pScale );
-
 	void					 spriteDisable();
 	void					 spriteDraw();
 	cSprite					*spriteGet( byte pCount );
@@ -93,11 +88,6 @@ public:
 
 	inline vector< sScreenPiece* > *collisionsGet() { return &mCollisions; }
 	inline void						fullscreenToggle() {	mFullScreen = !mFullScreen;
-															
-															if( mFullScreen )
-																scaleSet( 3 );
-															else 
-																scaleSet( 2 );
 
 															mScreenRedraw = true;
 															refresh();

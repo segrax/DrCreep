@@ -31,9 +31,6 @@
     <Filter Include="Source Files\castle\objects">
       <UniqueIdentifier>{860897f0-0c6f-4e3f-9dc4-02ed26e51743}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\graphics\scale">
-      <UniqueIdentifier>{385d154b-8a81-41f3-9b57-359f0a9130ce}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\playerInput.h">
@@ -126,18 +123,6 @@
     <ClInclude Include="..\..\src\graphics\screenSurface.h">
       <Filter>Source Files\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\graphics\window.h">
-      <Filter>Source Files\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\graphics\scale\scale3x.h">
-      <Filter>Source Files\graphics\scale</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\graphics\scale\scalebit.h">
-      <Filter>Source Files\graphics\scale</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\graphics\scale\scale2x.h">
-      <Filter>Source Files\graphics\scale</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\resid-0.16\envelope.h">
       <Filter>Source Files\resid-0.16</Filter>
     </ClInclude>
@@ -180,6 +165,21 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\graphics\window.hpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Dimension.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Position.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Event.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Singleton.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\stdafx.cpp">
@@ -214,18 +214,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\graphics\screenSurface.cpp">
       <Filter>Source Files\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\graphics\window.cpp">
-      <Filter>Source Files\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\graphics\scale\scale3x.cpp">
-      <Filter>Source Files\graphics\scale</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\graphics\scale\scalebit.cpp">
-      <Filter>Source Files\graphics\scale</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\graphics\scale\scale2x.cpp">
-      <Filter>Source Files\graphics\scale</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\resid-0.16\envelope.cpp">
       <Filter>Source Files\resid-0.16</Filter>
@@ -286,6 +274,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\vic-ii\bitmapMulticolor.cpp">
       <Filter>Source Files\vic-ii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\graphics\window.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Event.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

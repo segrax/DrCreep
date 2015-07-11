@@ -24,8 +24,6 @@
  */
 
 #include "stdafx.h"
-#include "graphics/window.h"
-#include "graphics/screenSurface.h"
 #include "sprite.h"
 #include "bitmapMulticolor.h"
 #include "screen.h"
@@ -49,7 +47,6 @@ cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 	mSpriteRedraw		= false;
 	mScreenRedraw		= false;
 	mTextRedraw			= false;
-	mSDLSurfaceScaled	= 0;
 	mFPSTotal			= 0;
 	mFPSSeconds			= 0;
 	mFPS				= 0;
@@ -63,12 +60,14 @@ cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 	mCursorX = mCursorY				= 0;
 
 	mDrawDestX = mDrawDestY = mDrawSrcX = mDrawSrcY = 0;
+	
+	mWindow = new cWindow( gWidth, gHeight );
+	mWindow->InitWindow( "The Castles of Dr. Creep" );
 
 	mSurface	= new cScreenSurface( gWidth, gHeight );
 	mBitmap		= new cBitmapMulticolor();
 
 	// Create the SDL surfaces 
-	mSDLSurface = SDL_CreateRGBSurface(	SDL_SWSURFACE,	gWidth,	gHeight,	 32, 0, 0, 0, 0);
 	mSDLCursorSurface = 0;
 
 	windowTitleUpdate();
@@ -83,14 +82,12 @@ cScreen::~cScreen() {
 	delete mBitmap;
 	delete mWindow;
 	
-	SDL_FreeSurface( mSDLSurface );
-	SDL_FreeSurface( mSDLSurfaceScaled );
 	SDL_FreeSurface( mSDLCursorSurface );
 }
 
 void cScreen::clear(  byte pColor = 0 ) {
 	
-	mSurface->Wipe( pColor );
+	mSurface->WipeBuffer( pColor );
 	mBitmapRedraw = true;
 	mSpriteRedraw = true;
 }
@@ -103,20 +100,20 @@ void cScreen::cursorEnabled( bool pOn ) {
 
 	SDL_FreeSurface( mSDLCursorSurface );
 	mSDLCursorSurface = SDL_CreateRGBSurface(	SDL_SWSURFACE,	width,	height,	 32, 0, 0, 0,255 );
-	SDL_SetColorKey(mSDLCursorSurface, SDL_SRCCOLORKEY, SDL_MapRGB(mSDLSurfaceScaled->format, 0, 0, 0)	);
+	//SDL_SetColorKey(mSDLCursorSurface, SDL_SRCCOLORKEY, SDL_MapRGB(mSDLSurfaceScaled->format, 0, 0, 0)	);
 
 	// Draw the red for the border
 	SDL_Rect	rect;
 	rect.x = rect.y = 0;
 	rect.w = width;
 	rect.h = height;
-	SDL_FillRect (mSDLCursorSurface, &rect, SDL_MapRGB(mSDLSurface->format, 255, 0, 0)); 
+	SDL_FillRect (mSDLCursorSurface, &rect, SDL_MapRGB(mSDLCursorSurface->format, 255, 0, 0)); 
 
 	// Make the middle transparent
 	rect.x = rect.y = 2;
 	rect.w -= (2 * mScale);
 	rect.h -= (2 * mScale);
-	SDL_FillRect (mSDLCursorSurface, &rect, SDL_MapRGB(mSDLSurface->format, 0, 0, 0)); 
+	SDL_FillRect (mSDLCursorSurface, &rect, SDL_MapRGB(mSDLCursorSurface->format, 0, 0, 0)); 
 }
 
 void cScreen::cursorSize( size_t pWidth, size_t pHeight ) {
@@ -132,39 +129,6 @@ void cScreen::cursorSet( word pPosX, word pPosY ) {
 	mCursorY = pPosY;
 }
 
-void cScreen::scaleSet( byte pScale ) {
-	word width, height;
-
-	// Invalid scale level?
-	if(pScale > 4)
-		return;
-
-	// Cleanup previous resources
-	SDL_FreeSurface( mSDLSurfaceScaled );
-	delete mWindow;
-
-	// Set new scale level
-	mScale = pScale;
-	
-#ifndef _WII
-	mDrawDestX = 8 * mScale;
-	mDrawSrcY = 15 * mScale;
-#else
-	mDrawDestX = 0;
-	mDrawDestY = 0;
-	mDrawSrcX = 24 * mScale;
-	mDrawSrcY = 20 * mScale;
-#endif
-
-	// Set new width/height
-	width = gWidth * mScale;
-	height = gHeight * mScale;
-
-	// Create window and a surface to scale to
-	mWindow = new cVideoWindow( width, height, 4, mFullScreen );
-	mSDLSurfaceScaled =	SDL_CreateRGBSurface(	SDL_SWSURFACE,	width, height,	 32, 0, 0, 0, 0);
-}
-
 void cScreen::bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 ) {
 	
 	mBitmapBuffer = pBuffer;
@@ -176,7 +140,7 @@ void cScreen::bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte
 }
 
 void cScreen::bitmapRefresh() {
-	mSurface->Wipe();
+	mSurface->WipeBuffer();
 
 	if(mBitmapRedraw) {
 		clear();
@@ -196,12 +160,12 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 	bool			 col1 = false, col2 = false;
 
 	sScreenPiece	*dest = 0;
-	dword			*destBuffer = 0;
+	byte			*destBuffer = 0;
 	sScreenPiece	*source = pSurface->screenPiecesGet();
-	dword			*sourceBuffer = pSurface->screenBufferGet();
+	byte			*sourceBuffer = pSurface->GetSurfaceBuffer();
 
-	size_t			 height = pSurface->heightGet();
-	size_t			 width = pSurface->widthGet();
+	size_t			 height = pSurface->GetHeight();
+	size_t			 width = pSurface->GetWidth();
 
 	mScreenRedraw = true;
 
@@ -209,7 +173,7 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 	for( word y = 0; y < height; ++y, ++pDestY ) {
 
 		dest = mSurface->screenPieceGet( pDestX, pDestY);
-		destBuffer = mSurface->screenBufferGet( pDestX, pDestY );
+		destBuffer = mSurface->GetSurfaceBuffer( pDestX, pDestY );
 
 		// Loop width
 		for( word x = 0; x < width; ++x ) {
@@ -245,7 +209,7 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 					dest->mSprite2 = pSpriteNo;
 			}
 
-			if( *sourceBuffer != 0 ) {
+			if( *sourceBuffer != 0 && *sourceBuffer != 0xFF) {
 
 				// Does this sprite have priority over the background?
 				if( !pPriority || ((dest->mPriority == ePriority_Background) && pPriority) ) {
@@ -296,7 +260,7 @@ void cScreen::windowTitleUpdate() {
 	windowTitle << " (" << VERSION;
 	windowTitle << " - " << __DATE__ << ")";
 
-	mWindow->titleSet( windowTitle.str() );
+	mWindow->TitleSet( windowTitle.str() );
 }
 
 void cScreen::refresh() {
@@ -313,23 +277,20 @@ void cScreen::refresh() {
 
 	if( mScreenRedraw ) {
 		mScreenRedraw = false;
-
-		SDL_Surface *surface = scaleUp();	
-		mWindow->clear(0);
-
-		if(!surface)
-			surface = mSDLSurface;
-
-		mWindow->blit( surface, mDrawDestX, mDrawDestY, mDrawSrcX, mDrawSrcY );
+	
+		mSurface->draw();
+		mWindow->RenderAt( mSurface, cPosition( mDrawDestX, mDrawDestY ) );
 
 		if(mCursorOn) {
 			size_t x =  ((mCursorX) * 2 ) * mScale;
 			size_t y =  70 + (mCursorY) * mScale;
 			
-			mWindow->blit( mSDLCursorSurface, x, y  );
+			//TODO
+			//mWindow->RenderAt( mSDLCursorSurface, cPosition(x,y) );
 		}
+		mWindow->FrameEnd();
 	}
-
+	
 }
 
 void cScreen::spriteDisable() {
@@ -358,29 +319,12 @@ void cScreen::spriteDraw() {
 	mScreenRedraw = true;
 }
 
-SDL_Surface	*cScreen::scaleUp( ) {
-
-	if( mScale < 2 || mScale > 4 ) {
-
-		memcpy( mSDLSurface->pixels, mSurface->screenBufferGet(), mSDLSurface->pitch * mSDLSurface->h );
-
-		return mSDLSurface;
-	}
-
-	SDL_SetColorKey(mSDLSurfaceScaled, SDL_SRCCOLORKEY, SDL_MapRGB(mSDLSurfaceScaled->format, 0, 0, 0)	);
-
-	// Do the scale
-	scale(mScale, mSDLSurfaceScaled->pixels, mSDLSurfaceScaled->pitch, mSurface->screenBufferGet(), mSDLSurface->pitch, mSDLSurface->format->BytesPerPixel, mSDLSurface->w, mSDLSurface->h);
-
-	return mSDLSurfaceScaled;
-}
-
 void cScreen::drawStandardText(byte *pTextData, word pTextChar, byte *pColorData) {
 	dword	data;
 	
 	mTextRedraw = true;
 	
-	mSurface->Wipe();
+	mSurface->WipeBuffer();
 
 	for( unsigned int y = 0; y < 200; y += 8 ) {
 

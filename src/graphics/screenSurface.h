@@ -42,36 +42,54 @@ struct sScreenPiece {
 };
 
 class cScreenSurface {
-private:
-	dword			*mScreenBuffer;
-	sScreenPiece	*mScreenPieces;				// Screen Info
-
-	size_t			 mScreenSize;
-
-	size_t			 mWidth, mHeight;
-
+protected:
 	dword			 mPalette[16];
+
+	sScreenPiece	*mScreenPieces;
+
+	byte*			mSurfaceBuffer;								// Loaded Image (uses palette indexs)
+	size_t			mSurfaceBufferSize;
+
+	SDL_Surface*	mSDLSurface;
+	SDL_Texture*	mTexture;
+
+	size_t			mWidth, mHeight;
+	bool			mFaded;
+
 	void			 palettePrepare();
+	void			 Wipe( byte pColor = 0 );						// Clear the surface
 
 public:
-
+	
 					 cScreenSurface( size_t pWidth, size_t pHeight );
-					~cScreenSurface( );
-
-	void			 pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePriority pPriority, size_t pCount = 1 );
-	void			 Wipe( dword pColor = 0 ) ;
+					~cScreenSurface();
 
 
-	inline size_t		 heightGet() { return mHeight; }
-	inline size_t		 widthGet()  { return mWidth; }
+	void			 draw( size_t pX = 0 , size_t pY = 0);					// Draw image to SDL Surface
 
-	inline dword *screenBufferGet() { return mScreenBuffer; }
-	inline dword *screenBufferGet( size_t pX, size_t pY ) {
-		return &mScreenBuffer[ ((pY * mWidth) + pX) ];
+
+
+	void			 WipeBuffer( byte pColor = 0 );
+
+	dword			*pixelGet( word pX = 0,	word pY = 0 );
+	void			 pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePriority pPriority, size_t pCount = 1);
+
+	inline SDL_Surface* GetSDLSurface() const { return mSDLSurface; }
+	inline SDL_Texture* GetTexture() const { return mTexture; };
+	inline byte*		GetSurfaceBuffer() const { return mSurfaceBuffer; }
+	inline byte*		GetSurfaceBuffer( word pDestX, word pDestY ) const { return mSurfaceBuffer + (mWidth * pDestY) + pDestX; }
+	inline bool			GetFaded() { return mFaded; }
+
+	inline byte *screenBufferGet() { return mSurfaceBuffer; }
+	inline byte *screenBufferGet( size_t pX, size_t pY ) {
+		return &mSurfaceBuffer[ ((pY * mWidth) + pX) ];
 	}
 
 	inline sScreenPiece *screenPiecesGet() { return mScreenPieces; }
 	inline sScreenPiece *screenPieceGet( size_t pX, size_t pY ) {
-		return &mScreenPieces[ ((pY * mWidth) + pX) ];
+	return &mScreenPieces[ ((pY * mWidth) + pX) ];
 	}
+
+	inline size_t		GetWidth() const { return mWidth;  }
+	inline size_t		GetHeight() const { return mHeight; }
 };
