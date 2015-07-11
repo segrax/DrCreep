@@ -48,12 +48,12 @@
 	#include <sys/timeb.h>
 #endif
 
-sObjectData mObjectCollisionData[6] = {	0x01, 0x00,	// Player
-										0x00, 0x04, // Lightning
-										0x00, 0x03, // Forcefield
-										0x01, 0x02, // Mummy
-										0x00, 0x04, // RayGun Laser
-										0x01, 0x00  // Frankie
+sObjectData mObjectCollisionData[6] = {	{0x01, 0x00}, // Player
+										{0x00, 0x04}, // Lightning
+										{0x00, 0x03}, // Forcefield
+										{0x01, 0x02}, // Mummy
+										{0x00, 0x04}, // RayGun Laser
+										{0x01, 0x00}  // Frankie
 									};
 
 cCreep::cCreep() {
