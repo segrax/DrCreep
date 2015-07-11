@@ -61,7 +61,7 @@ bool cWindow::InitWindow( const std::string& pWindowTitle ) {
 		return false;
 	}
 
-	SDL_RenderSetLogicalSize(mRenderer, 320, 200);
+	SDL_RenderSetLogicalSize(mRenderer, gWidth, gHeight);
 
 	//SetCursor();
 	return true;
@@ -165,38 +165,7 @@ void cWindow::RenderAt( cScreenSurface* pImage, cPosition pSource ) {
 	//Draw the texture
 	SDL_RenderCopy( mRenderer, pImage->GetTexture(), &Src, NULL);
 }
-/*
-void cWindow::RenderAt( cImage* pImage, cPosition pSource, cDimension pSourceDimension, cPosition pDestination, cDimension pDestinationDimension  ) {
-	SDL_Rect Src;
-	SDL_Rect Dest;
-	
-	Src.w = pSourceDimension.mWidth;
-	Src.h = pSourceDimension.mHeight;
-	Src.x = pSource.mX;
-	Src.y = pSource.mY;
 
-	Dest.x = pDestination.mX;
-	Dest.y = pDestination.mY;
-	Dest.w = pDestinationDimension.mWidth;
-	Dest.h = pDestinationDimension.mHeight;
-
-	//Draw the texture
-	SDL_RenderCopy( mRenderer, pImage->GetTexture(), &Src, &Dest);
-}
-
-cImage* cWindow::RenderText( const std::wstring& pString ) {
-	SDL_Color TextColor;
-	TextColor.b = 255;
-
-	SDL_Surface* textSurface = TTF_RenderText_Solid( mFont, Sqrat::wstring_to_string( pString ).c_str(), TextColor );
-	SDL_Texture* texture = SDL_CreateTextureFromSurface( mRenderer, textSurface );
-	SDL_FreeSurface( textSurface );
-
-	cImage* Image = new cImage( texture );
-
-	return Image;
-}
-*/
 void cWindow::FrameEnd() {
 
 	SDL_RenderPresent( mRenderer );
@@ -217,17 +186,6 @@ void cWindow::SetMousePosition( const cPosition& pPosition ) {
 	SDL_WarpMouseInWindow( mWindow, pPosition.mX, pPosition.mY );
 }
 
-/*
-const cDimension cWindow::GetDimensionWindow() const {
-	
-	return mDimensionWindow;
-}
-
-const cDimension cWindow::GetDimensionPlayfield() const {
-
-	return mDimensionPlayfield;
-}
-*/
 SDL_Renderer* cWindow::GetRenderer() const {
 
 	return mRenderer;

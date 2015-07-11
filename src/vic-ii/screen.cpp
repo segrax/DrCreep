@@ -61,8 +61,8 @@ cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 
 	mDrawDestX = mDrawDestY = mDrawSrcX = mDrawSrcY = 0;
 	
-	mWindow = new cWindow( gWidth, gHeight );
-	mWindow->InitWindow( "The Castles of Dr. Creep" );
+	mWindow = new cWindow( gWidth * 2, gHeight * 2 );
+	mWindow->InitWindow( pWindowTitle );
 
 	mSurface	= new cScreenSurface( gWidth, gHeight );
 	mBitmap		= new cBitmapMulticolor();
