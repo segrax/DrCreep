@@ -1,6 +1,6 @@
 pathInc = -I/usr/include/directfb/direct -I/usr/include/directfb -I./src
-Libs = `sdl-config --cflags` -L/usr/local/lib
-DLibs = `sdl-config --libs` -L/usr/local/lib
+Libs = `sdl2-config --cflags` -L/usr/local/lib
+DLibs = `sdl2-config --libs` -L/usr/local/lib
  
 CC = g++ -DFREEBSD -c -Wall $(pathInc) $(Libs)
 LD = g++ obj/*.o $(DLibs)
