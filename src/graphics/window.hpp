@@ -50,5 +50,5 @@ class cWindow : public cSingleton<cWindow> {
 		void				TitleSet( std::string pWindowText );
 
 		SDL_Renderer*		GetRenderer() const;
-
+		SDL_Window*			GetWindow() const;
 };

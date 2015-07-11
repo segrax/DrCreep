@@ -185,6 +185,7 @@ void cPlayerInput::KeyboardCheck() {
 			default:
 				mKeyPressed = mEvent.mButton;
 				mKeyPressedRaw = mEvent.mButtonRaw;
+				break;
 		}
 	}
 

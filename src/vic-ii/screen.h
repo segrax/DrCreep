@@ -87,7 +87,10 @@ public:
 
 	inline vector< sScreenPiece* > *collisionsGet() { return &mCollisions; }
 	inline void						fullscreenToggle() {	mFullScreen = !mFullScreen;
-
+															if (mFullScreen)
+																SDL_SetWindowFullscreen( mWindow->GetWindow(), SDL_FALSE );
+															else
+																SDL_SetWindowFullscreen( mWindow->GetWindow(), SDL_TRUE );
 															mScreenRedraw = true;
 															refresh();
 														}

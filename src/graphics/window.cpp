@@ -63,6 +63,8 @@ bool cWindow::InitWindow( const std::string& pWindowTitle ) {
 
 	SDL_RenderSetLogicalSize(mRenderer, gWidth, gHeight);
 
+	//SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+
 	//SetCursor();
 	return true;
 }
@@ -189,4 +191,8 @@ void cWindow::SetMousePosition( const cPosition& pPosition ) {
 SDL_Renderer* cWindow::GetRenderer() const {
 
 	return mRenderer;
+}
+
+SDL_Window*	cWindow::GetWindow() const {
+	return mWindow;
 }
