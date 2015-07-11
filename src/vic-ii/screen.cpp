@@ -111,8 +111,8 @@ void cScreen::cursorEnabled( bool pOn ) {
 
 	// Make the middle transparent
 	rect.x = rect.y = 2;
-	rect.w -= (2 * mScale);
-	rect.h -= (2 * mScale);
+	rect.w -= 2;
+	rect.h -= 2;
 	SDL_FillRect (mSDLCursorSurface, &rect, SDL_MapRGB(mSDLCursorSurface->format, 0, 0, 0)); 
 }
 

@@ -105,8 +105,8 @@ private:
 
 	void						 bamSectorMark( size_t pTrack, size_t pSector, bool pValue = true );				// Mark a sector used/free
 
-	bool						 bamTrackSectorFree( size_t &pTrack, size_t &pSector );								// Check for free sectors in a track
-	bool						 bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrack = 0x12 );	// Check for free sectors on the disk
+	bool						 bamTrackSectorFree( byte &pTrack, byte &pSector );									// Check for free sectors in a track
+	bool						 bamSectorFree( byte &pTrack, byte &pSector, byte pDirectoryTrack = 0x12 );		// Check for free sectors on the disk
 
 	bool						 bamTest( );																		// Test the BAM against the real one
 
@@ -118,13 +118,13 @@ private:
 	void						 filesCleanup();										// Memory Cleanup
 	bool						 fileLoad( sD64File *pFile );							// Load a file from the disk
 
-	byte						*sectorPtr( size_t pTrack, size_t pSector );			// Obtain pointer to 'pTrack'/'pSector' in the disk buffer
+	byte						*sectorPtr( dword pTrack, dword pSector );				// Obtain pointer to 'pTrack'/'pSector' in the disk buffer
 
-	inline size_t				 trackRange(size_t pTrack) {							// Number of sectors in 'pTrack'
+	inline byte					 trackRange(byte pTrack) {							// Number of sectors in 'pTrack'
 		return 21 - (pTrack > 17) * 2 - (pTrack > 24) - (pTrack > 30);
 	}
 
-	inline bool					 bamTrackSectorUse( size_t pTrack, size_t pSector ) {	// Is 'pTrack' / 'pSector' free?
+	inline bool					 bamTrackSectorUse( byte pTrack, byte pSector ) {	// Is 'pTrack' / 'pSector' free?
 		if( pTrack == 0 || pTrack > mTrackCount || pSector > trackRange(pTrack) )
 			return false;
 

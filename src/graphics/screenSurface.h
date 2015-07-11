@@ -53,7 +53,7 @@ protected:
 	SDL_Surface*	mSDLSurface;
 	SDL_Texture*	mTexture;
 
-	size_t			mWidth, mHeight;
+	int				mWidth, mHeight;
 	bool			mFaded;
 
 	void			 palettePrepare();
@@ -61,7 +61,7 @@ protected:
 
 public:
 	
-					 cScreenSurface( size_t pWidth, size_t pHeight );
+					 cScreenSurface( int pWidth, int pHeight );
 					~cScreenSurface();
 
 

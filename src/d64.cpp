@@ -121,10 +121,10 @@ cD64::~cD64( ) {
 // Check the BAM against the loaded information
 bool cD64::bamTest( ) {
 
-	for( size_t track = 1; track <= mTrackCount; ++track )
+	for( byte track = 1; track <= mTrackCount; ++track )
 
 		// Check each sector of the track
-		for( size_t sector = 0; sector < trackRange( track ); ++sector ) {
+		for( byte sector = 0; sector < trackRange( track ); ++sector ) {
 		
 			if( mBamTracks[track][sector] )
 				if( !mBamRealTracks[track][sector] )
@@ -180,13 +180,13 @@ void cD64::bamCreate() {
 
 // Set BAM to empty disk state
 void cD64::bamClear() {
-	size_t range = 0;
+	byte range = 0;
 
 	// Clear BAM memory 
-	for( size_t T = 0; T <= mTrackCount; ++T ) {
+	for( byte T = 0; T <= mTrackCount; ++T ) {
 		mBamFree[T] = range = trackRange(T);
 
-		for( size_t S = 0; S <= 0x17; ++S ) {
+		for( byte S = 0; S <= 0x17; ++S ) {
 			mBamRealTracks[T][S] = 0;
 
 			if(S < range) {
@@ -284,12 +284,12 @@ void cD64::bamSectorMark( size_t pTrack, size_t pSector, bool pValue ) {
 }
 
 // Check a track for free sectors
-bool cD64::bamTrackSectorFree( size_t &pTrack, size_t &pSector ) {
-	size_t track = pTrack;
+bool cD64::bamTrackSectorFree( byte &pTrack, byte &pSector ) {
+	byte track = pTrack;
 	bool wrapped = false;
 
 	// Loop each sector in this track
-	for( size_t sector = pSector; sector < trackRange( track ); ) {
+	for( byte sector = pSector; sector < trackRange( track ); ) {
 			
 		// Is this sector free
 		if( mBamTracks[track][sector] == true ) {
@@ -321,9 +321,9 @@ bool cD64::bamTrackSectorFree( size_t &pTrack, size_t &pSector ) {
 // 
 // Starting from the directory track, attempt to find a free sector, moving the head in one direction
 //
-bool cD64::bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrack ) {
+bool cD64::bamSectorFree( byte &pTrack, byte &pSector, byte pDirectoryTrack ) {
 	bool first = false, moveDown = true;
-	size_t	moveSize = 0;
+	byte	moveSize = 0;
 	
 	// Disk track check has gone past the end atleast once
 	bool wrapped = false;
@@ -353,7 +353,7 @@ bool cD64::bamSectorFree( size_t &pTrack, size_t &pSector, size_t pDirectoryTrac
 	}
 
 	// Loop for each track of the disk
-	for( size_t track = pTrack; track > 0 && track <= mTrackCount; ) {
+	for( byte track = pTrack; track > 0 && track <= mTrackCount; ) {
 		
 		// Test this track, starting at 'pSector'
 		if( bamTrackSectorFree( track, pSector ) == true ) {
@@ -475,7 +475,7 @@ sD64File *cD64::directoryEntryLoad( byte *pBuffer ) {
 // Load the disk directory
 void cD64::directoryLoad() {
 	// Directory starts at Track 18, sector 1
-	size_t   currentTrack = 0x12, currentSector = 1;
+	byte   currentTrack = 0x12, currentSector = 1;
 	byte	*sectorBuffer;
 
 	// Cleanup previous load
@@ -537,7 +537,7 @@ bool cD64::directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer ) {
 bool cD64::directoryAdd( sD64File *pFile ) {
 	
 	// Directory starts at Track 18, sector 1
-	size_t   currentTrack = 0x12, currentSector = 1;
+	byte   currentTrack = 0x12, currentSector = 1;
 	byte	*sectorBuffer;
 
 	// Loop until the current Track/Sector is invalid
@@ -605,8 +605,8 @@ void cD64::filesCleanup() {
 
 // Load a file from the disk
 bool cD64::fileLoad( sD64File *pFile ) {
-	size_t bytesCopied = 0, copySize = 0xFE;
-	size_t currentTrack = pFile->mTrack, currentSector = pFile->mSector;
+	word bytesCopied = 0, copySize = 0xFE;
+	byte currentTrack = pFile->mTrack, currentSector = pFile->mSector;
 	bool   noCopy = false;
 
 	// Cleanup old buffer
@@ -704,7 +704,8 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 	
 	//
 	byte	*buffer = 0, *bufferSrc = pData;
-	size_t	 track = 0, sector = 0, copySize = 0;
+	byte	 track = 0, sector = 0;
+	size_t	 copySize = 0;
 
 	bool sectorFirst = true;
 
@@ -778,8 +779,8 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 }
 
 // Obtain pointer to 'pTrack'/'pSector' in the disk buffer
-byte *cD64::sectorPtr( size_t pTrack, size_t pSector ) {
-	size_t	currentTrack, currentRange;
+byte *cD64::sectorPtr( dword pTrack, dword pSector ) {
+	dword	currentTrack, currentRange;
 	dword	offset = 0;
 
 	// Invalid track?
