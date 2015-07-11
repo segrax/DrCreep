@@ -58,27 +58,6 @@ Robert Crossfield <robcrossfield@gmail.com>
 
  D64s will be created in the data\save folder, and all save games will be stored in these files.
  These files are compatible with the original Commodore64 game, and in return the original save games are supported.
-
-
-####Wii Version
-
-#####Required
- 
- SD Card with folder '/apps/drcreep/data' containing your Dr.Creep D64 and CHAR.ROM
- 
-
-
-####Controls
-    Hold WiiMote on its side,
-    
-#####In-Game
-    DPAD 	= Movement
-    Button 2 	= Fire Button
-    Button A 	= Self Kill
-
-#####Intro	
-    Button Plus = Option Menu
-    Button 1 	= HighScores
     
 
 ####Game Controls
