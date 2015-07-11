@@ -30,7 +30,7 @@
 #include "creep.h"
 #include <time.h>
 
-const word gWidth = 384, gHeight = 272;
+const word gWidth = 366, gHeight = 272;
 
 cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
 
