@@ -252,7 +252,7 @@ protected:
 	byte		 mUnlimitedLives;
 	dword		 mTicksPrevious;
 	timeb		 mPlayer1Time, mPlayer2Time;
-	size_t		 mPlayer1Seconds, mPlayer2Seconds;
+	int			 mPlayer1Seconds, mPlayer2Seconds;
 
 	bool		 mPlayerStatus[2];
 	word		 mVoice, mVoiceTmp;

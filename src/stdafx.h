@@ -51,7 +51,6 @@ using namespace std;
 class cCreep;
 
 extern const char *VERSION;
-extern cCreep	  *gCreep;
 
 #ifndef _WIN32
 	#include <unistd.h>
@@ -122,3 +121,4 @@ bool			 local_FileCreate( string pFile, string pPath, bool pDataSave );
 bool			 local_FileSave( string pFile, string pPath, bool pDataSave, byte *pBuffer, size_t pBufferSize );
 
 #define g_Window cWindow::GetSingleton()
+#define g_Creep cCreep::GetSingleton()

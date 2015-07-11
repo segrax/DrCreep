@@ -72,7 +72,7 @@ struct sObjectPart {
 	bool		mSet;
 	bool		mDrags;					// object will be dragged when being placed
 	eDirection	mDragDirection;
-	size_t		mLength;
+	byte		mLength;
 	bool		mPlaced;
 	byte		mCursorWidth, mCursorHeight;
 
@@ -127,7 +127,7 @@ public:
 
 	void		 mPartAdd()			{ ++mPart; }
 
-	void		 partSet( size_t pVal ) { mPart = pVal; }
+	void		 partSet( byte pVal ) { mPart = pVal; }
 
 	sObjectPart	*partGet()			{ return &mParts[ mPart ]; }
 	sObjectPart	*partGet( size_t pPart )			{ return &mParts[ pPart ]; }

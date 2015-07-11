@@ -27,6 +27,7 @@
 #include "d64.h"
 #include "castle/castle.h"
 #include "castleManager.h"
+#include "creep.h"
 
 cCastleInfoD64::cCastleInfoD64( cCastleManager *pCastleManager, cD64 *pD64, sD64File *pFile ) : cCastleInfo( pCastleManager, pFile->mName ) {
 	mD64 = pD64;
@@ -527,7 +528,7 @@ cCastle *cCastleManager::castleLoad( size_t pNumber ) {
 		return 0;
 
 	delete mCastle;
-	mCastle = new cCastle( gCreep, mCastles[ pNumber ] );
+	mCastle = new cCastle( cCreep::GetSingletonPtr(), mCastles[ pNumber ] );
 	
 	return mCastle;
 }

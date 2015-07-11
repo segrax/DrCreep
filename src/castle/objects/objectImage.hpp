@@ -52,8 +52,8 @@ public:
 
 		word word_30 = 0;
 		
-		size_t X = mWidth;
-		size_t height = (mHeight - 1) >> 3;
+		dword X = mWidth;
+		dword height = (mHeight - 1) >> 3;
 		++height;
 
 		//1B18

@@ -44,7 +44,6 @@ class cPlayerInput {
 private:
 	cEvent				 mEvent;
 	sPlayerInput		 mInput[2];
-	cCreep				*mCreep;
 	bool				 mRunStop,	mRestore, mF2, mF3, mF4, mF5;
 	bool				 mFullscreen;
 	byte				 mKeyPressed, mKeyPressedRaw;
@@ -56,7 +55,7 @@ private:
     void         JoystickInputSet( sPlayerInput *pInput );
 
 public:
-				 cPlayerInput( cCreep *pCreep );
+				 cPlayerInput();
 				~cPlayerInput();
 
 	void		 inputCheck( bool pClearAll, cEvent pEvent );

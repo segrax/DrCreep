@@ -37,7 +37,6 @@ class cScreen {
 	cWindow					*mWindow;
 	cBitmapMulticolor		*mBitmap;
 	cScreenSurface			*mSurface;
-	cCreep					*mCreep;
 
 	SDL_Surface				*mSDLCursorSurface;
 
@@ -60,7 +59,7 @@ class cScreen {
 
 public:
 
-							 cScreen( cCreep *pCreep, string pWindowTitle );
+							 cScreen( string pWindowTitle );
 							~cScreen();
 	
 	void					 bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte pBackgroundColor0 );

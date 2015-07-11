@@ -67,8 +67,8 @@ cCreep::cCreep() {
 
 	mDebug = new cDebug();
 	mCastleManager = new cCastleManager();
-	mInput = new cPlayerInput( this );
-	mScreen = new cScreen( this, mWindowTitle );
+	mInput = new cPlayerInput();
+	mScreen = new cScreen( mWindowTitle );
 	mSound = 0;
 
 	// Load the C64 Character Rom
@@ -195,7 +195,7 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	bool consoleShow = false;
 
 	int	count = 0;
-	size_t	playLevel = 0;
+	int	playLevel = 0;
 	bool	playLevelSet = false;
 	bool	unlimited = false;
 
@@ -1372,7 +1372,7 @@ void cCreep::menuUpdate( size_t pCastleNumber ) {
 
 	word_30 += mMemory[ 0xBA00 + pCastleNumber ];
 
-	mMemory[ 0x24A6 ] = pCastleNumber;
+	mMemory[ 0x24A6 ] = (byte) pCastleNumber;
 
 	// 2466
 
@@ -2020,17 +2020,17 @@ void cCreep::obj_Player_Execute( byte pSpriteNumber ) {
 		time_t diffSec;
 		timeb timeNow;
 		ftime(&timeNow);
-		size_t seconds, secondsO, minutes, hours;
+		int seconds, secondsO, minutes, hours;
 
 		// Player 1/2 Time management
 		if( Y == 0 ) {
 			diffSec = timeNow.time - mPlayer1Time.time;
-			mPlayer1Seconds += (size_t) diffSec;
+			mPlayer1Seconds += (int) diffSec;
 			secondsO = mPlayer1Seconds;
 		}
 		if( Y == 2 ) {
 			diffSec = timeNow.time - mPlayer2Time.time;
-			mPlayer2Seconds += (size_t) diffSec;
+			mPlayer2Seconds += (int) diffSec;
 			secondsO = mPlayer2Seconds;
 		}
 
@@ -4513,7 +4513,7 @@ void cCreep::gameHighScores( ) {
 
 	word_30 = (A + mMemory[ 0xBA00 + X ]) + ((mMemory[ 0x5D06 + Y] | 0x04) << 8);
 
-	mMemory[ 0xBA03 + X ] = mCastle->nameGet().size() + 1;
+	mMemory[ 0xBA03 + X ] = (byte) mCastle->nameGet().size() + 1;
 
 	Y =  mMemory[ 0xBA03 + X ] - 2;
 

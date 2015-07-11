@@ -54,24 +54,24 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 		mBuffer += 2;
 
 		// Set the window title screen
-		gCreep->screenGet()->levelNameSet( mName );
+		g_Creep.screenGet()->levelNameSet( mName );
 
 		// Copy the castle into game memory
-		memcpy( gCreep->memory(0x9800), mBuffer, pCastleInfo->bufferSizeGet() - 2 );
+		memcpy( g_Creep.memory(0x9800), mBuffer, pCastleInfo->bufferSizeGet() - 2 );
 
 		// Load the highscores for this castle
-		if( mCastleInfo->managerGet()->scoresLoad( mName, gCreep->memory(0xB800) ) == false ) {
+		if( mCastleInfo->managerGet()->scoresLoad( mName, g_Creep.memory(0xB800) ) == false ) {
 			
 			// No highscores found, write a blank table
 
 			// Size of table
-			writeLEWord( gCreep->memory(0xB800), 0x007A );
+			writeLEWord( g_Creep.memory(0xB800), 0x007A );
 			
 			// Entries
 			for( signed char Y = 0x77; Y >= 0; --Y )
-				*gCreep->memory( 0xB802 + Y ) = 0xFF;
+				*g_Creep.memory( 0xB802 + Y ) = 0xFF;
 
-			gCreep->DisableSpritesAndStopSound();
+			g_Creep.DisableSpritesAndStopSound();
 		}
 	} else {
 		mBuffer = mCreep->memory( 0x7800 );
@@ -179,7 +179,7 @@ void cCastle::castleSave( byte *pTarget ) {
 	// Room Directory Terminator
 	*(buffer) = 0xFF;
 
-	word	memDest = 0x7900 + (mRooms.size() * 8) + 1;
+	size_t	memDest = 0x7900 + (mRooms.size() * 8) + 1;
 	size_t	size = 0;
 
 	for( roomIT = mRooms.begin(); roomIT != mRooms.end(); ++roomIT ) {

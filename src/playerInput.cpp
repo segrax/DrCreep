@@ -29,8 +29,7 @@
 #include "vic-ii/screen.h"
 
 
-cPlayerInput::cPlayerInput( cCreep *pCreep ) {
-	mCreep = pCreep;
+cPlayerInput::cPlayerInput() {
 
 	mKeyPressed = 0;
 	mKeyPressedRaw = 0;
@@ -180,7 +179,7 @@ void cPlayerInput::KeyboardCheck() {
 				break;
 
 			case SDL_SCANCODE_F10:
-				mCreep->screenGet()->fullscreenToggle();
+				g_Creep.screenGet()->fullscreenToggle();
 				break;
 
 			default:

@@ -33,8 +33,6 @@ const char   *VERSION = "v1.1";
 const char	 *gDataPath = "data/";
 const char	 *gSavePath = "data/save/";
 
-cCreep		 *gCreep;
-
 #ifdef _MACOSX
 int SDL_main( int argc, char *argv[]) {
 #else
@@ -47,7 +45,7 @@ int	main( int argc, char *argv[] ) {
 #endif
 
 #ifndef BUILDER
-	gCreep = new cCreep();
+	cCreep* gCreep = new cCreep();
 #else
 	gCreep = new cBuilder(0);
 #endif
@@ -184,11 +182,11 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 
 	finalPath << "/*" << pExtension;
 
-	int size = MultiByteToWideChar( 0,0, finalPath.str().c_str(), finalPath.str().length(), 0, 0);
+	size_t size = MultiByteToWideChar( 0,0, finalPath.str().c_str(), (int) finalPath.str().length(), 0, 0);
 	WCHAR    *pathFin = new WCHAR[ size + 1];
 	memset( pathFin, 0, size + 1);
 
-	size = MultiByteToWideChar( 0,0, finalPath.str().c_str(), size, pathFin, size);
+	size = MultiByteToWideChar( 0,0, finalPath.str().c_str(), (int) size, pathFin, (int) size);
 	pathFin[size] = 0;
 
 	if((dhandle = FindFirstFile(pathFin, &fdata)) == INVALID_HANDLE_VALUE) {

@@ -227,7 +227,7 @@ size_t cRoom::saveCount( byte **pBuffer, eRoomObjects pObjectType ) {
 	*pBuffer += 2;
 
 	// Number of objects
-	*(*pBuffer)++ = objects.size();
+	*(*pBuffer)++ = (byte) objects.size();
 
 	// Write each door
 	for( objectIT = objects.begin(); objectIT != objects.end(); ++objectIT ) 

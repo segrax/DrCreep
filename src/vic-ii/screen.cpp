@@ -32,9 +32,7 @@
 
 const word gWidth = 366, gHeight = 272;
 
-cScreen::cScreen( cCreep *pCreep, string pWindowTitle ) {
-
-	mCreep = pCreep;
+cScreen::cScreen( string pWindowTitle ) {
 
 	for(byte Y = 0; Y < 8; ++Y ) {
 		mSprites[Y] = new cSprite();
@@ -341,7 +339,7 @@ void cScreen::drawStandardText(byte *pTextData, word pTextChar, byte *pColorData
 			for( size_t charY = 0 ; charY < 8; ++charY ) {
 
 				// Read char row
-				data = mCreep->charRom( 0xD000 + (_vidChar + charY & 0x0FFF) );
+				data = g_Creep.charRom( 0xD000 + (_vidChar + charY & 0x0FFF) );
 
 				// Lets draw 8 bits
 				for( size_t bit = 0, charX = X; bit < 8; bit++, charX++ ) {
