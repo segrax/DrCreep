@@ -40,7 +40,7 @@ cPlayerInput::cPlayerInput() {
 	mF3 = false;
 	mF4 = false;
 	mF5 = false;
-
+	mReturnPressed = false;
 }
 
 cPlayerInput::~cPlayerInput() {
@@ -60,6 +60,7 @@ void cPlayerInput::inputClear() {
 	mF5 = false;
 	mRunStop = false;
 	mRestore = false;
+	mReturnPressed = false;
 }
 
 void cPlayerInput::joystickSet( size_t pPlayer, int pJoystickNumber ) {
@@ -109,6 +110,12 @@ void cPlayerInput::KeyboardCheck() {
 	if( mEvent.mType == eEvent_KeyUp ) {
 
 		switch( mEvent.mButton ) {
+			case SDL_SCANCODE_RETURN:
+				mReturnPressed = false;
+				mKeyPressed = 0;
+				mKeyPressedRaw = 0;
+				break;
+
 			case SDL_SCANCODE_F1:
 				mRunStop = false;
 				break;
@@ -154,6 +161,12 @@ void cPlayerInput::KeyboardCheck() {
 	if( mEvent.mType == eEvent_KeyDown ) {
 
 		switch( mEvent.mButton ) {
+			case SDL_SCANCODE_RETURN:
+				mReturnPressed = true;
+				mKeyPressed = mEvent.mButton;
+				mKeyPressedRaw = mEvent.mButtonRaw;
+				break;
+
 			case SDL_SCANCODE_F1:
 				mRunStop = true;
 				break;

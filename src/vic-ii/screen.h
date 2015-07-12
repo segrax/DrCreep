@@ -95,7 +95,7 @@ public:
 															refresh();
 														}
 
-	inline void				 bitmapRedrawSet() { mBitmapRedraw = true; }
+	inline void				 bitmapRedrawSet( bool pVal = true ) { mBitmapRedraw = pVal; }
 	inline void				 spriteRedrawSet() { mSpriteRedraw = true; }
 	inline void				 screenRedrawSet() { mScreenRedraw = true; }
 

@@ -277,7 +277,7 @@ void cScreen::refresh() {
 		mScreenRedraw = false;
 	
 		mSurface->draw();
-		mWindow->RenderAt( mSurface, cPosition( mDrawDestX, mDrawDestY ) );
+		mWindow->RenderAt( mSurface, cPosition( 8, 15 ) );
 
 		if(mCursorOn) {
 			size_t x =  ((mCursorX) * 2 ) * mScale;

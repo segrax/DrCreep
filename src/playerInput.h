@@ -44,7 +44,7 @@ class cPlayerInput {
 private:
 	cEvent				 mEvent;
 	sPlayerInput		 mInput[2];
-	bool				 mRunStop,	mRestore, mF2, mF3, mF4, mF5;
+	bool				 mRunStop,	mRestore, mF2, mF3, mF4, mF5, mReturnPressed;
 	bool				 mFullscreen;
 	byte				 mKeyPressed, mKeyPressedRaw;
 
@@ -78,6 +78,7 @@ public:
 	inline bool	 f3Get()		 { retVal( bool, mF3) }
 	inline bool	 f4Get()		 { retVal( bool, mF4) }
 	inline bool	 f5Get()		 { retVal( bool, mF5) }
+	inline bool	 returnGet()	 { retVal( bool, mReturnPressed) }
 	inline bool	 runStopGet()	 { retVal( bool, mRunStop) }
 	inline bool	 restoreGet()	 { retVal( bool, mRestore) }
 	inline bool	 fullscreenGet() { retVal( bool, mFullscreen ) }

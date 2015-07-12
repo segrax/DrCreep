@@ -553,13 +553,6 @@ void cCreep::textShow() {
 				// 2712
 				mStrLength = 0;
 				
-				// Wait for restore key
-				do { 
-					interruptWait(3);
-					eventProcess( true );
-
-				} while( !mInput->restoreGet() );
-				
 				return;
 			}
 		} else {
@@ -1212,6 +1205,7 @@ s2238:
 		}
 		
 		// Decode the background as text
+		mScreen->bitmapRedrawSet( false );
 		mScreen->drawStandardText( &mMemory[ 0x400 ], 0x1000, &mMemory[ 0xD800 ]);
 
         // 
@@ -1329,10 +1323,10 @@ s2238:
                 case 3:{
                     gamePositionLoad();
 						
-				    if( mMemory[ 0x24FD ] != 1 )
-						continue;
+				    //if( mMemory[ 0x24FD ] != 1 )
+					//	continue;
 
-                    break;
+                    goto s2238;
                        }
 
                 case 4:{

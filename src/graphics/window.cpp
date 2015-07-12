@@ -82,11 +82,13 @@ void cWindow::EventCheck() {
 			case SDL_KEYDOWN:
 				Event.mType = eEvent_KeyDown;
 				Event.mButton = SysEvent.key.keysym.scancode;
+				Event.mButtonRaw = SysEvent.key.keysym.sym;
 				break;
 
 			case SDL_KEYUP:
 				Event.mType = eEvent_KeyUp;
 				Event.mButton = SysEvent.key.keysym.scancode;
+				Event.mButtonRaw = SysEvent.key.keysym.sym;
 				break;
 
 			case SDL_MOUSEMOTION:
