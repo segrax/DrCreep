@@ -32,7 +32,10 @@ enum eEventType {
 	eEvent_MouseWheelUp		= 8,
 	eEvent_MouseWheelDown	= 9,
 	eEvent_Quit				= 10,
-	eEvent_Redraw			= 11
+	eEvent_Redraw			= 11,
+	eEvent_JoyButtonDown	= 12,
+	eEvent_JoyButtonUp		= 13,
+	eEvent_JoyMovement		= 14
 };
 
 class cEvent {
@@ -43,6 +46,7 @@ class cEvent {
 		unsigned int		mButtonRaw;
 		unsigned int		mButtonCount;
 
+		int					mJoyAxis;
 		cPosition			mPosition;
 
 	public:

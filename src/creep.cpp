@@ -1136,34 +1136,21 @@ musicUpdate:;
 
 // C49 : Music Change
 void cCreep::musicChange() {
-	vector<string>				musicFiles = mCastleManager->musicGet();
-	vector<string>::iterator	musicIT;
-	bool						ok = false;
+	byte*						MusicPtr = 0;
 
-	if(mMusicCurrent == "")
-		ok = true;
-
-	for( musicIT = musicFiles.begin(); musicIT != musicFiles.end(); ++musicIT ) {
-		
-		// Found current track?
-		if( (*musicIT).compare( mMusicCurrent ) == 0 ) {
-			ok = true;
-			continue;
-		}
-
-		if(ok) 
-			break;
-	}
-
-	if( (!ok) || musicIT == musicFiles.end()) {
-		mMusicCurrent = "";
-		return;
-	}
+	mMusicCurrent[5]++;
 	
 	mMusicBufferSize = 0;
 
-	mMusicCurrent = *musicIT;
-	mMusicBuffer = mCastleManager->fileLoad( mMusicCurrent, mMusicBufferSize ) + 4;		// Skip PRG load address, and the first 2 bytes of the real-data
+	while (MusicPtr == 0) {
+		MusicPtr = mCastleManager->fileLoad( mMusicCurrent, mMusicBufferSize );
+
+		// Reset to MUSIC0
+		if (MusicPtr == 0)
+			mMusicCurrent[5] = '0';
+	};
+
+	mMusicBuffer = MusicPtr + 4;		// Skip PRG load address, and the first 2 bytes of the real-data
 	mMusicBufferStart = mMusicBuffer;
 
 	byte A = 0;
@@ -4205,12 +4192,14 @@ void cCreep::eventProcess( bool pResetKeys ) {
 	for (std::vector<cEvent>::iterator EventIT = mEvents.begin(); EventIT != mEvents.end(); ++EventIT) {
 
 		switch (EventIT->mType) {
+			case eEvent_KeyUp:
 			case eEvent_KeyDown:
 				mInput->inputCheck( pResetKeys, *EventIT );
-
 				break;
 
-			case eEvent_KeyUp:
+			case eEvent_JoyButtonDown:
+			case eEvent_JoyButtonUp:
+			case eEvent_JoyMovement:
 				mInput->inputCheck( pResetKeys, *EventIT );
 				break;
 

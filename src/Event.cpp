@@ -28,6 +28,7 @@ cEvent::cEvent( const eEventType& pType ) {
 	mButton = 0;
 	mButtonRaw = 0;
 	mButtonCount = 0;
+	mJoyAxis = 0;
 }
 
 cEvent::~cEvent() {

@@ -41,7 +41,7 @@ cWindow::~cWindow() {
 
 bool cWindow::InitWindow( const std::string& pWindowTitle ) {
 	
-	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK ) != 0) {
 		// TODO: Log error
 		//SDL_GetError();
 		return false;
@@ -146,6 +146,24 @@ void cWindow::EventCheck() {
 				}
 			}
 
+			case SDL_JOYAXISMOTION:
+				
+				if (SysEvent.jaxis.axis == 0 || SysEvent.jaxis.axis == 1) {
+					Event.mType = eEvent_JoyMovement;
+					Event.mButton = SysEvent.jaxis.axis;
+					Event.mJoyAxis = SysEvent.jaxis.value;
+				}
+				break;
+
+			case SDL_JOYBUTTONDOWN:
+				Event.mType = eEvent_JoyButtonDown;
+				Event.mButton = SysEvent.jbutton.button;
+				break;
+
+			case SDL_JOYBUTTONUP:
+				Event.mType = eEvent_JoyButtonUp;
+				Event.mButton = SysEvent.jbutton.button;
+				break;
 		}
 
 		if ( Event.mType != eEvent_None )

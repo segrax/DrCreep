@@ -205,50 +205,49 @@ void cPlayerInput::KeyboardCheck() {
 }
 
 void cPlayerInput::JoystickInputSet( sPlayerInput *pInput ) {
-    Uint8 button = SDL_JoystickGetButton( pInput->mJoystick, 0 );
-    Uint8 hatEvent = SDL_JoystickGetHat( pInput->mJoystick, 0 );
-	Uint8 hatNums = SDL_JoystickNumHats( pInput->mJoystick );
 
-	Sint16 axisX = SDL_JoystickGetAxis( pInput->mJoystick, 0 )  / 32767;
-	Sint16 axisY = SDL_JoystickGetAxis( pInput->mJoystick, 1 )  / 32767;
+	if (mEvent.mType == eEvent_JoyButtonDown) {
 
-    if( button == 1 )
-        pInput->mButton = true;
-
-    if( button == 0 )
-        pInput->mButton = false;
-
-    if ( axisX == 0 ) {
-        pInput->mLeft = false;
-        pInput->mRight = false;
-    }
-
-	if( axisY == 0 ) {
-		pInput->mDown = false;
-        pInput->mUp = false;
+		pInput->mButton = true;
+		return;
 	}
 
-    if ( axisY == -1 )
-        pInput->mUp = true;
-    else
-        pInput->mUp = false;
+	if (mEvent.mType == eEvent_JoyButtonUp ) {
 
-    if ( axisX == -1 )
-        pInput->mLeft = true;
-    else
-        pInput->mLeft = false;
+		pInput->mButton = false;
+		return;
+	}
 
-    if ( axisX == 1 )
-        pInput->mRight = true;
-    else
-        pInput->mRight = false;
+	if (mEvent.mButton == 0) {
+		if (mEvent.mJoyAxis < -8000) {
+			pInput->mLeft = true;
+			pInput->mRight = false;
+		} else
+		if (mEvent.mJoyAxis > 8000) {
+			pInput->mRight = true;
+			pInput->mLeft = false;
+		}
+		else {
+			pInput->mLeft = false;
+			pInput->mRight = false;
+		}
+	}
 
-    if ( axisY == 1 )
-        pInput->mDown = true;       
-    else
-        pInput->mDown = false;
+	if (mEvent.mButton == 1) {
+		if (mEvent.mJoyAxis < -8000) {
+			pInput->mUp = true;
+			pInput->mDown = false;
+		} else
+		if (mEvent.mJoyAxis > 8000) {
+			pInput->mDown = true;
+			pInput->mUp = false;
+		}
+		else {
+			pInput->mUp = false;
+			pInput->mDown = false;
+		}
+	}
 
-    
 }
 
 void cPlayerInput::KeyboardInputSet1( sPlayerInput *pInput ) {
