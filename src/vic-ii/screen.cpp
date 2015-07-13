@@ -292,6 +292,7 @@ void cScreen::refresh() {
 }
 
 void cScreen::spriteDisable() {
+
 	for( signed char Y = 7; Y >= 0; --Y )
 		mSprites[Y]->_rEnabled = false;
 }

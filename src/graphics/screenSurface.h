@@ -54,7 +54,6 @@ protected:
 	SDL_Texture*	mTexture;
 
 	int				mWidth, mHeight;
-	bool			mFaded;
 
 	void			 palettePrepare();
 	void			 Wipe( byte pColor = 0 );						// Clear the surface
@@ -78,8 +77,7 @@ public:
 	inline SDL_Texture* GetTexture() const { return mTexture; };
 	inline byte*		GetSurfaceBuffer() const { return mSurfaceBuffer; }
 	inline byte*		GetSurfaceBuffer( word pDestX, word pDestY ) const { return mSurfaceBuffer + (mWidth * pDestY) + pDestX; }
-	inline bool			GetFaded() { return mFaded; }
-
+	
 	inline byte *screenBufferGet() { return mSurfaceBuffer; }
 	inline byte *screenBufferGet( size_t pX, size_t pY ) {
 		return &mSurfaceBuffer[ ((pY * mWidth) + pX) ];

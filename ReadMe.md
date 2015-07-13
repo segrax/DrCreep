@@ -49,11 +49,6 @@ Robert Crossfield <robcrossfield@gmail.com>
  *Castle Builder: Editing of existing castles, or creation of new ones
 
 
-####Whats Broken
- *sound is not perfect
- 
-
-
 ####Save Game Support
 
  D64s will be created in the data\save folder, and all save games will be stored in these files.

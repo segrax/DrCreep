@@ -64,8 +64,8 @@ bool cWindow::InitWindow( const std::string& pWindowTitle ) {
 	SDL_RenderSetLogicalSize(mRenderer, gWidth, gHeight);
 
 	//SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+	SDL_ShowCursor(SDL_DISABLE); 
 
-	//SetCursor();
 	return true;
 }
 
@@ -199,8 +199,7 @@ void cWindow::SetCursor() {
 	SDL_Cursor* cursor;
 
 	cursor = 	SDL_CreateSystemCursor( SDL_SYSTEM_CURSOR_CROSSHAIR );
-	SDL_SetCursor(cursor);
-
+	SDL_SetCursor(0);
 }
 
 void cWindow::SetMousePosition( const cPosition& pPosition ) {

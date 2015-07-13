@@ -54,7 +54,6 @@ void cScreenSurface::palettePrepare() {
 cScreenSurface::cScreenSurface( int pWidth, int pHeight ) {
 	mWidth = pWidth; 
 	mHeight = pHeight;
-	mFaded = false;
 
 	// Create the screen buffer
 	mSDLSurface = SDL_CreateRGBSurface( 0, pWidth, pHeight, 32, 0xFF, 0xFF << 8, 0xFF << 16, 0 );
@@ -73,6 +72,7 @@ cScreenSurface::cScreenSurface( int pWidth, int pHeight ) {
 
 cScreenSurface::~cScreenSurface() {
 	delete[] mSurfaceBuffer;
+	delete[] mScreenPieces;
 
 	SDL_FreeSurface( mSDLSurface );
 	SDL_DestroyTexture( mTexture );
@@ -81,7 +81,6 @@ cScreenSurface::~cScreenSurface() {
 void cScreenSurface::Wipe( byte pColor ) {
 
 	SDL_FillRect( mSDLSurface, 0, pColor );
-
 }
 
 void cScreenSurface::WipeBuffer( byte pColor ) {
