@@ -185,9 +185,12 @@ void cCreep::titleDisplay() {
 	buffer += 0x02;	
 
 	mScreen->bitmapLoad( buffer,  buffer + 0x1F40, buffer + 0x2328, 1 );
-	mScreen->refresh();
-	hw_IntSleep(0x10);
-
+	
+	for (int i = 0; i < 0x15; ++i) {
+		hw_IntSleep(1);
+		eventProcess(true);
+		mScreen->refresh();
+	}
     delete introImage;
 }
 
