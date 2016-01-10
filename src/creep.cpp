@@ -2324,17 +2324,17 @@ void cCreep::obj_Frankie_Execute( byte pSpriteNumber ) {
 			distance = mRoomSprites[pSpriteNumber].mX;
 			distance -= mRoomSprites[Y].mX;
 
+			A = mRoomSprites[pSpriteNumber].Sprite_field_1E;
+
 			if( !(distance < 0)) {
 				// We are behind frank
-
-				if( !(mRoomSprites[pSpriteNumber].Sprite_field_1E & FRANKIE_POINTING_LEFT) )
+				if( !(A & FRANKIE_POINTING_LEFT) )
 					continue;
 				else
 					goto s3B6E;
 			}
 
 			// 3B5E
-			A = mRoomSprites[pSpriteNumber].Sprite_field_1E;
 			if( !(A & FRANKIE_POINTING_LEFT)) {
 s3B6E:
 				A |= FRANKIE_AWAKE;
