@@ -68,7 +68,9 @@ Game Controls:
   F6  = Enable Player 1 Joystick 
   F7  = Enable Player 2 Joystick
   F10 = Fullscreen Toggle
-
+  -   = Decrease Window Size
+  +   = Increase Window Size
+	
  Intro:
  ------
 

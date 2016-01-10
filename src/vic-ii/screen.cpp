@@ -40,10 +40,8 @@ cScreen::cScreen( string pWindowTitle ) {
 		mSprites[Y]->_multiColor1 = 0x0D;
 	}
 
-	mFullScreen			= false;
 	mBitmapRedraw		= false;
 	mSpriteRedraw		= false;
-	mScreenRedraw		= false;
 	mTextRedraw			= false;
 	mFPSTotal			= 0;
 	mFPSSeconds			= 0;
@@ -59,7 +57,7 @@ cScreen::cScreen( string pWindowTitle ) {
 
 	mDrawDestX = mDrawDestY = mDrawSrcX = mDrawSrcY = 0;
 	
-	mWindow = new cWindow( gWidth * 2, gHeight * 2 );
+	mWindow = new cWindow();
 	mWindow->InitWindow( pWindowTitle );
 
 	mSurface	= new cScreenSurface( gWidth, gHeight );
@@ -146,7 +144,6 @@ void cScreen::bitmapRefresh() {
 		mBitmapRedraw = false;
 	}
 	blit( mBitmap->mSurface, 24, 50, false, 0 );
-	mScreenRedraw = true;
 }
 
 void cScreen::blit( cSprite *pSprite, byte pSpriteNo ) {
@@ -164,8 +161,6 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 
 	size_t			 height = pSurface->GetHeight();
 	size_t			 width = pSurface->GetWidth();
-
-	mScreenRedraw = true;
 
 	// Loop height
 	for( word y = 0; y < height; ++y, ++pDestY ) {
@@ -258,7 +253,7 @@ void cScreen::windowTitleUpdate() {
 	windowTitle << " (" << VERSION;
 	windowTitle << " - " << __DATE__ << ")";
 
-	mWindow->TitleSet( windowTitle.str() );
+	mWindow->SetWindowTitle( windowTitle.str() );
 }
 
 void cScreen::refresh() {
@@ -269,26 +264,20 @@ void cScreen::refresh() {
 	}
 
 	if( mTextRedraw ) {
-		mScreenRedraw = true;
 		mTextRedraw = false;
 	}
 
-	if( mScreenRedraw ) {
-		mScreenRedraw = false;
-	
-		mSurface->draw();
-		mWindow->RenderAt( mSurface, cPosition( 8, 15 ) );
+	mWindow->RenderAt(mSurface, cPosition(8, 15));
 
-		if(mCursorOn) {
-			size_t x =  ((mCursorX) * 2 ) * mScale;
-			size_t y =  70 + (mCursorY) * mScale;
+	if(mCursorOn) {
+		size_t x =  ((mCursorX) * 2 ) * mScale;
+		size_t y =  70 + (mCursorY) * mScale;
 			
-			//TODO
-			//mWindow->RenderAt( mSDLCursorSurface, cPosition(x,y) );
-		}
-		mWindow->FrameEnd();
+		//TODO
+		//mWindow->RenderAt( mSDLCursorSurface, cPosition(x,y) );
 	}
 	
+	mWindow->FrameEnd();
 }
 
 void cScreen::spriteDisable() {
@@ -315,7 +304,6 @@ void cScreen::spriteDraw() {
 	}
 
 	mSpriteRedraw = false;
-	mScreenRedraw = true;
 }
 
 void cScreen::drawStandardText(byte *pTextData, word pTextChar, byte *pColorData) {

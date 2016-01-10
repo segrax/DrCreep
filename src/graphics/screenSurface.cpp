@@ -57,7 +57,7 @@ cScreenSurface::cScreenSurface( int pWidth, int pHeight ) {
 
 	// Create the screen buffer
 	mSDLSurface = SDL_CreateRGBSurface( 0, pWidth, pHeight, 32, 0xFF, 0xFF << 8, 0xFF << 16, 0 );
-	mTexture = SDL_CreateTexture(g_Window.GetRenderer(), SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, pWidth, pHeight);
+	mTexture = SDL_CreateTexture(g_Window.GetRenderer(), SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, pWidth, pHeight);
 	
 	mSurfaceBuffer = new byte[ mWidth * mHeight ];
 	mSurfaceBufferSize = mWidth * mHeight;

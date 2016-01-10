@@ -63,7 +63,9 @@ Robert Crossfield <robcrossfield@gmail.com>
     F6  = Enable Player 1 Joystick 
     F7  = Enable Player 2 Joystick
     F10 = Fullscreen Toggle
-
+    -   = Decrease Window Size
+    +   = Increase Window Size
+	
 #####Intro
     F1 = Options
     F3 = Display Highscores

@@ -48,7 +48,7 @@ cSound::cSound( cCreep *pCreep ) {
 	mSID = new cSID();
 
 	// Set the sampling parameters, PAL, at a rate of 44100Hz
-	mSID->set_sampling_parameters(985248, SAMPLE_FAST, 0xAC44);	// 44100
+	mSID->set_sampling_parameters(985248, SAMPLE_FAST, 44100);
 	// 1022727.1428571428
 	//
   	mSID->enable_filter(false);

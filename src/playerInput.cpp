@@ -195,6 +195,18 @@ void cPlayerInput::KeyboardCheck() {
 				g_Creep.screenGet()->fullscreenToggle();
 				break;
 
+			case SDL_SCANCODE_EQUALS:
+				g_Window.WindowIncrease();
+				g_Creep.screenGet()->bitmapRedrawSet();
+				g_Creep.screenGet()->refresh();
+				break;
+
+			case SDL_SCANCODE_MINUS:
+				g_Window.WindowDecrease();
+				g_Creep.screenGet()->bitmapRedrawSet();
+				g_Creep.screenGet()->refresh();
+				break;
+
 			default:
 				mKeyPressed = mEvent.mButton;
 				mKeyPressedRaw = mEvent.mButtonRaw;

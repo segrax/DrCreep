@@ -43,7 +43,7 @@ class cScreen {
 	vector< sScreenPiece* >  mCollisions;
 	cSprite					*mSprites[8];
 
-	bool					 mFullScreen,		mBitmapRedraw, mSpriteRedraw, mScreenRedraw, mTextRedraw;
+	bool					 mBitmapRedraw, mSpriteRedraw, mTextRedraw;
 	size_t					 mScale, mDrawDestX, mDrawDestY, mDrawSrcX, mDrawSrcY;
 	string					 mWindowTitle, mLevelName;
 	size_t					 mRoomNumber;
@@ -86,18 +86,13 @@ public:
 	inline void				 roomNumberSet( size_t pValue ) { mRoomNumber = (pValue + 1); windowTitleUpdate(); }
 
 	inline vector< sScreenPiece* > *collisionsGet() { return &mCollisions; }
-	inline void						fullscreenToggle() {	mFullScreen = !mFullScreen;
-															if (mFullScreen)
-																SDL_SetWindowFullscreen( mWindow->GetWindow(), SDL_FALSE );
-															else
-																SDL_SetWindowFullscreen( mWindow->GetWindow(), SDL_TRUE );
-															mScreenRedraw = true;
+	inline void						fullscreenToggle() {
+															mWindow->SetFullScreen();
 															refresh();
 														}
 
 	inline void				 bitmapRedrawSet( bool pVal = true ) { mBitmapRedraw = pVal; }
 	inline void				 spriteRedrawSet() { mSpriteRedraw = true; }
-	inline void				 screenRedrawSet() { mScreenRedraw = true; }
 
 	inline dword			 fpsGet()			{ return mFPS; }
 	inline dword			 fpsAverageGet()	{ if(!mFPSSeconds || !mFPSTotal)

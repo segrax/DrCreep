@@ -659,7 +659,6 @@ void cCreep::screenClear() {
 		mMemory[word_30] = 0;
 	
 	mObjectCount = 0;
-	mScreen->screenRedrawSet();
 	mScreen->bitmapRedrawSet();
 }
 
@@ -4223,7 +4222,6 @@ void cCreep::eventProcess( bool pResetKeys ) {
 				break;
 
 			case eEvent_Redraw:
-				mScreen->screenRedrawSet();
 				mScreen->bitmapRedrawSet();
 				break;
 		}
