@@ -31,12 +31,10 @@ enum ePriority {
 
 struct sScreenPiece {
 	ePriority	mPriority;
-	//dword		mPixel;
 	byte		mSprite, mSprite2;
 
 	sScreenPiece() {
 		mPriority = ePriority_None;
-//		mPixel = 0xFF;
 		mSprite = mSprite2 = 0;
 	}
 };
