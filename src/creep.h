@@ -154,7 +154,7 @@ class sCreepSprite {
 public:
 	byte mSpriteType;				// 0
 	byte mX;						// 1	
-	byte mY;						// 2
+	word mY;						// 2
 	byte spriteImageID;				// 3
 	byte state;						// 4
 	byte Sprite_field_5;			// 5

@@ -2109,8 +2109,8 @@ void cCreep::obj_Player_Execute( byte pSpriteNumber ) {
 				mRoomSprites[ pSpriteNumber ].Sprite_field_1B += 0x04;
 				Y = mRoomSprites[ pSpriteNumber ].Sprite_field_1B;
 
-				mRoomSprites[ pSpriteNumber ].mX += mMemory[ 0x34A1 + Y ];
-				mRoomSprites[ pSpriteNumber ].mY += mMemory[ 0x34A2 + Y ];
+				mRoomSprites[ pSpriteNumber ].mX += (int8) mMemory[ 0x34A1 + Y ];
+				mRoomSprites[ pSpriteNumber ].mY += (int8) mMemory[ 0x34A2 + Y ];
 			}
 
 		} else if( A == 6 ) {
@@ -2222,7 +2222,7 @@ s33DE:;
 	A = (mRoomSprites[pSpriteNumber].Sprite_field_1F & 3);
 
 	if( A == 2 ) {
-		mRoomSprites[pSpriteNumber].mY -= byte_5FD8;
+		mRoomSprites[pSpriteNumber].mY -= (int8) byte_5FD8;
 
 	} else {
 		// 33F4
@@ -2233,8 +2233,8 @@ s33DE:;
 	}
 	// 3405
 	Y = mRoomSprites[pSpriteNumber].Sprite_field_1F;
-	mRoomSprites[pSpriteNumber].mX += mMemory[ 0x34D7 + Y ];
-	mRoomSprites[pSpriteNumber].mY += mMemory[ 0x34DF + Y ];
+	mRoomSprites[pSpriteNumber].mX += (int8) mMemory[ 0x34D7 + Y ];
+	mRoomSprites[pSpriteNumber].mY += (int8) mMemory[ 0x34DF + Y ];
 
 	if( !(Y & 3) ) {
 		// 3421
@@ -2498,7 +2498,7 @@ s3B6E:
 	// 3CB4
 s3CB4:;
 	if( mRoomSprites[pSpriteNumber].mButtonState & 2 ) {
-		mRoomSprites[pSpriteNumber].mY -= byte_5FD8;
+		mRoomSprites[pSpriteNumber].mY -= (int8) byte_5FD8;
 
 		++mRoomSprites[pSpriteNumber].spriteImageID;
 		if( mRoomSprites[pSpriteNumber].mButtonState != 2 ) {
@@ -5157,7 +5157,7 @@ void cCreep::obj_Door_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 
 	// 40BB
 
-	mRoomSprites[pSpriteNumber].mY = mMemory[ word_40 + 1 ] + 0x0F;
+	mRoomSprites[pSpriteNumber].mY = (int8) mMemory[ word_40 + 1 ] + 0x0F;
 	mRoomSprites[pSpriteNumber].mX = mMemory[ word_40 ] + 0x06;
 	if( mMemory[ word_40 + 7 ] != 0 )
 		mMemory[ 0x785D + mRoomSprites[pSpriteNumber].playerNumber ] = 1;
@@ -6552,7 +6552,7 @@ void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
 			mRoomSprites[pSpriteNumber].spriteImageID = A;
 			mRoomSprites[pSpriteNumber].mX += mMemory[ 0x39F7 + Y ];
 
-			mRoomSprites[pSpriteNumber].mY += mMemory[ 0x39FF + Y ];
+			mRoomSprites[pSpriteNumber].mY += (int8) mMemory[ 0x39FF + Y ];
 			
 			mMemory[ 0x7630 ] = (mRoomSprites[pSpriteNumber].Sprite_field_1F << 2) + 0x24;
 			sound_PlayEffect( SOUND_MUMMY_RELEASE );

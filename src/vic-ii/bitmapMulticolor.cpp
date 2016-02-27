@@ -91,5 +91,5 @@ void cBitmapMulticolor::load( byte *pBuffer, byte *pColorData, byte *pColorRam, 
 
 	}	// Y
 
-	mSurface->draw();
+	//mSurface->draw();
 }
