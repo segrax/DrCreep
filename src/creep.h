@@ -230,6 +230,9 @@ protected:
 	sCreepAnim		 mRoomAnim[ MAX_OBJECTS ];		// BF00
 
 	byte			*mMemory,			*mGameData,		*mLevel,		*m64CharRom;
+
+	static const unsigned char		 mRoomIntroData[];
+
 	size_t			 mMemorySize;
 
 	cDebug			*mDebug;

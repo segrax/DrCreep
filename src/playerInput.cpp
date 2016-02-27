@@ -113,7 +113,7 @@ void cPlayerInput::KeyboardCheck() {
 			case SDL_SCANCODE_RETURN:
 				mReturnPressed = false;
 				mKeyPressed = 0;
-				mKeyPressedRaw = 0;
+				mKeyPressedRaw = 0x0D;
 				break;
 
 			case SDL_SCANCODE_F1:
@@ -150,7 +150,21 @@ void cPlayerInput::KeyboardCheck() {
 
 			default:
 				mKeyPressed = 0;
-				mKeyPressedRaw = 0;
+
+				if (mKeyPressed >= SDL_SCANCODE_A && mKeyPressed <= SDL_SCANCODE_Z)
+					mKeyPressedRaw = 'A' + (mKeyPressed - 4);
+
+				if (mKeyPressed >= SDL_SCANCODE_1 && mKeyPressed <= SDL_SCANCODE_9)
+					mKeyPressedRaw = '1' + (mKeyPressed - 30);
+
+				if (mKeyPressed == SDL_SCANCODE_0)
+					mKeyPressedRaw = '0';
+
+				if (mKeyPressed == SDL_SCANCODE_RETURN)
+					mKeyPressedRaw = 0x0D;
+
+				if (mKeyPressed == SDL_SCANCODE_BACKSPACE)
+					mKeyPressedRaw = 8;
 				break;
 		}
 
@@ -164,7 +178,7 @@ void cPlayerInput::KeyboardCheck() {
 			case SDL_SCANCODE_RETURN:
 				mReturnPressed = true;
 				mKeyPressed = mEvent.mButton;
-				mKeyPressedRaw = mEvent.mButtonRaw;
+				mKeyPressedRaw = 0x0D;
 				break;
 
 			case SDL_SCANCODE_F1:
@@ -209,7 +223,22 @@ void cPlayerInput::KeyboardCheck() {
 
 			default:
 				mKeyPressed = mEvent.mButton;
-				mKeyPressedRaw = mEvent.mButtonRaw;
+
+				if (mKeyPressed >= SDL_SCANCODE_A && mKeyPressed <= SDL_SCANCODE_Z)
+					mKeyPressedRaw = 'A' + (mKeyPressed - 4);
+
+				if (mKeyPressed >= SDL_SCANCODE_1 && mKeyPressed <= SDL_SCANCODE_9)
+					mKeyPressedRaw = '1' + (mKeyPressed - 30);
+
+				if (mKeyPressed == SDL_SCANCODE_0)
+					mKeyPressedRaw = '0';
+
+				if (mKeyPressed == SDL_SCANCODE_RETURN)
+					mKeyPressedRaw = 0x0D;
+
+				if (mKeyPressed == SDL_SCANCODE_BACKSPACE)
+					mKeyPressedRaw = 8;
+
 				break;
 		}
 	}

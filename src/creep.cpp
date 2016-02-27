@@ -41,6 +41,22 @@
 #include <io.h>
 #endif
 
+const unsigned char cCreep::mRoomIntroData[] = {
+
+	0x0A, 0x16, // eObjectIntroMultiDraw
+	0x08, 0x06, 0x10, 0x58, 0x14, 0x00, 0x00, 
+
+	0x6D, 0x2A, // eObjectIntroText
+	0x28, 0x30, 0x08, 0x21, 'T', 'H', 'E', ' ', 'C', 'A', 'S', 'T', 'L', 'E', 'S', ' ', 'O', 'F' | 0x80, 
+	0x30, 0x40, 0x0D, 0x22, 'D', 'O', 'C', 'T', 'O', 'R', ' ', 'C', 'R', 'E', 'E', 'P' | 0x80, 
+	0x34, 0x80, 0x07, 0x21, 'B', 'Y', ' ', 'E', 'D', ' ', 'H', 'O', 'B', 'B', 'S' | 0x80,
+	0x24, 0xC0, 0x0C, 0x21, 'S', 'T', 'R', 'O', 'B', 'S', ' ', 'C', 'A', 'N', 'A', 'R', 'D', 'L', 'Y' | 0x80,
+	0x00,
+
+	//	0x10, 0xC0, 0x0C, 0x21, 'B', 'R', 'O', 'D', 'E', 'R', 'B', 'U', 'N', 'D', ' ', ' ', 'S', 'O', 'F', 'T', 'W', 'A', 'R', 'E' | 0x80,
+	0x00, 0x00	// eObjectNone
+};
+
 sObjectData mObjectCollisionData[6] = {	{0x01, 0x00}, // Player
 										{0x00, 0x04}, // Lightning
 										{0x00, 0x03}, // Forcefield
@@ -62,8 +78,8 @@ cCreep::cCreep() {
 	// Prepare memory for use
 	mMemorySize = 0x10000;
 	mMemory = new byte[ mMemorySize ];
-	for( size_t x = 0; x < mMemorySize; ++x )
-		mMemory[x] = 0;
+
+	memset( mMemory, 0, mMemorySize );
 
 	mDebug = new cDebug();
 	mCastleManager = new cCastleManager();
@@ -832,7 +848,7 @@ void cCreep::roomPrepare( word pAddress ) {
 				break;
 
 			case eObjectText:		// String Print
-			case 0x2A6D:
+			case eObjectIntroText:
 				obj_stringPrint();
 				break;
 
@@ -841,7 +857,7 @@ void cCreep::roomPrepare( word pAddress ) {
 				break;
 
 			case eObjectMultiDraw:
-			case 0x160A:				// Intro
+			case eObjectIntroMultiDraw:
 				obj_MultiDraw( );
 				break;
 
@@ -881,6 +897,7 @@ bool cCreep::Intro() {
 			roomLoad();
 		} else {
 			mObjectPtr = 0x0D1A;
+			memcpy( &mMemory[0x0D1A], mRoomIntroData, sizeof mRoomIntroData );
 
 			screenClear();
 			roomPrepare( );
@@ -3552,7 +3569,7 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 	byte gfxDestX2;
 	byte gfxPosRightX;
 	byte gfxDestY;
-	byte gfxCurPos;
+	word gfxCurPos = 0;
 
 	byte videoPtr0, videoPtr1;
 	byte Counter2;

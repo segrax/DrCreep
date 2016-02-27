@@ -44,7 +44,10 @@ enum eRoomObjects {
 	eObjectText			= 0x0833,
 	eObjectImage		= 0x0836,
 
-	eObjectNone			= 0x0000,
+	eObjectIntroMultiDraw	= 0x160A,
+	eObjectIntroText		= 0x2A6D,
+
+	eObjectNone				= 0x0000,
 };
 
 enum eRoomAnimation {
