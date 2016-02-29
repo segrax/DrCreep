@@ -120,7 +120,7 @@ private:
 
 	byte						*sectorPtr( dword pTrack, dword pSector );				// Obtain pointer to 'pTrack'/'pSector' in the disk buffer
 
-	inline byte					 trackRange(byte pTrack) {							// Number of sectors in 'pTrack'
+	inline size_t				 trackRange(const size_t pTrack) const {				// Number of sectors in 'pTrack'
 		return 21 - (pTrack > 17) * 2 - (pTrack > 24) - (pTrack > 30);
 	}
 

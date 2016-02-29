@@ -48,7 +48,7 @@ public:
 	void				CalculateWindowSize();
 	word				CalculateFullscreenSize();
 
-	bool				CanChangeToMultiplier(int pNewMultiplier);
+	bool				CanChangeToMultiplier(const size_t pNewMultiplier);
 
 	void				EventCheck();
 	void				FrameEnd();

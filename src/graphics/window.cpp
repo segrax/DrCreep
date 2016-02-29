@@ -172,7 +172,7 @@ uint16 cWindow::CalculateFullscreenSize() {
 	return --Multiplier;
 }
 
-bool cWindow::CanChangeToMultiplier(int pNewMultiplier) {
+bool cWindow::CanChangeToMultiplier(const size_t pNewMultiplier) {
 	SDL_DisplayMode current;
 	SDL_GetCurrentDisplayMode(0, &current);
 

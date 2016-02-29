@@ -179,7 +179,8 @@ public:
 	}
 
 	void clear() {
-		mSpriteType = mX = mY = spriteImageID = 0;
+		mSpriteType = mX = spriteImageID = 0;
+		mY = 0;
 		state = Sprite_field_5 = Sprite_field_6 = Sprite_field_8 = 0;
 		spriteFlags = 0;
 		mCollisionWidth = mCollisionHeight = 0;

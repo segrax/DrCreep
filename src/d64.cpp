@@ -519,11 +519,11 @@ bool cD64::directoryEntrySet( byte pEntryPos, sD64File *pFile, byte *pBuffer ) {
 	memcpy( &pBuffer[ 0x05 ], pFile->mName.c_str(), pFile->mName.size() );
 	
 	// Number of sectors used by file
-	word totalBlocks = (pFile->mBufferSize / 254);
+	size_t totalBlocks = (pFile->mBufferSize / 254);
 	if( pFile->mBufferSize % 254 )
 		++totalBlocks;
 
-	writeLEWord( &pBuffer[ 0x1E ], totalBlocks );
+	writeLEWord( &pBuffer[ 0x1E ], (word) totalBlocks );
 	return true;
 }
 
