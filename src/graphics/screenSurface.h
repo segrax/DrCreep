@@ -82,7 +82,7 @@ public:
 	}
 
 	inline sScreenPiece *screenPiecesGet() { return mScreenPieces; }
-	inline sScreenPiece *screenPieceGet( size_t pX, size_t pY ) {
+	inline sScreenPiece *screenPieceGet( const size_t pX, const size_t pY ) const {
 	return &mScreenPieces[ ((pY * mWidth) + pX) ];
 	}
 
