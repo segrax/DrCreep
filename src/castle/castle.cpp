@@ -189,8 +189,8 @@ void cCastle::castleSave( byte *pTarget ) {
 
 		// Write pointer to room objects
 		byte *dirBuffer = roomIT->second->mRoomDirPtr + 4;
-		writeLEWord( dirBuffer, memDest + 2);
-		writeLEWord( dirBuffer + 2, memDest );
+		writeLEWord( dirBuffer, (word) memDest + 2);
+		writeLEWord( dirBuffer + 2, (word) memDest );
 
 		// Save all objects, and add up memory size
 		memDest += roomIT->second->roomSaveObjects( &buffer );
@@ -206,7 +206,7 @@ void cCastle::castleSave( byte *pTarget ) {
 
 	// Save final room ptr
 	if(mFinalRoom) {
-		writeLEWord( pTarget + 0x5F, memDest);
+		writeLEWord( pTarget + 0x5F, (word) memDest);
 
 		// Save final room objects
 		memDest += mFinalRoom->roomSaveObjects( &buffer );
@@ -217,7 +217,7 @@ void cCastle::castleSave( byte *pTarget ) {
 
 	memDest += 2;
 	// Write size of castle to beginning to castle memory
-	writeLEWord(  pTarget, (memDest - 0x7800) );
+	writeLEWord(  pTarget, (word) (memDest - 0x7800) );
 }
 
 /**

@@ -62,7 +62,7 @@ cScreenSurface::cScreenSurface( int pWidth, int pHeight ) {
 	mSurfaceBuffer = new byte[ mWidth * mHeight ];
 	mSurfaceBufferSize = mWidth * mHeight;
 	mScreenPieces = new sScreenPiece[ mSurfaceBufferSize ];
-	for (int i = 0; i < mSurfaceBufferSize; ++i) {
+	for (size_t i = 0; i < mSurfaceBufferSize; ++i) {
 		mSurfaceBuffer[i] = 0;
 	}
 
@@ -93,7 +93,7 @@ void cScreenSurface::WipeBuffer( byte pColor ) {
 	}
 }
 
-dword *cScreenSurface::pixelGet( word x, word y ) {
+dword *cScreenSurface::pixelGet( const size_t x, const size_t y ) {
 	register dword *position = (dword*) mSDLSurface->pixels ;
 		
 	// Offset by Y

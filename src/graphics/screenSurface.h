@@ -68,13 +68,13 @@ public:
 
 	void			 WipeBuffer( byte pColor = 0 );
 
-	dword			*pixelGet( word pX = 0,	word pY = 0 );
+	dword			*pixelGet( const size_t pX = 0,	const size_t pY = 0 );
 	void			 pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePriority pPriority, size_t pCount = 1);
 
 	inline SDL_Surface* GetSDLSurface() const { return mSDLSurface; }
 	inline SDL_Texture* GetTexture() const { return mTexture; };
 	inline byte*		GetSurfaceBuffer() const { return mSurfaceBuffer; }
-	inline byte*		GetSurfaceBuffer( word pDestX, word pDestY ) const { return mSurfaceBuffer + (mWidth * pDestY) + pDestX; }
+	inline byte*		GetSurfaceBuffer( const size_t pDestX, const size_t pDestY ) const { return mSurfaceBuffer + (mWidth * pDestY) + pDestX; }
 	
 	inline byte *screenBufferGet() { return mSurfaceBuffer; }
 	inline byte *screenBufferGet( size_t pX, size_t pY ) {

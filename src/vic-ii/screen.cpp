@@ -112,7 +112,7 @@ void cScreen::cursorEnabled( bool pOn ) {
 	SDL_FillRect (mSDLCursorSurface, &rect, SDL_MapRGB(mSDLCursorSurface->format, 0, 0, 0)); 
 }
 
-void cScreen::cursorSize( size_t pWidth, size_t pHeight ) {
+void cScreen::cursorSize( const size_t pWidth, const size_t pHeight ) {
 	mCursorWidth = pWidth;
 	mCursorHeight = pHeight;
 

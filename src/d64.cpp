@@ -763,7 +763,7 @@ bool cD64::fileSave( string pFilename, byte *pData, size_t pBytes, word pLoadAdd
 	
 	// Set the Track to none (to mark end of chain), and the sector the the number of bytes used
 	buffer[0] = 0;
-	buffer[1] = (copySize - 1);
+	buffer[1] = (uint8) (copySize - 1);
 
 	// Add entry to the directory
 	if( directoryAdd( &File ) == false )

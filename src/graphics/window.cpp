@@ -152,8 +152,8 @@ void cWindow::CalculateWindowSize() {
 	SDL_DisplayMode current;
 	SDL_GetCurrentDisplayMode(0, &current);
 
-	while ((mOriginalResolution.mWidth * mWindow_Multiplier) <= (current.w / 2) &&
-		(mOriginalResolution.mHeight * mWindow_Multiplier) <= (current.h / 2)) {
+	while ((mOriginalResolution.mWidth * mWindow_Multiplier) <= (unsigned int) (current.w / 2) &&
+		(mOriginalResolution.mHeight * mWindow_Multiplier) <= (unsigned int) (current.h / 2)) {
 		++mWindow_Multiplier;
 	}
 
@@ -165,7 +165,8 @@ uint16 cWindow::CalculateFullscreenSize() {
 	SDL_GetCurrentDisplayMode(0, &current);
 	int16 Multiplier = 1;
 
-	while ((mOriginalResolution.mWidth * Multiplier) <= current.w && (mOriginalResolution.mHeight * Multiplier) <= current.h) {
+	while ((mOriginalResolution.mWidth * Multiplier) <= (unsigned int) current.w &&
+			(mOriginalResolution.mHeight * Multiplier) <= (unsigned int) current.h) {
 		++Multiplier;
 	}
 
@@ -176,8 +177,8 @@ bool cWindow::CanChangeToMultiplier(const size_t pNewMultiplier) {
 	SDL_DisplayMode current;
 	SDL_GetCurrentDisplayMode(0, &current);
 
-	if ((mOriginalResolution.mWidth  * pNewMultiplier >= current.w ||
-		mOriginalResolution.mHeight * pNewMultiplier >= current.h) ||
+	if ((mOriginalResolution.mWidth  * pNewMultiplier >= (unsigned int) current.w ||
+		mOriginalResolution.mHeight * pNewMultiplier >= (unsigned int) current.h) ||
 		pNewMultiplier <= 0)
 		return false;
 

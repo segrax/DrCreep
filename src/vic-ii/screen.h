@@ -49,7 +49,8 @@ class cScreen {
 	size_t					 mRoomNumber;
 
 	bool					 mCursorOn;
-	word					 mCursorX, mCursorY, mCursorWidth, mCursorHeight;
+	word					 mCursorX, mCursorY;
+	size_t					 mCursorWidth, mCursorHeight;
 
 	void					 bitmapRefresh();
 	void					 blit( cSprite *pSprite, byte pSpriteNo );
@@ -67,7 +68,7 @@ public:
 	void					 clear( byte pColor );
 
 	void					 cursorEnabled( bool pOn = true );
-	void					 cursorSize( size_t pWidth, size_t pHeight );
+	void					 cursorSize( const size_t pWidth, const size_t pHeight );
 	void					 cursorSet( word pPosX, word pPosY );
 
 	void					 drawStandardText(byte *pTextData, word pTextChar, byte *pColorData);

@@ -1686,7 +1686,8 @@ s2F51:;
 
 // 311E
 void cCreep::Sprite_Object_Collision_Check( byte pSpriteNumber ) {
-	byte SpriteX_Start, SpriteX_Finish, SpriteY_Start, SpriteY_Finish;
+	byte SpriteX_Start, SpriteX_Finish;
+	word SpriteY_Start, SpriteY_Finish;
 
 	SpriteX_Start = mRoomSprites[pSpriteNumber].mX;
 	SpriteX_Finish = SpriteX_Start + mRoomSprites[pSpriteNumber].mCollisionWidth;
@@ -1848,7 +1849,8 @@ void cCreep::Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 
 // 3026
 void cCreep::Sprite_Collision_Check( byte pSpriteNumber ) {
-	byte SpriteY_Bottom, SpriteX, SpriteX_Right, SpriteY;
+	byte SpriteY_Bottom, SpriteX, SpriteX_Right;
+	word SpriteY;
 
 	byte HitData = mObjectCollisionData[mRoomSprites[pSpriteNumber].mSpriteType].mHitData;
 
@@ -2552,7 +2554,7 @@ s3D4C:;
 s3D4F:;
 	mMemory[ word_40 + 6 ] = mRoomSprites[pSpriteNumber].mButtonState;
 	mMemory[ word_40 + 3 ] = mRoomSprites[pSpriteNumber].mX;
-	mMemory[ word_40 + 4 ] = mRoomSprites[pSpriteNumber].mY;
+	mMemory[ word_40 + 4 ] = (uint8) mRoomSprites[pSpriteNumber].mY;
 	mMemory[ word_40 + 5 ] = mRoomSprites[pSpriteNumber].spriteImageID;
 }
 
@@ -5157,7 +5159,7 @@ void cCreep::obj_Door_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 
 	// 40BB
 
-	mRoomSprites[pSpriteNumber].mY = (int8) mMemory[ word_40 + 1 ] + 0x0F;
+	mRoomSprites[pSpriteNumber].mY = (uint8) mMemory[ word_40 + 1 ] + 0x0F;
 	mRoomSprites[pSpriteNumber].mX = mMemory[ word_40 ] + 0x06;
 	if( mMemory[ word_40 + 7 ] != 0 )
 		mMemory[ 0x785D + mRoomSprites[pSpriteNumber].playerNumber ] = 1;
@@ -6619,7 +6621,7 @@ void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
 
 	// 38BA
 	mMemory[ word_40 + 5 ] = mRoomSprites[pSpriteNumber].mX;
-	mMemory[ word_40 + 6 ] = mRoomSprites[pSpriteNumber].mY;
+	mMemory[ word_40 + 6 ] = (uint8) mRoomSprites[pSpriteNumber].mY;
 
 	hw_SpritePrepare( pSpriteNumber );
 }
