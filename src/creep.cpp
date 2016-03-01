@@ -1020,6 +1020,8 @@ bool cCreep::musicBufferFeed() {
 	
 musicUpdate:;
 
+	mPlayingSound = -1;
+
 	for(; !done ;) {
 		if(!mMusicBuffer)
 			return false;
@@ -1414,9 +1416,9 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 
 	// Start the editor, using the current castle
 	if( mInput->f4Get() ) {
-
+		musicChange();
 		if( !mBuilder ) {
-			builderStart( mStartCastle );
+			//builderStart( mStartCastle );
 			input->clear();
 		}
 	}
@@ -1425,7 +1427,7 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	if( mInput->f5Get() ) {
 		
 		if( !mBuilder ) {
-			builderStart( -1 );
+			//builderStart( -1 );
 			input->clear();
 		}
 	}
