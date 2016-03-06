@@ -48,7 +48,7 @@ cSound::cSound( cCreep *pCreep ) {
 	mSID = new cSID();
 
 	// Set the sampling parameters, PAL, at a rate of 44100Hz
-	mSID->set_sampling_parameters(985248, SAMPLE_FAST, 44100);
+	//mSID->set_sampling_parameters(985248, SAMPLE_FAST, 22050 );
 	// 1022727.1428571428
 	//
   	mSID->enable_filter(false);
@@ -76,6 +76,7 @@ cSound::~cSound() {
 
 void cSound::audioBufferFill( short *pBuffer, int pBufferSize ) {
 	byte *musicBuffer = mCreep->musicBufferGet();
+	memset( pBuffer, 0, pBufferSize );
 
 	// Convert buffer size in bytes, to the size in words (each sample is 1 word)
 	int samplesRemaining = (pBufferSize / 2);
@@ -103,12 +104,14 @@ void cSound::audioBufferFill( short *pBuffer, int pBufferSize ) {
 
 		// Time for video frame update?
   		if (mCyclesRemaining <= 0) {
-  			mCyclesRemaining = 0x4CC8 / 2;	// PAL
+			mCyclesRemaining =  (g_Creep.mTimerGet() * 60 ) * 6;
+
+			/*mCyclesRemaining = 0x4CC8 * 2;*/
   		}
 
   		// Clock the SID for 'samplesRemaining', only will do all if there is enough cpu cycles remaining
   		int sampleCount = mSID->clock(mCyclesRemaining, pBuffer, samplesRemaining);
-		
+	
 		//mTicks -= sampleCount;
 
 		// Decrease number of samples remaining by the number of samples just calculated
@@ -117,9 +120,6 @@ void cSound::audioBufferFill( short *pBuffer, int pBufferSize ) {
 		// Increase buffer by the number of samples just calculated
   		pBuffer += sampleCount;
   	}
-
-	if(mFinalCount==10)
-		playback(false);
 }
 
 // Write to the SID Registers
@@ -137,10 +137,10 @@ bool cSound::devicePrepare() {
 	// FM Quality, 16Bit Signed, Mono
 	desired->freq=22050;
 	desired->format=AUDIO_S16LSB;
-	desired->channels=0;
+	desired->channels=2;
 
 	// 2048 Samples, at 2 bytes per sample
-	desired->samples=0x800;
+	desired->samples=0x400;
 
 	// Function to call when the audio playback buffer is empty
 	desired->callback = cSound_AudioCallback;

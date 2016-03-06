@@ -306,6 +306,8 @@ protected:
 	word		 word_30, word_32, word_3C, mObjectPtr, word_40, mRoomPtr;
 
 	bool		 mMenuReturn, mNoInput;
+	bool		 mTimerFired;
+	int16		 mTimer;
 
 public:
 	std::vector<cEvent>		mEvents;
@@ -332,6 +334,10 @@ public:
 				}
 
 		bool			EventAdd( cEvent pEvent );
+
+		inline void				 mTimerSet( uint8 pTimer ) { mTimer = pTimer; mMemory[0xDC05] = pTimer; }
+		inline uint8			 mTimerGet() { return mMemory[0xDC05]; }
+		inline bool				 mTimerFiredGet() { bool ret = mTimerFired; mTimerFired = false; return ret; }
 
 		inline cPlayerInput		*inputGet()		{ return mInput; }
 		inline cScreen			*screenGet()	{ return mScreen; }

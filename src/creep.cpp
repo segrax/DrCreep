@@ -127,6 +127,8 @@ cCreep::cCreep() {
 
 	mMenuReturn = false;
 	mTicksPrevious = SDL_GetTicks();
+	mTimerFired = false;
+	mTimer = 0;
 
 	mPlayerStatus[0] = mPlayerStatus[1] = false;
 }
@@ -294,6 +296,12 @@ void cCreep::interruptWait( byte pCount) {
 			sleepTime = 0;
 		else 
 			sleepTime = -sleepTime;
+	}
+
+	mTimer -= sleepTime;
+	if (mTimer < 0) {
+		mTimerFired = true;
+		mTimer = mMemory[0xDC05];
 	}
 
 	Sleep( (dword) sleepTime * pCount );
@@ -1020,8 +1028,6 @@ bool cCreep::musicBufferFeed() {
 	
 musicUpdate:;
 
-	mPlayingSound = -1;
-
 	for(; !done ;) {
 		if(!mMusicBuffer)
 			return false;
@@ -1062,7 +1068,6 @@ musicUpdate:;
 				A |= 1;
 				mSound->sidWrite( (mVoiceNum * 7) + 4, A );
 				mMemory[ mVoiceTmp + 4 ] = A;
-
 
 				continue;
 
@@ -1108,6 +1113,25 @@ musicUpdate:;
 				continue;
 
 			case 5:
+				A = mMemory[0x20CC];
+				mSound->sidWrite( 0x15, A);
+				mMemory[0x2100] = A;
+
+				A = mMemory[0x20CD];
+				mSound->sidWrite( 0x16, A );
+				mMemory[0x2101] = A;
+
+				X = mMemory[0x20CB] & 3;
+				A = 1 << X;
+				A |= mMemory[0x20CE];
+				mSound->sidWrite( 0x17, A );
+				mMemory[0x2102] = A;
+
+				A = mMemory[0x2103] & 0x0F;
+				A |= mMemory[0x20CD];
+				mMemory[0x2103] = A;
+				mSound->sidWrite( 0x18, A );
+
 				continue;
 
 			case 6:
@@ -1129,7 +1153,7 @@ musicUpdate:;
 				A <<= 2;
 				A |= 3;
 
-				mMemory[0xDC05] = A;
+				mTimerSet( A );
 				continue;
 
 			default:
@@ -1194,7 +1218,7 @@ void cCreep::musicChange() {
 	mMemory[ 0x2107 ] = 0x14;
 	mMemory[ 0x20DE ] = 1;
 
-	mMemory[0xDC05] = (0x14 << 2) | 3;
+	mTimerSet((0x14 << 2) | 3);
 
 	mSound->playback( true );
 }
@@ -1417,6 +1441,7 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	// Start the editor, using the current castle
 	if( mInput->f4Get() ) {
 		musicChange();
+		mMusicPlaying = 1;
 		if( !mBuilder ) {
 			//builderStart( mStartCastle );
 			input->clear();
@@ -4634,7 +4659,7 @@ void cCreep::sound_PlayEffect( char pA ) {
 	mMemory[ 0x2105 ] = 0x18;
 	mMemory[ 0x2106 ] = 0x18;
 	mMemory[ 0x2107 ] = 0x14;
-	mMemory[ 0xDC05 ] = (mMemory[ 0x2107 ] << 2 ) | 3;
+	mTimerSet((mMemory[ 0x2107 ] << 2 ) | 3);
 	mMemory[ 0xDC0D ] = 0x81;
 	mMemory[ 0xDC0E ] = 0x01;
 
