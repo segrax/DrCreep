@@ -15,6 +15,7 @@ sid:
 	$(CC) src/sound/sound.cpp src/resid-0.16/*.cpp
 
 creep : main
+	mkdir -p obj
 	mv *.o obj/
 	$(LD) -o run/creep
 
