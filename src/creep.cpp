@@ -4389,6 +4389,7 @@ void cCreep::gameEscapeCastle() {
 		sprite->mY = mRoomSprites[X].mY + 0x32;
 
 		hw_SpritePrepare( X );
+
 		sprite->_rEnabled = true;
 
 		if( mMemory[ 0x1AB2 ] )
@@ -4405,7 +4406,7 @@ void cCreep::gameEscapeCastle() {
 	}
 
 	// 1AA7
-	hw_IntSleep(0xA);
+	//hw_IntSleep(0xA);
 }
 
 // 1B9F

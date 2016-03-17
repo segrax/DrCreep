@@ -47,7 +47,7 @@ cWindow::~cWindow() {
 
 bool cWindow::InitWindow(const std::string& pWindowTitle) {
 
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK ) != 0) {
 		std::cout << "Failed to initialise SDL\n";
 		exit(1);
 		return false;
@@ -135,6 +135,23 @@ void cWindow::EventCheck() {
 
 			Event.mPosition = cPosition(SysEvent.motion.x, SysEvent.motion.y);
 			Event.mButtonCount = SysEvent.button.clicks;
+			break;
+
+		case SDL_CONTROLLERAXISMOTION:
+		case SDL_JOYAXISMOTION:
+			Event.mType = eEvent_JoyMovement;
+			Event.mButton = SysEvent.jaxis.axis;
+			Event.mJoyAxis = SysEvent.jaxis.value;
+			break;
+
+		case SDL_CONTROLLERBUTTONDOWN:
+		case SDL_JOYBUTTONDOWN:
+			Event.mType = eEvent_JoyButtonDown;
+			break;
+
+		case SDL_CONTROLLERBUTTONUP:
+		case SDL_JOYBUTTONUP:
+			Event.mType = eEvent_JoyButtonUp;
 			break;
 
 		case SDL_QUIT:
