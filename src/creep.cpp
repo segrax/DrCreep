@@ -127,7 +127,6 @@ cCreep::cCreep() {
 
 	mMenuReturn = false;
 	mTicksPrevious = SDL_GetTicks();
-	mTimerFired = false;
 	mTimer = 0;
 
 	mPlayerStatus[0] = mPlayerStatus[1] = false;
@@ -296,12 +295,6 @@ void cCreep::interruptWait( byte pCount) {
 			sleepTime = 0;
 		else 
 			sleepTime = -sleepTime;
-	}
-
-	mTimer -= sleepTime;
-	if (mTimer < 0) {
-		mTimerFired = true;
-		mTimer = mMemory[0xDC05];
 	}
 
 	Sleep( (dword) sleepTime * pCount );
@@ -2361,20 +2354,20 @@ void cCreep::obj_Frankie_Execute( byte pSpriteNumber ) {
 				continue;
 
 			Y = mMemory[ 0x34D1 + Y ];
-			short int distance = mRoomSprites[pSpriteNumber].mY;
-			distance -= mRoomSprites[Y].mY;
+			uint8 distanceY = mRoomSprites[pSpriteNumber].mY;
+			distanceY -= mRoomSprites[Y].mY;
 
 			// Within 4 on the Y axis, then frank can wake up
-			if( distance >= 4 )
+			if( distanceY >= 4 )
 				continue;
 
 			// 3B4A
-			distance = mRoomSprites[pSpriteNumber].mX;
-			distance -= mRoomSprites[Y].mX;
+			int8 distanceX = mRoomSprites[pSpriteNumber].mX;
+			distanceX -= mRoomSprites[Y].mX;
 
 			A = mRoomSprites[pSpriteNumber].Sprite_field_1E;
 
-			if( !(distance < 0)) {
+			if( !(distanceX < 0)) {
 				// We are behind frank
 				if( !(A & FRANKIE_POINTING_LEFT) )
 					continue;
@@ -2459,31 +2452,30 @@ s3B6E:
 			if( mMemory[ 0x780D + byte_3F0A ] == 0 ) {
 				
 				Y = mMemory[ 0x34D1 + byte_3F0A ];
-				A = mRoomSprites[Y].mX;
-				A -= mRoomSprites[pSpriteNumber].mX;
+				int16 Pos = mRoomSprites[Y].mX - mRoomSprites[pSpriteNumber].mX;
 				//3C2A
-				if( A < 0 ) {
-					A ^= 0xFF;
-					++A;
+				if( Pos < 0 ) {
+					Pos ^= 0xFF;
+					++Pos;
 					Y = 3;
 				} else {
 					Y = 1;
 				}
-				if( A < mMemory[ 0x3F0C +  Y ] )
-					mMemory[ 0x3F0C + Y ] = A;
+				if(Pos < mMemory[ 0x3F0C +  Y ] )
+					mMemory[ 0x3F0C + Y ] = (int8) Pos;
 
 				Y = mMemory[ 0x34D1 + byte_3F0A ];
-				A = mRoomSprites[Y].mY;
-				A -= mRoomSprites[pSpriteNumber].mY;
-				if( A < 0 ) {
-					A ^= 0xFF;
-					++A;
+				Pos = mRoomSprites[Y].mY - mRoomSprites[pSpriteNumber].mY;
+
+				if(Pos < 0 ) {
+					Pos ^= 0xFF;
+					++Pos;
 					Y = 0;
 				} else {
 					Y = 2;
 				}
-				if( A < mMemory[ 0x3F0C + Y ] )
-					mMemory[ 0x3F0C + Y ] = A;
+				if(Pos < mMemory[ 0x3F0C + Y ] )
+					mMemory[ 0x3F0C + Y ] = (int8) Pos;
 			}
 			// 3C62
 		}
