@@ -3,6 +3,9 @@ The Castles of Dr. Creep
 
 [![Build Status](https://travis-ci.org/segrax/DrCreep.svg?branch=master)](https://travis-ci.org/segrax/DrCreep)
 
+###Now Available on Steam
+**http://store.steampowered.com/app/517930**
+
 ####About
 
  The Castles of Dr. Creep is an open source reimplementation of the 
