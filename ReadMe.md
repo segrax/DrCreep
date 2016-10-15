@@ -13,10 +13,6 @@ The Castles of Dr. Creep
  Now with a built in castle Builder, allowing the player to create their
   own castles and build onto an existing castle.
 
-
-Enjoy,
-  
-Robert Crossfield <robcrossfield@gmail.com>
 <br>
 ####History
  
