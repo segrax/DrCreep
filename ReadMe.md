@@ -13,7 +13,6 @@ The Castles of Dr. Creep
  Now with a built in castle Builder, allowing the player to create their
   own castles and build onto an existing castle.
 
-<br>
 #### History
  
 " As a programmer, I appreciate the difficulty of reverse-engineering the 6502 object code to C++.  
