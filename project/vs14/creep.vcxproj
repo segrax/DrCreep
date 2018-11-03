@@ -198,8 +198,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)..\..\run\</OutDir>
-    <IncludePath>D:\Systems\Librarys\SDL2-2.0.4\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Systems\Librarys\SDL2-2.0.4\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>packages\sdl2.2.0.5\build\native\include;$(IncludePath)</IncludePath>
+    <LibraryPath>packages\sdl2.2.0.5\build\native\lib\Win32\dynamic;packages\sdl2_mixer.vc.2.0.1.1\build\native\lib\Win32\dynamic;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>D:\Systems\Librarys\SDL2-2.0.4\include;$(IncludePath)</IncludePath>
@@ -249,6 +249,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
