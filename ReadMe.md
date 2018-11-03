@@ -1,7 +1,7 @@
 The Castles of Dr. Creep
 ------------------------
 
-[![Build Status](https://travis-ci.org/segrax/DrCreep.svg?branch=master)](https://travis-ci.org/segrax/DrCreep)
+[![Build Status](https://travis-ci.com/segrax/DrCreep.svg?branch=master)](https://travis-ci.com/segrax/DrCreep)
 
 ### Now Available on Steam
 **http://store.steampowered.com/app/517930**

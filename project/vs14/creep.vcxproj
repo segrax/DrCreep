@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -67,7 +67,6 @@
     <ClInclude Include="..\..\src\vic-ii\bitmapMulticolor.h" />
     <ClInclude Include="..\..\src\vic-ii\screen.h" />
     <ClInclude Include="..\..\src\vic-ii\sprite.h" />
-    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\builder.cpp" />
@@ -114,15 +113,6 @@
     <None Include="..\..\src\resid-0.16\configure.in" />
     <None Include="..\..\src\resid-0.16\COPYING" />
     <None Include="..\..\src\resid-0.16\depcomp" />
-    <None Include="..\..\src\resid-0.16\INSTALL" />
-    <None Include="..\..\src\resid-0.16\install-sh" />
-    <None Include="..\..\src\resid-0.16\ltconfig" />
-    <None Include="..\..\src\resid-0.16\ltmain.sh" />
-    <None Include="..\..\src\resid-0.16\Makefile.am" />
-    <None Include="..\..\src\resid-0.16\Makefile.in" />
-    <None Include="..\..\src\resid-0.16\missing" />
-    <None Include="..\..\src\resid-0.16\mkinstalldirs" />
-    <None Include="..\..\src\resid-0.16\NEWS" />
     <None Include="..\..\src\resid-0.16\README" />
     <None Include="..\..\src\resid-0.16\samp2src.pl" />
     <None Include="..\..\src\resid-0.16\siddefs.h.in" />
@@ -147,31 +137,32 @@
     <ProjectGuid>{D42B6739-00F8-4350-A3EE-D01924B64A50}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>creep</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -194,9 +185,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)_d</TargetName>
-    <IncludePath>D:\Systems\Librarys\SDL2-2.0.4\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Systems\Librarys\SDL2-2.0.4\lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>packages\sdl2.2.0.5\build\native\lib\Win32\dynamic;packages\sdl2_mixer.vc.2.0.1.1\build\native\lib\Win32\dynamic;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\..\run\</OutDir>
+    <IncludePath>packages\sdl2.2.0.5\build\native\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>

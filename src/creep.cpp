@@ -1542,45 +1542,31 @@ void cCreep::convertTimeToNumber( byte pA, byte pY ) {
 
 // 2E37: 
 void cCreep::Sprite_Collision_Set() {
-	byte gfxSpriteCollision = 0, gfxBackgroundCollision = 0;
-
 	vector< sScreenPiece *>				*collisions = mScreen->collisionsGet();
 	vector< sScreenPiece *>::iterator	 colIT;
 
 	for( colIT = collisions->begin(); colIT != collisions->end(); ++colIT ) {
 		sScreenPiece *piece = *colIT;
 
-		if( piece->mPriority == ePriority_Background || piece->mSprite2 == 0 ) {
-			// Background collision
-			gfxBackgroundCollision |= (1 << (piece->mSprite-1) );
+		if (piece->mSprite) {
+			if (piece->mPriority == ePriority_Background || piece->mSprite2 == 0) {
+				// Background collision
 
-		} 
-		if( piece->mSprite2 ) {
-			// Sprite collision
-			gfxSpriteCollision |= (1 << (piece->mSprite-1) );
-			gfxSpriteCollision |= (1 << (piece->mSprite2-1) );
+				if (!(mRoomSprites[piece->mSprite-1].state & SPR_UNUSED))
+					mRoomSprites[piece->mSprite-1].state |= SPR_COLLIDE_BACKGROUND;
+
+			}
+			if (piece->mSprite2) {
+				// Sprite collision
+
+				if (!(mRoomSprites[piece->mSprite-1].state & SPR_UNUSED))
+					mRoomSprites[piece->mSprite-1].state |= SPR_COLLIDE_SPRITE;
+
+				if (!(mRoomSprites[piece->mSprite2-1].state & SPR_UNUSED))
+					mRoomSprites[piece->mSprite2-1].state |= SPR_COLLIDE_SPRITE;
+			}
 		}
 
-	}
-
-	// loop each sprite, marking it with a collision, if one occured
-	for( byte spriteNumber = 0; spriteNumber != MAX_SPRITES; ++spriteNumber) {
-		
-		byte A = mRoomSprites[spriteNumber].state;
-		if( !(A & SPR_UNUSED) ) {
-
-			A &= 0xF9;
-			if( gfxSpriteCollision & 0x01 )
-				A |= SPR_COLLIDE_SPRITE;
-			
-			if( gfxBackgroundCollision & 0x01 )
-				A |= SPR_COLLIDE_BACKGROUND;
-
-			mRoomSprites[spriteNumber].state = A;
-		}
-
-		gfxSpriteCollision >>= 1;
-		gfxBackgroundCollision >>= 1;
 	}
 }
 
@@ -1706,7 +1692,7 @@ s2F51:;
 
 // 311E
 void cCreep::Sprite_Object_Collision_Check( byte pSpriteNumber ) {
-	byte SpriteX_Start, SpriteX_Finish;
+	word SpriteX_Start, SpriteX_Finish;
 	word SpriteY_Start, SpriteY_Finish;
 
 	SpriteX_Start = mRoomSprites[pSpriteNumber].mX;
@@ -1726,10 +1712,15 @@ void cCreep::Sprite_Object_Collision_Check( byte pSpriteNumber ) {
 	for( byte ObjectNumber = 0; ObjectNumber < mObjectCount; ++ObjectNumber ) {
 
 		if( !(mRoomAnim[ObjectNumber].mFlags & ITM_DISABLE ))
-			if( !(SpriteX_Finish < mRoomAnim[ObjectNumber].mX ))
-				if( !(mRoomAnim[ObjectNumber].mX + mRoomAnim[ObjectNumber].mWidth < SpriteX_Start))
-					if( !(SpriteY_Finish < mRoomAnim[ObjectNumber].mY) )
-						if( !(mRoomAnim[ObjectNumber].mY + mRoomAnim[ObjectNumber].mHeight < SpriteY_Start) ) {
+
+			// SpriteX >= Room Object
+			if( (SpriteX_Finish >= mRoomAnim[ObjectNumber].mX ))
+
+				if( (mRoomAnim[ObjectNumber].mX + mRoomAnim[ObjectNumber].mWidth >= SpriteX_Start))
+
+					if( (SpriteY_Finish >= mRoomAnim[ObjectNumber].mY) )
+
+						if( (mRoomAnim[ObjectNumber].mY + mRoomAnim[ObjectNumber].mHeight >= SpriteY_Start) ) {
 							//318C
 							if( Sprite_Object_Collision( pSpriteNumber, ObjectNumber ) == true )
 								mRoomSprites[pSpriteNumber].state |= SPR_ACTION_FLASH;
@@ -1869,7 +1860,7 @@ void cCreep::Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 
 // 3026
 void cCreep::Sprite_Collision_Check( byte pSpriteNumber ) {
-	byte SpriteY_Bottom, SpriteX, SpriteX_Right;
+	word SpriteY_Bottom, SpriteX, SpriteX_Right;
 	word SpriteY;
 
 	byte HitData = mObjectCollisionData[mRoomSprites[pSpriteNumber].mSpriteType].mHitData;
@@ -2354,15 +2345,15 @@ void cCreep::obj_Frankie_Execute( byte pSpriteNumber ) {
 				continue;
 
 			Y = mMemory[ 0x34D1 + Y ];
-			uint8 distanceY = mRoomSprites[pSpriteNumber].mY;
+			int16 distanceY = mRoomSprites[pSpriteNumber].mY;
 			distanceY -= mRoomSprites[Y].mY;
 
 			// Within 4 on the Y axis, then frank can wake up
-			if( distanceY >= 4 )
+			if( distanceY >= 4 || distanceY <= -4)
 				continue;
 
 			// 3B4A
-			int8 distanceX = mRoomSprites[pSpriteNumber].mX;
+			int16 distanceX = mRoomSprites[pSpriteNumber].mX;
 			distanceX -= mRoomSprites[Y].mX;
 
 			A = mRoomSprites[pSpriteNumber].Sprite_field_1E;
@@ -2580,7 +2571,7 @@ s3D4F:;
 // 3D6E: Frankie?
 bool cCreep::obj_Frankie_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 
-	char A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].mWidth;
+	uint8 A = mRoomSprites[pSpriteNumber].mX + mRoomSprites[pSpriteNumber].mWidth;
 	A -= mRoomAnim[pObjectNumber].mX;
 
 	if( A >= 4 )

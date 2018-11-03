@@ -144,10 +144,12 @@ void cSprite::drawSingle( byte *pBuffer ) {
 void cSprite::streamLoad( byte *pBuffer ) {
 
 	// No stream provided, then use the previous one
-	if (!pBuffer)
+	if (!pBuffer) {
+		if (!_buffer)
+			return;
 		pBuffer = _buffer;
 
-	else {
+	} else {
 		// Otherwise set the buffer to the new stream
 		_buffer = pBuffer;
 		return;
