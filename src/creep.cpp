@@ -32,7 +32,6 @@
 #include "castleManager.h"
 #include "creep.h"
 #include "sound/sound.h"
-#include "builder.hpp"
 
 #include "debug.h"
 
@@ -44,15 +43,21 @@
 const unsigned char cCreep::mRoomIntroData[] = {
 
 	0x0A, 0x16, // eObjectIntroMultiDraw
-	0x08, 0x06, 0x10, 0x58, 0x14, 0x00, 0x00, 
-
-	0x6D, 0x2A, // eObjectIntroText
-	0x28, 0x30, 0x08, 0x21, 'T', 'H', 'E', ' ', 'C', 'A', 'S', 'T', 'L', 'E', 'S', ' ', 'O', 'F' | 0x80, 
-	0x30, 0x40, 0x0D, 0x22, 'D', 'O', 'C', 'T', 'O', 'R', ' ', 'C', 'R', 'E', 'E', 'P' | 0x80, 
-	0x34, 0x80, 0x07, 0x21, 'B', 'Y', ' ', 'E', 'D', ' ', 'H', 'O', 'B', 'B', 'S' | 0x80,
-	0x24, 0xC0, 0x0C, 0x21, 'S', 'T', 'R', 'O', 'B', 'S', ' ', 'C', 'A', 'N', 'A', 'R', 'D', 'L', 'Y' | 0x80,
+	//	Count, Id,     X,    Y
+		0x08, 0x06, 0x10, 0x48, 0x14, 0x00, 
 	0x00,
 
+	0x6D, 0x2A, // eObjectIntroText
+
+	// X     Y  FONT  COLOR
+	0x28, 0x20, 0x08, 0x21, 'T', 'H', 'E', ' ', 'C', 'A', 'S', 'T', 'L', 'E', 'S', ' ', 'O', 'F' | 0x80,
+	0x30, 0x30, 0x0D, 0x22, 'D', 'O', 'C', 'T', 'O', 'R', ' ', 'C', 'R', 'E', 'E', 'P' | 0x80,
+	0x34, 0x70, 0x07, 0x21, 'B', 'Y', ' ', 'E', 'D', ' ', 'H', 'O', 'B', 'B', 'S' | 0x80,
+	0x10, 0xA0, 0x03, 0x21, 'T', 'U', 'T', 'O', 'R', 'I', 'A', 'L', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' | 0x80,
+	0x10, 0xC0, 0x0C, 0x21, 'P', 'R', 'E', 'S', 'S', ' ', 'A', 'C', 'T', 'I', 'O', 'N', ' ', 'O', 'R', ' ', 'M', 'E', 'N', 'U' | 0x80,
+	0x00,
+	
+	// Original
 	//	0x10, 0xC0, 0x0C, 0x21, 'B', 'R', 'O', 'D', 'E', 'R', 'B', 'U', 'N', 'D', ' ', ' ', 'S', 'O', 'F', 'T', 'W', 'A', 'R', 'E' | 0x80,
 	0x00, 0x00	// eObjectNone
 };
@@ -88,12 +93,12 @@ cCreep::cCreep() {
 	mSound = 0;
 
 	// Load the C64 Character Rom
-	if( (m64CharRom = local_FileRead( "char.rom", "",  romSize, false )) == 0 ) {
+	if( (m64CharRom = local_FileRead( "CHAR.ROM", "",  romSize, false )) == 0 ) {
 		mDebug->error("File \"char.rom\" not found");
 		return;
 	}
 
-	if( (mGameData = mCastleManager->fileLoad( "OBJECT", romSize )) == 0 ) {
+	if( (mGameData = mCastleManager->fileLoad("OBJECT", romSize)) == 0 ) {
 		mDebug->error("File \"OBJECT\" not found");
 		return;
 	}
@@ -116,8 +121,8 @@ cCreep::cCreep() {
 
 	mCurrentPlayer = 0xBA;
 
-	mBuilder = 0;
 	mCastle = 0;
+	mCastleChanged = 0;
 	mJoyButtonState = 0xA0;
 
 	mMusicCurrent = "MUSIC0";
@@ -141,52 +146,6 @@ cCreep::~cCreep() {
 	delete mScreen;
 	delete mInput;
 	delete mDebug;
-	delete mBuilder;
-}
-
-void cCreep::builderStart( int pStartLevel ) {
-	bool	run = true;
-
-	mBuilder = new cBuilder( this );
-	mBuilder->mSoundSet( mSound );
-
-	mScreen->roomNumberSet(0);
-	mBuilder->start(pStartLevel, false);
-
-	for(; mBuilder->mTestGet(); ) {
-
-		// Copy the castle from editor memory to game memory
-		memcpy( &mMemory[0x7800], mBuilder->memory( 0x7800 ), 0x2000 );
-		memcpy( &mMemory[0x9800], mBuilder->memory( 0x7800 ), 0x2000 );
-
-		// Run the level
-		mIntro = false;
-		mainLoop();	
-
-		// Return to the editor
-		mQuit = false;
-		mBuilder->mStartCastle = -2;
-		mBuilder->mainLoop();
-	}
-
-	// Remove screen/sound ptr so builder doesnt delete it
-	mBuilder->screenSet(0);
-	mBuilder->mSoundSet(0);
-
-	// Delete Builder
-	delete mBuilder;
-	mBuilder = 0;
-
-	// Set the screen back
-	mScreen->clear(0);
-	mScreen->windowTitleSet(mWindowTitle);
-	mScreen->roomNumberSet(-1);
-
-	// Disable the sprites
-	mScreen->spriteDisable();
-
-	// Set the screen ptrs
-	mScreen->bitmapLoad( &mMemory[ 0xE000 ], &mMemory[ 0xCC00 ], &mMemory[ 0xD800 ], 0 );
 }
 
 void cCreep::titleDisplay() {
@@ -208,11 +167,9 @@ void cCreep::titleDisplay() {
 		eventProcess(true);
 		mScreen->refresh();
 	}
-    delete introImage;
 }
 
 void cCreep::run( int pArgCount, char *pArgs[] ) {
-	bool consoleShow = false;
 
 	int	count = 0;
 	int	playLevel = 0;
@@ -227,9 +184,6 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	while( count < pArgCount ) {
 		string arg = string( pArgs[count] );
 
-		if( arg == "-c")
-			consoleShow = true;
-		
 		if( arg == "-u") {
 			cout << " Unlimited Lives enabled." << endl;
 			unlimited = true;
@@ -257,17 +211,11 @@ void cCreep::run( int pArgCount, char *pArgs[] ) {
 	if(playLevel)
 		--playLevel;
 
-#ifdef _DEBUG
-	consoleShow = true;
-#endif
-	// Hide the console unless its requested by user
-	if( !consoleShow )
-        mDebug->consoleHide();
-
 	mScreen->windowTitleUpdate();
 
 	// Display the title screen
 #ifndef _DEBUG
+	DisplayControls();
 	titleDisplay();
 #endif
 
@@ -382,12 +330,62 @@ void cCreep::start( int pStartLevel, bool pUnlimited ) {
 	mainLoop();
 }
 
+void cCreep::DisplayControls() {
+	static bool Started = false;
+
+	int Count = 0x30;
+
+	if (Started == false) {
+		// First 6 launchs, display the controls for longer
+		if (g_Steam.GetSingletonPtr()->IncreaseStat(eStat_TimesLaunched) < 6) {
+			Count = 0x60;
+		}
+		Started = true;
+	}
+
+	cScreenSurface Keyboard("keyboard.bmp");
+
+	for (int i = 0; i < Count; ++i) {
+		g_Window.RenderShrunk(&Keyboard);
+		g_Window.FrameEnd();
+
+		hw_IntSleep(1);
+		eventProcess(true);
+
+		KeyboardJoystickMonitor(0);
+		if (mJoyButtonState)
+			return;
+
+		KeyboardJoystickMonitor(1);
+		if (mJoyButtonState)
+			return;
+	}
+
+	cScreenSurface Joystick("joystick.bmp");	
+
+	for (int i = 0; i < Count; ++i) {
+		g_Window.RenderShrunk(&Joystick);
+		g_Window.FrameEnd();
+		hw_IntSleep(1);
+		eventProcess(true);
+
+		KeyboardJoystickMonitor(0);
+		if (mJoyButtonState)
+			break;
+
+		KeyboardJoystickMonitor(1);
+		if (mJoyButtonState)
+			break;
+	}
+}
+
 // 0x7572
 void cCreep::optionsMenuPrepare() {
 	word byte_30;
 
 	byte_30 = 0x400;
 
+	// Clear Screen
 	for( signed char X = 3; X >= 0; --X ) {
 		for( word Y = 0; Y <= 0xFF; ++Y )
 			mMemory[ byte_30 + Y ] = 0x20;
@@ -395,60 +393,45 @@ void cCreep::optionsMenuPrepare() {
 		byte_30 += 0x100;
 	}
 
-	word byte_3E;
+	size_t Item = 0;
 
-	mFileListingNamePtr = 0;
-
-	byte_3E = 0x7760;
+	mOptionsMenuCurrentItem = 0;
 
 	//0x759C
 	for(;;) {
-		byte Y = 0;
-		word A = mMemory[ byte_3E ];
-		if(A == 0xFF)
+		if(mMenu[Item].mX == -1)
 			break;
 
-		A = mMemory[ byte_3E + 2 ];
-		if(A != 0xFF) {
+		if(mMenu[Item].mAction != -1) {
 
-			byte X = mFileListingNamePtr;
+			byte X = mOptionsMenuCurrentItem;
 
-			for( Y = 0; Y < 3; ++Y ) {
-				
-				mMemory[ 0xBA00 + X ] = mMemory[ byte_3E + Y];
-				++X;
-			}
+			mMemory[0xBA00 + X + 0] = (uint8) mMenu[Item].mX;
+			mMemory[0xBA00 + X + 1] = (uint8) mMenu[Item].mY;
+			mMemory[0xBA00 + X + 2] = (uint8) mMenu[Item].mAction;
 
-			mFileListingNamePtr = ++X;
+			mOptionsMenuCurrentItem += 4;
 		}
 
 		// 75C0
-		byte X = mMemory[ byte_3E + 1 ];
+		byte X = (byte) mMenu[Item].mY;
 		byte_30 = mMemory[ 0x5CE6 + X ];
 		
 		//
-		A = mMemory[ 0x5D06 + X ] + 4;
+		word A = mMemory[ 0x5D06 + X ] + 4;
 		byte_30 = (A << 8) + (byte_30 & 0xFF);
 
 		//
-		A = (byte_30 & 0xFF) + mMemory[ byte_3E ];
+		A = (byte_30 & 0xFF) + mMenu[Item].mX;
 		byte_30 = A + (byte_30 & 0xFF00);
 
-		
-		//0x75E1
-		byte_3E += 3;
-		
-		for( Y = 0; ; ++Y ) {
+		for (size_t Y = 0; mMenu[Item].mText[Y] != 0 ; ++Y) {
 
-			mMemory[ byte_30 + Y ] = (byte) mMemory[ byte_3E + Y] & 0x3F;
 
-			if( mMemory[ byte_3E + Y] & 0x80 )
-				break;
+			mMemory[byte_30 + Y] = mMenu[Item].mText[Y] & 0x3F;
 		}
 
-		// 75FC
-		++Y;
-		byte_3E += Y;
+		++Item;
 	}
 
 	// 760A
@@ -480,7 +463,7 @@ void cCreep::optionsMenuPrepare() {
 
 	// Now do available castle names
 	for(int curCastle = 0; curCastle < 0x18; ++curCastle) {
-		word X = mFileListingNamePtr;
+		word X = mOptionsMenuCurrentItem;
 		cCastleInfo *castle = mCastleManager->castleInfoGet( curCastle );
 
 		if( !castle )
@@ -513,7 +496,7 @@ void cCreep::optionsMenuPrepare() {
 		for( size_t counter = 0; counter < castle->nameGet().length(); ++counter, ++word_32 )
 			mMemory[ word_32 ] = toupper(castle->nameGet()[ counter ]) & 0x3F;
 
-		mFileListingNamePtr += 4;
+		mOptionsMenuCurrentItem += 4;
 
 		if(mMemory[ 0x775E ] == 3)
 			mMemory[ 0x775E ] = 0x16;
@@ -526,14 +509,14 @@ void cCreep::optionsMenuPrepare() {
 		}
 	}
 	
-	mMemory[ 0x239A ] = mFileListingNamePtr - 4;
+	mMemory[ 0x239A ] = mOptionsMenuCurrentItem - 4;
 
-	mFileListingNamePtr = 0x08;
+	mOptionsMenuCurrentItem = 0x04;
 	DisableSpritesAndStopSound();
 }
 
 // 268F: 
-void cCreep::textShow() {
+void cCreep::StringPrint_StringInput() {
 	mRestorePressed = false;
 
 	mTextColor = mMemory[ 0x278A ];
@@ -543,9 +526,9 @@ void cCreep::textShow() {
 
 	mMemory[ 0x27A2 ] = 0x2D;
 
-	for( mStrLength = mMemory[ 0x278C ]; mStrLength; --mStrLength ) {
+	for( mStrLength = mStrLengthMax; mStrLength; --mStrLength ) {
 		
-		textPrintCharacter();
+		StringPrint_Character();
 		mTextXPos += 0x08;
 	}
 
@@ -553,17 +536,17 @@ void cCreep::textShow() {
 	for(;;) {
 		hw_Update();
 
-		if( mStrLength != mMemory[ 0x278C ] ) {
+		if( mStrLength != mStrLengthMax ) {
 			++mMemory[ 0x27A3 ];
 
 			byte X = mMemory[ 0x27A3 ] & 3;
 			mMemory[ 0x27A2 ] = mMemory[ 0x27A4 + X ];
 			mTextXPos = (mStrLength << 3) + mMemory[ 0x2788 ];
-			textPrintCharacter();
+			StringPrint_Character();
 		}
 
 		// 26F7
-		byte A = textGetKeyFromUser();
+		byte A = StringInput_GetKey();
 		if( A == 0x80 || mInput->restoreGet() == true ) {
 			if( mRestorePressed == false &&  mInput->restoreGet() != true) {
 
@@ -576,45 +559,53 @@ void cCreep::textShow() {
 				return;
 			}
 		} else {
-			// 2730 
+
+			// 2730: Backspace
 			if( A == 8 ) {
-				if( mStrLength != mMemory[ 0x278C ] ) {
-					mMemory[ 0x78A2 ] = 0x2D;
-					textPrintCharacter();
+
+				// Draw a '-' over the last character
+				if( mStrLength != mStrLengthMax ) {
+					mMemory[ 0x27A2 ] = 0x2D;
+					StringPrint_Character();
 				}
-				// 2744
-				if(mStrLength)
+
+				// Backpeddle
+				if (mStrLength)
 					--mStrLength;
+
 				continue;
 
 			} else {
 				// 274F
+				// Enter pushed?
 				if( A == 0x0D )
 					return;
 				
-				if( mStrLength == mMemory[ 0x278C ] )
+				// Max length?
+				if( mStrLength == mStrLengthMax )
 					continue;
 				
+				// Add keypress to string
 				mMemory[ 0x278E + mStrLength ] = A;
 				++mStrLength;
 
 				mMemory[ 0x27A2 ] = A;
-				textPrintCharacter();
+				StringPrint_Character();
 			}
 		}
 	}
 }
 
 // 2772:
-void cCreep::textPrintCharacter() {
+void cCreep::StringPrint_Character() {
 	mMemory[ 0x27A2 ] |= 0x80;
 
 	mObjectPtr = 0x27A2;
-	stringDraw();
+	StringPrint();
 }
 
 // 27A8
-byte cCreep::textGetKeyFromUser() {
+byte cCreep::StringInput_GetKey() {
 	byte key = mInput->keyRawGet();
 	
 	if( key == 0 )
@@ -657,7 +648,6 @@ void cCreep::mainLoop() {
 
 		Game();
 	}
-
 }
 
 // 18E4
@@ -876,6 +866,7 @@ void cCreep::roomPrepare( word pAddress ) {
 // B8D
 bool cCreep::Intro() {
 
+	mCastleChanged = 0;
 	mMenuMusicScore = 0;
 	mMenuScreenTimer = 3;
 	mMenuScreenCount = 0;
@@ -892,13 +883,36 @@ bool cCreep::Intro() {
 			++mMenuScreenCount;
 			roomPtrSet( mMenuScreenCount );
 
-			if( ((mMemory[ mRoomPtr ]) & 0x40) )
+			// Final Room?
+			if (((mMemory[mRoomPtr]) & 0x40)) {
+
+				g_Steam.SetAchievement(eAchievement_IntroWatched);
+
 				mMenuScreenCount = 0;
+			}
 
 			roomLoad();
 		} else {
 			mObjectPtr = 0x0D1A;
 			memcpy( &mMemory[0x0D1A], mRoomIntroData, sizeof mRoomIntroData );
+
+			string CastleName = mCastle->nameGet(true);
+
+			size_t NameSize = mCastle->nameGet().size();
+			if (NameSize > 20)
+				NameSize = 20;
+			
+			if (NameSize < 20) {
+				size_t Max = (20 / 2) - (mCastle->nameGet().size() / 2);
+
+				while (NameSize < mCastle->nameGet().size() + Max) {
+
+					CastleName.insert(CastleName.begin(), ' ');
+					NameSize = CastleName.size();
+				}
+			}
+
+			memcpy( &mMemory[0x0D1A + 64], CastleName.c_str(), NameSize);
 
 			screenClear();
 			roomPrepare( );
@@ -911,10 +925,11 @@ bool cCreep::Intro() {
 				if( mMenuMusicScore == 0 )
 					++mMenuMusicScore;
 				else {
+					g_Steam.SetAchievement(eAchievement_IntroMusicPlayed);
+
 					// 0C49
 					musicChange();
 					mMusicPlaying = 1;
-					return true;
 				}
 			}
 		}
@@ -946,24 +961,40 @@ bool cCreep::Intro() {
 			// Change which player controller is checked
 			byte_D10 ^= 0x01;
 
+			// Display Keymap
+			if (mInput->f2Get()) {
+
+				DisplayControls();
+			}
+
 			// Display Highscores on F3
 			if( mInput->f3Get() ) {
+
 				DisableSpritesAndStopSound();
 				gameHighScores();
 
 				mObjectPtr = 0x239C;
 				obj_stringPrint();
 
-				mMemory[0x278C] = 0;
-				textShow();
+				mStrLengthMax = 0;
+				StringPrint_StringInput();
 
 				return true;
 			}
 
 			if( mRunStopPressed == true ) {
+
 				optionsMenu();
+
 				if( mSaveGameLoaded == 1 ) {
 					mJoyButtonState = 1;
+					break;
+				}
+
+				if (mCastleChanged == 1) {
+					mMenuScreenTimer = 3;
+					mMenuScreenCount = 0;
+					mJoyButtonState = 0;
 					break;
 				}
 
@@ -1161,6 +1192,7 @@ musicUpdate:;
 		mMusicBuffer = 0;
 		
 	} else {
+		mMusicPlaying = 0;
 		mMusicBuffer = mMusicBufferStart;
 		mMemory[ 0x20DD ] = 0x02;
 		
@@ -1181,7 +1213,7 @@ void cCreep::musicChange() {
 	mMusicBufferSize = 0;
 
 	while (MusicPtr == 0) {
-		MusicPtr = mCastleManager->fileLoad( mMusicCurrent, mMusicBufferSize );
+		MusicPtr = mCastleManager->musicLoad( mMusicCurrent, mMusicBufferSize );
 
 		// Reset to MUSIC0
 		if (MusicPtr == 0)
@@ -1223,10 +1255,8 @@ s2238:
 		mScreen->spriteDisable();
 
 		// 0x2257: Set the color of all text positions to WHITE
-		for(word_30 = 0xD800; word_30 < 0xDC00; word_30 += 0x100) {
-
-			for( word Y=0 ;Y != 0x100; ++Y ) 
-				mMemory[ word_30 + Y ] = 1;
+		for(word_30 = 0xD800; word_30 < 0xDC00; ++word_30 ) {
+			mMemory[ word_30 ] = 1;
 		}
 		
 		// Decode the background as text
@@ -1237,14 +1267,16 @@ s2238:
         // 0x226E: Options Menu Loop
 		for(;;) {
 		    
-            // Do hardware update/sleep
-			hw_Update();
-			hw_IntSleep(1);
+			// Check for input
 
-            // Check for input
+			interruptWait(7);
+
+			// Do hardware update/sleep
+			hw_Update();
+
 			KeyboardJoystickMonitor(0);
 
-			// Leave menu if restore (escape) was pressed
+			// Leave menu if restore (escape) was pressed (or enter)
 			if( mRestorePressed ) {
 				mRestorePressed = false;
 
@@ -1255,12 +1287,13 @@ s2238:
             // No joystick button?
 			if( !mJoyButtonState ) {
 				
-				if( byte_5F56 & 0xFB )
+				// No Movement?
+				if( mJoystickInput & 0xFB )
 					continue;
 				
 				// 22F7
 				// 
-				byte X = mFileListingNamePtr;
+				byte X = mOptionsMenuCurrentItem;
 				byte Y = mMemory[ 0xBA01 + X ];
 				
 				word_30 = mMemory[ 0x5CE6 + Y ];
@@ -1270,18 +1303,19 @@ s2238:
 				
 				mMemory[ word_30 + Y ] = 0x20;
 
-				byte A = byte_5F56;
+				// Up or down?
+				byte A = mJoystickInput;
 				if(A) {
-					A = mFileListingNamePtr;
+					A = mOptionsMenuCurrentItem;
 
-					if( mFileListingNamePtr == mMemory[ 0x239A ] )
+					if( mOptionsMenuCurrentItem == mMemory[ 0x239A ] )
 						A = 0;
 					else
 						A += 4;
 
 				} else {
 					// 22B5
-					A = mFileListingNamePtr;
+					A = mOptionsMenuCurrentItem;
 					if( A )
 						A -= 4;
 					else
@@ -1290,7 +1324,7 @@ s2238:
 				}
 
 				// 22C3
-				mFileListingNamePtr = A;
+				mOptionsMenuCurrentItem = A;
 				X = A;
 
 				Y = mMemory[ 0xBA01 + X ];
@@ -1306,13 +1340,16 @@ s2238:
 			} else {
 				// Button Press
 				// 22E5
-				byte X = mFileListingNamePtr;
+				byte X = mOptionsMenuCurrentItem;
 
                 // Selected Menu Option
 				byte A = mMemory[ 0xBA02 + X ];
                 switch( A ) {
 
-                case 0: {
+                case eMenuAction_UnlimitedLives: {
+
+					g_Steam.SetAchievement(eAchievement_EnabledUnlimitedLives);
+
                     //  22ED: Unlimited Lives Toggle
 					mUnlimitedLives ^= 0xFF;
 
@@ -1332,29 +1369,28 @@ s2238:
                     break;
                         }
 
-                case 1:{
+                case eMenuAction_ExitMenu:{
                 default:
                    //inputWait();
 				    DisableSpritesAndStopSound();
 				    return;
                        }
 
-                case 2:{
-                    X = mFileListingNamePtr;
+                case eMenuAction_ChangeLevel:{
+                    X = mOptionsMenuCurrentItem;
 					ChangeLevel(X);
-                    break;
+					mCastleChanged = 1;
+                    return;
                        }
 
-                case 3:{
-                    gamePositionLoad();
-						
-				    //if( mMemory[ 0x24FD ] != 1 )
-					//	continue;
+                case eMenuAction_ResumeGame:{
 
+                    gamePositionLoad();
+				
                     goto s2238;
                        }
 
-                case 4:{
+                case eMenuAction_BestTimes:{
                     if( mMemory[ 0x2399 ] == 0xFF )
 						continue;
 
@@ -1365,8 +1401,8 @@ s2238:
 					mObjectPtr = 0x239C;
 					obj_stringPrint();
 
-					mMemory[ 0x278C ] = 0;
-					textShow();
+					mStrLengthMax = 0;
+					StringPrint_StringInput();
 						
 					goto s2238;
                        }
@@ -1426,29 +1462,10 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	mRunStopPressed = false;
 
 	sPlayerInput *input = mInput->inputGet( pA );
-
+	
 	// Pause the game, or enter the options menu
 	if( mInput->runStopGet() )
 		mRunStopPressed = true;
-
-	// Start the editor, using the current castle
-	if( mInput->f4Get() ) {
-		musicChange();
-		mMusicPlaying = 1;
-		if( !mBuilder ) {
-			//builderStart( mStartCastle );
-			input->clear();
-		}
-	}
-
-	// Start the editor, with a new castle
-	if( mInput->f5Get() ) {
-		
-		if( !mBuilder ) {
-			//builderStart( -1 );
-			input->clear();
-		}
-	}
 
 	// Kill the player(s) if the restore key is pressed
 	if( mInput->restoreGet() )
@@ -1473,7 +1490,7 @@ void cCreep::KeyboardJoystickMonitor( byte pA ) {
 	}
 
 	X &= 0x0F;
-	byte_5F56 = mMemory[ 0x5F59 + X ];
+	mJoystickInput = mMemory[ 0x5F59 + X ];
 	mJoyButtonState = A;
 }
 
@@ -1495,22 +1512,19 @@ void cCreep::events_Execute() {
 }
 
 // 29AE: 
-void cCreep::convertTimerToTime() {
+void cCreep::convertTimerToTime( const sPlayerTime& pTime ) {
 	
-	byte A = mMemory[ mObjectPtr + 1 ];
-	convertTimeToNumber( A, 6 );
+	convertTimeToNumber( pTime.Seconds(), 6 );
 
-	A = mMemory[ mObjectPtr + 2 ];
-	convertTimeToNumber( A, 3 );
+	convertTimeToNumber( pTime.Minutes(), 3 );
 	
-	A = mMemory[ mObjectPtr + 3 ];
-	convertTimeToNumber( A, 0 );
+	convertTimeToNumber( pTime.Hours(), 0 );
 
 }
 
 // 29D0: 
-void cCreep::convertTimeToNumber( byte pA, byte pY ) {
-	byte byte_2A6B = pA;
+void cCreep::convertTimeToNumber(size_t pA, byte pY ) {
+	byte byte_2A6B = (byte) pA;
 	
 	byte byte_2A6C = 0;
 
@@ -1542,6 +1556,8 @@ void cCreep::convertTimeToNumber( byte pA, byte pY ) {
 
 // 2E37: 
 void cCreep::Sprite_Collision_Set() {
+	byte gfxSpriteCollision = 0, gfxBackgroundCollision = 0;
+
 	vector< sScreenPiece *>				*collisions = mScreen->collisionsGet();
 	vector< sScreenPiece *>::iterator	 colIT;
 
@@ -1834,6 +1850,19 @@ void cCreep::Sprite_Collision( byte pSpriteNumber, byte pSpriteNumber2 ) {
 			return;
 
 		case SPRITE_TYPE_PLAYER:			//  Hit Player
+
+			if (mRoomSprites[pSpriteNumber2].mSpriteType == SPRITE_TYPE_LIGHTNING)
+				g_Steam.SetAchievement(eAchievement_Death_Voltage);
+
+			if (mRoomSprites[pSpriteNumber2].mSpriteType == SPRITE_TYPE_LASER)
+				g_Steam.SetAchievement(eAchievement_Death_Laser);
+
+			if (mRoomSprites[pSpriteNumber2].mSpriteType == SPRITE_TYPE_MUMMY)
+				g_Steam.SetAchievement(eAchievement_Death_Mummy);
+
+			if (mRoomSprites[pSpriteNumber2].mSpriteType == SPRITE_TYPE_FRANKIE)
+				g_Steam.SetAchievement(eAchievement_Death_Frankie);
+
 			StartSpriteFlash = obj_Player_Sprite_Collision( pSpriteNumber, pSpriteNumber2 );
 			break;
 
@@ -2033,47 +2062,28 @@ void cCreep::obj_Player_Execute( byte pSpriteNumber ) {
 		time_t diffSec;
 		timeb timeNow;
 		ftime(&timeNow);
-		int seconds, secondsO, minutes, hours;
+
+		sPlayerTime *Time = 0;
 
 		// Player 1/2 Time management
 		if( Y == 0 ) {
 			diffSec = timeNow.time - mPlayer1Time.time;
-			mPlayer1Seconds += (int) diffSec;
-			secondsO = mPlayer1Seconds;
+			diffSec -= mPlayer1SecondsPause;
+			mPlayer1SecondsPause = 0;
+			Time = &mPlayersTime[0];
+
+			writeLEWord( &mMemory[0x7855], (uint16_t) (Time->mSeconds + diffSec));
 		}
 		if( Y == 2 ) {
 			diffSec = timeNow.time - mPlayer2Time.time;
-			mPlayer2Seconds += (int) diffSec;
-			secondsO = mPlayer2Seconds;
+			diffSec -= mPlayer2SecondsPause;
+			mPlayer2SecondsPause = 0;
+			Time = &mPlayersTime[1];
+
+			writeLEWord(&mMemory[0x7857], (uint16_t) (Time->mSeconds + diffSec));
 		}
 
-		// Ptr to CIA Timer
-		word_30 = readLEWord( &mMemory[ 0x34E7 + Y ] );
-		word_32 = readLEWord( &mMemory[ 0x34EB + Y ] );
-
-		// Do conversions, as the time was originally stored using only 1-10 digits
-		int t = (secondsO % 60);
-		t /= 10;
-		seconds = (secondsO % 60) + (6 * t);
- 
-		t = (secondsO / 60);
-		t /= 10;
-		minutes = (secondsO / 60) + (6 * t);
-
-		t = ((secondsO / 60) / 60);
-		t /= 10;
-		hours = ((secondsO / 60) / 60) + (6 * t);
-
-		// Store the current players time
-		// Seconds
-		mMemory[ word_32 + 1 ] = seconds;
-
-		// Minutes
-		mMemory[ word_32 + 2 ] = minutes;
-
-		// Hours
-		mMemory[ word_32 + 3 ] = hours;
-
+		Time->AddSeconds((size_t) diffSec);
 		return;
 	} 
 
@@ -2122,8 +2132,8 @@ void cCreep::obj_Player_Execute( byte pSpriteNumber ) {
 				mRoomSprites[ pSpriteNumber ].Sprite_field_1B += 0x04;
 				Y = mRoomSprites[ pSpriteNumber ].Sprite_field_1B;
 
-				mRoomSprites[ pSpriteNumber ].mX += (int8) mMemory[ 0x34A1 + Y ];
-				mRoomSprites[ pSpriteNumber ].mY += (int8) mMemory[ 0x34A2 + Y ];
+				mRoomSprites[ pSpriteNumber ].mX += (int8_t) mMemory[ 0x34A1 + Y ];
+				mRoomSprites[ pSpriteNumber ].mY += (int8_t) mMemory[ 0x34A2 + Y ];
 			}
 
 		} else if( A == 6 ) {
@@ -2196,9 +2206,9 @@ s32DB:;
 	// 338E
 	KeyboardJoystickMonitor( mRoomSprites[pSpriteNumber].playerNumber );
 	mRoomSprites[pSpriteNumber].mButtonState = mJoyButtonState;
-	mRoomSprites[pSpriteNumber].Sprite_field_1E = byte_5F56;
+	mRoomSprites[pSpriteNumber].Sprite_field_1E = mJoystickInput;
 	
-	byte Y = byte_5F56;
+	byte Y = mJoystickInput;
 	if( !(Y & 0x80 )) {
 
 		if( mMemory[ 0x2F82 + Y ] & byte_34D5 ) {
@@ -2213,10 +2223,10 @@ s32DB:;
 		if(!( A & 0x80 )) {
 			A += 1;
 			A &= 7;
-			if( A != byte_5F56 ) {
+			if( A != mJoystickInput ) {
 				A -= 2;
 				A &= 7;
-				if( A != byte_5F56 )
+				if( A != mJoystickInput )
 					goto s33D6;
 			}
 			
@@ -2235,7 +2245,7 @@ s33DE:;
 	A = (mRoomSprites[pSpriteNumber].Sprite_field_1F & 3);
 
 	if( A == 2 ) {
-		mRoomSprites[pSpriteNumber].mY -= (int8) byte_5FD8;
+		mRoomSprites[pSpriteNumber].mY -= (int8_t) byte_5FD8;
 
 	} else {
 		// 33F4
@@ -2246,8 +2256,8 @@ s33DE:;
 	}
 	// 3405
 	Y = mRoomSprites[pSpriteNumber].Sprite_field_1F;
-	mRoomSprites[pSpriteNumber].mX += (int8) mMemory[ 0x34D7 + Y ];
-	mRoomSprites[pSpriteNumber].mY += (int8) mMemory[ 0x34DF + Y ];
+	mRoomSprites[pSpriteNumber].mX += (int8_t) mMemory[ 0x34D7 + Y ];
+	mRoomSprites[pSpriteNumber].mY += (int8_t) mMemory[ 0x34DF + Y ];
 
 	if( !(Y & 3) ) {
 		// 3421
@@ -2345,16 +2355,14 @@ void cCreep::obj_Frankie_Execute( byte pSpriteNumber ) {
 				continue;
 
 			Y = mMemory[ 0x34D1 + Y ];
-			int16 distanceY = mRoomSprites[pSpriteNumber].mY;
-			distanceY -= mRoomSprites[Y].mY;
+			int16_t distanceY = mRoomSprites[pSpriteNumber].mY - mRoomSprites[Y].mY;
 
 			// Within 4 on the Y axis, then frank can wake up
 			if( distanceY >= 4 || distanceY <= -4)
 				continue;
 
 			// 3B4A
-			int16 distanceX = mRoomSprites[pSpriteNumber].mX;
-			distanceX -= mRoomSprites[Y].mX;
+			int16_t distanceX = mRoomSprites[pSpriteNumber].mX - mRoomSprites[Y].mX;
 
 			A = mRoomSprites[pSpriteNumber].Sprite_field_1E;
 
@@ -2443,7 +2451,7 @@ s3B6E:
 			if( mMemory[ 0x780D + byte_3F0A ] == 0 ) {
 				
 				Y = mMemory[ 0x34D1 + byte_3F0A ];
-				int16 Pos = mRoomSprites[Y].mX - mRoomSprites[pSpriteNumber].mX;
+				int16_t Pos = mRoomSprites[Y].mX - mRoomSprites[pSpriteNumber].mX;
 				//3C2A
 				if( Pos < 0 ) {
 					Pos ^= 0xFF;
@@ -2453,7 +2461,7 @@ s3B6E:
 					Y = 1;
 				}
 				if(Pos < mMemory[ 0x3F0C +  Y ] )
-					mMemory[ 0x3F0C + Y ] = (int8) Pos;
+					mMemory[ 0x3F0C + Y ] = (int8_t) Pos;
 
 				Y = mMemory[ 0x34D1 + byte_3F0A ];
 				Pos = mRoomSprites[Y].mY - mRoomSprites[pSpriteNumber].mY;
@@ -2466,7 +2474,7 @@ s3B6E:
 					Y = 2;
 				}
 				if(Pos < mMemory[ 0x3F0C + Y ] )
-					mMemory[ 0x3F0C + Y ] = (int8) Pos;
+					mMemory[ 0x3F0C + Y ] = (int8_t) Pos;
 			}
 			// 3C62
 		}
@@ -2510,7 +2518,7 @@ s3B6E:
 	// 3CB4
 s3CB4:;
 	if( mRoomSprites[pSpriteNumber].mButtonState & 2 ) {
-		mRoomSprites[pSpriteNumber].mY -= (int8) byte_5FD8;
+		mRoomSprites[pSpriteNumber].mY -= (int8_t) byte_5FD8;
 
 		++mRoomSprites[pSpriteNumber].spriteImageID;
 		if( mRoomSprites[pSpriteNumber].mButtonState != 2 ) {
@@ -2888,14 +2896,15 @@ bool cCreep::ChangeLevel( size_t pMenuItem ) {
 void cCreep::Game() {
 
 	mMenuReturn = false;
-	mPlayer1Seconds = 0;
-	mPlayer2Seconds = 0;
+	mPlayer1SecondsPause = 0;
+	mPlayer2SecondsPause = 0;
 
 	if( mSaveGameLoaded == 1 ) {
 		// D7D
 		mSaveGameLoaded = 0;
 		mMemory[ 0x7802 ] |= 1;
 	} else {
+
 		// D8D
 		word_30 = 0x9800;
 		word_32 = 0x7800;
@@ -2907,9 +2916,12 @@ void cCreep::Game() {
 		// Which joystick was selected when button press was detected (in intro)
 		mMemory[ 0x7812 ] = byte_D10;
 
-		// Clear Stored CIA Timers
+		// Clear Stored CIA Timers (Original Player Time)
 		for( signed char Y = 7; Y >= 0; --Y )
 			mMemory[ 0x7855 + Y ] = 0;
+
+		mPlayersTime[0].Reset();
+		mPlayersTime[1].Reset();
 
 		mMemory[ 0x785D ] = mMemory[ 0x785E ] = 0;
 		mMemory[ 0x7809 ] = mMemory[ 0x7803 ];	// Player1 Start Room
@@ -2926,6 +2938,9 @@ void cCreep::Game() {
 		} else
 			mMemory[ 0x7810 ] = 1;
 	}
+
+
+	g_Steam.FindLeaderboard(mCastle->nameGet().c_str());
 
 	// E19
 	for(;;) {
@@ -2946,7 +2961,7 @@ void cCreep::Game() {
 				mPlayerStatus[X] = true;
 
 			} else {
-				mPlayerStatus[0] = mPlayerStatus[1] =true;
+				mPlayerStatus[0] = mPlayerStatus[1] = true;
 			}
 
 		} else {
@@ -2989,15 +3004,14 @@ void cCreep::Game() {
 					if(! (mMemory[ 0x7802 ] & 1 )) {
 						
 						if( mUnlimitedLives != 0xFF ) {
-							
-							byte A = X << 2;
-							
-							word_30 = 0x7855 + A;
-							for( signed char Y = 3; Y >= 0; --Y )
-								mMemory[ 0x1CF9 + Y ] = mMemory[ word_30 + Y ];
+
+							mMemory[0x1CF9 + 3] = (uint8) mPlayersTime[X].Seconds();
+							mMemory[0x1CF9 + 2] = (uint8) mPlayersTime[X].Minutes();
+							mMemory[0x1CF9 + 1] = (uint8) mPlayersTime[X].Hours();
+							mMemory[0x1CF9 + 0] = 0;
 							
 							mMemory[ 0x1CFD ] = X;
-							gameHighScoresHandle();
+							gameHighScoresHandle(X);
 						}
 					}
 					// EFC
@@ -3007,6 +3021,20 @@ sEFC:;
 				} else {
 				// EDE
 					// Player Died
+					int32_t Count = g_Steam.IncreaseStat( eStat_GameOverCount );
+
+					if (Count > 0)
+						g_Steam.SetAchievement( eAchievement_DeathCount_1 );
+
+					if (Count > 10)
+						g_Steam.SetAchievement( eAchievement_DeathCount_10 );
+
+					if (Count > 50)
+						g_Steam.SetAchievement( eAchievement_DeathCount_50 );
+
+					if (Count > 100)
+						g_Steam.SetAchievement( eAchievement_DeathCount_100 );
+
 					if( mUnlimitedLives != 0xFF ) {
 						--mMemory[ 0x7807 + X ];
 						byte A = mMemory[ 0x7807 + X ];
@@ -3026,6 +3054,16 @@ sEFC:;
 		// F0B
 		if( mMemory[ 0xF62 ] == 1 ) {
 			screenClear();
+			if ( mMemory[0x7807] == 0 || mMemory[0x7808] == 0 ) {
+
+				// either player lost all lives?
+				if ((mMemory[0x780F] == 0 && mMemory[0x7807] == 0) || (mMemory[0x7810] == 0 && mMemory[0x7808] == 0))
+					g_Steam.SetAchievement(eAchievement_DeathCount_1Player);
+
+				// Both players dead?
+				if ((mMemory[0x780F] == 0 && mMemory[0x7807] == 0) && (mMemory[0x7810] == 0 && mMemory[0x7808] == 0))
+					g_Steam.SetAchievement(eAchievement_DeathCount_2Player);
+			}
 
 			mObjectPtr = 0x0F64;		// Game Over
 			obj_stringPrint();
@@ -3139,10 +3177,7 @@ bool cCreep::mapDisplay() {
 			obj_stringPrint();
 
 			// 1058
-			mObjectPtr = (Y << 2);
-			mObjectPtr += 0x7855;
-
-			convertTimerToTime();
+			convertTimerToTime( mPlayersTime[ Y ] );
 
 			gfxPosX = mMemory[ 0x11D3 + Y ] + 8;
 			gfxPosY = 0x10;
@@ -3286,6 +3321,9 @@ bool cCreep::obj_Player_Collision( byte pSpriteNumber, byte pObjectNumber ) {
 
 		if( A < 4 ) {
 			mMemory[ 0x780D + mRoomSprites[pSpriteNumber].playerNumber ] = 2;
+
+			g_Steam.SetAchievement(eAchievement_Death_TrapDoor);
+
 			return true;
 		}
 
@@ -3380,6 +3418,7 @@ void cCreep::roomMain() {
 
 	roomLoad();
 	eventProcess( true );
+	mInput->inputClear();
 
 	for(byte X = 0; X < 2; ++X ) {
 		
@@ -3400,6 +3439,11 @@ void cCreep::roomMain() {
 
 		// Do pause?
 		if( mRunStopPressed == true ) {
+			timeb timeNow;
+			ftime(&timeNow);
+
+			time_t TimePause = timeNow.time;
+
 			//150E
 			do {
 				interruptWait( 3 );
@@ -3408,6 +3452,16 @@ void cCreep::roomMain() {
 				KeyboardJoystickMonitor( 0 );						
 
 			} while( !mRunStopPressed );
+
+
+			ftime(&timeNow);
+			time_t diff = timeNow.time - TimePause;
+
+			if (mMemory[0x780D + 0] == 0)
+				mPlayer1SecondsPause += diff;
+
+			if (mMemory[0x780D + 1] == 0)
+				mPlayer2SecondsPause += diff;
 
 		}
 		// 156B
@@ -3467,7 +3521,7 @@ byte cCreep::sub_6009( byte pA ) {
 }
 
 // 2AA9
-void cCreep::stringDraw() {
+void cCreep::StringPrint() {
 	byte gfxPosX, gfxPosY;
 
 	gfxPosX = mTxtX_0 = mTextXPos;
@@ -3516,7 +3570,7 @@ void cCreep::stringDraw() {
 			writeLEWord(&mMemory[ word_30 ], tmp);
 
 			byte A;
-
+			
 			if( mTextFontt < 2 ) {
 				A = 2;
 
@@ -3557,6 +3611,7 @@ void cCreep::stringDraw() {
 
 //2A6D
 void cCreep::obj_stringPrint( ) {
+	size_t count = 0;
 
 	while( (mTextXPos = mMemory[ mObjectPtr ]) ) {
 		mTextYPos = mMemory[ mObjectPtr + 1 ];
@@ -3565,7 +3620,18 @@ void cCreep::obj_stringPrint( ) {
 
 		mObjectPtr += 0x04;
 
-		stringDraw( );
+		// HACK: Seperate the text drawn on the tutorial rooms by 1 line
+		if (mCastle->nameGet() == "Tutorial") {
+
+			if (mMenuScreenTimer != 0 || mIntro == false) {
+				if (count) {
+					mTextYPos += (uint8) (1 * count);
+				}
+
+				++count;
+			}
+		}
+		StringPrint( );
 	}
 
 	++mObjectPtr;
@@ -4250,6 +4316,10 @@ void cCreep::eventProcess( bool pResetKeys ) {
 				break;
 
 			case eEvent_Quit:
+				mQuit = true;
+#ifdef STEAM_BUILD
+				SteamAPI_Shutdown();
+#endif
 				exit( 0 );
 				break;
 
@@ -4267,6 +4337,10 @@ void cCreep::hw_Update() {
 
 	mScreen->refresh();
 	eventProcess( false );
+
+#ifdef STEAM_BUILD
+	SteamAPI_RunCallbacks();
+#endif
 }
 
 // 1935: Sleep for X amount of interrupts
@@ -4281,6 +4355,33 @@ void cCreep::hw_IntSleep( byte pA ) {
 // 1950: Player Escapes from the Castle
 void cCreep::gameEscapeCastle() {
 	
+	// Steam
+	g_Steam.SetAchievement( (eAchievements) (eAchievement_Castle + mCastle->infoGet()->castleNumberGet()));
+
+	int32_t Count = g_Steam.IncreaseStat(eStat_CastlesCompleted);
+
+	if (Count > 1)
+		g_Steam.SetAchievement(eAchievement_EscapeCount_1);
+
+	if (Count > 5)
+		g_Steam.SetAchievement(eAchievement_EscapeCount_5);
+
+	if (Count >= 14)
+		g_Steam.SetAchievement(eAchievement_EscapeCount_14);
+
+	// Still got all lives?
+	if ((mMemory[0x780F] == 1 && mMemory[0x7807] == 3) || (mMemory[0x7810] == 1 && mMemory[0x7808] == 3) )
+		g_Steam.SetAchievement(eAchievement_EscapeCount_1Player);
+
+	// Still got all lives?
+	if (mMemory[0x780F] == 1 && mMemory[0x7810] == 1)
+		if (mMemory[0x7807] == 3 && mMemory[0x7808] == 3)
+			g_Steam.SetAchievement(eAchievement_EscapeCount_2Player);
+
+	// Both players alive?
+	if (mMemory[0x780F] == 1 && mMemory[0x7810] == 1)
+		g_Steam.SetAchievement(eAchievement_EscapeCount_BothAlive);
+
 	screenClear();
 	mMemory[ 0x0B72 ] = 6;
 	if( mMemory[ 0x7802 ] & 0x80 ) {
@@ -4296,8 +4397,8 @@ void cCreep::gameEscapeCastle() {
 
 	mObjectPtr = 0x1AB3;
 	obj_stringPrint();
-	mObjectPtr = 0x7855 + (mMemory[ 0x1AB2 ] << 2);
-	convertTimerToTime();
+
+	convertTimerToTime( mPlayersTime[mMemory[0x1AB2]] );
 
 	screenDraw(0, 0x93, 0x68, 0x18, 0 );
 	// 19AF
@@ -4393,37 +4494,41 @@ void cCreep::gameEscapeCastle() {
 }
 
 // 1B9F
-void cCreep::gameHighScoresHandle() {
-	if( mMemory[ 0x7812 ] ) 
+void cCreep::gameHighScoresHandle( const size_t pPlayerNumber ) {
+
+	eventProcess(false);
+	mInput->keyRawGet();
+
+	// Player1 or 2?
+	if(pPlayerNumber)
 		word_30 = 0xB840;
 	else
 		word_30 = 0xB804;
 
 	// 1BBE
-	byte HighScorePosition = 0x0A;
+	signed int HighScorePosition = 0x0A;
 	
-	for(;;) {
+	for(; HighScorePosition>=0; --HighScorePosition) {
 
-		for(byte Y = 3;Y != 0; --Y) {
-			// 1BC5
-			byte A = mMemory[ word_30 + Y ];
-			if( A < mMemory[ 0x1CF9 + Y ] ) {
-				// 1BD1
-				word_30 += 0x06;
-				--HighScorePosition;
-				break;
-			}
+		if (mHighScores[pPlayerNumber][HighScorePosition].mTime.mSeconds == 0 || mPlayersTime[pPlayerNumber].mSeconds < mHighScores[pPlayerNumber][HighScorePosition].mTime.mSeconds) {
 
-			if( A != mMemory[ 0x1CF9 + Y ] )
-				goto s1BE7;	
+			--HighScorePosition;
+			continue;
+		}
+
+		if (mPlayersTime[pPlayerNumber].mSeconds > mHighScores[pPlayerNumber][HighScorePosition].mTime.mSeconds) {
+			++HighScorePosition;
+			break;
 		}
 	}
 
+	if (HighScorePosition < 0)
+		HighScorePosition = 0;
+
 	// 1BE7
-s1BE7:;
 	byte Y;
 
-	if( mMemory[ 0x7812 ] != 0 ) {
+	if(pPlayerNumber) {
 		Y = 0x73;
 		mMemory[ 0x2788 ] = 0x68;
 	} else {
@@ -4431,35 +4536,33 @@ s1BE7:;
 		Y = 0x37;
 		mMemory[ 0x2788 ] = 0x18;
 	}
-	// 1BFF
-	byte A = 0x0A - HighScorePosition;
+
+	// Y Position to input
+	byte A = HighScorePosition;
 	A <<= 3;
 	A += 0x38;
 	mMemory[ 0x2789 ] = A;
 
-	byte X = 0x0A - HighScorePosition;
-	
+	// Color
+	byte X = HighScorePosition;
 	mMemory[ 0x278A ] = mMemory[ 0x1E85 + X ];
 
 	writeLEWord(&mMemory[ 0x1D03 ], (word_30 - 2));
 	
-	for( ;HighScorePosition ; --HighScorePosition ) {
+	for( int HSP = 0x09; HSP >= HighScorePosition; --HSP) {
 
-		mMemory[ 0x1CFF ] = 6;
-
-		for( ; Y ; --Y ) 
-			mMemory[ 0xB806 + Y ] = mMemory[ 0xB800 + Y ];
+		mHighScores[pPlayerNumber][HSP + 1] = mHighScores[pPlayerNumber][HSP];
 		
 		//1C40
 	}
 
 	// 1C43
-	for(Y = 3; Y != 0; --Y )
-		mMemory[ word_30 + Y ] = mMemory[ 0x1CF9 + Y ];
-	
-	// 1C4D
-	word_30 = readLEWord( &mMemory[ 0x1D03 ] );
-	mMemory[ word_30 ] = 0;
+	mHighScores[pPlayerNumber][HighScorePosition].mTime = mPlayersTime[pPlayerNumber];
+
+	// Update Leaderboard for Player 1
+	if(pPlayerNumber == 0 && mPlayersTime[pPlayerNumber].mSeconds)
+		g_Steam.LeaderboardUploadScore(mPlayersTime[pPlayerNumber].mSeconds);
+
 	gameHighScores();
 
 	// 1C60
@@ -4471,19 +4574,15 @@ s1BE7:;
 	mMemory[ 0x1D10 ] = A;
 	obj_stringPrint();
 
-	mMemory[ 0x278C ] = 3;
 	mMemory[ 0x278B ] = 1;
 
-	textShow();
-	word_30 = readLEWord( &mMemory[ 0x1D03 ] );
+	mStrLengthMax = sizeof(mHighScores[pPlayerNumber][HighScorePosition].mName);
+	StringPrint_StringInput();
 
-	for(Y = 0; Y < 3; ++Y) {
-		if( Y >= 3 )
-			A = 0x20;
-		else
-			A = mMemory[ 0x278E + Y ];
+	// Copy the name
+	for(Y = 0; Y < sizeof(mHighScores[pPlayerNumber][HighScorePosition].mName); ++Y) {
 
-		mMemory[ word_30 + Y ] = A;
+		mHighScores[pPlayerNumber][HighScorePosition].mName[Y] = mMemory[0x278E + Y];
 	}
 	
 	// 1CA9
@@ -4510,7 +4609,7 @@ s1BE7:;
 	mMemory[ 0x28D1 ] = 2;
 	
 	// Save highscores
-	mCastleManager->scoresSave( mCastle->nameGet(), readLEWord( &mMemory[ 0xB800 ] ), &mMemory[ 0xB800 ] );
+	mCastleManager->scoresSave( mCastle->nameGet(), sizeof(mHighScores), (uint8*) &mHighScores[0] );
 
 	DisableSpritesAndStopSound();
 }
@@ -4519,7 +4618,9 @@ s1BE7:;
 void cCreep::gameHighScores( ) {
 	screenClear();
 
-	byte X = (mCastle->infoGet()->castleNumberGet() * 4) + 0x10;
+	g_Steam.SetAchievement(eAchievement_LookAtHighScores);
+
+	byte X = (byte) (mCastle->infoGet()->castleNumberGet() * 4) + 0x10;
 	mMemory[ 0x2399 ] = X;
 
 	byte Y = mMemory[ 0xBA01 + X ];
@@ -4541,11 +4642,9 @@ void cCreep::gameHighScores( ) {
 	// Mark end of name
 	mMemory[ 0xB87A + (mCastle->nameGet().size()-1) ] |= 0x80;
 
-
 	mObjectPtr = 0xB87A;
-	//1D81
-	A = 0x15 - mMemory[ 0xBA03 + X ];
 
+	A = 0x15 - mMemory[ 0xBA03 + X ];
 	A <<= 2;
 	A += 0x10;
 	
@@ -4555,7 +4654,7 @@ void cCreep::gameHighScores( ) {
 	mTextFont = 0x02;
 
 	// Draw castle name
-	stringDraw();
+	StringPrint();
 
 	X = 0;
 	mTextXPos = 0x18;
@@ -4564,19 +4663,20 @@ void cCreep::gameHighScores( ) {
 	// 1DAD
 	for(;;) {
 		mTextYPos = 0x38;
-		
-		for( mMemory[ 0xB889 ] = 0; mMemory[ 0xB889 ] < 0x0A; ++mMemory[ 0xB889 ]) {
+
+		for(size_t HighScorePosition = 0; HighScorePosition < 0x0A; ++HighScorePosition ) {
 			
-			Y = mMemory[ 0xB889 ];
-			mTextColor = mMemory[ 0x1E85 + Y ];
-			A = mMemory[ 0xB802 + X ];
-			if( A != 0xFF ) {
-				mMemory[ 0xB87A ] = A;
-				mMemory[ 0xB87B ] = mMemory[ 0xB803 + X ];
-				A = mMemory[ 0xB804 + X ];
+			mTextColor = mMemory[ 0x1E85 + HighScorePosition ];
+			A = mHighScores[X][HighScorePosition].mName[0];
+
+			if(mHighScores[X][HighScorePosition].mName[0] != 0xFF ) {
+				mMemory[ 0xB87A ] = mHighScores[X][HighScorePosition].mName[0];
+				mMemory[ 0xB87B ] = mHighScores[X][HighScorePosition].mName[1];
+				A = mHighScores[X][HighScorePosition].mName[2];
 
 			} else {
 				// 1DD6
+
 				mMemory[ 0xB87A ] = mMemory[ 0xB87B ] = A = 0x2E; 
 			}
 
@@ -4584,18 +4684,16 @@ void cCreep::gameHighScores( ) {
 			mMemory[ 0xB87C ] = A | 0x80;
 
 			mObjectPtr = 0xB87A; 
-			stringDraw();
+			StringPrint();
 
-			if( mMemory[ 0xB802 + X ] != 0xFF ) {
+			if(mHighScores[X][HighScorePosition].mName[0] != 0xFF ) {
 				// 1DF5
-				mObjectPtr = (X + 4) + 0xB800;
-				convertTimerToTime();
+				convertTimerToTime( mHighScores[X][HighScorePosition].mTime );
 				screenDraw( 0, 0x93, mTextXPos + 0x20, mTextYPos, 0x94 );
 			}
 				
 			// 1E20
 			mTextYPos += 0x08;
-			X += 0x06;
 		}
 		
 		// 1E3B
@@ -4603,6 +4701,7 @@ void cCreep::gameHighScores( ) {
 			break;
 
 		mTextXPos = 0x68;
+		++X;
 	}
 
 	// Draw BEST TIMES
@@ -4917,11 +5016,11 @@ void cCreep::gameFilenameGet( bool pLoading, bool pCastleSave ) {
 	roomPrepare();
 	mMemory[ 0x2788 ] = 0x20;
 	mMemory[ 0x2789 ] = 0x48;
-	mMemory[ 0x278C ] = 0x10;
+	mStrLengthMax = 0x10;
 	mMemory[ 0x278A ] = 0x01;
 	mMemory[ 0x278B ] = 0x02;
 
-	textShow();
+	StringPrint_StringInput();
 }
 
 // 24A7
@@ -4933,8 +5032,15 @@ void cCreep::gamePositionLoad() {
 
 	string filename = string( (char*) &mMemory[ 0x278E ], mStrLength );
 	
-	if( mCastleManager->positionLoad( filename, &mMemory[ 0x7800 ] ) == true)
+	if (mCastleManager->positionLoad(filename, &mMemory[0x7800]) == true) {
+
+		g_Steam.SetAchievement(eAchievement_RestoredGame);
+
 		mSaveGameLoaded = 1;
+
+		mPlayersTime[0].mSeconds = readLEWord(&mMemory[0x7855]);
+		mPlayersTime[1].mSeconds = readLEWord(&mMemory[0x7857]);
+	}
 
 	DisableSpritesAndStopSound();
 }
@@ -4970,8 +5076,12 @@ void cCreep::gamePositionSave( bool pCastleSave ) {
 
 		hw_Update();
 		hw_IntSleep(0x23);
-	} else
+	}
+	else {
 		DisableSpritesAndStopSound();
+
+		g_Steam.SetAchievement(eAchievement_SavedGame);
+	}
 
 }
 
@@ -5296,14 +5406,14 @@ void cCreep::obj_RayGun_Execute( byte pObjectNumber ) {
 
 				if( mMemory[ 0x780D + byte_4D5F ] == 0 ) {
 					byte Y = mMemory[ 0x34D1 + byte_4D5F ];
-					char A = mRoomSprites[Y].mY;
+					char A = (char) mRoomSprites[Y].mY;
 					A -= mRoomAnim[pObjectNumber].mY;
 					if( A < 0 )
 						A = (A ^ 0xFF) + 1;
 
 					if( A < mRaygunCount ) {
 						mRaygunCount = A;
-						byte A = mRoomSprites[Y].mY;
+						byte A = (uint8) mRoomSprites[Y].mY;
 
 						if( A >= 0xC8 || A < mRoomAnim[pObjectNumber].mY ) {
 							mRaygunTmpVar = RAYGUN_MOVE_UP;	// Will Move Up
@@ -6565,7 +6675,7 @@ void cCreep::obj_Mummy_Execute( byte pSpriteNumber ) {
 			mRoomSprites[pSpriteNumber].spriteImageID = A;
 			mRoomSprites[pSpriteNumber].mX += mMemory[ 0x39F7 + Y ];
 
-			mRoomSprites[pSpriteNumber].mY += (int8) mMemory[ 0x39FF + Y ];
+			mRoomSprites[pSpriteNumber].mY += (int8_t) mMemory[ 0x39FF + Y ];
 			
 			mMemory[ 0x7630 ] = (mRoomSprites[pSpriteNumber].Sprite_field_1F << 2) + 0x24;
 			sound_PlayEffect( SOUND_MUMMY_RELEASE );
@@ -6759,6 +6869,8 @@ void cCreep::obj_Door_Button_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 		return;
 
 	mRoomAnim[DoorID].mFlags |= ITM_EXECUTE;
+
+	g_Steam.SetAchievement(eAchievement_OpenDoor);
 }
 
 // 4647: In Front Forcefield Timer
@@ -6958,6 +7070,9 @@ void cCreep::obj_Teleport_InFront( byte pSpriteNumber, byte pObjectNumber ) {
 
 		obj_Teleport_SetColour( A, pObjectNumber );
 	} else {
+
+		g_Steam.SetAchievement(eAchievement_UseTeleport);
+
 		// 4F1A
 		// Use Teleport
 		mRoomAnim[pObjectNumber].mFlags |= ITM_EXECUTE;

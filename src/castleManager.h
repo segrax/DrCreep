@@ -143,6 +143,7 @@ public:
 	bool					 positionSave( string pFilename, size_t pSaveSize, byte *pData );
 	cD64					*positionDiskCreate();
 	cD64					*castleDiskCreate();
+	byte*					 musicLoad(string pFilename, size_t& pDataSize);
 
 	bool					 scoresLoad( string pCastleName, byte *pData );
 	bool					 scoresSave( string pCastleName, size_t pSaveSize, byte *pData );

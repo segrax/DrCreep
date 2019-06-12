@@ -79,27 +79,39 @@ void cPlayerInput::joystickSet( size_t pPlayer, int pJoystickNumber ) {
         return;
 
     SDL_JoystickEventState(SDL_ENABLE);
-    mInput[pPlayer].mJoystick = SDL_JoystickOpen(pJoystickNumber);
-
 }
 
 void cPlayerInput::inputCheck( bool pClearAll, cEvent pEvent ) {
+
+	if (pEvent.mType >= eEvent_JoyStickStart && pEvent.mType <= eEvent_JoyStickEnd) {
+		
+		if (g_Window.ControllerIsFree(pEvent.mSourceID)) {
+			g_Window.ControllerRemoveFree(pEvent.mSourceID);
+
+			if (mInput[0].mJoystick == -1) {
+				mInput[0].mJoystick = pEvent.mSourceID;
+
+			} else if (mInput[1].mJoystick == -1) {
+				mInput[1].mJoystick = pEvent.mSourceID;
+			}
+		}
+	}
 
 	if(pClearAll)
 		inputClear();
 
 	mEvent = pEvent;
 
-		KeyboardCheck();
-        if( mInput[ 0 ].mJoystick == 0 )
-		    KeyboardInputSet1( &mInput[ 0 ] );
-        else
-            JoystickInputSet( &mInput[0] );
+	KeyboardCheck();
+   
+	KeyboardInputSet1( &mInput[ 0 ] );
+	KeyboardInputSet2(&mInput[1]);
 
-        if( mInput[ 1 ].mJoystick == 0 )
-    		KeyboardInputSet2( &mInput[ 1 ] );
-        else
-            JoystickInputSet( &mInput[1] );
+	if (mInput[0].mJoystick != -1)
+        JoystickInputSet( &mInput[0] );
+   
+	if (mInput[1].mJoystick != -1)
+        JoystickInputSet( &mInput[1] );
 
 	return;
 }
@@ -135,14 +147,6 @@ void cPlayerInput::KeyboardCheck() {
 			case SDL_SCANCODE_F5:
 				mF5 = false;
 				break;
-
-            case SDL_SCANCODE_F6:
-                joystickSet(0, 0);
-                break;
-
-            case SDL_SCANCODE_F7:
-                joystickSet(1, 1);
-                break;
 
 			case SDL_SCANCODE_ESCAPE:
 				mRestore = false;
@@ -247,15 +251,77 @@ void cPlayerInput::KeyboardCheck() {
 
 void cPlayerInput::JoystickInputSet( sPlayerInput *pInput ) {
 
+	if (pInput->mJoystick != mEvent.mSourceID)
+		return;
+
 	if (mEvent.mType == eEvent_JoyButtonDown) {
 
-		pInput->mButton = true;
+		// Dodgy Keyboard mappings
+
+		// Joystick button
+		if( mEvent.mButton == SDL_CONTROLLER_BUTTON_A)
+			pInput->mButton = true;
+		
+		// Escape
+		if (mEvent.mButton == SDL_CONTROLLER_BUTTON_B) {
+			mRestore = true;
+
+		}
+
+		// F1
+		if (mEvent.mButton == SDL_CONTROLLER_BUTTON_X) {
+			mRunStop = true;
+		}
+
+		// Enter
+		if (mEvent.mButton == SDL_CONTROLLER_BUTTON_Y) {
+			mReturnPressed = true;
+			mKeyPressed = mEvent.mButton;
+			mKeyPressedRaw = 0x0D;
+		}
+
+
+
 		return;
 	}
 
 	if (mEvent.mType == eEvent_JoyButtonUp ) {
 
-		pInput->mButton = false;
+		//
+		if (mEvent.mButton == SDL_CONTROLLER_BUTTON_A)
+			pInput->mButton = false;
+
+
+		// Escape
+		if (mEvent.mButton == SDL_CONTROLLER_BUTTON_B) {
+			mRestore = false;
+
+		}
+
+		// F1
+		if (mEvent.mButton == SDL_CONTROLLER_BUTTON_X) {
+			mRunStop = false;
+		}
+
+		// Enter
+		if (mEvent.mButton == SDL_CONTROLLER_BUTTON_Y) {
+			mReturnPressed = false;
+			mKeyPressed = 0;
+			mKeyPressedRaw = 0;
+		}
+
+		if (mEvent.mButton == SDL_CONTROLLER_BUTTON_LEFTSHOULDER) {
+			g_Window.WindowDecrease();
+			g_Creep.screenGet()->bitmapRedrawSet();
+			g_Creep.screenGet()->refresh();
+		}
+
+		if (mEvent.mButton == SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) {
+			g_Window.WindowIncrease();
+			g_Creep.screenGet()->bitmapRedrawSet();
+			g_Creep.screenGet()->refresh();
+		}
+
 		return;
 	}
 
@@ -300,6 +366,7 @@ void cPlayerInput::KeyboardInputSet1( sPlayerInput *pInput ) {
 
 	switch( mEvent.mButton ) {
 #ifndef _MACOSX
+		case SDL_SCANCODE_LCTRL:
 		case SDL_SCANCODE_RCTRL:
 #else
         case SDL_SCANCODE_SPACE:

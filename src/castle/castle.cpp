@@ -59,17 +59,12 @@ cCastle::cCastle( cCreep *pCreep, cCastleInfo *pCastleInfo ) {
 		// Copy the castle into game memory
 		memcpy( g_Creep.memory(0x9800), mBuffer, pCastleInfo->bufferSizeGet() - 2 );
 
-		// Load the highscores for this castle
-		if( mCastleInfo->managerGet()->scoresLoad( mName, g_Creep.memory(0xB800) ) == false ) {
-			
-			// No highscores found, write a blank table
+		memset( &g_Creep.mHighScores[0], 0xFF, sizeof( g_Creep.mHighScores ) );
 
-			// Size of table
-			writeLEWord( g_Creep.memory(0xB800), 0x007A );
+		// Load the highscores for this castle
+		if( mCastleInfo->managerGet()->scoresLoad( mName, (uint8*) &g_Creep.mHighScores[0] ) == false ) {
 			
-			// Entries
-			for( signed char Y = 0x77; Y >= 0; --Y )
-				*g_Creep.memory( 0xB802 + Y ) = 0xFF;
+			// No highscores found
 
 			g_Creep.DisableSpritesAndStopSound();
 		}

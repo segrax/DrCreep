@@ -24,18 +24,25 @@ enum eEventType {
 	eEvent_None				= 0,
 	eEvent_KeyDown			= 1,
 	eEvent_KeyUp			= 2,
+
 	eEvent_MouseMove		= 3,
+
 	eEvent_MouseLeftDown	= 4,
 	eEvent_MouseLeftUp		= 5,
 	eEvent_MouseRightDown	= 6,
 	eEvent_MouseRightUp		= 7,
+
 	eEvent_MouseWheelUp		= 8,
 	eEvent_MouseWheelDown	= 9,
+
 	eEvent_Quit				= 10,
 	eEvent_Redraw			= 11,
-	eEvent_JoyButtonDown	= 12,
+
+	eEvent_JoyStickStart	= 12,
+	eEvent_JoyButtonDown	= eEvent_JoyStickStart,
 	eEvent_JoyButtonUp		= 13,
-	eEvent_JoyMovement		= 14
+	eEvent_JoyMovement		= 14,
+	eEvent_JoyStickEnd		= eEvent_JoyMovement
 };
 
 class cEvent {
@@ -45,6 +52,7 @@ class cEvent {
 		unsigned int		mButton;
 		unsigned int		mButtonRaw;
 		unsigned int		mButtonCount;
+		signed int			mSourceID;
 
 		int					mJoyAxis;
 		cPosition			mPosition;

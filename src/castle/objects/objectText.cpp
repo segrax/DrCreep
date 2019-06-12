@@ -24,7 +24,7 @@ void cObjectText::textSet() {
 	*mRoom->mBuilder->memory( 0x278A ) = 0x01;
 	*mRoom->mBuilder->memory( 0x278B ) = 0x02;
 
-	mRoom->mBuilder->textShow();
+	mRoom->mBuilder->StringPrint_StringInput();
 
 	if(mRoom->mBuilder->mStrLengthGet() > 0)
 		mString = string( (char*) mRoom->mBuilder->memory( 0x278E ), (unsigned char) mRoom->mBuilder->mStrLengthGet() );

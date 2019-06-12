@@ -26,7 +26,6 @@
 #include "stdafx.h"
 #include "creep.h"
 #include "castle/objects/object.hpp"
-#include "builder.hpp"
 
 const char   *VERSION = "v1.1";
 
@@ -44,13 +43,12 @@ int	main( int argc, char *argv[] ) {
 	SetConsoleCtrlHandler( (PHANDLER_ROUTINE) CtrlHandler, TRUE );
 #endif
 
-#ifndef BUILDER
 	cCreep* gCreep = new cCreep();
-#else
-	gCreep = new cBuilder(0);
-#endif
+
+	cSteam* Steam = new cSteam();
 	gCreep->run( argc, argv );
 
+	delete Steam;
 	delete gCreep;
 
 	return 0;
@@ -58,10 +56,6 @@ int	main( int argc, char *argv[] ) {
 
 string local_PathGenerate( string pFile, string pPath, bool pDataSave ) {
 	stringstream	 filePathFinal;
-
-#ifdef _MACOSX
-    filePathFinal << "/Applications/DrCreep/";
-#endif
 
 #ifdef FREEBSD
                 filePathFinal << "/usr/local/share/drcreep/";
@@ -231,11 +225,13 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 	
 #ifndef FREEBSD
 #ifndef _MACOSX
+#ifndef LINUX
 #include <direct.h>
 #endif
 #endif
-
+#endif
 #include <dirent.h>
+#include <stdlib.h>
 
 bool CtrlHandler( dword fdwCtrlType ) {
 	
@@ -261,11 +257,7 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 
 	char path[2000];
 	#ifndef FREEBSD
-        #ifdef _MACOSX
-            strcpy(&path[0],"/Applications/DrCreep");
-        #else
             getcwd(path, 2000);
-        #endif
     #else
 	strcpy(&path[0],"/usr/local/share/drcreep");
 	#endif
@@ -287,7 +279,7 @@ vector<string> directoryList(string pPath, string pExtension, bool pDataSave) {
 		
     transform( findType.begin(), findType.end(), findType.begin(), ::toupper);
 
-	int count = scandir(finalPath.str().c_str(), (dirent***) &directFiles, file_select, 0);
+	int count = scandir(finalPath.str().c_str(), (dirent***) &directFiles, file_select, alphasort);
 	
 	for( int i = 0; i < count; ++i ) {
 

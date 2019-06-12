@@ -45,9 +45,10 @@ using namespace std;
 #include "Dimension.hpp"
 #include "Position.hpp"
 #include "Event.hpp"
+#include "Menu.hpp"
 #include "graphics/screenSurface.h"
 #include "graphics/window.hpp"
-
+#include "Steam.hpp"
 class cCreep;
 
 extern const char *VERSION;
@@ -122,3 +123,4 @@ bool			 local_FileSave( string pFile, string pPath, bool pDataSave, byte *pBuffe
 
 #define g_Window cWindow::GetSingleton()
 #define g_Creep cCreep::GetSingleton()
+#define g_Steam cSteam::GetSingleton()

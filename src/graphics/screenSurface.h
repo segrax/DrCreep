@@ -59,8 +59,8 @@ protected:
 public:
 	
 					 cScreenSurface( int pWidth, int pHeight );
+					 cScreenSurface(const std::string& pFile);
 					~cScreenSurface();
-
 
 	void			 draw( size_t pX = 0 , size_t pY = 0);					// Draw image to SDL Surface
 
@@ -71,6 +71,7 @@ public:
 	dword			*pixelGet( const size_t pX = 0,	const size_t pY = 0 );
 	void			 pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePriority pPriority, size_t pCount = 1);
 
+	
 	inline SDL_Surface* GetSDLSurface() const { return mSDLSurface; }
 	inline SDL_Texture* GetTexture() const { return mTexture; };
 	inline byte*		GetSurfaceBuffer() const { return mSurfaceBuffer; }

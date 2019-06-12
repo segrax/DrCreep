@@ -56,8 +56,8 @@ cScreenSurface::cScreenSurface( int pWidth, int pHeight ) {
 	mHeight = pHeight;
 
 	// Create the screen buffer
-	mSDLSurface = SDL_CreateRGBSurface( 0, pWidth, pHeight, 32, 0xFF, 0xFF << 8, 0xFF << 16, 0 );
-	mTexture = SDL_CreateTexture(g_Window.GetRenderer(), SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, pWidth, pHeight);
+	mSDLSurface = SDL_CreateRGBSurface(0, (int)pWidth, (int)pHeight, 32, 0xFF << 16, 0xFF << 8, 0xFF, 0);
+	mTexture = SDL_CreateTexture(g_Window.GetRenderer(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, pWidth, pHeight);
 	
 	mSurfaceBuffer = new byte[ mWidth * mHeight ];
 	mSurfaceBufferSize = mWidth * mHeight;
@@ -68,6 +68,19 @@ cScreenSurface::cScreenSurface( int pWidth, int pHeight ) {
 
 	palettePrepare();
 	Wipe();
+}
+
+cScreenSurface::cScreenSurface(const std::string& pFile) {
+
+	mSDLSurface = SDL_LoadBMP(pFile.c_str());
+	mTexture = SDL_CreateTextureFromSurface(g_Window.GetRenderer(), mSDLSurface);
+
+	mWidth = mSDLSurface->w;
+	mHeight = mSDLSurface->h;
+
+	mSurfaceBuffer = 0;
+	mSurfaceBufferSize = 0;
+	mScreenPieces = 0;
 }
 
 cScreenSurface::~cScreenSurface() {
@@ -119,7 +132,6 @@ void cScreenSurface::pixelDraw( size_t pX, size_t pY, dword pPaletteIndex, ePrio
 		++piece;
 	}
 }
-
 
 void cScreenSurface::draw( size_t pX, size_t pY ) {
 

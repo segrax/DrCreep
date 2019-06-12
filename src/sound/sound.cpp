@@ -75,6 +75,9 @@ cSound::~cSound() {
 }
 
 void cSound::audioBufferFill( short *pBuffer, int pBufferSize ) {
+	if (!mCreep)
+		return;
+
 	byte *musicBuffer = mCreep->musicBufferGet();
 	memset( pBuffer, 0, pBufferSize );
 
@@ -149,7 +152,7 @@ bool cSound::devicePrepare() {
 	desired->userdata = this;
 
 	// Open the audio device
-	mVal = SDL_OpenAudio(desired, mAudioSpec);
+	mVal = SDL_OpenAudioDevice(NULL, 0, desired, mAudioSpec, 0);
 
 	delete desired;
 
@@ -166,10 +169,10 @@ void cSound::playback( bool pStart ) {
 	
 	if( pStart && mVal >= 0 ) {
 		// Start
-		SDL_PauseAudio(0);
+		SDL_PauseAudioDevice(mVal, 0);
 		mFinalCount = 0;
-	} else
+	} else {
 		// Stop
-		SDL_PauseAudio(1);
-
+		SDL_PauseAudioDevice(mVal, 1);
+	}
 }

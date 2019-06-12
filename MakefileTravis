@@ -26,7 +26,7 @@ castle :
 	$(CC) src/castle/castle.cpp  src/castle/room.cpp src/castle/objects/*.cpp 
 
 main :
-	$(CC) src/castleManager.cpp src/stdafx.cpp src/creep.cpp src/d64.cpp src/debug.cpp src/builder.cpp src/playerInput.cpp src/Event.cpp 
+	$(CC) src/castleManager.cpp src/stdafx.cpp src/creep.cpp src/d64.cpp src/debug.cpp src/builder.cpp src/playerInput.cpp src/Event.cpp src/Menu.cpp src/Steam.cpp
 
 
 clean :

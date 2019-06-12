@@ -147,9 +147,10 @@ void cSprite::streamLoad( byte *pBuffer ) {
 	if (!pBuffer) {
 		if (!_buffer)
 			return;
+
 		pBuffer = _buffer;
 
-	} else {
+	}  else {
 		// Otherwise set the buffer to the new stream
 		_buffer = pBuffer;
 		return;

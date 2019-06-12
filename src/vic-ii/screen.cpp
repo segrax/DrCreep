@@ -40,6 +40,7 @@ cScreen::cScreen( string pWindowTitle ) {
 		mSprites[Y]->_multiColor1 = 0x0D;
 	}
 
+	mBitmapBuffer = 0;
 	mBitmapRedraw		= false;
 	mSpriteRedraw		= false;
 	mTextRedraw			= false;
@@ -96,13 +97,12 @@ void cScreen::cursorEnabled( bool pOn ) {
 
 	SDL_FreeSurface( mSDLCursorSurface );
 	mSDLCursorSurface = SDL_CreateRGBSurface(	SDL_SWSURFACE,	width,	height,	 32, 0, 0, 0,255 );
-	//SDL_SetColorKey(mSDLCursorSurface, SDL_SRCCOLORKEY, SDL_MapRGB(mSDLSurfaceScaled->format, 0, 0, 0)	);
 
 	// Draw the red for the border
 	SDL_Rect	rect;
 	rect.x = rect.y = 0;
-	rect.w = width;
-	rect.h = height;
+	rect.w = (int) width;
+	rect.h = (int) height;
 	SDL_FillRect (mSDLCursorSurface, &rect, SDL_MapRGB(mSDLCursorSurface->format, 255, 0, 0)); 
 
 	// Make the middle transparent
@@ -137,6 +137,9 @@ void cScreen::bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte
 
 void cScreen::bitmapRefresh() {
 	mSurface->WipeBuffer();
+
+	if (!mBitmapBuffer)
+		return;
 
 	if(mBitmapRedraw) {
 		clear();
@@ -236,22 +239,13 @@ void cScreen::windowTitleUpdate() {
 	stringstream windowTitle;
 
 	windowTitle << mWindowTitle;
-	windowTitle << ".";
+
 
 	// No level yet?
 	if( mLevelName.size() ) {
-		windowTitle << "'";
-		windowTitle << mLevelName;
 
-		// Room Number?
-		if(mRoomNumber)
-			windowTitle << " - Room: " << (mRoomNumber - 1);
-
-		windowTitle << "'";
+		windowTitle << ": " << mLevelName;
 	}
-
-	windowTitle << " (" << VERSION;
-	windowTitle << " - " << __DATE__ << ")";
 
 	mWindow->SetWindowTitle( windowTitle.str() );
 }

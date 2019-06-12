@@ -29,7 +29,6 @@ class cScreen;
 class cPlayerInput;
 class cSound;
 class cDebug;
-class cBuilder;
 
 struct sObjectData {
 	byte mFlashData;
@@ -220,10 +219,57 @@ struct sCreepAnim {		// 0xBF
 	}
 };
 
+struct sPlayerTime {
+	size_t	mSeconds;
+
+	sPlayerTime() {
+		Reset();
+	}
+
+	void Reset() {
+		mSeconds = 0;
+	}
+
+	void AddSeconds( size_t pSeconds ) {
+		mSeconds += pSeconds;
+	}
+
+	size_t Hours() const {
+		int t = ((mSeconds / 60) / 60);
+		t /= 10;
+		return ((mSeconds / 60) / 60) + (6 * t);
+	}
+
+	size_t Minutes() const {
+		int t = (mSeconds / 60);
+		t /= 10;
+		return (mSeconds / 60) + (6 * t);
+
+	}
+
+	size_t Seconds() const {
+		int t = (mSeconds % 60);
+		t /= 10;
+		return (mSeconds % 60) + (6 * t);
+	}
+};
+
+struct sHighScore {
+	unsigned char		mName[3];
+	sPlayerTime	mTime;
+
+	sHighScore() {
+		for (int i = 0; i < sizeof(mName); ++i)
+			mName[i] = 0xFF;
+	}
+};
+
 #define MAX_SPRITES 0x8
 #define MAX_OBJECTS 0x20
 
 class cCreep : public cSingleton<cCreep> {
+	public:
+	sHighScore	 	 mHighScores[2][11];
 
 protected:
 	sCreepSprite	 mRoomSprites[ MAX_SPRITES ];	// BD00
@@ -234,6 +280,8 @@ protected:
 
 	static const unsigned char		 mRoomIntroData[];
 
+	sPlayerTime		 mPlayersTime[2];
+
 	size_t			 mMemorySize;
 
 	cDebug			*mDebug;
@@ -242,21 +290,20 @@ protected:
 	cScreen			*mScreen;
 	cPlayerInput	*mInput;
 	cSound			*mSound;
-	cBuilder		*mBuilder;
 
 	string			 mMusicCurrent;
 	string			 mWindowTitle;
 	byte			*mMusicBuffer, *mMusicBufferStart;
 	size_t			 mMusicBufferSize;
 
-	byte		 mFileListingNamePtr;
+	byte		 mOptionsMenuCurrentItem;
 	
 	bool		 mIntro;
 	byte		 mMenuMusicScore, mMenuScreenCount, mMenuScreenTimer;
 	byte		 mUnlimitedLives;
 	dword		 mTicksPrevious;
 	timeb		 mPlayer1Time, mPlayer2Time;
-	int			 mPlayer1Seconds, mPlayer2Seconds;
+	int			 mPlayer1SecondsPause, mPlayer2SecondsPause;
 
 	bool		 mPlayerStatus[2];
 	word		 mVoice, mVoiceTmp;
@@ -266,8 +313,9 @@ protected:
 	bool		 mRunStopPressed;
 
 	byte		 mStrLength;
+	byte		 mStrLengthMax;
 
-	byte		 mMusicPlaying, mSaveGameLoaded;
+	byte		 mMusicPlaying, mSaveGameLoaded, mCastleChanged;
 
 	byte		 mEngine_Ticks;
 	char		 mPlayingSound;					
@@ -287,7 +335,7 @@ protected:
 	word		 mRoomLightningPtr;											// Lightning
 	
 	word		 mConveyorPtr;												// Conveyor
-	byte		 mJoyButtonState, byte_5F56;
+	byte		 mJoyButtonState, mJoystickInput;
 
 	byte		 byte_D10;
 	byte		 mDisableSoundEffects, mObjectCount;
@@ -309,6 +357,7 @@ protected:
 	uint8		 mTimer;
 
 public:
+
 	std::vector<cEvent>		mEvents;
 
 	int			 mStartCastle;
@@ -343,8 +392,6 @@ public:
 
 		inline byte	mStrLengthGet() { return mStrLength; }
 
-		void	 builderStart( int pStartCastle );
-
 		cCastle	*castleGet() { return mCastle; }
 
 		void	 start( int pStartLevel, bool pUnlimited );			// Game Entry Point
@@ -353,6 +400,7 @@ public:
 		void	 roomPtrSet( byte pRoomNumber );
 
 		bool	 ChangeLevel( size_t pMenuItem );
+		void	 DisplayControls();
 		void	 Game();
 		void	 roomMain();
 
@@ -397,9 +445,10 @@ public:
 		byte	 seedGet( );
 
 		void	 Sprite_FlashOnOff( byte pSpriteNumber );// Flash a sprite on and off
-		void	 stringDraw( );							// Draw a string
+		void	 StringPrint_Character(); 
+		void	 StringPrint( );						// Draw a string
+		void	 StringPrint_StringInput();
 
-		void	 textShow();
 		void	 titleDisplay();						// Display 'PIC A TITLE'
 
 		void	 roomLoad();
@@ -407,14 +456,13 @@ public:
 		
 		void	 DisableSpritesAndStopSound();
 
-		void	 gameHighScoresHandle();
+		void	 gameHighScoresHandle( const size_t pPlayerNumber );
 		void	 sound_PlayEffect( char pA );
 		
-		void	 textPrintCharacter();
-		byte	 textGetKeyFromUser();
+		byte	 StringInput_GetKey();
 
-		void	 convertTimerToTime();
-		void	 convertTimeToNumber( byte pA, byte pY );
+		void	 convertTimerToTime( const sPlayerTime& pTime );
+		void	 convertTimeToNumber( size_t pA, byte pY );
 
 		void	 obj_TrapDoor_Switch_Check( byte pA );
 		void	 roomAnim_Disable( byte pSpriteNumber );			// Redraw floor piece?

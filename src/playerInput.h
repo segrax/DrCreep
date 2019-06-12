@@ -24,12 +24,12 @@
  */
 
 struct sPlayerInput {
-    SDL_Joystick    *mJoystick;
-	bool		 mRight, mLeft, mUp, mDown;
-	bool		 mButton;
+    signed int			mJoystick;
+	bool			 mRight, mLeft, mUp, mDown;
+	bool			 mButton;
 
 	sPlayerInput() {
-        mJoystick = 0;
+        mJoystick = -1;
 		clear();
 	}
 

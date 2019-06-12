@@ -35,6 +35,7 @@ cWindow::cWindow() {
 
 	mWindowMode = true;
 	mWindow = 0;
+
 }
 
 cWindow::~cWindow() {
@@ -47,7 +48,7 @@ cWindow::~cWindow() {
 
 bool cWindow::InitWindow(const std::string& pWindowTitle) {
 
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK ) != 0) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER ) != 0) {
 		std::cout << "Failed to initialise SDL\n";
 		exit(1);
 		return false;
@@ -72,6 +73,18 @@ bool cWindow::InitWindow(const std::string& pWindowTitle) {
 	SDL_RenderSetLogicalSize(mRenderer, 366, 272);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 0);
 	SetCursor();
+
+	for (int id = 0; id < SDL_NumJoysticks(); ++id) {
+		if (SDL_IsGameController(id)) {
+			
+			ControllerAdd(id);
+		}
+	}
+
+#ifndef _DEBUG
+	SetFullScreen();
+#endif
+
 	return true;
 }
 
@@ -102,6 +115,8 @@ void cWindow::EventCheck() {
 		case SDL_MOUSEBUTTONDOWN:
 
 			switch (SysEvent.button.button) {
+			default:
+				break;
 
 			case 1:
 				Event.mType = eEvent_MouseLeftDown;
@@ -121,6 +136,8 @@ void cWindow::EventCheck() {
 		case SDL_MOUSEBUTTONUP:
 
 			switch (SysEvent.button.button) {
+			default:
+				break;
 
 			case 1:
 				Event.mType = eEvent_MouseLeftUp;
@@ -137,21 +154,69 @@ void cWindow::EventCheck() {
 			Event.mButtonCount = SysEvent.button.clicks;
 			break;
 
+		case SDL_JOYHATMOTION:
+			Event.mType = eEvent_JoyMovement;
+			Event.mButton = SysEvent.jhat.hat;
+			Event.mSourceID = ControllerGet(SysEvent.cdevice.which);
+
+			if (SysEvent.jhat.value & 1) {
+				Event.mJoyAxis = -8001;
+				Event.mButton = 1;
+				g_Creep.EventAdd(Event);
+			}
+			if (SysEvent.jhat.value & 2) {
+				Event.mJoyAxis = 8001;
+				Event.mButton = 0;
+				g_Creep.EventAdd(Event);
+			}
+			if (SysEvent.jhat.value & 4) {
+				Event.mJoyAxis = 8001;
+				Event.mButton = 1;
+				g_Creep.EventAdd(Event);
+			}
+
+			if (SysEvent.jhat.value & 8) {
+				Event.mJoyAxis = -8001;
+				Event.mButton = 0;
+				g_Creep.EventAdd(Event);
+			}
+
+			if (!SysEvent.jhat.value) {
+				g_Creep.EventAdd(Event);
+
+				Event.mButton = 1;
+				g_Creep.EventAdd(Event);
+			}
+			continue;
+
 		case SDL_CONTROLLERAXISMOTION:
 		case SDL_JOYAXISMOTION:
 			Event.mType = eEvent_JoyMovement;
 			Event.mButton = SysEvent.jaxis.axis;
 			Event.mJoyAxis = SysEvent.jaxis.value;
+			Event.mSourceID = ControllerGet(SysEvent.cdevice.which);
 			break;
 
 		case SDL_CONTROLLERBUTTONDOWN:
 		case SDL_JOYBUTTONDOWN:
 			Event.mType = eEvent_JoyButtonDown;
+			Event.mButton = SysEvent.cbutton.button;
+			Event.mSourceID = ControllerGet(SysEvent.cdevice.which);
 			break;
 
 		case SDL_CONTROLLERBUTTONUP:
 		case SDL_JOYBUTTONUP:
 			Event.mType = eEvent_JoyButtonUp;
+			Event.mButton = SysEvent.cbutton.button;
+			Event.mSourceID = ControllerGet(SysEvent.cdevice.which);
+			break;
+
+		case SDL_CONTROLLERDEVICEADDED:
+			ControllerAdd(SysEvent.cdevice.which);
+			break;
+
+		case SDL_CONTROLLERDEVICEREMOVED:
+			ControllerRemove(SysEvent.cdevice.which);
 			break;
 
 		case SDL_QUIT:
@@ -177,10 +242,10 @@ void cWindow::CalculateWindowSize() {
 	SetWindowSize(mWindow_Multiplier);
 }
 
-uint16 cWindow::CalculateFullscreenSize() {
+int16_t cWindow::CalculateFullscreenSize() {
 	SDL_DisplayMode current;
 	SDL_GetCurrentDisplayMode(0, &current);
-	int16 Multiplier = 1;
+	int16_t Multiplier = 1;
 
 	while ((mOriginalResolution.mWidth * Multiplier) <= (unsigned int) current.w &&
 			(mOriginalResolution.mHeight * Multiplier) <= (unsigned int) current.h) {
@@ -263,15 +328,20 @@ void cWindow::RenderAt(cScreenSurface* pImage, cPosition pSource) {
 }
 
 void cWindow::RenderShrunk(cScreenSurface* pImage) {
-	SDL_Rect Src;
+	SDL_Rect Src, Dest;
 	Src.w = pImage->GetWidth();
 	Src.h = pImage->GetHeight();
 	Src.x = 0;
 	Src.y = 0;
 
-	pImage->draw();
+	// Original screen size, otherwise the logical size will adjust 
+	Dest.w = mScreenSize.mWidth;
+	Dest.h = mScreenSize.mHeight;
 
-	SDL_RenderCopy(mRenderer, pImage->GetTexture(), &Src, NULL);
+	Dest.x = 0;
+	Dest.y = 0;
+	
+	SDL_RenderCopy(mRenderer, pImage->GetTexture(), &Src, &Dest);
 }
 
 void cWindow::SetCursor() {
@@ -287,7 +357,7 @@ void cWindow::SetFullScreen() {
 
 		SetWindowSize(CalculateFullscreenSize());
 
-		SDL_SetWindowFullscreen(mWindow, SDL_WINDOW_FULLSCREEN);
+		SDL_SetWindowFullscreen(mWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
 		mWindowMode = false;
 	}
@@ -339,4 +409,86 @@ void cWindow::SetWindowSize(const int pMultiplier) {
 const cDimension cWindow::GetWindowSize() const {
 
 	return cDimension(mOriginalResolution.mWidth * mWindow_Multiplier, mOriginalResolution.mHeight * mWindow_Multiplier);
+}
+
+SDL_GameController* cWindow::ControllerAdd(int pId) {
+
+
+	SDL_GameController *pad = SDL_GameControllerOpen(pId);
+
+	SDL_JoystickID myInstance =
+		SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(pad));
+
+	if (mGameControllers.find(myInstance) != mGameControllers.end())
+		return pad;
+
+	mGameControllerFree.push_back(myInstance);
+	mGameControllers.insert( std::pair< SDL_JoystickID, SDL_GameController* >(myInstance, pad ));
+
+	return pad;
+}
+
+Sint32 cWindow::ControllerGet(int pId) {
+	
+	std::map< SDL_JoystickID, SDL_GameController* >::iterator Iterator = mGameControllers.find(pId);
+	if (Iterator == mGameControllers.end())
+		return 0;
+
+	return Iterator->first;
+}
+
+void cWindow::ControllerRemove(int pId) {
+
+
+	std::map< SDL_JoystickID, SDL_GameController* >::iterator Iterator = mGameControllers.find(pId);
+	if (Iterator == mGameControllers.end())
+		return;
+
+	SDL_GameControllerClose(Iterator->second);
+	mGameControllers.erase(Iterator);
+
+	for (std::vector< SDL_JoystickID >::iterator JoyIT = mGameControllerFree.begin(); JoyIT != mGameControllerFree.end(); ++JoyIT) {
+		
+		if (*JoyIT == pId) {
+			mGameControllerFree.erase(JoyIT);
+			break;
+		}
+	}
+}
+
+SDL_JoystickID cWindow::ControllerGetFree() {
+
+	if (mGameControllerFree.empty())
+		return 0;
+
+	SDL_JoystickID ID = mGameControllerFree.back();
+	mGameControllerFree.pop_back();
+
+	return ID;
+}
+
+void cWindow::ControllerFree(SDL_JoystickID pId) {
+	mGameControllerFree.push_back(pId);
+}
+
+SDL_JoystickID cWindow::ControllerIsFree(SDL_JoystickID pId) {
+
+	for (std::vector< SDL_JoystickID >::iterator JoyIT = mGameControllerFree.begin(); JoyIT != mGameControllerFree.end(); ++JoyIT) {
+
+		if (*JoyIT == pId)
+			return true;
+	}
+
+	return false;
+}
+
+void cWindow::ControllerRemoveFree(SDL_JoystickID pId) {
+
+	for (std::vector< SDL_JoystickID >::iterator JoyIT = mGameControllerFree.begin(); JoyIT != mGameControllerFree.end(); ++JoyIT) {
+
+		if (*JoyIT == pId) {
+			mGameControllerFree.erase(JoyIT);
+			return;
+		}
+	}
 }

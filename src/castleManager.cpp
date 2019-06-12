@@ -451,6 +451,11 @@ bool cCastleManager::positionSave( string pFilename, size_t pSaveSize, byte *pDa
 	return disk->fileSave( pFilename, pData, pSaveSize, 0x7800 );
 }
 
+byte* cCastleManager::musicLoad(string pFilename, size_t& pDataSize) {
+
+	return fileLoad(pFilename, pDataSize);
+}
+
 bool cCastleManager::scoresLoad( string pCastleName, byte *pData ) {
 	stringstream filename;
 

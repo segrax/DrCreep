@@ -35,7 +35,8 @@ private:
 	byte				mWindow_Multiplier, mWindow_MultiplierPrevious;
 
 	bool				mWindowMode;
-
+	std::map< SDL_JoystickID, SDL_GameController* >	mGameControllers;
+	std::vector< SDL_JoystickID >					mGameControllerFree;
 protected:
 
 	void				SetWindowSize(const int pMultiplier);
@@ -46,7 +47,7 @@ public:
 	~cWindow();
 
 	void				CalculateWindowSize();
-	word				CalculateFullscreenSize();
+	int16_t				CalculateFullscreenSize();
 
 	bool				CanChangeToMultiplier(const size_t pNewMultiplier);
 
@@ -57,6 +58,15 @@ public:
 
 	void				PositionWindow();
 
+	SDL_GameController *ControllerAdd(int pId);
+	SDL_JoystickID		ControllerGet(int pId);
+	void				ControllerRemove(int pId);
+
+	SDL_JoystickID		ControllerGetFree();
+	void				ControllerFree(SDL_JoystickID pId);
+	SDL_JoystickID		ControllerIsFree(SDL_JoystickID pId);
+	void				ControllerRemoveFree(SDL_JoystickID pId);
+	
 	void				RenderAt(cScreenSurface* pImage, cPosition pSource = cPosition(0, 0));
 	void				RenderShrunk(cScreenSurface* pImage);
 
