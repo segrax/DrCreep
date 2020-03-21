@@ -1925,8 +1925,8 @@ void cCreep::Sprite_Collision_Check( byte pSpriteNumber ) {
 
 								if( A > SpriteX ) {
 									// 30A5
-									if( SpriteY_Bottom >= mRoomSprites[SpriteNumber].mY ) {
-										if( (mRoomSprites[SpriteNumber].mY + mRoomSprites[SpriteNumber].mCollisionHeight) >= SpriteY ) {
+									if( SpriteY_Bottom > mRoomSprites[SpriteNumber].mY ) {
+										if( (mRoomSprites[SpriteNumber].mY + mRoomSprites[SpriteNumber].mCollisionHeight) > SpriteY ) {
 												
 											Sprite_Collision( pSpriteNumber, SpriteNumber);
 											Sprite_Collision( SpriteNumber, pSpriteNumber );
