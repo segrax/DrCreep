@@ -53,8 +53,8 @@ class cScreen {
 	size_t					 mCursorWidth, mCursorHeight;
 
 	void					 bitmapRefresh();
-	void					 blit( cSprite *pSprite, byte pSpriteNo );
-	void					 blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority, byte pSpriteNo);
+	void					 blit( cSprite *pSprite, int pSpriteNo );
+	void					 blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority, int pSpriteNo);
 	
 	void					 SDLSurfaceSet();
 

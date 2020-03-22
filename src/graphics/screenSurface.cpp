@@ -102,7 +102,7 @@ void cScreenSurface::WipeBuffer( byte pColor ) {
 	
 	for( size_t count = 0; count < mSurfaceBufferSize; ++count, ++piece ) {
 		piece->mPriority = ePriority_None;
-		piece->mSprite = piece->mSprite2 = 0;
+		piece->mSprite = piece->mSprite2 = -1;
 	}
 }
 

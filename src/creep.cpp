@@ -1564,15 +1564,15 @@ void cCreep::Sprite_Collision_Set() {
 	for( colIT = collisions->begin(); colIT != collisions->end(); ++colIT ) {
 		sScreenPiece *piece = *colIT;
 
-		if (piece->mSprite) {
-			if (piece->mPriority == ePriority_Background || piece->mSprite2 == 0) {
+		if (piece->mSprite >= 0) {
+			if (piece->mPriority == ePriority_Background || piece->mSprite2 == -1) {
 				// Background collision
 
 				if (!(mRoomSprites[piece->mSprite-1].state & SPR_UNUSED))
 					mRoomSprites[piece->mSprite-1].state |= SPR_COLLIDE_BACKGROUND;
 
 			}
-			if (piece->mSprite2) {
+			if (piece->mSprite2 >= 0) {
 				// Sprite collision
 
 				if (!(mRoomSprites[piece->mSprite-1].state & SPR_UNUSED))
@@ -1920,13 +1920,13 @@ void cCreep::Sprite_Collision_Check( byte pSpriteNumber ) {
 						if(! (A & HitData )) {
 
 							// 308E
-							if( SpriteX_Right > mRoomSprites[SpriteNumber].mX ) {
+							if( SpriteX_Right >= mRoomSprites[SpriteNumber].mX ) {
 								A = mRoomSprites[SpriteNumber].mX + mRoomSprites[SpriteNumber].mCollisionWidth;
 
-								if( A > SpriteX ) {
+								if( A >= SpriteX ) {
 									// 30A5
-									if( SpriteY_Bottom > mRoomSprites[SpriteNumber].mY ) {
-										if( (mRoomSprites[SpriteNumber].mY + mRoomSprites[SpriteNumber].mCollisionHeight) > SpriteY ) {
+									if( SpriteY_Bottom >= mRoomSprites[SpriteNumber].mY ) {
+										if( (mRoomSprites[SpriteNumber].mY + mRoomSprites[SpriteNumber].mCollisionHeight) >= SpriteY ) {
 												
 											Sprite_Collision( pSpriteNumber, SpriteNumber);
 											Sprite_Collision( SpriteNumber, pSpriteNumber );

@@ -146,15 +146,15 @@ void cScreen::bitmapRefresh() {
 		mBitmap->load( mBitmapBuffer, mBitmapColorData, mBitmapColorRam, mBitmapBackgroundColor );
 		mBitmapRedraw = false;
 	}
-	blit( mBitmap->mSurface, 24, 50, false, 0 );
+	blit( mBitmap->mSurface, 24, 50, false, -1 );
 }
 
-void cScreen::blit( cSprite *pSprite, byte pSpriteNo ) {
+void cScreen::blit( cSprite *pSprite, int pSpriteNo ) {
 	
 	blit( pSprite->_surface, pSprite->mX, pSprite->mY, pSprite->_rPriority, pSpriteNo );
 }
 
-void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority, byte pSpriteNo) {
+void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool pPriority, int pSpriteNo) {
 	bool			 col1 = false, col2 = false;
 
 	sScreenPiece	*dest = 0;
@@ -177,35 +177,34 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 			if( dest->mPriority == ePriority_None )
 				dest->mPriority = source->mPriority;
 
-			// Check for any collisions
-			if( source->mPriority != ePriority_None ) {
+			if (*sourceBuffer != 0 && *sourceBuffer != 0xFF) {
+				// Check for any collisions
+				if( source->mPriority != ePriority_None ) {
 
-				if( dest->mPriority == ePriority_Foreground || dest->mSprite ) {
-
-					// 
-					if(dest->mSprite && dest->mSprite2 != pSpriteNo) {
-						dest->mSprite2 = pSpriteNo; 
-						if(!col1) {
-							mCollisions.push_back( dest );
-							col1 = true;
+					if (dest->mPriority == ePriority_Foreground || dest->mSprite >= 0) {
+ 
+						if (dest->mSprite >= 0 && dest->mSprite2 != pSpriteNo) {
+							dest->mSprite2 = pSpriteNo;
+							if (!col1) {
+								mCollisions.push_back(dest);
+								col1 = true;
+							}
 						}
-					} else {
-						dest->mSprite = pSpriteNo;
-						if(!col2 && pSpriteNo) {
-							mCollisions.push_back( dest );
-							col2 = true;
+						else {
+							dest->mSprite = pSpriteNo;
+							if (!col2 && pSpriteNo != -1) {
+								mCollisions.push_back(dest);
+								col2 = true;
+							}
 						}
 					}
+
+					if (pSpriteNo >= 0 && dest->mSprite == -1)
+						dest->mSprite = pSpriteNo;
+					else if (pSpriteNo != dest->mSprite && dest->mSprite2 == -1)
+						dest->mSprite2 = pSpriteNo;
 				}
 
-				if( pSpriteNo && !dest->mSprite )
-					dest->mSprite = pSpriteNo;
-
-				else if( pSpriteNo != dest->mSprite && dest->mSprite)
-					dest->mSprite2 = pSpriteNo;
-			}
-
-			if( *sourceBuffer != 0 && *sourceBuffer != 0xFF) {
 
 				// Does this sprite have priority over the background?
 				if( !pPriority || ((dest->mPriority == ePriority_Background) && pPriority) ) {
