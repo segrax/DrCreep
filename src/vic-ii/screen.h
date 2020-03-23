@@ -30,6 +30,12 @@ class cSprite;
 class cScreenSurface;
 struct sScreenPiece;
 
+struct sBackgroundColor
+{
+	byte mStart, mStop;
+	byte mColor;
+};
+
 class cScreen {
 	byte					 *mBitmapBuffer, *mBitmapColorData, *mBitmapColorRam, mBitmapBackgroundColor;
 	dword					  mFPS, mFPSTotal, mFPSSeconds;
@@ -40,6 +46,7 @@ class cScreen {
 
 	SDL_Surface				*mSDLCursorSurface;
 
+	vector< sBackgroundColor > mBackgroundColors;
 	vector< sScreenPiece* >  mCollisions;
 	cSprite					*mSprites[8];
 
@@ -86,6 +93,7 @@ public:
 
 	inline void				 roomNumberSet( size_t pValue ) { mRoomNumber = (pValue + 1); windowTitleUpdate(); }
 
+	inline vector< sBackgroundColor > *backgroundColorsGet() { return &mBackgroundColors; }
 	inline vector< sScreenPiece* > *collisionsGet() { return &mCollisions; }
 	inline void						fullscreenToggle() {
 															mWindow->SetFullScreen();

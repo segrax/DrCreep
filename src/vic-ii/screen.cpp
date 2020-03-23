@@ -136,13 +136,12 @@ void cScreen::bitmapLoad( byte *pBuffer, byte *pColorData, byte *pColorRam, byte
 }
 
 void cScreen::bitmapRefresh() {
-	mSurface->WipeBuffer();
 
 	if (!mBitmapBuffer)
 		return;
 
 	if(mBitmapRedraw) {
-		clear();
+		mSpriteRedraw = true;
 		mBitmap->load( mBitmapBuffer, mBitmapColorData, mBitmapColorRam, mBitmapBackgroundColor );
 		mBitmapRedraw = false;
 	}
@@ -252,7 +251,17 @@ void cScreen::windowTitleUpdate() {
 void cScreen::refresh() {
 
 	if(( mBitmapRedraw || mSpriteRedraw) && !mTextRedraw) {
+		mSurface->WipeBuffer();
+		for (auto section : mBackgroundColors) {
+
+			for (int y = section.mStart; y < section.mStop; ++y) {
+				mSurface->pixelDraw(0, y, section.mColor, ePriority_Background, mSurface->GetWidth());
+			}
+		}
+
 		bitmapRefresh();
+
+
 		spriteDraw();
 	}
 

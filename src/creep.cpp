@@ -4405,6 +4405,13 @@ void cCreep::gameEscapeCastle() {
 
 	mMemory[ 0x1AE5 ] = A;
 	mMemory[ 0x1AE4 ] = 0;
+	
+	auto background = mScreen->backgroundColorsGet();
+
+	background->push_back({ 0x00, 0xA2, 0x00 });
+	background->push_back({ 0xA2, 0xCA, 0x0B });
+	background->push_back({ 0xCA, 0xD2, 0x09 });
+	background->push_back({ 0xD2, 0xFF, 0x0B });
 
 	// 19DF
 	for(;;) {
@@ -4480,6 +4487,7 @@ void cCreep::gameEscapeCastle() {
 
 	// 1AA7
 	//hw_IntSleep(0xA);
+	background->clear();
 }
 
 // 1B9F
