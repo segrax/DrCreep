@@ -511,7 +511,7 @@ void cCreep::optionsMenuPrepare() {
 	
 	mMemory[ 0x239A ] = mOptionsMenuCurrentItem - 4;
 
-	mOptionsMenuCurrentItem = 0x04;
+	mOptionsMenuCurrentItem = 0x08;
 	DisableSpritesAndStopSound();
 }
 
@@ -3620,17 +3620,6 @@ void cCreep::obj_stringPrint( ) {
 
 		mObjectPtr += 0x04;
 
-		// HACK: Seperate the text drawn on the tutorial rooms by 1 line
-		if (mCastle->nameGet() == "Tutorial") {
-
-			if (mMenuScreenTimer != 0 || mIntro == false) {
-				if (count) {
-					mTextYPos += (uint8) (1 * count);
-				}
-
-				++count;
-			}
-		}
 		StringPrint( );
 	}
 
@@ -4397,12 +4386,12 @@ void cCreep::gameEscapeCastle() {
 
 	mObjectPtr = 0x1AB3;
 	obj_stringPrint();
-
-	convertTimerToTime( mPlayersTime[mMemory[0x1AB2]] );
-
-	screenDraw(0, 0x93, 0x68, 0x18, 0 );
-	// 19AF
 	
+	// Draw Players Escape time
+	convertTimerToTime( mPlayersTime[mMemory[0x1AB2]] );
+	screenDraw(0, 0x93, 0x68, 0x18, 0 );
+	
+	// 19AF
 	byte Y = mMemory[ 0x1AB2 ];
 	byte X = mMemory[ 0x34D1 + Y ];
 	mRoomSprites[X].mY= 0x87;
