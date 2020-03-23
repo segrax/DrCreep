@@ -4406,7 +4406,7 @@ void cCreep::gameEscapeCastle() {
 	mMemory[ 0x1AE5 ] = A;
 	mMemory[ 0x1AE4 ] = 0;
 	
-	auto background = mScreen->backgroundColorsGet();
+	std::vector<sBackgroundColor>* background = mScreen->backgroundColorsGet();
 
 	background->push_back({ 0x00, 0xA2, 0x00 });
 	background->push_back({ 0xA2, 0xCA, 0x0B });

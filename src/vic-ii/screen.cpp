@@ -252,10 +252,10 @@ void cScreen::refresh() {
 
 	if(( mBitmapRedraw || mSpriteRedraw) && !mTextRedraw) {
 		mSurface->WipeBuffer();
-		for (auto section : mBackgroundColors) {
+		for (std::vector< sBackgroundColor>::iterator section = mBackgroundColors.begin(); section != mBackgroundColors.end(); ++section) {
 
-			for (int y = section.mStart; y < section.mStop; ++y) {
-				mSurface->pixelDraw(0, y, section.mColor, ePriority_Background, mSurface->GetWidth());
+			for (int y = section->mStart; y < section->mStop; ++y) {
+				mSurface->pixelDraw(0, y, section->mColor, ePriority_Background, mSurface->GetWidth());
 			}
 		}
 

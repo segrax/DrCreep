@@ -83,7 +83,7 @@ Section "Copy Files" drcreepInst
   File "..\License.txt"
   File "..\Readme.txt"
   File "..\run\creep.exe"
-  File "..\run\SDL.dll"
+  File "..\run\SDL2.dll"
 
   SetOutPath "$INSTDIR\data"
   File "..\run\data\char.rom"
@@ -165,7 +165,7 @@ Section "Uninstall"
     Delete "$INSTDIR\creep.exe"
     Delete "$INSTDIR\Uninstall.exe"
     Delete "$INSTDIR\Readme.txt"
-    Delete "$INSTDIR\SDL.dll"
+    Delete "$INSTDIR\SDL2.dll"
     Delete "$INSTDIR\data\*"
     Delete "$INSTDIR\data\castles\*"
 
