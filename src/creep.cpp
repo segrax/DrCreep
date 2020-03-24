@@ -3785,16 +3785,18 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 		byte byte38 = byte_38 & 0xFF, byte39 = ((byte_38 & 0xFF00) >> 8);
 
 		byte39 = A;
-		
+
+		byte38 >>= 1;
 		if( byte39 & 0x01 ) {
 			byte38 |= 0x80;
 		}
+		byte39 >>= 1;
 		byte38 >>= 1;
 		
 		if( byte39 & 0x01 ) {
 			byte38 |= 0x80;
 		}
-		byte38 >>= 1;
+
 		byte39 = A;
 
 		// 59C6
@@ -3834,9 +3836,6 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 			}
 		}
 
-		//if(!A)
-		//	A = pGfxPosY;
-		
 		// 5A2E
 		gfxPosTopY = A;
 
@@ -3899,13 +3898,13 @@ void cCreep::screenDraw( word pDecodeMode, word pGfxID, byte pGfxPosX, byte pGfx
 
 				// 5AB8
 				for( byte Y = 0;; ++Y ) {
-					if( gfxCurPos < 0x28 ) {
+					if( (int8_t) gfxCurPos < 0x28 ) {
 						
 						byte A = mMemory[ word_30 + Y ];
 						mMemory[ word_36 + Y] &= (A ^ 0xFF );
 					} 
 					// 5AC7
-					if( gfxCurPos == mTxtDestXRight )
+					if( (byte) gfxCurPos == mTxtDestXRight )
 						break;
 					
 					word_36 += 0x7;
@@ -3937,10 +3936,10 @@ s5AED:;
 
 				for( byte Y = 0; ; ++Y ) {
 					// 5B2E
-					if( gfxCurPos < 0x28 )
+					if((byte) gfxCurPos < 0x28 )
 						mMemory[ byte_36 + Y ] |= mMemory[ word_32 + Y ];
 
-					if( gfxCurPos == gfxPosRightX )
+					if((byte) gfxCurPos == gfxPosRightX )
 						break;
 
 					//5B43
@@ -3990,9 +3989,9 @@ noCarry2:;
 
 		if( gfxCurrentPosY < 0x19 ) {
 			
-			for( Y = 0, gfxCurPos = gfxDestX2; gfxCurPos <= gfxPosRightX; ++gfxCurPos, ++Y ) {
+			for( Y = 0, gfxCurPos = gfxDestX2; (int8_t)gfxCurPos <= (int8_t)gfxPosRightX; ++gfxCurPos, ++Y ) {
 			
-				if( gfxCurPos < 0x28 )
+				if((byte)gfxCurPos < 0x28 )
 					mMemory[ word_30 + Y ] = mMemory[ word_32 + Y ];
 			}
 		}
@@ -4035,9 +4034,9 @@ noCarry2:;
 		
 		if( gfxCurrentPosY < 0x19 ) {
 
-			for(Y = 0, gfxCurPos = gfxDestX2; gfxCurPos <= gfxPosRightX; ++gfxCurPos, ++Y) {
+			for(Y = 0, gfxCurPos = gfxDestX2; (int8_t)gfxCurPos <= (int8_t)gfxPosRightX; ++gfxCurPos, ++Y) {
 
-				if( gfxCurPos < 0x28 ) 
+				if((byte) gfxCurPos < 0x28 )
 					mMemory[ word_30 + Y ] = mMemory[ word_32 + Y ];
 			}
 		}
@@ -4406,8 +4405,8 @@ void cCreep::gameEscapeCastle() {
 	mMemory[ 0x1AE5 ] = A;
 	mMemory[ 0x1AE4 ] = 0;
 	
+	// Set the colors to draw the road
 	std::vector<sBackgroundColor>* background = mScreen->backgroundColorsGet();
-
 	background->push_back({ 0x00, 0xA2, 0x00 });
 	background->push_back({ 0xA2, 0xCA, 0x0B });
 	background->push_back({ 0xCA, 0xD2, 0x09 });

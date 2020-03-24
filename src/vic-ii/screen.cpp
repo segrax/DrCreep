@@ -173,43 +173,46 @@ void cScreen::blit( cScreenSurface *pSurface, size_t pDestX, size_t pDestY, bool
 		// Loop width
 		for( word x = 0; x < width; ++x ) {
 			
-			if( dest->mPriority == ePriority_None )
-				dest->mPriority = source->mPriority;
+			if (pDestX + x >=24 && pDestX + x <= 343) {
 
-			if (*sourceBuffer != 0 && *sourceBuffer != 0xFF) {
-				// Check for any collisions
-				if( source->mPriority != ePriority_None ) {
+				if (dest->mPriority == ePriority_None)
+					dest->mPriority = source->mPriority;
 
-					if (dest->mPriority == ePriority_Foreground || dest->mSprite >= 0) {
- 
-						if (dest->mSprite >= 0 && dest->mSprite2 != pSpriteNo) {
-							dest->mSprite2 = pSpriteNo;
-							if (!col1) {
-								mCollisions.push_back(dest);
-								col1 = true;
+				if (*sourceBuffer != 0 && *sourceBuffer != 0xFF) {
+					// Check for any collisions
+					if (source->mPriority != ePriority_None) {
+
+						if (dest->mPriority == ePriority_Foreground || dest->mSprite >= 0) {
+
+							if (dest->mSprite >= 0 && dest->mSprite2 != pSpriteNo) {
+								dest->mSprite2 = pSpriteNo;
+								if (!col1) {
+									mCollisions.push_back(dest);
+									col1 = true;
+								}
+							}
+							else {
+								dest->mSprite = pSpriteNo;
+								if (!col2 && pSpriteNo != -1) {
+									mCollisions.push_back(dest);
+									col2 = true;
+								}
 							}
 						}
-						else {
+
+						if (pSpriteNo >= 0 && dest->mSprite == -1)
 							dest->mSprite = pSpriteNo;
-							if (!col2 && pSpriteNo != -1) {
-								mCollisions.push_back(dest);
-								col2 = true;
-							}
-						}
+						else if (pSpriteNo != dest->mSprite && dest->mSprite2 == -1)
+							dest->mSprite2 = pSpriteNo;
 					}
 
-					if (pSpriteNo >= 0 && dest->mSprite == -1)
-						dest->mSprite = pSpriteNo;
-					else if (pSpriteNo != dest->mSprite && dest->mSprite2 == -1)
-						dest->mSprite2 = pSpriteNo;
-				}
 
+					// Does this sprite have priority over the background?
+					if (!pPriority || ((dest->mPriority == ePriority_Background) && pPriority)) {
+						*destBuffer = *sourceBuffer;
 
-				// Does this sprite have priority over the background?
-				if( !pPriority || ((dest->mPriority == ePriority_Background) && pPriority) ) {
-					*destBuffer = *sourceBuffer;
-
-					dest->mPriority = source->mPriority;
+						dest->mPriority = source->mPriority;
+					}
 				}
 			}
 
@@ -255,13 +258,11 @@ void cScreen::refresh() {
 		for (std::vector< sBackgroundColor>::iterator section = mBackgroundColors.begin(); section != mBackgroundColors.end(); ++section) {
 
 			for (int y = section->mStart; y < section->mStop; ++y) {
-				mSurface->pixelDraw(0, y, section->mColor, ePriority_Background, mSurface->GetWidth());
+				mSurface->pixelDraw(24, y, section->mColor, ePriority_Background, mSurface->GetWidth() - 26 - 20);
 			}
 		}
 
 		bitmapRefresh();
-
-
 		spriteDraw();
 	}
 
