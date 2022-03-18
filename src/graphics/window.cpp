@@ -63,7 +63,7 @@ bool cWindow::InitWindow(const std::string& pWindowTitle) {
 		return false;
 	}
 
-	mRenderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	mRenderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_SOFTWARE);
 	if (!mRenderer) {
 		std::cout << "Failed to create rendered\n";
 		exit(1);
@@ -216,6 +216,8 @@ void cWindow::EventCheck() {
 			break;
 
 		case SDL_CONTROLLERDEVICEREMOVED:
+			Event.mType = eEvent_JoyStickDisconnect;
+			Event.mSourceID = ControllerGet(SysEvent.cdevice.which);
 			ControllerRemove(SysEvent.cdevice.which);
 			break;
 
@@ -242,10 +244,10 @@ void cWindow::CalculateWindowSize() {
 	SetWindowSize(mWindow_Multiplier);
 }
 
-int16_t cWindow::CalculateFullscreenSize() {
+word cWindow::CalculateFullscreenSize() {
 	SDL_DisplayMode current;
 	SDL_GetCurrentDisplayMode(0, &current);
-	int16_t Multiplier = 1;
+	word Multiplier = 1;
 
 	while ((mOriginalResolution.mWidth * Multiplier) <= (unsigned int) current.w &&
 			(mOriginalResolution.mHeight * Multiplier) <= (unsigned int) current.h) {

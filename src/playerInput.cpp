@@ -83,6 +83,15 @@ void cPlayerInput::joystickSet( size_t pPlayer, int pJoystickNumber ) {
 
 void cPlayerInput::inputCheck( bool pClearAll, cEvent pEvent ) {
 
+	if (pEvent.mType == eEvent_JoyStickDisconnect) {
+		
+		if(mInput[0].mJoystick == pEvent.mSourceID)
+			mInput[0].mJoystick = -1;
+
+		if (mInput[1].mJoystick == pEvent.mSourceID)
+			mInput[1].mJoystick = -1;
+	}
+
 	if (pEvent.mType >= eEvent_JoyStickStart && pEvent.mType <= eEvent_JoyStickEnd) {
 		
 		if (g_Window.ControllerIsFree(pEvent.mSourceID)) {

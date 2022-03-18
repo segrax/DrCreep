@@ -47,7 +47,7 @@ public:
 	~cWindow();
 
 	void				CalculateWindowSize();
-	int16_t				CalculateFullscreenSize();
+	word				CalculateFullscreenSize();
 
 	bool				CanChangeToMultiplier(const size_t pNewMultiplier);
 

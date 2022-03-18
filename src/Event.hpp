@@ -42,7 +42,8 @@ enum eEventType {
 	eEvent_JoyButtonDown	= eEvent_JoyStickStart,
 	eEvent_JoyButtonUp		= 13,
 	eEvent_JoyMovement		= 14,
-	eEvent_JoyStickEnd		= eEvent_JoyMovement
+	eEvent_JoyStickEnd		= eEvent_JoyMovement,
+	eEvent_JoyStickDisconnect,
 };
 
 class cEvent {

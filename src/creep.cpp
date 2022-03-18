@@ -4285,6 +4285,7 @@ void cCreep::eventProcess( bool pResetKeys ) {
 			case eEvent_JoyButtonDown:
 			case eEvent_JoyButtonUp:
 			case eEvent_JoyMovement:
+			case eEvent_JoyStickDisconnect:
 				mInput->inputCheck( pResetKeys, *EventIT );
 				break;
 
